@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**07:24.349** total execution time for 39 files **from all galleries**:
+**07:25.568** total execution time for 39 files **from all galleries**:
 
 .. container::
 
@@ -50,11 +50,11 @@ Computation times
    * - :ref:`sphx_glr_auto_examples_dpd_simulations_plot_dpd_simulation.py` (``../examples/dpd_simulations/plot_dpd_simulation.py``)
      - 00:04.279
      - 0.0
+   * - :ref:`sphx_glr_auto_examples_force_balance_plot_entanglement_sampling_comparison.py` (``../examples/force_balance/plot_entanglement_sampling_comparison.py``)
+     - 00:02.957
+     - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_relaxation.py` (``../examples/force_balance/plot_force_relaxation.py``)
      - 00:02.929
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_force_balance_plot_entanglement_sampling_comparison.py` (``../examples/force_balance/plot_entanglement_sampling_comparison.py``)
-     - 00:01.738
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_sampling_cutoff_effect.py` (``../examples/force_balance/plot_sampling_cutoff_effect.py``)
      - 00:00.642

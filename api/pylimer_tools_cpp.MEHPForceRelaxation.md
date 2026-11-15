@@ -1,6 +1,6 @@
 # MEHPForceRelaxation
 
-### *class* pylimer_tools_cpp.MEHPForceRelaxation(self: [pylimer_tools_cpp.MEHPForceRelaxation](#pylimer_tools_cpp.MEHPForceRelaxation), universe: [pylimer_tools_cpp.Universe](pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2, is_2d: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False, force_evaluator: [pylimer_tools_cpp.MEHPForceEvaluator](pylimer_tools_cpp.MEHPForceEvaluator.md#pylimer_tools_cpp.MEHPForceEvaluator) = None, kappa: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1.0, remove_2functional_crosslinkers: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False, remove_dangling_chains: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False)
+### *class* pylimer_tools_cpp.MEHPForceRelaxation(\*args, \*\*kwargs)
 
 Bases: `pybind11_object`
 
@@ -12,19 +12,43 @@ Consequently, it offers a variety of configurable non-linear solvers using NLopt
 
 Please cite Gusev [[Gus19](../acknowledgements.md#id8)] if you use this method in your work.
 
-Instantiate the simulator for a certain universe.
+Overloaded function.
 
-* **Parameters:**
-  * **universe** – The universe to simulate with
-  * **crosslinker_type** – The atom type of the crosslinkers. Needed to reduce the network.
-  * **is2d** – Whether to ignore the z direction.
-  * **force_evaluator** – The force evaluator to use
-  * **kappa** – The spring constant
-  * **remove_2functional_crosslinkers** – Whether to replace two-functional crosslinkers with a “normal” chain bead
-  * **remove_dangling_chains** – Whether to remove dangling chains before running the simulation.
-    **Caution**: Removing the dangling chains will result in incorrect results fo the computation of
-    [`get_soluble_weight_fraction()`](#pylimer_tools_cpp.MEHPForceRelaxation.get_soluble_weight_fraction) and
-    [`get_dangling_weight_fraction()`](#pylimer_tools_cpp.MEHPForceRelaxation.get_dangling_weight_fraction)
+1. \_\_init_\_(self: pylimer_tools_cpp.MEHPForceRelaxation, universe: pylimer_tools_cpp.Universe, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, is_2d: bool = False, force_evaluator: pylimer_tools_cpp.MEHPForceEvaluator = None, kappa: typing.SupportsFloat | typing.SupportsIndex = 1.0, remove_2functional_crosslinkers: bool = False, remove_dangling_chains: bool = False) -> None
+   > Instantiate the simulator for a certain universe.
+   > * **param universe:**
+   >   The universe to simulate with
+   > * **param crosslinker_type:**
+   >   The atom type of the crosslinkers. Needed to reduce the network.
+   > * **param is2d:**
+   >   Whether to ignore the z direction.
+   > * **param force_evaluator:**
+   >   The force evaluator to use
+   > * **param kappa:**
+   >   The spring constant
+   > * **param remove_2functional_crosslinkers:**
+   >   Whether to replace two-functional crosslinkers with a “normal” chain bead
+   > * **param remove_dangling_chains:**
+   >   Whether to remove dangling chains before running the simulation.
+   >   **Caution**: Removing the dangling chains will result in incorrect results fo the computation of
+   >   [`get_soluble_weight_fraction()`](#pylimer_tools_cpp.MEHPForceRelaxation.get_soluble_weight_fraction) and
+   >   [`get_dangling_weight_fraction()`](#pylimer_tools_cpp.MEHPForceRelaxation.get_dangling_weight_fraction)
+2. \_\_init_\_(self: pylimer_tools_cpp.MEHPForceRelaxation, box: pylimer_tools_cpp.Box, crosslinker_universe: pylimer_tools_cpp.CrosslinkerUniverse, is_2d: bool = False, force_evaluator: pylimer_tools_cpp.MEHPForceEvaluator = None, kappa: typing.SupportsFloat | typing.SupportsIndex = 1.0, remove_dangling_chains: bool = False, include_free_chains: bool = True) -> None
+   > Instantiate the simulator from a Box and a CrosslinkerUniverse.
+   > * **param box:**
+   >   Simulation box
+   > * **param crosslinker_universe:**
+   >   Canonical CrosslinkerUniverse representation
+   > * **param is_2d:**
+   >   Whether to ignore the z direction
+   > * **param force_evaluator:**
+   >   The force evaluator to use
+   > * **param kappa:**
+   >   The spring constant
+   > * **param remove_dangling_chains:**
+   >   Whether to exclude dangling chains
+   > * **param include_free_chains:**
+   >   Whether to include free/soluble chains
 
 ### Attributes Summary
 

@@ -1,6 +1,6 @@
 # MEHPForceBalance
 
-### *class* pylimer_tools_cpp.MEHPForceBalance(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), universe: [pylimer_tools_cpp.Universe](pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2, is_2d: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False, remove_2functional_crosslinkers: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False, remove_dangling_chains: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False)
+### *class* pylimer_tools_cpp.MEHPForceBalance(\*args, \*\*kwargs)
 
 Bases: `pybind11_object`
 
@@ -14,15 +14,34 @@ or remain fixed at their contour positions (via `disable_slipping=True`).
 See [Nomenclature](../nomenclature.md) for details on entanglement terminology and the rationale
 for fixed links, and cite Bernhard and Gusev [[BG25](../acknowledgements.md#id12)] if you use this method.
 
-Instantiate the simulator for a certain universe.
+Overloaded function.
 
-* **Parameters:**
-  * **universe** – The universe to simulate with
-  * **crosslinker_type** – The atom type of the crosslinkers. Needed to reduce the network.
-  * **is2D** – Whether to ignore the z direction.
-  * **kappa** – The spring constant
-  * **remove_2functionalCrosslinkers** – whether to keep or remove the 2-functional crosslinkers when setting up the network
-  * **remove_dangling_chains** – whether to keep or remove obviously dangling chains when setting up the network
+1. \_\_init_\_(self: pylimer_tools_cpp.MEHPForceBalance, universe: pylimer_tools_cpp.Universe, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, is_2d: bool = False, remove_2functional_crosslinkers: bool = False, remove_dangling_chains: bool = False) -> None
+   > Instantiate the simulator for a certain universe.
+   > * **param universe:**
+   >   The universe to simulate with
+   > * **param crosslinker_type:**
+   >   The atom type of the crosslinkers. Needed to reduce the network.
+   > * **param is2D:**
+   >   Whether to ignore the z direction.
+   > * **param kappa:**
+   >   The spring constant
+   > * **param remove_2functionalCrosslinkers:**
+   >   whether to keep or remove the 2-functional crosslinkers when setting up the network
+   > * **param remove_dangling_chains:**
+   >   whether to keep or remove obviously dangling chains when setting up the network
+2. \_\_init_\_(self: pylimer_tools_cpp.MEHPForceBalance, box: pylimer_tools_cpp.Box, crosslinker_universe: pylimer_tools_cpp.CrosslinkerUniverse, is_2d: bool = False, remove_dangling_chains: bool = False, include_free_chains: bool = True) -> None
+   > Instantiate the simulator from a Box and a CrosslinkerUniverse.
+   > * **param box:**
+   >   Simulation box
+   > * **param crosslinker_universe:**
+   >   Canonical CrosslinkerUniverse representation
+   > * **param is_2d:**
+   >   Whether to ignore the z direction
+   > * **param remove_dangling_chains:**
+   >   Whether to exclude dangling chains
+   > * **param include_free_chains:**
+   >   Whether to include free/soluble chains
 
 ### Attributes Summary
 

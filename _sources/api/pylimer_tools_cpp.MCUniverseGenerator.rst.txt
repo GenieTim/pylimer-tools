@@ -20,9 +20,15 @@ MCUniverseGenerator
       ~MCUniverseGenerator.add_solvent_chains
       ~MCUniverseGenerator.add_star_crosslinkers
       ~MCUniverseGenerator.add_strands
+      ~MCUniverseGenerator.compute_bond_length_stats
+      ~MCUniverseGenerator.compute_end_to_end_stats
+      ~MCUniverseGenerator.compute_strand_bond_counts
       ~MCUniverseGenerator.config_nr_of_mc_steps
       ~MCUniverseGenerator.config_primary_loop_probability
       ~MCUniverseGenerator.config_secondary_loop_probability
+      ~MCUniverseGenerator.count_atom_types
+      ~MCUniverseGenerator.count_atoms_by_degree
+      ~MCUniverseGenerator.determine_effective_functionality_per_type
       ~MCUniverseGenerator.disable_max_distance
       ~MCUniverseGenerator.get_box
       ~MCUniverseGenerator.get_crosslinker_universe
@@ -69,9 +75,15 @@ MCUniverseGenerator
    .. automethod:: add_solvent_chains
    .. automethod:: add_star_crosslinkers
    .. automethod:: add_strands
+   .. automethod:: compute_bond_length_stats
+   .. automethod:: compute_end_to_end_stats
+   .. automethod:: compute_strand_bond_counts
    .. automethod:: config_nr_of_mc_steps
    .. automethod:: config_primary_loop_probability
    .. automethod:: config_secondary_loop_probability
+   .. automethod:: count_atom_types
+   .. automethod:: count_atoms_by_degree
+   .. automethod:: determine_effective_functionality_per_type
    .. automethod:: disable_max_distance
    .. automethod:: get_box
    .. automethod:: get_crosslinker_universe

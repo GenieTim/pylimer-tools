@@ -313,6 +313,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.randomly_sample_entanglements_analytical.html">randomly_sample_entanglements_analytical</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.randomly_sample_entanglements_on_demand.html">randomly_sample_entanglements_on_demand</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.randomly_sample_entanglements_v2.html">randomly_sample_entanglements_v2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.sample_strand_beads_on_demand.html">sample_strand_beads_on_demand</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.split_csv.html">split_csv</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.version_information.html">version_information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.Atom.html">Atom</a></li>
@@ -320,6 +321,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.AtomStyle.html">AtomStyle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.AveFileReader.html">AveFileReader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.BackTrackStatus.html">BackTrackStatus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.BondLengthStats.html">BondLengthStats</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.Box.html">Box</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.ComputedDoubleValues.html">ComputedDoubleValues</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.ComputedIntValues.html">ComputedIntValues</a></li>
@@ -328,6 +330,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.DataFileReader.html">DataFileReader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.DataFileWriter.html">DataFileWriter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.DumpFileReader.html">DumpFileReader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.EndToEndStats.html">EndToEndStats</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.EntanglementFilteringMode.html">EntanglementFilteringMode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.EntanglementSamplingMethod.html">EntanglementSamplingMethod</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.ExitReason.html">ExitReason</a></li>
@@ -357,6 +360,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedBalance2Network.html">SimplifiedBalance2Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedBalanceNetwork.html">SimplifiedBalanceNetwork</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedNetwork.html">SimplifiedNetwork</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.StrandCategory.html">StrandCategory</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.StrandPairEntanglements.html">StrandPairEntanglements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.StructureSimplificationMode.html">StructureSimplificationMode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.Universe.html">Universe</a></li>
@@ -418,30 +422,75 @@
 <h1>MEHPForceRelaxation<a class="headerlink" href="#mehpforcerelaxation" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceRelaxation">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">MEHPForceRelaxation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation" title="pylimer_tools_cpp.MEHPForceRelaxation"><span class="pre">pylimer_tools_cpp.MEHPForceRelaxation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">universe</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="pre">pylimer_tools_cpp.Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinker_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsInt" title="(in Python v3.15)"><span class="pre">SupportsInt</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsIndex" title="(in Python v3.15)"><span class="pre">SupportsIndex</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_2d</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_evaluator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.MEHPForceEvaluator.html#pylimer_tools_cpp.MEHPForceEvaluator" title="pylimer_tools_cpp.MEHPForceEvaluator"><span class="pre">pylimer_tools_cpp.MEHPForceEvaluator</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kappa</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsFloat" title="(in Python v3.15)"><span class="pre">SupportsFloat</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsIndex" title="(in Python v3.15)"><span class="pre">SupportsIndex</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_2functional_crosslinkers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_dangling_chains</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceRelaxation" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">MEHPForceRelaxation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceRelaxation" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
 <p>A small simulation tool for quickly minimizing the force between the crosslinker beads.</p>
 <p>This is the first of three force relaxation methods available in this library.
 The relevant feature of this implementation is the configurable spring potential.
 Consequently, it offers a variety of configurable non-linear solvers using NLoptLib.</p>
 <p>Please cite <span class="bibtex-citation" id="id1">Gusev [<a class="reference internal" href="../acknowledgements.html#id8" title="Andrei A. Gusev. Numerical Estimates of the Topological Effects in the Elasticity of Gaussian Polymer Networks and Their Exact Theoretical Description. Macromolecules, 52(9):3244–3251, May 2019. doi:10.1021/acs.macromol.9b00262.">Gus19</a>]</span> if you use this method in your work.</p>
-<p>Instantiate the simulator for a certain universe.</p>
+<p>Overloaded function.</p>
+<ol class="arabic">
+<li><p>__init__(self: pylimer_tools_cpp.MEHPForceRelaxation, universe: pylimer_tools_cpp.Universe, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, is_2d: bool = False, force_evaluator: pylimer_tools_cpp.MEHPForceEvaluator = None, kappa: typing.SupportsFloat | typing.SupportsIndex = 1.0, remove_2functional_crosslinkers: bool = False, remove_dangling_chains: bool = False) -&gt; None</p>
+<blockquote>
+<div><p>Instantiate the simulator for a certain universe.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.params.universe"></span><strong>universe</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.params.universe">¶</a> – The universe to simulate with</p></li>
-<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.params.crosslinker_type">¶</a> – The atom type of the crosslinkers. Needed to reduce the network.</p></li>
-<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.params.is2d"></span><strong>is2d</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.params.is2d">¶</a> – Whether to ignore the z direction.</p></li>
-<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.params.force_evaluator"></span><strong>force_evaluator</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.params.force_evaluator">¶</a> – The force evaluator to use</p></li>
-<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.params.kappa"></span><strong>kappa</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.params.kappa">¶</a> – The spring constant</p></li>
-<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.params.remove_2functional_crosslinkers"></span><strong>remove_2functional_crosslinkers</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.params.remove_2functional_crosslinkers">¶</a> – Whether to replace two-functional crosslinkers with a “normal” chain bead</p></li>
-<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.params.remove_dangling_chains"></span><strong>remove_dangling_chains</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.params.remove_dangling_chains">¶</a> – Whether to remove dangling chains before running the simulation.
+<dt class="field-odd">param universe<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The universe to simulate with</p>
+</dd>
+<dt class="field-even">param crosslinker_type<span class="colon">:</span></dt>
+<dd class="field-even"><p>The atom type of the crosslinkers. Needed to reduce the network.</p>
+</dd>
+<dt class="field-odd">param is2d<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Whether to ignore the z direction.</p>
+</dd>
+<dt class="field-even">param force_evaluator<span class="colon">:</span></dt>
+<dd class="field-even"><p>The force evaluator to use</p>
+</dd>
+<dt class="field-odd">param kappa<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The spring constant</p>
+</dd>
+<dt class="field-even">param remove_2functional_crosslinkers<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether to replace two-functional crosslinkers with a “normal” chain bead</p>
+</dd>
+<dt class="field-odd">param remove_dangling_chains<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Whether to remove dangling chains before running the simulation.
 <strong>Caution</strong>: Removing the dangling chains will result in incorrect results fo the computation of
 <a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_soluble_weight_fraction" title="pylimer_tools_cpp.MEHPForceRelaxation.get_soluble_weight_fraction"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_soluble_weight_fraction()</span></code></a> and
-<a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_dangling_weight_fraction" title="pylimer_tools_cpp.MEHPForceRelaxation.get_dangling_weight_fraction"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_dangling_weight_fraction()</span></code></a></p></li>
-</ul>
+<a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_dangling_weight_fraction" title="pylimer_tools_cpp.MEHPForceRelaxation.get_dangling_weight_fraction"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_dangling_weight_fraction()</span></code></a></p>
 </dd>
 </dl>
+</div></blockquote>
+</li>
+<li><p>__init__(self: pylimer_tools_cpp.MEHPForceRelaxation, box: pylimer_tools_cpp.Box, crosslinker_universe: pylimer_tools_cpp.CrosslinkerUniverse, is_2d: bool = False, force_evaluator: pylimer_tools_cpp.MEHPForceEvaluator = None, kappa: typing.SupportsFloat | typing.SupportsIndex = 1.0, remove_dangling_chains: bool = False, include_free_chains: bool = True) -&gt; None</p>
+<blockquote>
+<div><p>Instantiate the simulator from a Box and a CrosslinkerUniverse.</p>
+<dl class="field-list simple">
+<dt class="field-odd">param box<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Simulation box</p>
+</dd>
+<dt class="field-even">param crosslinker_universe<span class="colon">:</span></dt>
+<dd class="field-even"><p>Canonical CrosslinkerUniverse representation</p>
+</dd>
+<dt class="field-odd">param is_2d<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Whether to ignore the z direction</p>
+</dd>
+<dt class="field-even">param force_evaluator<span class="colon">:</span></dt>
+<dd class="field-even"><p>The force evaluator to use</p>
+</dd>
+<dt class="field-odd">param kappa<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The spring constant</p>
+</dd>
+<dt class="field-even">param remove_dangling_chains<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether to exclude dangling chains</p>
+</dd>
+<dt class="field-odd">param include_free_chains<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Whether to include free/soluble chains</p>
+</dd>
+</dl>
+</div></blockquote>
+</li>
+</ol>
 <p class="rubric">Attributes Summary</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">

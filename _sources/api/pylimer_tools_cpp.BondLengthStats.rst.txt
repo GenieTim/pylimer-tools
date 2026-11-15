@@ -1,0 +1,25 @@
+BondLengthStats
+===============
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: BondLengthStats
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~BondLengthStats.max_bond_length
+      ~BondLengthStats.mean_bond_length
+      ~BondLengthStats.mean_squared_bond_length
+      ~BondLengthStats.min_bond_length
+      ~BondLengthStats.nr_of_bonds
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: max_bond_length
+   .. autoattribute:: mean_bond_length
+   .. autoattribute:: mean_squared_bond_length
+   .. autoattribute:: min_bond_length
+   .. autoattribute:: nr_of_bonds

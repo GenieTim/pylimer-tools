@@ -313,6 +313,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.randomly_sample_entanglements_analytical.html">randomly_sample_entanglements_analytical</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.randomly_sample_entanglements_on_demand.html">randomly_sample_entanglements_on_demand</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.randomly_sample_entanglements_v2.html">randomly_sample_entanglements_v2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.sample_strand_beads_on_demand.html">sample_strand_beads_on_demand</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.split_csv.html">split_csv</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.version_information.html">version_information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.Atom.html">Atom</a></li>
@@ -320,6 +321,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.AtomStyle.html">AtomStyle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.AveFileReader.html">AveFileReader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.BackTrackStatus.html">BackTrackStatus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.BondLengthStats.html">BondLengthStats</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.Box.html">Box</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.ComputedDoubleValues.html">ComputedDoubleValues</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.ComputedIntValues.html">ComputedIntValues</a></li>
@@ -328,6 +330,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.DataFileReader.html">DataFileReader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.DataFileWriter.html">DataFileWriter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.DumpFileReader.html">DumpFileReader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.EndToEndStats.html">EndToEndStats</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.EntanglementFilteringMode.html">EntanglementFilteringMode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.EntanglementSamplingMethod.html">EntanglementSamplingMethod</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.ExitReason.html">ExitReason</a></li>
@@ -357,6 +360,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedBalance2Network.html">SimplifiedBalance2Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedBalanceNetwork.html">SimplifiedBalanceNetwork</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedNetwork.html">SimplifiedNetwork</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.StrandCategory.html">StrandCategory</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.StrandPairEntanglements.html">StrandPairEntanglements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.StructureSimplificationMode.html">StructureSimplificationMode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.Universe.html">Universe</a></li>
@@ -418,7 +422,7 @@
 <h1>MEHPForceBalance<a class="headerlink" href="#mehpforcebalance" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceBalance">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">MEHPForceBalance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance" title="pylimer_tools_cpp.MEHPForceBalance"><span class="pre">pylimer_tools_cpp.MEHPForceBalance</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">universe</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="pre">pylimer_tools_cpp.Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinker_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsInt" title="(in Python v3.15)"><span class="pre">SupportsInt</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsIndex" title="(in Python v3.15)"><span class="pre">SupportsIndex</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_2d</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_2functional_crosslinkers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_dangling_chains</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceBalance" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">MEHPForceBalance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceBalance" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
 <p>A small simulation tool for quickly minimizing the force between the crosslinker beads.</p>
 <p>This is the second implementation in the group of MEHP provided by this package.
@@ -427,19 +431,56 @@ with the option to dynamically slip along the two associated strands (via <code 
 or remain fixed at their contour positions (via <code class="docutils literal notranslate"><span class="pre">disable_slipping=True</span></code>).</p>
 <p>See <a class="reference internal" href="../nomenclature.html"><span class="doc">Nomenclature</span></a> for details on entanglement terminology and the rationale
 for fixed links, and cite <span class="bibtex-citation" id="id1">Bernhard and Gusev [<a class="reference internal" href="../acknowledgements.html#id12" title="Tim Bernhard and Andrei A. Gusev. Phantom force balance procedure for predicting the modulus of entangled polymer networks. ACS Polymers Au, 2025. doi:10.1021/acspolymersau.5c00036.">BG25</a>]</span> if you use this method.</p>
-<p>Instantiate the simulator for a certain universe.</p>
+<p>Overloaded function.</p>
+<ol class="arabic">
+<li><p>__init__(self: pylimer_tools_cpp.MEHPForceBalance, universe: pylimer_tools_cpp.Universe, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, is_2d: bool = False, remove_2functional_crosslinkers: bool = False, remove_dangling_chains: bool = False) -&gt; None</p>
+<blockquote>
+<div><p>Instantiate the simulator for a certain universe.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.params.universe"></span><strong>universe</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.params.universe">¶</a> – The universe to simulate with</p></li>
-<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.params.crosslinker_type">¶</a> – The atom type of the crosslinkers. Needed to reduce the network.</p></li>
-<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.params.is2D"></span><strong>is2D</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.params.is2D">¶</a> – Whether to ignore the z direction.</p></li>
-<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.params.kappa"></span><strong>kappa</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.params.kappa">¶</a> – The spring constant</p></li>
-<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.params.remove_2functionalCrosslinkers"></span><strong>remove_2functionalCrosslinkers</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.params.remove_2functionalCrosslinkers">¶</a> – whether to keep or remove the 2-functional crosslinkers when setting up the network</p></li>
-<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.params.remove_dangling_chains"></span><strong>remove_dangling_chains</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.params.remove_dangling_chains">¶</a> – whether to keep or remove obviously dangling chains when setting up the network</p></li>
-</ul>
+<dt class="field-odd">param universe<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The universe to simulate with</p>
+</dd>
+<dt class="field-even">param crosslinker_type<span class="colon">:</span></dt>
+<dd class="field-even"><p>The atom type of the crosslinkers. Needed to reduce the network.</p>
+</dd>
+<dt class="field-odd">param is2D<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Whether to ignore the z direction.</p>
+</dd>
+<dt class="field-even">param kappa<span class="colon">:</span></dt>
+<dd class="field-even"><p>The spring constant</p>
+</dd>
+<dt class="field-odd">param remove_2functionalCrosslinkers<span class="colon">:</span></dt>
+<dd class="field-odd"><p>whether to keep or remove the 2-functional crosslinkers when setting up the network</p>
+</dd>
+<dt class="field-even">param remove_dangling_chains<span class="colon">:</span></dt>
+<dd class="field-even"><p>whether to keep or remove obviously dangling chains when setting up the network</p>
 </dd>
 </dl>
+</div></blockquote>
+</li>
+<li><p>__init__(self: pylimer_tools_cpp.MEHPForceBalance, box: pylimer_tools_cpp.Box, crosslinker_universe: pylimer_tools_cpp.CrosslinkerUniverse, is_2d: bool = False, remove_dangling_chains: bool = False, include_free_chains: bool = True) -&gt; None</p>
+<blockquote>
+<div><p>Instantiate the simulator from a Box and a CrosslinkerUniverse.</p>
+<dl class="field-list simple">
+<dt class="field-odd">param box<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Simulation box</p>
+</dd>
+<dt class="field-even">param crosslinker_universe<span class="colon">:</span></dt>
+<dd class="field-even"><p>Canonical CrosslinkerUniverse representation</p>
+</dd>
+<dt class="field-odd">param is_2d<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Whether to ignore the z direction</p>
+</dd>
+<dt class="field-even">param remove_dangling_chains<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether to exclude dangling chains</p>
+</dd>
+<dt class="field-odd">param include_free_chains<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Whether to include free/soluble chains</p>
+</dd>
+</dl>
+</div></blockquote>
+</li>
+</ol>
 <p class="rubric">Attributes Summary</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">

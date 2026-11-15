@@ -313,6 +313,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.randomly_sample_entanglements_analytical.html">randomly_sample_entanglements_analytical</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.randomly_sample_entanglements_on_demand.html">randomly_sample_entanglements_on_demand</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.randomly_sample_entanglements_v2.html">randomly_sample_entanglements_v2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.sample_strand_beads_on_demand.html">sample_strand_beads_on_demand</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.split_csv.html">split_csv</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.version_information.html">version_information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.Atom.html">Atom</a></li>
@@ -320,6 +321,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.AtomStyle.html">AtomStyle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.AveFileReader.html">AveFileReader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.BackTrackStatus.html">BackTrackStatus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.BondLengthStats.html">BondLengthStats</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.Box.html">Box</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.ComputedDoubleValues.html">ComputedDoubleValues</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.ComputedIntValues.html">ComputedIntValues</a></li>
@@ -328,6 +330,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.DataFileReader.html">DataFileReader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.DataFileWriter.html">DataFileWriter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.DumpFileReader.html">DumpFileReader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.EndToEndStats.html">EndToEndStats</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.EntanglementFilteringMode.html">EntanglementFilteringMode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.EntanglementSamplingMethod.html">EntanglementSamplingMethod</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.ExitReason.html">ExitReason</a></li>
@@ -357,6 +360,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedBalance2Network.html">SimplifiedBalance2Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedBalanceNetwork.html">SimplifiedBalanceNetwork</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedNetwork.html">SimplifiedNetwork</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.StrandCategory.html">StrandCategory</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.StrandPairEntanglements.html">StrandPairEntanglements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.StructureSimplificationMode.html">StructureSimplificationMode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.Universe.html">Universe</a></li>
@@ -472,6 +476,37 @@ without slipping along the chain contour (see <a class="reference internal" href
 </dd>
 <dt class="field-odd">param entanglements_as_springs<span class="colon">:</span></dt>
 <dd class="field-odd"><p>whether to use the entanglements as springs instead of links</p>
+</dd>
+</dl>
+</div></blockquote>
+</li>
+<li><p>__init__(self: pylimer_tools_cpp.MEHPForceBalance2, box: pylimer_tools_cpp.Box, crosslinker_universe: pylimer_tools_cpp.CrosslinkerUniverse, entanglements: pylimer_tools_cpp.StrandPairEntanglements = StrandPairEntanglements(), crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, is_2d: bool = False, entanglements_as_springs: bool = False, remove_dangling_chains: bool = False, include_free_chains: bool = True) -&gt; None</p>
+<blockquote>
+<div><p>Instantiate the simulator from a Box, a CrosslinkerUniverse, and StrandPairEntanglements.</p>
+<dl class="field-list simple">
+<dt class="field-odd">param box<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Simulation box</p>
+</dd>
+<dt class="field-even">param crosslinker_universe<span class="colon">:</span></dt>
+<dd class="field-even"><p>Canonical CrosslinkerUniverse representation</p>
+</dd>
+<dt class="field-odd">param entanglements<span class="colon">:</span></dt>
+<dd class="field-odd"><p>StrandPairEntanglements along strands</p>
+</dd>
+<dt class="field-even">param crosslinker_type<span class="colon">:</span></dt>
+<dd class="field-even"><p>The atom type of crosslinkers</p>
+</dd>
+<dt class="field-odd">param is_2d<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Whether to ignore the z direction</p>
+</dd>
+<dt class="field-even">param entanglements_as_springs<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether to model entanglements as springs instead of merged links</p>
+</dd>
+<dt class="field-odd">param remove_dangling_chains<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Whether to exclude dangling chains</p>
+</dd>
+<dt class="field-even">param include_free_chains<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether to include free/soluble chains</p>
 </dd>
 </dl>
 </div></blockquote>

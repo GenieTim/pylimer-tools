@@ -41,9 +41,15 @@ Initialize a new MCUniverseGenerator with specified box dimensions.
 | [`add_solvent_chains`](#pylimer_tools_cpp.MCUniverseGenerator.add_solvent_chains)(self, ...[, ...])                | Randomly distribute additional, free chains.                                                                                                                           |
 | [`add_star_crosslinkers`](#pylimer_tools_cpp.MCUniverseGenerator.add_star_crosslinkers)(self, nr_of_stars, ...)       | Add star-like crosslinkers with pre-connected strands (useful e.g. for tetra-PEG networks).                                                                            |
 | [`add_strands`](#pylimer_tools_cpp.MCUniverseGenerator.add_strands)(self, nr_of_strands, strand_lengths)    | Add strands.                                                                                                                                                           |
+| [`compute_bond_length_stats`](#pylimer_tools_cpp.MCUniverseGenerator.compute_bond_length_stats)(self)                     | Stream over strands in O(1) strand memory to compute realized bond length statistics without constructing a Universe.                                                  |
+| [`compute_end_to_end_stats`](#pylimer_tools_cpp.MCUniverseGenerator.compute_end_to_end_stats)(self[, category])          | Stream over strands matching category to compute end-to-end distance statistics without constructing a Universe.                                                       |
+| [`compute_strand_bond_counts`](#pylimer_tools_cpp.MCUniverseGenerator.compute_strand_bond_counts)(self[, category])        | Return the number of bonds for each strand matching category.                                                                                                          |
 | [`config_nr_of_mc_steps`](#pylimer_tools_cpp.MCUniverseGenerator.config_nr_of_mc_steps)(self[, n_steps])              | Set the number of Monte-Carlo steps during bond length equilibration.                                                                                                  |
 | [`config_primary_loop_probability`](#pylimer_tools_cpp.MCUniverseGenerator.config_primary_loop_probability)(self[, ...])        | Configure an additional weight reduction for the primary loop formation.                                                                                               |
 | [`config_secondary_loop_probability`](#pylimer_tools_cpp.MCUniverseGenerator.config_secondary_loop_probability)(self[, ...])      | Configure an additional weight reduction for the secondary loop formation.                                                                                             |
+| [`count_atom_types`](#pylimer_tools_cpp.MCUniverseGenerator.count_atom_types)(self)                              | Count atoms per atom type without constructing a Universe.                                                                                                             |
+| [`count_atoms_by_degree`](#pylimer_tools_cpp.MCUniverseGenerator.count_atoms_by_degree)(self)                         | Count atoms per bond degree without constructing a Universe.                                                                                                           |
+| [`determine_effective_functionality_per_type`](#pylimer_tools_cpp.MCUniverseGenerator.determine_effective_functionality_per_type)(self)    | Compute effective functionality (mean degree) per atom type without constructing a Universe.                                                                           |
 | [`disable_max_distance`](#pylimer_tools_cpp.MCUniverseGenerator.disable_max_distance)(self)                          | Disable the maximum distance provider to allow unlimited distance sampling.                                                                                            |
 | [`get_box`](#pylimer_tools_cpp.MCUniverseGenerator.get_box)(self)                                       | Get the simulation box of the generator.                                                                                                                               |
 | [`get_crosslinker_universe`](#pylimer_tools_cpp.MCUniverseGenerator.get_crosslinker_universe)(self)                      | Get a copy of the internal CrosslinkerUniverse (crosslinker coordinates and strand topology) without instantiating individual strand beads or constructing a Universe. |
@@ -227,6 +233,33 @@ To link them to crosslinkers, use some of the `link_strand_` methods.
   * **strand_lengths** – A list of integers representing the number of beads of each of the strands.
   * **strand_atom_type** – Type of atoms for the strands (default: 1).
 
+#### compute_bond_length_stats(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator)) → [pylimer_tools_cpp.BondLengthStats](pylimer_tools_cpp.BondLengthStats.html.md#pylimer_tools_cpp.BondLengthStats)
+
+Stream over strands in O(1) strand memory to compute realized bond length statistics
+without constructing a Universe.
+
+* **Returns:**
+  BondLengthStats object.
+
+#### compute_end_to_end_stats(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), category: [pylimer_tools_cpp.StrandCategory](pylimer_tools_cpp.StrandCategory.html.md#pylimer_tools_cpp.StrandCategory) = StrandCategory.NETWORK_STRAND) → [pylimer_tools_cpp.EndToEndStats](pylimer_tools_cpp.EndToEndStats.html.md#pylimer_tools_cpp.EndToEndStats)
+
+Stream over strands matching category to compute end-to-end distance statistics
+without constructing a Universe.
+
+* **Parameters:**
+  **category** – StrandCategory filter (default: NETWORK_STRAND).
+* **Returns:**
+  EndToEndStats object.
+
+#### compute_strand_bond_counts(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), category: [pylimer_tools_cpp.StrandCategory](pylimer_tools_cpp.StrandCategory.html.md#pylimer_tools_cpp.StrandCategory) = StrandCategory.ALL) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[int](https://docs.python.org/3/builtins/functions.html#int)]
+
+Return the number of bonds for each strand matching category.
+
+* **Parameters:**
+  **category** – StrandCategory filter (default: ALL).
+* **Returns:**
+  List of bond counts per matching strand.
+
 #### config_nr_of_mc_steps(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), n_steps: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Set the number of Monte-Carlo steps during bond length equilibration.
@@ -251,6 +284,27 @@ Defaults to 1., which means the general $P(\vec{R})$ is used without any bias.
 This results in more secondary loops for shorter chains than for longer ones.
 
 Set to 0. to disable the formation of secondary loops.
+
+#### count_atom_types(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator)) → [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[int](https://docs.python.org/3/builtins/functions.html#int), [int](https://docs.python.org/3/builtins/functions.html#int)]
+
+Count atoms per atom type without constructing a Universe.
+
+* **Returns:**
+  Dict mapping atom type to count.
+
+#### count_atoms_by_degree(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator)) → [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[int](https://docs.python.org/3/builtins/functions.html#int), [int](https://docs.python.org/3/builtins/functions.html#int)]
+
+Count atoms per bond degree without constructing a Universe.
+
+* **Returns:**
+  Dict mapping degree to atom count.
+
+#### determine_effective_functionality_per_type(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator)) → [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[int](https://docs.python.org/3/builtins/functions.html#int), [float](https://docs.python.org/3/builtins/functions.html#float)]
+
+Compute effective functionality (mean degree) per atom type without constructing a Universe.
+
+* **Returns:**
+  Dict mapping atom type to mean degree.
 
 #### disable_max_distance(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator)) → [None](https://docs.python.org/3/builtins/constants.html#None)
 

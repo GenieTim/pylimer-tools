@@ -263,6 +263,7 @@
 - [randomly_sample_entanglements_analytical](api/pylimer_tools_cpp.randomly_sample_entanglements_analytical.html.md): Overloaded function.
 - [randomly_sample_entanglements_on_demand](api/pylimer_tools_cpp.randomly_sample_entanglements_on_demand.html.md): Overloaded function.
 - [randomly_sample_entanglements_v2](api/pylimer_tools_cpp.randomly_sample_entanglements_v2.html.md): Alias for randomly_sample_entanglements (v2 has been unified into standard method).
+- [sample_strand_beads_on_demand](api/pylimer_tools_cpp.sample_strand_beads_on_demand.html.md): Deterministically realize the internal bead coordinates of a single strand
 - [split_csv](api/pylimer_tools_cpp.split_csv.html.md): Read a file containing a number of CSVs. Returns them split up.
 - [version_information](api/pylimer_tools_cpp.version_information.html.md): Returns  a string of the the current version, incl. git hash and date of compilation.
 - [Atom](api/pylimer_tools_cpp.Atom.html.md): Bases: &#96;pybind11_object&#96;
@@ -270,6 +271,7 @@
 - [AtomStyle](api/pylimer_tools_cpp.AtomStyle.html.md): Bases: &#96;Enum&#96;
 - [AveFileReader](api/pylimer_tools_cpp.AveFileReader.html.md): Bases: &#96;pybind11_object&#96;
 - [BackTrackStatus](api/pylimer_tools_cpp.BackTrackStatus.html.md): Bases: &#96;Enum&#96;
+- [BondLengthStats](api/pylimer_tools_cpp.BondLengthStats.html.md): Bases: &#96;pybind11_object&#96;
 - [Box](api/pylimer_tools_cpp.Box.html.md): Bases: &#96;pybind11_object&#96;
 - [ComputedDoubleValues](api/pylimer_tools_cpp.ComputedDoubleValues.html.md): Bases: &#96;IntEnum&#96;
 - [ComputedIntValues](api/pylimer_tools_cpp.ComputedIntValues.html.md): Bases: &#96;IntEnum&#96;
@@ -278,6 +280,7 @@
 - [DataFileReader](api/pylimer_tools_cpp.DataFileReader.html.md): Bases: &#96;pybind11_object&#96;
 - [DataFileWriter](api/pylimer_tools_cpp.DataFileWriter.html.md): Bases: &#96;pybind11_object&#96;
 - [DumpFileReader](api/pylimer_tools_cpp.DumpFileReader.html.md): Bases: &#96;pybind11_object&#96;
+- [EndToEndStats](api/pylimer_tools_cpp.EndToEndStats.html.md): Bases: &#96;pybind11_object&#96;
 - [EntanglementFilteringMode](api/pylimer_tools_cpp.EntanglementFilteringMode.html.md): Bases: &#96;IntEnum&#96;
 - [EntanglementSamplingMethod](api/pylimer_tools_cpp.EntanglementSamplingMethod.html.md): Bases: &#96;Enum&#96;
 - [ExitReason](api/pylimer_tools_cpp.ExitReason.html.md): Bases: &#96;IntEnum&#96;
@@ -307,6 +310,7 @@
 - [SimplifiedBalance2Network](api/pylimer_tools_cpp.SimplifiedBalance2Network.html.md): Bases: &#96;pybind11_object&#96;
 - [SimplifiedBalanceNetwork](api/pylimer_tools_cpp.SimplifiedBalanceNetwork.html.md): Bases: &#96;pybind11_object&#96;
 - [SimplifiedNetwork](api/pylimer_tools_cpp.SimplifiedNetwork.html.md): Bases: &#96;pybind11_object&#96;
+- [StrandCategory](api/pylimer_tools_cpp.StrandCategory.html.md): Bases: &#96;IntEnum&#96;
 - [StrandPairEntanglements](api/pylimer_tools_cpp.StrandPairEntanglements.html.md): Bases: &#96;pybind11_object&#96;
 - [StructureSimplificationMode](api/pylimer_tools_cpp.StructureSimplificationMode.html.md): Bases: &#96;Enum&#96;
 - [Universe](api/pylimer_tools_cpp.Universe.html.md): Bases: &#96;pybind11_object&#96;
@@ -319,11 +323,11 @@
 - [TRACK_BACKWARD](api/pylimer_tools_cpp.TRACK_BACKWARD.html.md): Track backward in the linking process
 - [TRACK_FORWARD](api/pylimer_tools_cpp.TRACK_FORWARD.html.md): Continue linking forward
 - [Computation times](auto_examples/dpd_simulations/sg_execution_times.html.md): &#42;&#42;00:04.279&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/dpd_simulations&#42;&#42;:
-- [Computation times](auto_examples/force_balance/sg_execution_times.html.md): &#42;&#42;00:07.850&#42;&#42; total execution time for 10 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
+- [Computation times](auto_examples/force_balance/sg_execution_times.html.md): &#42;&#42;00:09.069&#42;&#42; total execution time for 10 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
 - [Computation times](auto_examples/network_generator/sg_execution_times.html.md): &#42;&#42;01:00.121&#42;&#42; total execution time for 9 files &#42;&#42;from auto_examples/network_generator&#42;&#42;:
 - [Computation times](auto_examples/normal_mode_analysis/sg_execution_times.html.md): &#42;&#42;00:10.988&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/normal_mode_analysis&#42;&#42;:
 - [Computation times](auto_examples/readers_writers/sg_execution_times.html.md): &#42;&#42;00:17.316&#42;&#42; total execution time for 13 files &#42;&#42;from auto_examples/readers_writers&#42;&#42;:
 - [Computation times](auto_examples/sg_execution_times.html.md): &#42;&#42;00:00.000&#42;&#42; total execution time for 0 files &#42;&#42;from auto_examples&#42;&#42;:
 - [Computation times](auto_examples/structure_analysis/sg_execution_times.html.md): &#42;&#42;00:00.384&#42;&#42; total execution time for 4 files &#42;&#42;from auto_examples/structure_analysis&#42;&#42;:
 - [Computation times](auto_examples/trajectory_analysis/sg_execution_times.html.md): &#42;&#42;05:43.410&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/trajectory_analysis&#42;&#42;:
-- [Computation times](sg_execution_times.html.md): &#42;&#42;07:24.349&#42;&#42; total execution time for 39 files &#42;&#42;from all galleries&#42;&#42;:
+- [Computation times](sg_execution_times.html.md): &#42;&#42;07:25.568&#42;&#42; total execution time for 39 files &#42;&#42;from all galleries&#42;&#42;:

@@ -313,6 +313,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.randomly_sample_entanglements_analytical.html">randomly_sample_entanglements_analytical</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.randomly_sample_entanglements_on_demand.html">randomly_sample_entanglements_on_demand</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.randomly_sample_entanglements_v2.html">randomly_sample_entanglements_v2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.sample_strand_beads_on_demand.html">sample_strand_beads_on_demand</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.split_csv.html">split_csv</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.version_information.html">version_information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.Atom.html">Atom</a></li>
@@ -320,6 +321,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.AtomStyle.html">AtomStyle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.AveFileReader.html">AveFileReader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.BackTrackStatus.html">BackTrackStatus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.BondLengthStats.html">BondLengthStats</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.Box.html">Box</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.ComputedDoubleValues.html">ComputedDoubleValues</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.ComputedIntValues.html">ComputedIntValues</a></li>
@@ -328,6 +330,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.DataFileReader.html">DataFileReader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.DataFileWriter.html">DataFileWriter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.DumpFileReader.html">DumpFileReader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.EndToEndStats.html">EndToEndStats</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.EntanglementFilteringMode.html">EntanglementFilteringMode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.EntanglementSamplingMethod.html">EntanglementSamplingMethod</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.ExitReason.html">ExitReason</a></li>
@@ -357,6 +360,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedBalance2Network.html">SimplifiedBalance2Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedBalanceNetwork.html">SimplifiedBalanceNetwork</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedNetwork.html">SimplifiedNetwork</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.StrandCategory.html">StrandCategory</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.StrandPairEntanglements.html">StrandPairEntanglements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.StructureSimplificationMode.html">StructureSimplificationMode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.Universe.html">Universe</a></li>
@@ -442,26 +446,57 @@ without explicitly instantiating all individual strand beads.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.strand_from" title="pylimer_tools_cpp.CrosslinkerUniverse.strand_from"><code class="xref py py-obj docutils literal notranslate"><span class="pre">strand_from</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.strand_to" title="pylimer_tools_cpp.CrosslinkerUniverse.strand_to"><code class="xref py py-obj docutils literal notranslate"><span class="pre">strand_to</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.strand_seeds" title="pylimer_tools_cpp.CrosslinkerUniverse.strand_seeds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">strand_seeds</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.strands_of_xlink" title="pylimer_tools_cpp.CrosslinkerUniverse.strands_of_xlink"><code class="xref py py-obj docutils literal notranslate"><span class="pre">strands_of_xlink</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.strand_to" title="pylimer_tools_cpp.CrosslinkerUniverse.strand_to"><code class="xref py py-obj docutils literal notranslate"><span class="pre">strand_to</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.xlink_chain_id" title="pylimer_tools_cpp.CrosslinkerUniverse.xlink_chain_id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xlink_chain_id</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.strands_of_xlink" title="pylimer_tools_cpp.CrosslinkerUniverse.strands_of_xlink"><code class="xref py py-obj docutils literal notranslate"><span class="pre">strands_of_xlink</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.xlink_types" title="pylimer_tools_cpp.CrosslinkerUniverse.xlink_types"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xlink_types</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.xlink_chain_id" title="pylimer_tools_cpp.CrosslinkerUniverse.xlink_chain_id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xlink_chain_id</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.xlink_x" title="pylimer_tools_cpp.CrosslinkerUniverse.xlink_x"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xlink_x</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.xlink_types" title="pylimer_tools_cpp.CrosslinkerUniverse.xlink_types"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xlink_types</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.xlink_y" title="pylimer_tools_cpp.CrosslinkerUniverse.xlink_y"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xlink_y</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.xlink_x" title="pylimer_tools_cpp.CrosslinkerUniverse.xlink_x"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xlink_x</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.xlink_z" title="pylimer_tools_cpp.CrosslinkerUniverse.xlink_z"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xlink_z</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.xlink_y" title="pylimer_tools_cpp.CrosslinkerUniverse.xlink_y"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xlink_y</span></code></a></p></td>
 <td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.xlink_z" title="pylimer_tools_cpp.CrosslinkerUniverse.xlink_z"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xlink_z</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Methods Summary</p>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.classify_strand" title="pylimer_tools_cpp.CrosslinkerUniverse.classify_strand"><code class="xref py py-obj docutils literal notranslate"><span class="pre">classify_strand</span></code></a>(self, strand_idx)</p></td>
+<td><p>Classify a strand into its topological StrandCategory.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.compute_bond_length_stats" title="pylimer_tools_cpp.CrosslinkerUniverse.compute_bond_length_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_bond_length_stats</span></code></a>(self, box[, ...])</p></td>
+<td><p>Stream over all strands in O(1) strand memory to compute realized bond length statistics.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.compute_end_to_end_stats" title="pylimer_tools_cpp.CrosslinkerUniverse.compute_end_to_end_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_end_to_end_stats</span></code></a>(self, box[, ...])</p></td>
+<td><p>Stream over strands matching <cite>category</cite> to compute realized end-to-end distance statistics.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.compute_strand_bond_counts" title="pylimer_tools_cpp.CrosslinkerUniverse.compute_strand_bond_counts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_strand_bond_counts</span></code></a>(self[, category])</p></td>
+<td><p>Return the number of bonds for each strand matching <cite>category</cite>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.count_atom_types" title="pylimer_tools_cpp.CrosslinkerUniverse.count_atom_types"><code class="xref py py-obj docutils literal notranslate"><span class="pre">count_atom_types</span></code></a>(self)</p></td>
+<td><p>Count atoms per atom type in O(N_xlinks + N_strands).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.count_atoms_by_degree" title="pylimer_tools_cpp.CrosslinkerUniverse.count_atoms_by_degree"><code class="xref py py-obj docutils literal notranslate"><span class="pre">count_atoms_by_degree</span></code></a>(self)</p></td>
+<td><p>Count atoms per bond degree in O(N_xlinks + N_strands).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.determine_effective_functionality_per_type" title="pylimer_tools_cpp.CrosslinkerUniverse.determine_effective_functionality_per_type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">determine_effective_functionality_per_type</span></code></a>(self)</p></td>
+<td><p>Compute effective functionality (mean degree) per atom type in O(N_xlinks + N_strands).</p></td>
 </tr>
 </tbody>
 </table>
@@ -490,6 +525,11 @@ without explicitly instantiating all individual strand beads.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.CrosslinkerUniverse.strand_from">
 <span class="sig-name descname"><span class="pre">strand_from</span></span><a class="headerlink" href="#pylimer_tools_cpp.CrosslinkerUniverse.strand_from" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.CrosslinkerUniverse.strand_seeds">
+<span class="sig-name descname"><span class="pre">strand_seeds</span></span><a class="headerlink" href="#pylimer_tools_cpp.CrosslinkerUniverse.strand_seeds" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -526,6 +566,103 @@ without explicitly instantiating all individual strand beads.</p>
 <dt class="sig sig-object py" id="pylimer_tools_cpp.CrosslinkerUniverse.xlink_z">
 <span class="sig-name descname"><span class="pre">xlink_z</span></span><a class="headerlink" href="#pylimer_tools_cpp.CrosslinkerUniverse.xlink_z" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<p class="rubric">Methods Documentation</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.CrosslinkerUniverse.classify_strand">
+<span class="sig-name descname"><span class="pre">classify_strand</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse" title="pylimer_tools_cpp.CrosslinkerUniverse"><span class="pre">pylimer_tools_cpp.CrosslinkerUniverse</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">strand_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsInt" title="(in Python v3.15)"><span class="pre">SupportsInt</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsIndex" title="(in Python v3.15)"><span class="pre">SupportsIndex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="pylimer_tools_cpp.StrandCategory.html#pylimer_tools_cpp.StrandCategory" title="pylimer_tools_cpp.StrandCategory"><span class="pre">pylimer_tools_cpp.StrandCategory</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.CrosslinkerUniverse.classify_strand" title="Link to this definition">¶</a></dt>
+<dd><p>Classify a strand into its topological StrandCategory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.CrosslinkerUniverse.classify_strand.params.strand_idx"></span><strong>strand_idx</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.classify_strand.params.strand_idx">¶</a> – Index of the strand.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>StrandCategory of the strand.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.CrosslinkerUniverse.compute_bond_length_stats">
+<span class="sig-name descname"><span class="pre">compute_bond_length_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse" title="pylimer_tools_cpp.CrosslinkerUniverse"><span class="pre">pylimer_tools_cpp.CrosslinkerUniverse</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">box</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.Box.html#pylimer_tools_cpp.Box" title="pylimer_tools_cpp.Box"><span class="pre">pylimer_tools_cpp.Box</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_mc_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsInt" title="(in Python v3.15)"><span class="pre">SupportsInt</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsIndex" title="(in Python v3.15)"><span class="pre">SupportsIndex</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="pylimer_tools_cpp.BondLengthStats.html#pylimer_tools_cpp.BondLengthStats" title="pylimer_tools_cpp.BondLengthStats"><span class="pre">pylimer_tools_cpp.BondLengthStats</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.CrosslinkerUniverse.compute_bond_length_stats" title="Link to this definition">¶</a></dt>
+<dd><p>Stream over all strands in O(1) strand memory to compute realized bond length statistics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="pylimer_tools_cpp.CrosslinkerUniverse.compute_bond_length_stats.params.box"></span><strong>box</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.compute_bond_length_stats.params.box">¶</a> – Simulation box.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.CrosslinkerUniverse.compute_bond_length_stats.params.n_mc_steps"></span><strong>n_mc_steps</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.compute_bond_length_stats.params.n_mc_steps">¶</a> – Number of MC equilibration steps per strand (default: 0).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>BondLengthStats object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.CrosslinkerUniverse.compute_end_to_end_stats">
+<span class="sig-name descname"><span class="pre">compute_end_to_end_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse" title="pylimer_tools_cpp.CrosslinkerUniverse"><span class="pre">pylimer_tools_cpp.CrosslinkerUniverse</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">box</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.Box.html#pylimer_tools_cpp.Box" title="pylimer_tools_cpp.Box"><span class="pre">pylimer_tools_cpp.Box</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">category</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.StrandCategory.html#pylimer_tools_cpp.StrandCategory" title="pylimer_tools_cpp.StrandCategory"><span class="pre">pylimer_tools_cpp.StrandCategory</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">StrandCategory.NETWORK_STRAND</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_mc_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsInt" title="(in Python v3.15)"><span class="pre">SupportsInt</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsIndex" title="(in Python v3.15)"><span class="pre">SupportsIndex</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="pylimer_tools_cpp.EndToEndStats.html#pylimer_tools_cpp.EndToEndStats" title="pylimer_tools_cpp.EndToEndStats"><span class="pre">pylimer_tools_cpp.EndToEndStats</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.CrosslinkerUniverse.compute_end_to_end_stats" title="Link to this definition">¶</a></dt>
+<dd><p>Stream over strands matching <cite>category</cite> to compute realized end-to-end distance statistics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="pylimer_tools_cpp.CrosslinkerUniverse.compute_end_to_end_stats.params.box"></span><strong>box</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.compute_end_to_end_stats.params.box">¶</a> – Simulation box.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.CrosslinkerUniverse.compute_end_to_end_stats.params.category"></span><strong>category</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.compute_end_to_end_stats.params.category">¶</a> – StrandCategory filter (default: NETWORK_STRAND).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.CrosslinkerUniverse.compute_end_to_end_stats.params.n_mc_steps"></span><strong>n_mc_steps</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.compute_end_to_end_stats.params.n_mc_steps">¶</a> – Number of MC equilibration steps per strand (default: 0).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>EndToEndStats object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.CrosslinkerUniverse.compute_strand_bond_counts">
+<span class="sig-name descname"><span class="pre">compute_strand_bond_counts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse" title="pylimer_tools_cpp.CrosslinkerUniverse"><span class="pre">pylimer_tools_cpp.CrosslinkerUniverse</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">category</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.StrandCategory.html#pylimer_tools_cpp.StrandCategory" title="pylimer_tools_cpp.StrandCategory"><span class="pre">pylimer_tools_cpp.StrandCategory</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">StrandCategory.ALL</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.CrosslinkerUniverse.compute_strand_bond_counts" title="Link to this definition">¶</a></dt>
+<dd><p>Return the number of bonds for each strand matching <cite>category</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.CrosslinkerUniverse.compute_strand_bond_counts.params.category"></span><strong>category</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.compute_strand_bond_counts.params.category">¶</a> – StrandCategory filter (default: ALL).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of bond counts per matching strand.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.CrosslinkerUniverse.count_atom_types">
+<span class="sig-name descname"><span class="pre">count_atom_types</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse" title="pylimer_tools_cpp.CrosslinkerUniverse"><span class="pre">pylimer_tools_cpp.CrosslinkerUniverse</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.CrosslinkerUniverse.count_atom_types" title="Link to this definition">¶</a></dt>
+<dd><p>Count atoms per atom type in O(N_xlinks + N_strands).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict mapping atom type to count.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.CrosslinkerUniverse.count_atoms_by_degree">
+<span class="sig-name descname"><span class="pre">count_atoms_by_degree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse" title="pylimer_tools_cpp.CrosslinkerUniverse"><span class="pre">pylimer_tools_cpp.CrosslinkerUniverse</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.CrosslinkerUniverse.count_atoms_by_degree" title="Link to this definition">¶</a></dt>
+<dd><p>Count atoms per bond degree in O(N_xlinks + N_strands).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict mapping degree to atom count.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.CrosslinkerUniverse.determine_effective_functionality_per_type">
+<span class="sig-name descname"><span class="pre">determine_effective_functionality_per_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse" title="pylimer_tools_cpp.CrosslinkerUniverse"><span class="pre">pylimer_tools_cpp.CrosslinkerUniverse</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.CrosslinkerUniverse.determine_effective_functionality_per_type" title="Link to this definition">¶</a></dt>
+<dd><p>Compute effective functionality (mean degree) per atom type in O(N_xlinks + N_strands).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict mapping atom type to mean degree.</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -593,6 +730,7 @@ without explicitly instantiating all individual strand beads.</p>
 <li><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.mean_squared_bead_distance_in_strand"><code class="docutils literal notranslate"><span class="pre">CrosslinkerUniverse.mean_squared_bead_distance_in_strand</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.strand_bead_type"><code class="docutils literal notranslate"><span class="pre">CrosslinkerUniverse.strand_bead_type</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.strand_from"><code class="docutils literal notranslate"><span class="pre">CrosslinkerUniverse.strand_from</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.strand_seeds"><code class="docutils literal notranslate"><span class="pre">CrosslinkerUniverse.strand_seeds</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.strand_to"><code class="docutils literal notranslate"><span class="pre">CrosslinkerUniverse.strand_to</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.strands_of_xlink"><code class="docutils literal notranslate"><span class="pre">CrosslinkerUniverse.strands_of_xlink</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.xlink_chain_id"><code class="docutils literal notranslate"><span class="pre">CrosslinkerUniverse.xlink_chain_id</span></code></a></li>
@@ -600,6 +738,13 @@ without explicitly instantiating all individual strand beads.</p>
 <li><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.xlink_x"><code class="docutils literal notranslate"><span class="pre">CrosslinkerUniverse.xlink_x</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.xlink_y"><code class="docutils literal notranslate"><span class="pre">CrosslinkerUniverse.xlink_y</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.xlink_z"><code class="docutils literal notranslate"><span class="pre">CrosslinkerUniverse.xlink_z</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.classify_strand"><code class="docutils literal notranslate"><span class="pre">CrosslinkerUniverse.classify_strand()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.compute_bond_length_stats"><code class="docutils literal notranslate"><span class="pre">CrosslinkerUniverse.compute_bond_length_stats()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.compute_end_to_end_stats"><code class="docutils literal notranslate"><span class="pre">CrosslinkerUniverse.compute_end_to_end_stats()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.compute_strand_bond_counts"><code class="docutils literal notranslate"><span class="pre">CrosslinkerUniverse.compute_strand_bond_counts()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.count_atom_types"><code class="docutils literal notranslate"><span class="pre">CrosslinkerUniverse.count_atom_types()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.count_atoms_by_degree"><code class="docutils literal notranslate"><span class="pre">CrosslinkerUniverse.count_atoms_by_degree()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.CrosslinkerUniverse.determine_effective_functionality_per_type"><code class="docutils literal notranslate"><span class="pre">CrosslinkerUniverse.determine_effective_functionality_per_type()</span></code></a></li>
 </ul>
 </li>
 </ul>

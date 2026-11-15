@@ -42,7 +42,25 @@ Overloaded function.
    >   Whether to ignore the z direction.
    > * **param entanglements_as_springs:**
    >   whether to use the entanglements as springs instead of links
-3. \_\_init_\_(self: pylimer_tools_cpp.MEHPForceBalance2, universe: pylimer_tools_cpp.Universe, nr_of_entanglements_to_sample: typing.SupportsInt | typing.SupportsIndex, upper_sampling_cutoff: typing.SupportsFloat | typing.SupportsIndex = 1.2, lower_sampling_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_sliplinks: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3, seed: str = ‘’, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, is_2d: bool = False, skip_dangling_soluble_entanglements: bool = True, entanglements_as_springs: bool = True) -> None
+3. \_\_init_\_(self: pylimer_tools_cpp.MEHPForceBalance2, box: pylimer_tools_cpp.Box, crosslinker_universe: pylimer_tools_cpp.CrosslinkerUniverse, entanglements: pylimer_tools_cpp.StrandPairEntanglements = StrandPairEntanglements(), crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, is_2d: bool = False, entanglements_as_springs: bool = False, remove_dangling_chains: bool = False, include_free_chains: bool = True) -> None
+   > Instantiate the simulator from a Box, a CrosslinkerUniverse, and StrandPairEntanglements.
+   > * **param box:**
+   >   Simulation box
+   > * **param crosslinker_universe:**
+   >   Canonical CrosslinkerUniverse representation
+   > * **param entanglements:**
+   >   StrandPairEntanglements along strands
+   > * **param crosslinker_type:**
+   >   The atom type of crosslinkers
+   > * **param is_2d:**
+   >   Whether to ignore the z direction
+   > * **param entanglements_as_springs:**
+   >   Whether to model entanglements as springs instead of merged links
+   > * **param remove_dangling_chains:**
+   >   Whether to exclude dangling chains
+   > * **param include_free_chains:**
+   >   Whether to include free/soluble chains
+4. \_\_init_\_(self: pylimer_tools_cpp.MEHPForceBalance2, universe: pylimer_tools_cpp.Universe, nr_of_entanglements_to_sample: typing.SupportsInt | typing.SupportsIndex, upper_sampling_cutoff: typing.SupportsFloat | typing.SupportsIndex = 1.2, lower_sampling_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_sliplinks: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3, seed: str = ‘’, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, is_2d: bool = False, skip_dangling_soluble_entanglements: bool = True, entanglements_as_springs: bool = True) -> None
    > Instantiate this simulator with randomly chosen slip-links.
    > * **param universe:**
    >   The universe containing the basic atoms and connectivity

@@ -17,12 +17,14 @@ Universe
       ~Universe.add_dihedral_angles
       ~Universe.clear_caches
       ~Universe.compute_angles
+      ~Universe.compute_bond_length_stats
       ~Universe.compute_bond_lengths
       ~Universe.compute_bond_vectors
       ~Universe.compute_dxs
       ~Universe.compute_dys
       ~Universe.compute_dzs
       ~Universe.compute_end_to_end_distances
+      ~Universe.compute_end_to_end_stats
       ~Universe.compute_mean_end_to_end_distance
       ~Universe.compute_mean_squared_end_to_end_distance
       ~Universe.compute_mean_strand_length
@@ -106,12 +108,14 @@ Universe
    .. automethod:: add_dihedral_angles
    .. automethod:: clear_caches
    .. automethod:: compute_angles
+   .. automethod:: compute_bond_length_stats
    .. automethod:: compute_bond_lengths
    .. automethod:: compute_bond_vectors
    .. automethod:: compute_dxs
    .. automethod:: compute_dys
    .. automethod:: compute_dzs
    .. automethod:: compute_end_to_end_distances
+   .. automethod:: compute_end_to_end_stats
    .. automethod:: compute_mean_end_to_end_distance
    .. automethod:: compute_mean_squared_end_to_end_distance
    .. automethod:: compute_mean_strand_length

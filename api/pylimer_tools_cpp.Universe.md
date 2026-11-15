@@ -26,12 +26,14 @@ Instantiate this Universe (Collection of Molecules) providing the box lengths.
 | [`add_dihedral_angles`](#pylimer_tools_cpp.Universe.add_dihedral_angles)(self, angles_from, ...)       | Add dihedral angles to the Universe.                                                                                                                                                                             |
 | [`clear_caches`](#pylimer_tools_cpp.Universe.clear_caches)(self)                                | Clear internal caches of decomposed molecules and chains with crosslinkers to reclaim memory.                                                                                                                    |
 | [`compute_angles`](#pylimer_tools_cpp.Universe.compute_angles)(self)                              | Compute the angle of each angle in the molecule, respecting periodic boundaries.                                                                                                                                 |
+| [`compute_bond_length_stats`](#pylimer_tools_cpp.Universe.compute_bond_length_stats)(self)                   | Compute summary bond length statistics (count, mean, mean squared, min, max) from the Universe's actual bond coordinates.                                                                                        |
 | [`compute_bond_lengths`](#pylimer_tools_cpp.Universe.compute_bond_lengths)(self)                        | Compute the length of each bond in the molecule, respecting periodic boundaries.                                                                                                                                 |
 | [`compute_bond_vectors`](#pylimer_tools_cpp.Universe.compute_bond_vectors)(self)                        | Compute the vectors of each bond in the molecule, respecting periodic boundaries.                                                                                                                                |
 | [`compute_dxs`](#pylimer_tools_cpp.Universe.compute_dxs)(self, atom_ids_to, atom_ids_from)     | Compute the dx distance for certain bonds (length in x direction).                                                                                                                                               |
 | [`compute_dys`](#pylimer_tools_cpp.Universe.compute_dys)(self, atom_ids_to, atom_ids_from)     | Compute the dy distance for certain bonds (length in y direction).                                                                                                                                               |
 | [`compute_dzs`](#pylimer_tools_cpp.Universe.compute_dzs)(self, atom_ids_to, atom_ids_from)     | Compute the dz distance for certain bonds (length in z direction).                                                                                                                                               |
 | [`compute_end_to_end_distances`](#pylimer_tools_cpp.Universe.compute_end_to_end_distances)(self, ...[, ...])    | Compute the end-to-end distance of each strand in the network.                                                                                                                                                   |
+| [`compute_end_to_end_stats`](#pylimer_tools_cpp.Universe.compute_end_to_end_stats)(self[, ...])             | Compute summary end-to-end distance statistics (count, excluded zero-length count, mean, mean squared) for strands matching `category` from the Universe's actual coordinates.                                   |
 | [`compute_mean_end_to_end_distance`](#pylimer_tools_cpp.Universe.compute_mean_end_to_end_distance)(self, ...)       | Compute the mean of the end-to-end distances of each strand in the network.                                                                                                                                      |
 | [`compute_mean_squared_end_to_end_distance`](#pylimer_tools_cpp.Universe.compute_mean_squared_end_to_end_distance)(...)     | Compute the mean square of the end-to-end distances of each strand (incl.                                                                                                                                        |
 | [`compute_mean_strand_length`](#pylimer_tools_cpp.Universe.compute_mean_strand_length)(self, ...)             | Compute the mean number of beads per strand.                                                                                                                                                                     |
@@ -104,7 +106,7 @@ Instantiate this Universe (Collection of Molecules) providing the box lengths.
 | [`set_timestep`](#pylimer_tools_cpp.Universe.set_timestep)(self, timestep)                      | Set the timestep when this Universe was captured.                                                                                                                                                                |
 | [`set_vertex_property`](#pylimer_tools_cpp.Universe.set_vertex_property)(self, vertex_id, ...)         | Set a specific property for a specific vertex.                                                                                                                                                                   |
 | [`simplify`](#pylimer_tools_cpp.Universe.simplify)(self)                                    | Remove self links and double bonds.                                                                                                                                                                              |
-| [`to_crosslinker_universe`](#pylimer_tools_cpp.Universe.to_crosslinker_universe)(self, crosslinker_type)   | Convert this Universe into a CrosslinkerUniverse representation.                                                                                                                                                 |
+| [`to_crosslinker_universe`](#pylimer_tools_cpp.Universe.to_crosslinker_universe)(self[, crosslinker_type]) | Convert this Universe into a CrosslinkerUniverse representation.                                                                                                                                                 |
 
 ### Methods Documentation
 
@@ -192,6 +194,14 @@ Compute the angle of each angle in the molecule, respecting periodic boundaries.
 * **Returns:**
   A list of angle values in radians
 
+#### compute_bond_length_stats(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe)) → [pylimer_tools_cpp.BondLengthStats](pylimer_tools_cpp.BondLengthStats.md#pylimer_tools_cpp.BondLengthStats)
+
+Compute summary bond length statistics (count, mean, mean squared, min, max)
+from the Universe’s actual bond coordinates.
+
+* **Returns:**
+  BondLengthStats object.
+
 #### compute_bond_lengths(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[float](https://docs.python.org/3/builtins/functions.html#float)]
 
 Compute the length of each bond in the molecule, respecting periodic boundaries.
@@ -251,6 +261,18 @@ Invalid strands (where said function returns 0.0 or -1.0) are ignored.
   * **derive_image_flags** – Whether to derive image flags from connectivity
 * **Returns:**
   List of end-to-end distances
+
+#### compute_end_to_end_stats(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2, category: [pylimer_tools_cpp.StrandCategory](pylimer_tools_cpp.StrandCategory.md#pylimer_tools_cpp.StrandCategory) = StrandCategory.NETWORK_STRAND, derive_image_flags: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [pylimer_tools_cpp.EndToEndStats](pylimer_tools_cpp.EndToEndStats.md#pylimer_tools_cpp.EndToEndStats)
+
+Compute summary end-to-end distance statistics (count, excluded zero-length count,
+mean, mean squared) for strands matching `category` from the Universe’s actual coordinates.
+
+* **Parameters:**
+  * **crosslinker_type** – The type of crosslinker atoms (default: 2)
+  * **category** – StrandCategory filter (default: NETWORK_STRAND)
+  * **derive_image_flags** – Whether to derive image flags from connectivity (default: True)
+* **Returns:**
+  EndToEndStats object.
 
 #### compute_mean_end_to_end_distance(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), derive_image_flags: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
@@ -907,7 +929,7 @@ automatically after adding bonds.
 This operation cleans up the graph structure by removing
 redundant connections.
 
-#### to_crosslinker_universe(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2) → pylimer_tools::sim::mehp::CrosslinkerUniverse
+#### to_crosslinker_universe(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2) → [pylimer_tools_cpp.CrosslinkerUniverse](pylimer_tools_cpp.CrosslinkerUniverse.md#pylimer_tools_cpp.CrosslinkerUniverse)
 
 Convert this Universe into a CrosslinkerUniverse representation.
 

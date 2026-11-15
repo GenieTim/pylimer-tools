@@ -1985,7 +1985,7 @@ The table below summarizes key trade-offs between discrete, on-demand, and analy
      [`NONE`](../../api/pylimer_tools_cpp.EntanglementFilteringMode.md#pylimer_tools_cpp.EntanglementFilteringMode.NONE) (paired with simplification) or scale
      target $N_{\text{ent}}$ by $1 / w_{\text{active}}^2$.
 
-**Total running time of the script:** (0 minutes 1.738 seconds)
+**Total running time of the script:** (0 minutes 2.957 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-entanglement-sampling-comparison-py"></a>
 

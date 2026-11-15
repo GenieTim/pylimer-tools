@@ -203,6 +203,7 @@
 - [randomly_sample_entanglements_analytical](pylimer_tools_cpp.randomly_sample_entanglements_analytical.html.md): Overloaded function.
 - [randomly_sample_entanglements_on_demand](pylimer_tools_cpp.randomly_sample_entanglements_on_demand.html.md): Overloaded function.
 - [randomly_sample_entanglements_v2](pylimer_tools_cpp.randomly_sample_entanglements_v2.html.md): Alias for randomly_sample_entanglements (v2 has been unified into standard method).
+- [sample_strand_beads_on_demand](pylimer_tools_cpp.sample_strand_beads_on_demand.html.md): Deterministically realize the internal bead coordinates of a single strand
 - [split_csv](pylimer_tools_cpp.split_csv.html.md): Read a file containing a number of CSVs. Returns them split up.
 - [version_information](pylimer_tools_cpp.version_information.html.md): Returns  a string of the the current version, incl. git hash and date of compilation.
 - [Atom](pylimer_tools_cpp.Atom.html.md): Bases: &#96;pybind11_object&#96;
@@ -210,6 +211,7 @@
 - [AtomStyle](pylimer_tools_cpp.AtomStyle.html.md): Bases: &#96;Enum&#96;
 - [AveFileReader](pylimer_tools_cpp.AveFileReader.html.md): Bases: &#96;pybind11_object&#96;
 - [BackTrackStatus](pylimer_tools_cpp.BackTrackStatus.html.md): Bases: &#96;Enum&#96;
+- [BondLengthStats](pylimer_tools_cpp.BondLengthStats.html.md): Bases: &#96;pybind11_object&#96;
 - [Box](pylimer_tools_cpp.Box.html.md): Bases: &#96;pybind11_object&#96;
 - [ComputedDoubleValues](pylimer_tools_cpp.ComputedDoubleValues.html.md): Bases: &#96;IntEnum&#96;
 - [ComputedIntValues](pylimer_tools_cpp.ComputedIntValues.html.md): Bases: &#96;IntEnum&#96;
@@ -218,6 +220,7 @@
 - [DataFileReader](pylimer_tools_cpp.DataFileReader.html.md): Bases: &#96;pybind11_object&#96;
 - [DataFileWriter](pylimer_tools_cpp.DataFileWriter.html.md): Bases: &#96;pybind11_object&#96;
 - [DumpFileReader](pylimer_tools_cpp.DumpFileReader.html.md): Bases: &#96;pybind11_object&#96;
+- [EndToEndStats](pylimer_tools_cpp.EndToEndStats.html.md): Bases: &#96;pybind11_object&#96;
 - [EntanglementFilteringMode](pylimer_tools_cpp.EntanglementFilteringMode.html.md): Bases: &#96;IntEnum&#96;
 - [EntanglementSamplingMethod](pylimer_tools_cpp.EntanglementSamplingMethod.html.md): Bases: &#96;Enum&#96;
 - [ExitReason](pylimer_tools_cpp.ExitReason.html.md): Bases: &#96;IntEnum&#96;
@@ -247,6 +250,7 @@
 - [SimplifiedBalance2Network](pylimer_tools_cpp.SimplifiedBalance2Network.html.md): Bases: &#96;pybind11_object&#96;
 - [SimplifiedBalanceNetwork](pylimer_tools_cpp.SimplifiedBalanceNetwork.html.md): Bases: &#96;pybind11_object&#96;
 - [SimplifiedNetwork](pylimer_tools_cpp.SimplifiedNetwork.html.md): Bases: &#96;pybind11_object&#96;
+- [StrandCategory](pylimer_tools_cpp.StrandCategory.html.md): Bases: &#96;IntEnum&#96;
 - [StrandPairEntanglements](pylimer_tools_cpp.StrandPairEntanglements.html.md): Bases: &#96;pybind11_object&#96;
 - [StructureSimplificationMode](pylimer_tools_cpp.StructureSimplificationMode.html.md): Bases: &#96;Enum&#96;
 - [Universe](pylimer_tools_cpp.Universe.html.md): Bases: &#96;pybind11_object&#96;

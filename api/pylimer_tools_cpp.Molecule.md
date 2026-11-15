@@ -1,18 +1,15 @@
 # Molecule
 
-### *class* pylimer_tools_cpp.Molecule(self: [pylimer_tools_cpp.Molecule](#pylimer_tools_cpp.Molecule), arg0: [pylimer_tools_cpp.Box](pylimer_tools_cpp.Box.md#pylimer_tools_cpp.Box), arg1: igraph_t, arg2: [pylimer_tools_cpp.MoleculeType](pylimer_tools_cpp.MoleculeType.md#pylimer_tools_cpp.MoleculeType), arg3: [collections.abc.Mapping](https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)])
+### *class* pylimer_tools_cpp.Molecule(self: [pylimer_tools_cpp.Molecule](#pylimer_tools_cpp.Molecule), other: [pylimer_tools_cpp.Molecule](#pylimer_tools_cpp.Molecule))
 
 Bases: `pybind11_object`
 
 An (ideally) connected series of atoms/beads.
 
-Construct a molecule from a graph structure.
+Construct a copy of a molecule.
 
 * **Parameters:**
-  * **box** – The simulation box containing this molecule
-  * **graph** – Pointer to the igraph structure representing connectivity
-  * **type** – The type of molecule (see MoleculeType enum)
-  * **mass_map** – Map of atom types to their masses
+  **other** – The molecule to copy
 
 ### Methods Summary
 
@@ -69,7 +66,7 @@ Returns 0.0 if the molecule does not have two or more atoms.
 * **Returns:**
   The end-to-end distance
 
-#### compute_end_to_end_distance_with_derived_image_flags(self: [pylimer_tools_cpp.Molecule](#pylimer_tools_cpp.Molecule)) → [float](https://docs.python.org/3/builtins/functions.html#float)
+#### compute_end_to_end_distance_with_derived_image_flags(self: [pylimer_tools_cpp.Molecule](#pylimer_tools_cpp.Molecule), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Compute the end-to-end distance ($R_{ee}$) of this molecule,
 but ignoring the image flags attached to the atoms.
@@ -94,7 +91,7 @@ Returns 0.0 if the molecule does not have two or more atoms.
 * **Returns:**
   The end-to-end vector
 
-#### compute_end_to_end_vector_with_derived_image_flags(self: [pylimer_tools_cpp.Molecule](#pylimer_tools_cpp.Molecule)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 1]']
+#### compute_end_to_end_vector_with_derived_image_flags(self: [pylimer_tools_cpp.Molecule](#pylimer_tools_cpp.Molecule), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 1]']
 
 Compute the end-to-end vector ($\overrightarrow{R}_{ee}$) of this molecule,
 but ignoring the image flags attached to the atoms.

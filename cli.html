@@ -315,6 +315,7 @@
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.randomly_sample_entanglements_analytical.html">randomly_sample_entanglements_analytical</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.randomly_sample_entanglements_on_demand.html">randomly_sample_entanglements_on_demand</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.randomly_sample_entanglements_v2.html">randomly_sample_entanglements_v2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.sample_strand_beads_on_demand.html">sample_strand_beads_on_demand</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.split_csv.html">split_csv</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.version_information.html">version_information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.Atom.html">Atom</a></li>
@@ -322,6 +323,7 @@
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.AtomStyle.html">AtomStyle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.AveFileReader.html">AveFileReader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.BackTrackStatus.html">BackTrackStatus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.BondLengthStats.html">BondLengthStats</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.Box.html">Box</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.ComputedDoubleValues.html">ComputedDoubleValues</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.ComputedIntValues.html">ComputedIntValues</a></li>
@@ -330,6 +332,7 @@
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.DataFileReader.html">DataFileReader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.DataFileWriter.html">DataFileWriter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.DumpFileReader.html">DumpFileReader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.EndToEndStats.html">EndToEndStats</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.EntanglementFilteringMode.html">EntanglementFilteringMode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.EntanglementSamplingMethod.html">EntanglementSamplingMethod</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.ExitReason.html">ExitReason</a></li>
@@ -359,6 +362,7 @@
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.SimplifiedBalance2Network.html">SimplifiedBalance2Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.SimplifiedBalanceNetwork.html">SimplifiedBalanceNetwork</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.SimplifiedNetwork.html">SimplifiedNetwork</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.StrandCategory.html">StrandCategory</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.StrandPairEntanglements.html">StrandPairEntanglements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.StructureSimplificationMode.html">StructureSimplificationMode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html">Universe</a></li>
@@ -444,7 +448,7 @@ You must specify either –target-p (crosslinker conversion) or –target-wsol
 <dd><p>Name of the polymer to generate the network for</p>
 <dl class="field-list simple">
 <dt class="field-odd">Options<span class="colon">:</span></dt>
-<dd class="field-odd"><p>apmma | ptfe | pi50 | ips | apams | apoa | ipp | pdms | app | pi20 | pib413 | spp | cispbd | pbd20 | p6n | pet | pib | app463 | pc | apma | pi75 | cispi | sbr | app413 | pe413 | pi34 | pbd98 | app348 | apva | pe | aps | pom | aphma | pi7 | peo | apea</p>
+<dd class="field-odd"><p>pi34 | pib | apva | app348 | app413 | apma | pe413 | pi50 | pi75 | ipp | pi20 | pdms | pet | cispi | ips | peo | pib413 | apmma | ptfe | apams | pc | cispbd | aps | sbr | pbd98 | app463 | app | pe | pbd20 | apea | pi7 | aphma | p6n | pom | spp | apoa</p>
 </dd>
 </dl>
 </dd></dl>
@@ -604,7 +608,7 @@ You must specify either –target-p (crosslinker conversion) or –target-wsol
 <dd><p>Name of the polymer to use for parameter retrieval.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Options<span class="colon">:</span></dt>
-<dd class="field-odd"><p>apmma | ptfe | pi50 | ips | apams | apoa | ipp | pdms | app | pi20 | pib413 | spp | cispbd | pbd20 | p6n | pet | pib | app463 | pc | apma | pi75 | cispi | sbr | app413 | pe413 | pi34 | pbd98 | app348 | apva | pe | aps | pom | aphma | pi7 | peo | apea</p>
+<dd class="field-odd"><p>pi34 | pib | apva | app348 | app413 | apma | pe413 | pi50 | pi75 | ipp | pi20 | pdms | pet | cispi | ips | peo | pib413 | apmma | ptfe | apams | pc | cispbd | aps | sbr | pbd98 | app463 | app | pe | pbd20 | apea | pi7 | aphma | p6n | pom | spp | apoa</p>
 </dd>
 </dl>
 </dd></dl>

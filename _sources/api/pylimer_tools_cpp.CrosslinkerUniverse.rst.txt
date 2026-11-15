@@ -15,6 +15,7 @@ CrosslinkerUniverse
       ~CrosslinkerUniverse.mean_squared_bead_distance_in_strand
       ~CrosslinkerUniverse.strand_bead_type
       ~CrosslinkerUniverse.strand_from
+      ~CrosslinkerUniverse.strand_seeds
       ~CrosslinkerUniverse.strand_to
       ~CrosslinkerUniverse.strands_of_xlink
       ~CrosslinkerUniverse.xlink_chain_id
@@ -23,6 +24,18 @@ CrosslinkerUniverse
       ~CrosslinkerUniverse.xlink_y
       ~CrosslinkerUniverse.xlink_z
 
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~CrosslinkerUniverse.classify_strand
+      ~CrosslinkerUniverse.compute_bond_length_stats
+      ~CrosslinkerUniverse.compute_end_to_end_stats
+      ~CrosslinkerUniverse.compute_strand_bond_counts
+      ~CrosslinkerUniverse.count_atom_types
+      ~CrosslinkerUniverse.count_atoms_by_degree
+      ~CrosslinkerUniverse.determine_effective_functionality_per_type
+
    .. rubric:: Attributes Documentation
 
    .. autoattribute:: bead_distance_in_strand
@@ -30,6 +43,7 @@ CrosslinkerUniverse
    .. autoattribute:: mean_squared_bead_distance_in_strand
    .. autoattribute:: strand_bead_type
    .. autoattribute:: strand_from
+   .. autoattribute:: strand_seeds
    .. autoattribute:: strand_to
    .. autoattribute:: strands_of_xlink
    .. autoattribute:: xlink_chain_id
@@ -37,3 +51,13 @@ CrosslinkerUniverse
    .. autoattribute:: xlink_x
    .. autoattribute:: xlink_y
    .. autoattribute:: xlink_z
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: classify_strand
+   .. automethod:: compute_bond_length_stats
+   .. automethod:: compute_end_to_end_stats
+   .. automethod:: compute_strand_bond_counts
+   .. automethod:: count_atom_types
+   .. automethod:: count_atoms_by_degree
+   .. automethod:: determine_effective_functionality_per_type

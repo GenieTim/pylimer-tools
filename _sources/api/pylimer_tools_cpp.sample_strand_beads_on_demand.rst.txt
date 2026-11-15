@@ -1,0 +1,6 @@
+sample_strand_beads_on_demand
+=============================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autofunction:: sample_strand_beads_on_demand

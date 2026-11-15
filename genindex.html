@@ -294,6 +294,7 @@
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.randomly_sample_entanglements_analytical.html">randomly_sample_entanglements_analytical</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.randomly_sample_entanglements_on_demand.html">randomly_sample_entanglements_on_demand</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.randomly_sample_entanglements_v2.html">randomly_sample_entanglements_v2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.sample_strand_beads_on_demand.html">sample_strand_beads_on_demand</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.split_csv.html">split_csv</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.version_information.html">version_information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.Atom.html">Atom</a></li>
@@ -301,6 +302,7 @@
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.AtomStyle.html">AtomStyle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.AveFileReader.html">AveFileReader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.BackTrackStatus.html">BackTrackStatus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.BondLengthStats.html">BondLengthStats</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.Box.html">Box</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.ComputedDoubleValues.html">ComputedDoubleValues</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.ComputedIntValues.html">ComputedIntValues</a></li>
@@ -309,6 +311,7 @@
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.DataFileReader.html">DataFileReader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.DataFileWriter.html">DataFileWriter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.DumpFileReader.html">DumpFileReader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.EndToEndStats.html">EndToEndStats</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.EntanglementFilteringMode.html">EntanglementFilteringMode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.EntanglementSamplingMethod.html">EntanglementSamplingMethod</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.ExitReason.html">ExitReason</a></li>
@@ -338,6 +341,7 @@
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.SimplifiedBalance2Network.html">SimplifiedBalance2Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.SimplifiedBalanceNetwork.html">SimplifiedBalanceNetwork</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.SimplifiedNetwork.html">SimplifiedNetwork</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.StrandCategory.html">StrandCategory</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.StrandPairEntanglements.html">StrandPairEntanglements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.StructureSimplificationMode.html">StructureSimplificationMode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html">Universe</a></li>
@@ -656,7 +660,11 @@
         <li><a href="api/pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation.run_force_relaxation.params.algorithm">algorithm (pylimer_tools_cpp.MEHPForceRelaxation.run_force_relaxation parameter)</a>, <a href="api/pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation.run_force_relaxation.params.algorithm">[1]</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.LinkSwappingMode.html#pylimer_tools_cpp.LinkSwappingMode.ALL">ALL (pylimer_tools_cpp.LinkSwappingMode attribute)</a>
+
+        <ul>
+          <li><a href="api/pylimer_tools_cpp.StrandCategory.html#pylimer_tools_cpp.StrandCategory.ALL">(pylimer_tools_cpp.StrandCategory attribute)</a>
 </li>
+        </ul></li>
         <li><a href="api/pylimer_tools_cpp.LinkSwappingMode.html#pylimer_tools_cpp.LinkSwappingMode.ALL_CYCLE">ALL_CYCLE (pylimer_tools_cpp.LinkSwappingMode attribute)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.LinkSwappingMode.html#pylimer_tools_cpp.LinkSwappingMode.ALL_MC">ALL_MC (pylimer_tools_cpp.LinkSwappingMode attribute)</a>
@@ -755,6 +763,8 @@
           <li><a href="api/pylimer_tools_cpp.ExitReason.html#pylimer_tools_cpp.ExitReason.as_integer_ratio">(pylimer_tools_cpp.ExitReason method)</a>
 </li>
           <li><a href="api/pylimer_tools_cpp.RouseSolverType.html#pylimer_tools_cpp.RouseSolverType.as_integer_ratio">(pylimer_tools_cpp.RouseSolverType method)</a>
+</li>
+          <li><a href="api/pylimer_tools_cpp.StrandCategory.html#pylimer_tools_cpp.StrandCategory.as_integer_ratio">(pylimer_tools_cpp.StrandCategory method)</a>
 </li>
         </ul></li>
         <li><a href="pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.assemble_gaussian_parameters_from_kuhn">assemble_gaussian_parameters_from_kuhn() (in module pylimer_tools.io.bead_spring_parameter_provider)</a>
@@ -963,8 +973,6 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.SLESolver.html#pylimer_tools_cpp.SLESolver.BICGSTAB_IDENTITY">BICGSTAB_IDENTITY (pylimer_tools_cpp.SLESolver attribute)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pylimer_tools_cpp.SLESolver.html#pylimer_tools_cpp.SLESolver.BICGSTAB_INCOMPLETE_LU">BICGSTAB_INCOMPLETE_LU (pylimer_tools_cpp.SLESolver attribute)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.ComputedDoubleValues.html#pylimer_tools_cpp.ComputedDoubleValues.bit_count">bit_count() (pylimer_tools_cpp.ComputedDoubleValues method)</a>
@@ -978,7 +986,11 @@
 </li>
           <li><a href="api/pylimer_tools_cpp.RouseSolverType.html#pylimer_tools_cpp.RouseSolverType.bit_count">(pylimer_tools_cpp.RouseSolverType method)</a>
 </li>
+          <li><a href="api/pylimer_tools_cpp.StrandCategory.html#pylimer_tools_cpp.StrandCategory.bit_count">(pylimer_tools_cpp.StrandCategory method)</a>
+</li>
         </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pylimer_tools_cpp.ComputedDoubleValues.html#pylimer_tools_cpp.ComputedDoubleValues.bit_length">bit_length() (pylimer_tools_cpp.ComputedDoubleValues method)</a>
 
         <ul>
@@ -989,6 +1001,8 @@
           <li><a href="api/pylimer_tools_cpp.ExitReason.html#pylimer_tools_cpp.ExitReason.bit_length">(pylimer_tools_cpp.ExitReason method)</a>
 </li>
           <li><a href="api/pylimer_tools_cpp.RouseSolverType.html#pylimer_tools_cpp.RouseSolverType.bit_length">(pylimer_tools_cpp.RouseSolverType method)</a>
+</li>
+          <li><a href="api/pylimer_tools_cpp.StrandCategory.html#pylimer_tools_cpp.StrandCategory.bit_length">(pylimer_tools_cpp.StrandCategory method)</a>
 </li>
         </ul></li>
         <li><a href="api/pylimer_tools_cpp.AtomStyle.html#pylimer_tools_cpp.AtomStyle.BODY">BODY (pylimer_tools_cpp.AtomStyle attribute)</a>
@@ -1002,6 +1016,8 @@
 </li>
         </ul></li>
         <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.add_bonds_with_types.params.bond_types">bond_types (pylimer_tools_cpp.Universe.add_bonds_with_types parameter)</a>, <a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.add_bonds_with_types.params.bond_types">[1]</a>
+</li>
+        <li><a href="api/pylimer_tools_cpp.BondLengthStats.html#pylimer_tools_cpp.BondLengthStats">BondLengthStats (class in pylimer_tools_cpp)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.add_bonds_with_types.params.bonds_from">bonds_from (pylimer_tools_cpp.Universe.add_bonds_with_types parameter)</a>, <a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.add_bonds_with_types.params.bonds_from">[1]</a>
 
@@ -1026,13 +1042,17 @@
 </li>
           <li><a href="api/pylimer_tools_cpp.Atom.html#pylimer_tools_cpp.Atom.get_unwrapped_z.params.box">(pylimer_tools_cpp.Atom.get_unwrapped_z parameter)</a>, <a href="api/pylimer_tools_cpp.Atom.html#pylimer_tools_cpp.Atom.get_unwrapped_z.params.box">[1]</a>
 </li>
+          <li><a href="api/pylimer_tools_cpp.CrosslinkerUniverse.html#pylimer_tools_cpp.CrosslinkerUniverse.compute_bond_length_stats.params.box">(pylimer_tools_cpp.CrosslinkerUniverse.compute_bond_length_stats parameter)</a>, <a href="api/pylimer_tools_cpp.CrosslinkerUniverse.html#pylimer_tools_cpp.CrosslinkerUniverse.compute_bond_length_stats.params.box">[1]</a>
+</li>
+          <li><a href="api/pylimer_tools_cpp.CrosslinkerUniverse.html#pylimer_tools_cpp.CrosslinkerUniverse.compute_end_to_end_stats.params.box">(pylimer_tools_cpp.CrosslinkerUniverse.compute_end_to_end_stats parameter)</a>, <a href="api/pylimer_tools_cpp.CrosslinkerUniverse.html#pylimer_tools_cpp.CrosslinkerUniverse.compute_end_to_end_stats.params.box">[1]</a>
+</li>
           <li><a href="api/pylimer_tools_cpp.do_linear_walk_chain_from_to.html#pylimer_tools_cpp.do_linear_walk_chain_from_to.params.box">(pylimer_tools_cpp.do_linear_walk_chain_from_to parameter)</a>, <a href="pylimer_tools_cpp.html#pylimer_tools_cpp.do_linear_walk_chain_from_to.params.box">[1]</a>
 </li>
           <li><a href="api/pylimer_tools_cpp.do_random_walk_chain_from_to.html#pylimer_tools_cpp.do_random_walk_chain_from_to.params.box">(pylimer_tools_cpp.do_random_walk_chain_from_to parameter)</a>, <a href="pylimer_tools_cpp.html#pylimer_tools_cpp.do_random_walk_chain_from_to.params.box">[1]</a>
 </li>
           <li><a href="api/pylimer_tools_cpp.do_random_walk_chain_from_to_mc.html#pylimer_tools_cpp.do_random_walk_chain_from_to_mc.params.box">(pylimer_tools_cpp.do_random_walk_chain_from_to_mc parameter)</a>, <a href="pylimer_tools_cpp.html#pylimer_tools_cpp.do_random_walk_chain_from_to_mc.params.box">[1]</a>
 </li>
-          <li><a href="api/pylimer_tools_cpp.Molecule.html#pylimer_tools_cpp.Molecule.params.box">(pylimer_tools_cpp.Molecule parameter)</a>, <a href="pylimer_tools_cpp.html#pylimer_tools_cpp.Molecule.params.box">[1]</a>
+          <li><a href="api/pylimer_tools_cpp.sample_strand_beads_on_demand.html#pylimer_tools_cpp.sample_strand_beads_on_demand.params.box">(pylimer_tools_cpp.sample_strand_beads_on_demand parameter)</a>, <a href="pylimer_tools_cpp.html#pylimer_tools_cpp.sample_strand_beads_on_demand.params.box">[1]</a>
 </li>
           <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.set_box.params.box">(pylimer_tools_cpp.Universe.set_box parameter)</a>, <a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.set_box.params.box">[1]</a>
 </li>
@@ -1077,6 +1097,18 @@
         </ul></li>
         <li><a href="pylimer_tools.utils.html#pylimer_tools.utils.cache_utility.is_current_cache.params.cache_file">cache_file (pylimer_tools.utils.cache_utility.is_current_cache parameter)</a>
 </li>
+        <li><a href="api/pylimer_tools_cpp.CrosslinkerUniverse.html#pylimer_tools_cpp.CrosslinkerUniverse.compute_end_to_end_stats.params.category">category (pylimer_tools_cpp.CrosslinkerUniverse.compute_end_to_end_stats parameter)</a>, <a href="api/pylimer_tools_cpp.CrosslinkerUniverse.html#pylimer_tools_cpp.CrosslinkerUniverse.compute_end_to_end_stats.params.category">[1]</a>
+
+        <ul>
+          <li><a href="api/pylimer_tools_cpp.CrosslinkerUniverse.html#pylimer_tools_cpp.CrosslinkerUniverse.compute_strand_bond_counts.params.category">(pylimer_tools_cpp.CrosslinkerUniverse.compute_strand_bond_counts parameter)</a>, <a href="api/pylimer_tools_cpp.CrosslinkerUniverse.html#pylimer_tools_cpp.CrosslinkerUniverse.compute_strand_bond_counts.params.category">[1]</a>
+</li>
+          <li><a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.compute_end_to_end_stats.params.category">(pylimer_tools_cpp.MCUniverseGenerator.compute_end_to_end_stats parameter)</a>, <a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.compute_end_to_end_stats.params.category">[1]</a>
+</li>
+          <li><a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.compute_strand_bond_counts.params.category">(pylimer_tools_cpp.MCUniverseGenerator.compute_strand_bond_counts parameter)</a>, <a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.compute_strand_bond_counts.params.category">[1]</a>
+</li>
+          <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.compute_end_to_end_stats.params.category">(pylimer_tools_cpp.Universe.compute_end_to_end_stats parameter)</a>, <a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.compute_end_to_end_stats.params.category">[1]</a>
+</li>
+        </ul></li>
         <li><a href="api/pylimer_tools_cpp.do_linear_walk_chain_from_to.html#pylimer_tools_cpp.do_linear_walk_chain_from_to.params.chain_len">chain_len (pylimer_tools_cpp.do_linear_walk_chain_from_to parameter)</a>, <a href="pylimer_tools_cpp.html#pylimer_tools_cpp.do_linear_walk_chain_from_to.params.chain_len">[1]</a>
 
         <ul>
@@ -1088,6 +1120,8 @@
 </li>
         </ul></li>
         <li><a href="api/pylimer_tools_cpp.AtomStyle.html#pylimer_tools_cpp.AtomStyle.CHARGE">CHARGE (pylimer_tools_cpp.AtomStyle attribute)</a>
+</li>
+        <li><a href="api/pylimer_tools_cpp.CrosslinkerUniverse.html#pylimer_tools_cpp.CrosslinkerUniverse.classify_strand">classify_strand() (pylimer_tools_cpp.CrosslinkerUniverse method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.clear_caches">clear_caches() (pylimer_tools_cpp.Universe method)</a>
 </li>
@@ -1123,6 +1157,14 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.compute_angles">compute_angles() (pylimer_tools_cpp.Universe method)</a>
 </li>
+        <li><a href="api/pylimer_tools_cpp.CrosslinkerUniverse.html#pylimer_tools_cpp.CrosslinkerUniverse.compute_bond_length_stats">compute_bond_length_stats() (pylimer_tools_cpp.CrosslinkerUniverse method)</a>
+
+        <ul>
+          <li><a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.compute_bond_length_stats">(pylimer_tools_cpp.MCUniverseGenerator method)</a>
+</li>
+          <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.compute_bond_length_stats">(pylimer_tools_cpp.Universe method)</a>
+</li>
+        </ul></li>
         <li><a href="api/pylimer_tools_cpp.Molecule.html#pylimer_tools_cpp.Molecule.compute_bond_lengths">compute_bond_lengths() (pylimer_tools_cpp.Molecule method)</a>
 
         <ul>
@@ -1179,6 +1221,14 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.compute_end_to_end_distances">compute_end_to_end_distances() (pylimer_tools_cpp.Universe method)</a>
 </li>
+        <li><a href="api/pylimer_tools_cpp.CrosslinkerUniverse.html#pylimer_tools_cpp.CrosslinkerUniverse.compute_end_to_end_stats">compute_end_to_end_stats() (pylimer_tools_cpp.CrosslinkerUniverse method)</a>
+
+        <ul>
+          <li><a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.compute_end_to_end_stats">(pylimer_tools_cpp.MCUniverseGenerator method)</a>
+</li>
+          <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.compute_end_to_end_stats">(pylimer_tools_cpp.Universe method)</a>
+</li>
+        </ul></li>
         <li><a href="api/pylimer_tools_cpp.Molecule.html#pylimer_tools_cpp.Molecule.compute_end_to_end_vector">compute_end_to_end_vector() (pylimer_tools_cpp.Molecule method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.Molecule.html#pylimer_tools_cpp.Molecule.compute_end_to_end_vector_with_derived_image_flags">compute_end_to_end_vector_with_derived_image_flags() (pylimer_tools_cpp.Molecule method)</a>
@@ -1255,6 +1305,12 @@
 </li>
         <li><a href="pylimer_tools.calc.html#pylimer_tools.calc.structure_analysis.compute_stoichiometric_imbalance">compute_stoichiometric_imbalance() (in module pylimer_tools.calc.structure_analysis)</a>
 </li>
+        <li><a href="api/pylimer_tools_cpp.CrosslinkerUniverse.html#pylimer_tools_cpp.CrosslinkerUniverse.compute_strand_bond_counts">compute_strand_bond_counts() (pylimer_tools_cpp.CrosslinkerUniverse method)</a>
+
+        <ul>
+          <li><a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.compute_strand_bond_counts">(pylimer_tools_cpp.MCUniverseGenerator method)</a>
+</li>
+        </ul></li>
         <li><a href="pylimer_tools.calc.html#pylimer_tools.calc.stoichiometric_relationships.compute_strand_number_density">compute_strand_number_density() (in module pylimer_tools.calc.stoichiometric_relationships)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.compute_temperature">compute_temperature() (pylimer_tools_cpp.Universe method)</a>
@@ -1325,6 +1381,8 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.MEHPForceBalance2.html#pylimer_tools_cpp.MEHPForceBalance2.config_cg_fallback_max_iterations">config_cg_fallback_max_iterations() (pylimer_tools_cpp.MEHPForceBalance2 method)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pylimer_tools_cpp.DataFileWriter.html#pylimer_tools_cpp.DataFileWriter.config_crosslinker_type">config_crosslinker_type() (pylimer_tools_cpp.DataFileWriter method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance.config_entanglement_type">config_entanglement_type() (pylimer_tools_cpp.MEHPForceBalance method)</a>
@@ -1335,8 +1393,6 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.DataFileWriter.html#pylimer_tools_cpp.DataFileWriter.config_include_dihedral_angles">config_include_dihedral_angles() (pylimer_tools_cpp.DataFileWriter method)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pylimer_tools_cpp.DataFileWriter.html#pylimer_tools_cpp.DataFileWriter.config_include_velocities">config_include_velocities() (pylimer_tools_cpp.DataFileWriter method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.DPDSimulator.html#pylimer_tools_cpp.DPDSimulator.config_lambda">config_lambda() (pylimer_tools_cpp.DPDSimulator method)</a>
@@ -1414,6 +1470,8 @@
 </li>
           <li><a href="api/pylimer_tools_cpp.RouseSolverType.html#pylimer_tools_cpp.RouseSolverType.conjugate">(pylimer_tools_cpp.RouseSolverType method)</a>
 </li>
+          <li><a href="api/pylimer_tools_cpp.StrandCategory.html#pylimer_tools_cpp.StrandCategory.conjugate">(pylimer_tools_cpp.StrandCategory method)</a>
+</li>
         </ul></li>
         <li><a href="api/pylimer_tools_cpp.CONJUGATE_GRADIENT.html#pylimer_tools_cpp.CONJUGATE_GRADIENT">CONJUGATE_GRADIENT (in module pylimer_tools_cpp)</a>
 
@@ -1445,8 +1503,20 @@
         </ul></li>
         <li><a href="api/pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation.count_active_clustered_atoms">count_active_clustered_atoms() (pylimer_tools_cpp.MEHPForceRelaxation method)</a>
 </li>
-        <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.count_atom_types">count_atom_types() (pylimer_tools_cpp.Universe method)</a>
+        <li><a href="api/pylimer_tools_cpp.CrosslinkerUniverse.html#pylimer_tools_cpp.CrosslinkerUniverse.count_atom_types">count_atom_types() (pylimer_tools_cpp.CrosslinkerUniverse method)</a>
+
+        <ul>
+          <li><a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.count_atom_types">(pylimer_tools_cpp.MCUniverseGenerator method)</a>
 </li>
+          <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.count_atom_types">(pylimer_tools_cpp.Universe method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/pylimer_tools_cpp.CrosslinkerUniverse.html#pylimer_tools_cpp.CrosslinkerUniverse.count_atoms_by_degree">count_atoms_by_degree() (pylimer_tools_cpp.CrosslinkerUniverse method)</a>
+
+        <ul>
+          <li><a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.count_atoms_by_degree">(pylimer_tools_cpp.MCUniverseGenerator method)</a>
+</li>
+        </ul></li>
         <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.count_atoms_in_skin_distance">count_atoms_in_skin_distance() (pylimer_tools_cpp.Universe method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.count_loop_lengths">count_loop_lengths() (pylimer_tools_cpp.Universe method)</a>
@@ -1572,10 +1642,6 @@
 </li>
           <li><a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.add_regularly_spaced_functionalized_strands.params.crosslinker_type">(pylimer_tools_cpp.MCUniverseGenerator.add_regularly_spaced_functionalized_strands parameter)</a>, <a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.add_regularly_spaced_functionalized_strands.params.crosslinker_type">[1]</a>
 </li>
-          <li><a href="api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance.params.crosslinker_type">(pylimer_tools_cpp.MEHPForceBalance parameter)</a>, <a href="pylimer_tools_cpp.html#pylimer_tools_cpp.MEHPForceBalance.params.crosslinker_type">[1]</a>
-</li>
-          <li><a href="api/pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation.params.crosslinker_type">(pylimer_tools_cpp.MEHPForceRelaxation parameter)</a>, <a href="pylimer_tools_cpp.html#pylimer_tools_cpp.MEHPForceRelaxation.params.crosslinker_type">[1]</a>
-</li>
           <li><a href="api/pylimer_tools_cpp.Molecule.html#pylimer_tools_cpp.Molecule.compute_total_vector.params.crosslinker_type">(pylimer_tools_cpp.Molecule.compute_total_vector parameter)</a>, <a href="api/pylimer_tools_cpp.Molecule.html#pylimer_tools_cpp.Molecule.compute_total_vector.params.crosslinker_type">[1]</a>
 </li>
           <li><a href="api/pylimer_tools_cpp.Molecule.html#pylimer_tools_cpp.Molecule.compute_vector_from_to.params.crosslinker_type">(pylimer_tools_cpp.Molecule.compute_vector_from_to parameter)</a>, <a href="api/pylimer_tools_cpp.Molecule.html#pylimer_tools_cpp.Molecule.compute_vector_from_to.params.crosslinker_type">[1]</a>
@@ -1587,6 +1653,8 @@
           <li><a href="api/pylimer_tools_cpp.randomly_sample_entanglements.html#pylimer_tools_cpp.randomly_sample_entanglements.params.crosslinker_type">(pylimer_tools_cpp.randomly_sample_entanglements parameter)</a>, <a href="pylimer_tools_cpp.html#pylimer_tools_cpp.randomly_sample_entanglements.params.crosslinker_type">[1]</a>
 </li>
           <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.compute_end_to_end_distances.params.crosslinker_type">(pylimer_tools_cpp.Universe.compute_end_to_end_distances parameter)</a>, <a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.compute_end_to_end_distances.params.crosslinker_type">[1]</a>
+</li>
+          <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.compute_end_to_end_stats.params.crosslinker_type">(pylimer_tools_cpp.Universe.compute_end_to_end_stats parameter)</a>, <a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.compute_end_to_end_stats.params.crosslinker_type">[1]</a>
 </li>
           <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.compute_mean_end_to_end_distance.params.crosslinker_type">(pylimer_tools_cpp.Universe.compute_mean_end_to_end_distance parameter)</a>, <a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.compute_mean_end_to_end_distance.params.crosslinker_type">[1]</a>
 </li>
@@ -1612,7 +1680,11 @@
 </li>
         </ul></li>
         <li><a href="api/pylimer_tools_cpp.peel_topological_leaves.html#pylimer_tools_cpp.peel_topological_leaves.params.crosslinker_universe">crosslinker_universe (pylimer_tools_cpp.peel_topological_leaves parameter)</a>, <a href="pylimer_tools_cpp.html#pylimer_tools_cpp.peel_topological_leaves.params.crosslinker_universe">[1]</a>
+
+        <ul>
+          <li><a href="api/pylimer_tools_cpp.sample_strand_beads_on_demand.html#pylimer_tools_cpp.sample_strand_beads_on_demand.params.crosslinker_universe">(pylimer_tools_cpp.sample_strand_beads_on_demand parameter)</a>, <a href="pylimer_tools_cpp.html#pylimer_tools_cpp.sample_strand_beads_on_demand.params.crosslinker_universe">[1]</a>
 </li>
+        </ul></li>
         <li><a href="api/pylimer_tools_cpp.CrosslinkerUniverse.html#pylimer_tools_cpp.CrosslinkerUniverse">CrosslinkerUniverse (class in pylimer_tools_cpp)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.DPDSimulator.html#pylimer_tools_cpp.DPDSimulator.validate_neighbour_list.params.cutoff">cutoff (pylimer_tools_cpp.DPDSimulator.validate_neighbour_list parameter)</a>, <a href="api/pylimer_tools_cpp.DPDSimulator.html#pylimer_tools_cpp.DPDSimulator.validate_neighbour_list.params.cutoff">[1]</a>
@@ -1626,7 +1698,11 @@
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pylimer_tools_cpp.MoleculeType.html#pylimer_tools_cpp.MoleculeType.DANGLING_CHAIN">DANGLING_CHAIN (pylimer_tools_cpp.MoleculeType attribute)</a>
+
+        <ul>
+          <li><a href="api/pylimer_tools_cpp.StrandCategory.html#pylimer_tools_cpp.StrandCategory.DANGLING_CHAIN">(pylimer_tools_cpp.StrandCategory attribute)</a>
 </li>
+        </ul></li>
         <li><a href="pylimer_tools.utils.html#pylimer_tools.utils.data_utility.get_tail.params.data">data (pylimer_tools.utils.data_utility.get_tail parameter)</a>
 
         <ul>
@@ -1684,6 +1760,8 @@
 </li>
           <li><a href="api/pylimer_tools_cpp.RouseSolverType.html#pylimer_tools_cpp.RouseSolverType.denominator">(pylimer_tools_cpp.RouseSolverType attribute)</a>
 </li>
+          <li><a href="api/pylimer_tools_cpp.StrandCategory.html#pylimer_tools_cpp.StrandCategory.denominator">(pylimer_tools_cpp.StrandCategory attribute)</a>
+</li>
         </ul></li>
         <li><a href="api/pylimer_tools_cpp.NormalModeSolver.html#pylimer_tools_cpp.NormalModeSolver.DENSE_EIGEN">DENSE_EIGEN (pylimer_tools_cpp.NormalModeSolver attribute)</a>
 </li>
@@ -1696,6 +1774,8 @@
         <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.compute_end_to_end_distances.params.derive_image_flags">derive_image_flags (pylimer_tools_cpp.Universe.compute_end_to_end_distances parameter)</a>, <a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.compute_end_to_end_distances.params.derive_image_flags">[1]</a>
 
         <ul>
+          <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.compute_end_to_end_stats.params.derive_image_flags">(pylimer_tools_cpp.Universe.compute_end_to_end_stats parameter)</a>, <a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.compute_end_to_end_stats.params.derive_image_flags">[1]</a>
+</li>
           <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.compute_mean_end_to_end_distance.params.derive_image_flags">(pylimer_tools_cpp.Universe.compute_mean_end_to_end_distance parameter)</a>, <a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.compute_mean_end_to_end_distance.params.derive_image_flags">[1]</a>
 </li>
           <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.compute_mean_squared_end_to_end_distance.params.derive_image_flags">(pylimer_tools_cpp.Universe.compute_mean_squared_end_to_end_distance parameter)</a>, <a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.compute_mean_squared_end_to_end_distance.params.derive_image_flags">[1]</a>
@@ -1707,8 +1787,14 @@
 </li>
         <li><a href="pylimer_tools.io.html#pylimer_tools.io.extract_thermo_data.detect_headers">detect_headers() (in module pylimer_tools.io.extract_thermo_data)</a>
 </li>
-        <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.determine_effective_functionality_per_type">determine_effective_functionality_per_type() (pylimer_tools_cpp.Universe method)</a>
+        <li><a href="api/pylimer_tools_cpp.CrosslinkerUniverse.html#pylimer_tools_cpp.CrosslinkerUniverse.determine_effective_functionality_per_type">determine_effective_functionality_per_type() (pylimer_tools_cpp.CrosslinkerUniverse method)</a>
+
+        <ul>
+          <li><a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.determine_effective_functionality_per_type">(pylimer_tools_cpp.MCUniverseGenerator method)</a>
 </li>
+          <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.determine_effective_functionality_per_type">(pylimer_tools_cpp.Universe method)</a>
+</li>
+        </ul></li>
         <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.determine_functionality_per_type">determine_functionality_per_type() (pylimer_tools_cpp.Universe method)</a>
 </li>
         <li><a href="pylimer_tools.io.html#pylimer_tools.io.read_lammps_output_file.apply_to_numeric_ignore_compat.params.df">df (pylimer_tools.io.read_lammps_output_file.apply_to_numeric_ignore_compat parameter)</a>
@@ -1729,10 +1815,10 @@
           <li><a href="pylimer_tools.utils.html#pylimer_tools.utils.optimize_dataframe.reduce_mem_usage.params.df">(pylimer_tools.utils.optimize_dataframe.reduce_mem_usage parameter)</a>
 </li>
         </ul></li>
-        <li><a href="api/pylimer_tools_cpp.AtomStyle.html#pylimer_tools_cpp.AtomStyle.DIELECTRIC">DIELECTRIC (pylimer_tools_cpp.AtomStyle attribute)</a>
-</li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/pylimer_tools_cpp.AtomStyle.html#pylimer_tools_cpp.AtomStyle.DIELECTRIC">DIELECTRIC (pylimer_tools_cpp.AtomStyle attribute)</a>
+</li>
         <li><a href="pylimer_tools.io.html#pylimer_tools.io.unit_styles.UnitStyleFactory.get_unit_style.params.dimension">dimension (pylimer_tools.io.unit_styles.UnitStyleFactory.get_unit_style parameter)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.compute_temperature.params.dimensions">dimensions (pylimer_tools_cpp.Universe.compute_temperature parameter)</a>, <a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.compute_temperature.params.dimensions">[1]</a>
@@ -1867,6 +1953,8 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.RouseSimulationResult.html#pylimer_tools_cpp.RouseSimulationResult.end_to_end_correlation">end_to_end_correlation (pylimer_tools_cpp.RouseSimulationResult attribute)</a>
 </li>
+        <li><a href="api/pylimer_tools_cpp.EndToEndStats.html#pylimer_tools_cpp.EndToEndStats">EndToEndStats (class in pylimer_tools_cpp)</a>
+</li>
         <li><a href="api/pylimer_tools_cpp.EntanglementFilteringMode.html#pylimer_tools_cpp.EntanglementFilteringMode">EntanglementFilteringMode (class in pylimer_tools_cpp)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.EntanglementSamplingMethod.html#pylimer_tools_cpp.EntanglementSamplingMethod">EntanglementSamplingMethod (class in pylimer_tools_cpp)</a>
@@ -1881,10 +1969,10 @@
           <li><a href="api/pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html#pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.evaluate_force_set_gradient">(pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator method)</a>
 </li>
         </ul></li>
-        <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus">evaluate_loss_modulus() (pylimer_tools_cpp.NormalModeAnalyzer method)</a>
-</li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus">evaluate_loss_modulus() (pylimer_tools_cpp.NormalModeAnalyzer method)</a>
+</li>
         <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_kpm">evaluate_loss_modulus_kpm() (pylimer_tools_cpp.NormalModeAnalyzer method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance">evaluate_spring_distance() (pylimer_tools_cpp.MEHPForceBalance method)</a>
@@ -2055,18 +2143,18 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.find_sparse_eigenvalues">find_sparse_eigenvalues() (pylimer_tools_cpp.NormalModeAnalyzer method)</a>
 </li>
-        <li><a href="api/pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation.params.force_evaluator">force_evaluator (pylimer_tools_cpp.MEHPForceRelaxation parameter)</a>, <a href="pylimer_tools_cpp.html#pylimer_tools_cpp.MEHPForceRelaxation.params.force_evaluator">[1]</a>
-
-        <ul>
-          <li><a href="api/pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation.set_force_evaluator.params.force_evaluator">(pylimer_tools_cpp.MEHPForceRelaxation.set_force_evaluator parameter)</a>, <a href="api/pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation.set_force_evaluator.params.force_evaluator">[1]</a>
+        <li><a href="api/pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation.set_force_evaluator.params.force_evaluator">force_evaluator (pylimer_tools_cpp.MEHPForceRelaxation.set_force_evaluator parameter)</a>, <a href="api/pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation.set_force_evaluator.params.force_evaluator">[1]</a>
 </li>
-        </ul></li>
         <li><a href="api/pylimer_tools_cpp.UniverseSequence.html#pylimer_tools_cpp.UniverseSequence.forget_at_index">forget_at_index() (pylimer_tools_cpp.UniverseSequence method)</a>
 </li>
         <li><a href="pylimer_tools.io.html#pylimer_tools.io.extract_thermo_data.read_one_group.params.fp">fp (pylimer_tools.io.extract_thermo_data.read_one_group parameter)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.MoleculeType.html#pylimer_tools_cpp.MoleculeType.FREE_CHAIN">FREE_CHAIN (pylimer_tools_cpp.MoleculeType attribute)</a>
+
+        <ul>
+          <li><a href="api/pylimer_tools_cpp.StrandCategory.html#pylimer_tools_cpp.StrandCategory.FREE_CHAIN">(pylimer_tools_cpp.StrandCategory attribute)</a>
 </li>
+        </ul></li>
         <li><a href="api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance.config_simplification_frequency.params.frequency">frequency (pylimer_tools_cpp.MEHPForceBalance.config_simplification_frequency parameter)</a>, <a href="api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance.config_simplification_frequency.params.frequency">[1]</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.ComputedDoubleValues.html#pylimer_tools_cpp.ComputedDoubleValues.from_bytes">from_bytes() (pylimer_tools_cpp.ComputedDoubleValues class method)</a>
@@ -2079,6 +2167,8 @@
           <li><a href="api/pylimer_tools_cpp.ExitReason.html#pylimer_tools_cpp.ExitReason.from_bytes">(pylimer_tools_cpp.ExitReason class method)</a>
 </li>
           <li><a href="api/pylimer_tools_cpp.RouseSolverType.html#pylimer_tools_cpp.RouseSolverType.from_bytes">(pylimer_tools_cpp.RouseSolverType class method)</a>
+</li>
+          <li><a href="api/pylimer_tools_cpp.StrandCategory.html#pylimer_tools_cpp.StrandCategory.from_bytes">(pylimer_tools_cpp.StrandCategory class method)</a>
 </li>
         </ul></li>
         <li><a href="api/pylimer_tools_cpp.do_linear_walk_chain_from_to.html#pylimer_tools_cpp.do_linear_walk_chain_from_to.params.from_coordinates">from_coordinates (pylimer_tools_cpp.do_linear_walk_chain_from_to parameter)</a>, <a href="pylimer_tools_cpp.html#pylimer_tools_cpp.do_linear_walk_chain_from_to.params.from_coordinates">[1]</a>
@@ -2963,8 +3053,6 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.SLESolver.html#pylimer_tools_cpp.SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT">GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT (pylimer_tools_cpp.SLESolver attribute)</a>
 </li>
-        <li><a href="api/pylimer_tools_cpp.Molecule.html#pylimer_tools_cpp.Molecule.params.graph">graph (pylimer_tools_cpp.Molecule parameter)</a>, <a href="pylimer_tools_cpp.html#pylimer_tools_cpp.Molecule.params.graph">[1]</a>
-</li>
         <li><a href="pylimer_tools.io.html#pylimer_tools.io.read_lammps_output_file.read_correlation_file.params.group_key">group_key (pylimer_tools.io.read_lammps_output_file.read_correlation_file parameter)</a>
 </li>
     </ul></td>
@@ -3054,6 +3142,8 @@
 </li>
           <li><a href="api/pylimer_tools_cpp.RouseSolverType.html#pylimer_tools_cpp.RouseSolverType.imag">(pylimer_tools_cpp.RouseSolverType attribute)</a>
 </li>
+          <li><a href="api/pylimer_tools_cpp.StrandCategory.html#pylimer_tools_cpp.StrandCategory.imag">(pylimer_tools_cpp.StrandCategory attribute)</a>
+</li>
         </ul></li>
         <li><a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.use_zscore_max_distance.params.in_sqrt_multiplier">in_sqrt_multiplier (pylimer_tools_cpp.MCUniverseGenerator.use_zscore_max_distance parameter)</a>, <a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.use_zscore_max_distance.params.in_sqrt_multiplier">[1]</a>
 
@@ -3089,10 +3179,10 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.UniverseSequence.html#pylimer_tools_cpp.UniverseSequence.initialize_from_data_sequence">initialize_from_data_sequence() (pylimer_tools_cpp.UniverseSequence method)</a>
 </li>
-        <li><a href="api/pylimer_tools_cpp.UniverseSequence.html#pylimer_tools_cpp.UniverseSequence.initialize_from_dump_file">initialize_from_dump_file() (pylimer_tools_cpp.UniverseSequence method)</a>
-</li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/pylimer_tools_cpp.UniverseSequence.html#pylimer_tools_cpp.UniverseSequence.initialize_from_dump_file">initialize_from_dump_file() (pylimer_tools_cpp.UniverseSequence method)</a>
+</li>
         <li><a href="api/pylimer_tools_cpp.RouseBrownianSimulator.html#pylimer_tools_cpp.RouseBrownianSimulator.initialize_linear_positions">initialize_linear_positions() (pylimer_tools_cpp.RouseBrownianSimulator method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.RouseBrownianSimulator.html#pylimer_tools_cpp.RouseBrownianSimulator.initialize_random_walk">initialize_random_walk() (pylimer_tools_cpp.RouseBrownianSimulator method)</a>
@@ -3119,14 +3209,8 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.inverse_langevin.html#pylimer_tools_cpp.inverse_langevin">inverse_langevin() (in module pylimer_tools_cpp)</a>
 </li>
-        <li><a href="api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance.params.is2D">is2D (pylimer_tools_cpp.MEHPForceBalance parameter)</a>, <a href="pylimer_tools_cpp.html#pylimer_tools_cpp.MEHPForceBalance.params.is2D">[1]</a>
+        <li><a href="api/pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation.run_force_relaxation.params.is2d">is2d (pylimer_tools_cpp.MEHPForceRelaxation.run_force_relaxation parameter)</a>, <a href="api/pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation.run_force_relaxation.params.is2d">[1]</a>
 </li>
-        <li><a href="api/pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation.params.is2d">is2d (pylimer_tools_cpp.MEHPForceRelaxation parameter)</a>, <a href="pylimer_tools_cpp.html#pylimer_tools_cpp.MEHPForceRelaxation.params.is2d">[1]</a>
-
-        <ul>
-          <li><a href="api/pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation.run_force_relaxation.params.is2d">(pylimer_tools_cpp.MEHPForceRelaxation.run_force_relaxation parameter)</a>, <a href="api/pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation.run_force_relaxation.params.is2d">[1]</a>
-</li>
-        </ul></li>
         <li><a href="api/pylimer_tools_cpp.MEHPForceEvaluator.html#pylimer_tools_cpp.MEHPForceEvaluator.is_2d">is_2d (pylimer_tools_cpp.MEHPForceEvaluator attribute)</a>
 
         <ul>
@@ -3153,6 +3237,8 @@
           <li><a href="api/pylimer_tools_cpp.ExitReason.html#pylimer_tools_cpp.ExitReason.is_integer">(pylimer_tools_cpp.ExitReason method)</a>
 </li>
           <li><a href="api/pylimer_tools_cpp.RouseSolverType.html#pylimer_tools_cpp.RouseSolverType.is_integer">(pylimer_tools_cpp.RouseSolverType method)</a>
+</li>
+          <li><a href="api/pylimer_tools_cpp.StrandCategory.html#pylimer_tools_cpp.StrandCategory.is_integer">(pylimer_tools_cpp.StrandCategory method)</a>
 </li>
         </ul></li>
         <li><a href="api/pylimer_tools_cpp.Box.html#pylimer_tools_cpp.Box.is_valid_offset">is_valid_offset() (pylimer_tools_cpp.Box method)</a>
@@ -3189,14 +3275,10 @@
 </li>
         <li><a href="pylimer_tools.calc.html#pylimer_tools.calc.mehp_utilities.predict_shear_modulus.params.k_boltzmann">k_boltzmann (pylimer_tools.calc.mehp_utilities.predict_shear_modulus parameter)</a>
 </li>
-        <li><a href="api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance.params.kappa">kappa (pylimer_tools_cpp.MEHPForceBalance parameter)</a>, <a href="pylimer_tools_cpp.html#pylimer_tools_cpp.MEHPForceBalance.params.kappa">[1]</a>
+        <li><a href="api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance.config_spring_constant.params.kappa">kappa (pylimer_tools_cpp.MEHPForceBalance.config_spring_constant parameter)</a>, <a href="api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance.config_spring_constant.params.kappa">[1]</a>
 
         <ul>
-          <li><a href="api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance.config_spring_constant.params.kappa">(pylimer_tools_cpp.MEHPForceBalance.config_spring_constant parameter)</a>, <a href="api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance.config_spring_constant.params.kappa">[1]</a>
-</li>
           <li><a href="api/pylimer_tools_cpp.MEHPForceBalance2.html#pylimer_tools_cpp.MEHPForceBalance2.config_spring_constant.params.kappa">(pylimer_tools_cpp.MEHPForceBalance2.config_spring_constant parameter)</a>, <a href="api/pylimer_tools_cpp.MEHPForceBalance2.html#pylimer_tools_cpp.MEHPForceBalance2.config_spring_constant.params.kappa">[1]</a>
-</li>
-          <li><a href="api/pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation.params.kappa">(pylimer_tools_cpp.MEHPForceRelaxation parameter)</a>, <a href="pylimer_tools_cpp.html#pylimer_tools_cpp.MEHPForceRelaxation.params.kappa">[1]</a>
 </li>
           <li><a href="api/pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html#pylimer_tools_cpp.NonGaussianSpringForceEvaluator.params.kappa">(pylimer_tools_cpp.NonGaussianSpringForceEvaluator parameter)</a>, <a href="pylimer_tools_cpp.html#pylimer_tools_cpp.NonGaussianSpringForceEvaluator.params.kappa">[1]</a>
 </li>
@@ -3381,11 +3463,11 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.set_mass.params.mass">mass (pylimer_tools_cpp.Universe.set_mass parameter)</a>, <a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.set_mass.params.mass">[1]</a>
 </li>
-        <li><a href="api/pylimer_tools_cpp.Molecule.html#pylimer_tools_cpp.Molecule.params.mass_map">mass_map (pylimer_tools_cpp.Molecule parameter)</a>, <a href="pylimer_tools_cpp.html#pylimer_tools_cpp.Molecule.params.mass_map">[1]</a>
-</li>
         <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.set_masses.params.mass_per_type">mass_per_type (pylimer_tools_cpp.Universe.set_masses parameter)</a>, <a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.set_masses.params.mass_per_type">[1]</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.ComputedDoubleValues.html#pylimer_tools_cpp.ComputedDoubleValues.MAX_B">MAX_B (pylimer_tools_cpp.ComputedDoubleValues attribute)</a>
+</li>
+        <li><a href="api/pylimer_tools_cpp.BondLengthStats.html#pylimer_tools_cpp.BondLengthStats.max_bond_length">max_bond_length (pylimer_tools_cpp.BondLengthStats attribute)</a>
 </li>
         <li>
     MAX_DISPLACEMENT
@@ -3438,6 +3520,10 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.ComputedDoubleValues.html#pylimer_tools_cpp.ComputedDoubleValues.MEAN_B">MEAN_B (pylimer_tools_cpp.ComputedDoubleValues attribute)</a>
 </li>
+        <li><a href="api/pylimer_tools_cpp.BondLengthStats.html#pylimer_tools_cpp.BondLengthStats.mean_bond_length">mean_bond_length (pylimer_tools_cpp.BondLengthStats attribute)</a>
+</li>
+        <li><a href="api/pylimer_tools_cpp.EndToEndStats.html#pylimer_tools_cpp.EndToEndStats.mean_end_to_end_distance">mean_end_to_end_distance (pylimer_tools_cpp.EndToEndStats attribute)</a>
+</li>
         <li><a href="api/pylimer_tools_cpp.Atom.html#pylimer_tools_cpp.Atom.mean_position_with">mean_position_with() (pylimer_tools_cpp.Atom method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.Atom.html#pylimer_tools_cpp.Atom.mean_position_with_unwrapped">mean_position_with_unwrapped() (pylimer_tools_cpp.Atom method)</a>
@@ -3452,7 +3538,11 @@
         </ul></li>
         <li><a href="api/pylimer_tools_cpp.CrosslinkerUniverse.html#pylimer_tools_cpp.CrosslinkerUniverse.mean_squared_bead_distance_in_strand">mean_squared_bead_distance_in_strand (pylimer_tools_cpp.CrosslinkerUniverse attribute)</a>
 </li>
+        <li><a href="api/pylimer_tools_cpp.BondLengthStats.html#pylimer_tools_cpp.BondLengthStats.mean_squared_bond_length">mean_squared_bond_length (pylimer_tools_cpp.BondLengthStats attribute)</a>
+</li>
         <li><a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.set_mean_squared_bead_distance.params.mean_squared_distance">mean_squared_distance (pylimer_tools_cpp.MCUniverseGenerator.set_mean_squared_bead_distance parameter)</a>, <a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.set_mean_squared_bead_distance.params.mean_squared_distance">[1]</a>
+</li>
+        <li><a href="api/pylimer_tools_cpp.EndToEndStats.html#pylimer_tools_cpp.EndToEndStats.mean_squared_end_to_end_distance">mean_squared_end_to_end_distance (pylimer_tools_cpp.EndToEndStats attribute)</a>
 </li>
         <li><a href="pylimer_tools.calc.html#pylimer_tools.calc.structure_analysis.measure_lower_bound_weight_fraction_of_soluble_material">measure_lower_bound_weight_fraction_of_soluble_material() (in module pylimer_tools.calc.structure_analysis)</a>
 </li>
@@ -3478,6 +3568,10 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements.params.method">method (pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements parameter)</a>, <a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements.params.method">[1]</a>
 </li>
+        <li><a href="api/pylimer_tools_cpp.BondLengthStats.html#pylimer_tools_cpp.BondLengthStats.min_bond_length">min_bond_length (pylimer_tools_cpp.BondLengthStats attribute)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="pylimer_tools.io.html#pylimer_tools.io.extract_thermo_data.extract_thermo_params.params.min_line_len">min_line_len (pylimer_tools.io.extract_thermo_data.extract_thermo_params parameter)</a>
 
         <ul>
@@ -3488,8 +3582,6 @@
           <li><a href="pylimer_tools.io.html#pylimer_tools.io.read_lammps_output_file.extract_thermo_params.params.min_line_len">(pylimer_tools.io.read_lammps_output_file.extract_thermo_params parameter)</a>
 </li>
         </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="pylimer_tools.utils.html#pylimer_tools.utils.data_utility.get_tail.params.min_n">min_n (pylimer_tools.utils.data_utility.get_tail parameter)</a>
 </li>
         <li><a href="pylimer_tools.calc.html#pylimer_tools.calc.mehp_utilities.compute_effective_nr_density_of_junctions.params.min_num_effective_strands">min_num_effective_strands (pylimer_tools.calc.mehp_utilities.compute_effective_nr_density_of_junctions parameter)</a>
@@ -3625,6 +3717,14 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.do_random_walk_chain_from_to_mc.html#pylimer_tools_cpp.do_random_walk_chain_from_to_mc.params.n_iterations">n_iterations (pylimer_tools_cpp.do_random_walk_chain_from_to_mc parameter)</a>, <a href="pylimer_tools_cpp.html#pylimer_tools_cpp.do_random_walk_chain_from_to_mc.params.n_iterations">[1]</a>
 </li>
+        <li><a href="api/pylimer_tools_cpp.CrosslinkerUniverse.html#pylimer_tools_cpp.CrosslinkerUniverse.compute_bond_length_stats.params.n_mc_steps">n_mc_steps (pylimer_tools_cpp.CrosslinkerUniverse.compute_bond_length_stats parameter)</a>, <a href="api/pylimer_tools_cpp.CrosslinkerUniverse.html#pylimer_tools_cpp.CrosslinkerUniverse.compute_bond_length_stats.params.n_mc_steps">[1]</a>
+
+        <ul>
+          <li><a href="api/pylimer_tools_cpp.CrosslinkerUniverse.html#pylimer_tools_cpp.CrosslinkerUniverse.compute_end_to_end_stats.params.n_mc_steps">(pylimer_tools_cpp.CrosslinkerUniverse.compute_end_to_end_stats parameter)</a>, <a href="api/pylimer_tools_cpp.CrosslinkerUniverse.html#pylimer_tools_cpp.CrosslinkerUniverse.compute_end_to_end_stats.params.n_mc_steps">[1]</a>
+</li>
+          <li><a href="api/pylimer_tools_cpp.sample_strand_beads_on_demand.html#pylimer_tools_cpp.sample_strand_beads_on_demand.params.n_mc_steps">(pylimer_tools_cpp.sample_strand_beads_on_demand parameter)</a>, <a href="pylimer_tools_cpp.html#pylimer_tools_cpp.sample_strand_beads_on_demand.params.n_mc_steps">[1]</a>
+</li>
+        </ul></li>
         <li><a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.config_nr_of_mc_steps.params.n_steps">n_steps (pylimer_tools_cpp.MCUniverseGenerator.config_nr_of_mc_steps parameter)</a>, <a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.config_nr_of_mc_steps.params.n_steps">[1]</a>
 </li>
         <li><a href="pylimer_tools.html#pylimer_tools.analyse_networks.compute_crosslinker_conversion.params.network">network (pylimer_tools.analyse_networks.compute_crosslinker_conversion parameter)</a>
@@ -3714,7 +3814,11 @@
 </li>
         </ul></li>
         <li><a href="api/pylimer_tools_cpp.MoleculeType.html#pylimer_tools_cpp.MoleculeType.NETWORK_STRAND">NETWORK_STRAND (pylimer_tools_cpp.MoleculeType attribute)</a>
+
+        <ul>
+          <li><a href="api/pylimer_tools_cpp.StrandCategory.html#pylimer_tools_cpp.StrandCategory.NETWORK_STRAND">(pylimer_tools_cpp.StrandCategory attribute)</a>
 </li>
+        </ul></li>
         <li><a href="pylimer_tools.calc.html#pylimer_tools.calc.mehp_utilities.compute_cycle_rank.params.networks">networks (pylimer_tools.calc.mehp_utilities.compute_cycle_rank parameter)</a>
 
         <ul>
@@ -3761,6 +3865,8 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.NormalModeSolver.html#pylimer_tools_cpp.NormalModeSolver">NormalModeSolver (class in pylimer_tools_cpp)</a>
 </li>
+        <li><a href="api/pylimer_tools_cpp.BondLengthStats.html#pylimer_tools_cpp.BondLengthStats.nr_of_bonds">nr_of_bonds (pylimer_tools_cpp.BondLengthStats attribute)</a>
+</li>
         <li><a href="api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance.get_gamma_factor.params.nr_of_chains">nr_of_chains (pylimer_tools_cpp.MEHPForceBalance.get_gamma_factor parameter)</a>, <a href="api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance.get_gamma_factor.params.nr_of_chains">[1]</a>
 
         <ul>
@@ -3793,6 +3899,8 @@
           <li><a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements_on_demand.params.nr_of_entanglements_to_sample">(pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements_on_demand parameter)</a>, <a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements_on_demand.params.nr_of_entanglements_to_sample">[1]</a>
 </li>
         </ul></li>
+        <li><a href="api/pylimer_tools_cpp.EndToEndStats.html#pylimer_tools_cpp.EndToEndStats.nr_of_excluded_zero_length">nr_of_excluded_zero_length (pylimer_tools_cpp.EndToEndStats attribute)</a>
+</li>
         <li><a href="api/pylimer_tools_cpp.SimplifiedBalance2Network.html#pylimer_tools_cpp.SimplifiedBalance2Network.nr_of_links">nr_of_links (pylimer_tools_cpp.SimplifiedBalance2Network attribute)</a>
 
         <ul>
@@ -3827,9 +3935,11 @@
         </ul></li>
         <li><a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.add_star_crosslinkers.params.nr_of_stars">nr_of_stars (pylimer_tools_cpp.MCUniverseGenerator.add_star_crosslinkers parameter)</a>, <a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.add_star_crosslinkers.params.nr_of_stars">[1]</a>
 </li>
-        <li><a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.add_end_functionalized_strands.params.nr_of_strands">nr_of_strands (pylimer_tools_cpp.MCUniverseGenerator.add_end_functionalized_strands parameter)</a>, <a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.add_end_functionalized_strands.params.nr_of_strands">[1]</a>
+        <li><a href="api/pylimer_tools_cpp.EndToEndStats.html#pylimer_tools_cpp.EndToEndStats.nr_of_strands">nr_of_strands (pylimer_tools_cpp.EndToEndStats attribute)</a>
 
         <ul>
+          <li><a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.add_end_functionalized_strands.params.nr_of_strands">(pylimer_tools_cpp.MCUniverseGenerator.add_end_functionalized_strands parameter)</a>, <a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.add_end_functionalized_strands.params.nr_of_strands">[1]</a>
+</li>
           <li><a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.add_functionalized_strands.params.nr_of_strands">(pylimer_tools_cpp.MCUniverseGenerator.add_functionalized_strands parameter)</a>, <a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.add_functionalized_strands.params.nr_of_strands">[1]</a>
 </li>
           <li><a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.add_randomly_functionalized_strands.params.nr_of_strands">(pylimer_tools_cpp.MCUniverseGenerator.add_randomly_functionalized_strands parameter)</a>, <a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.add_randomly_functionalized_strands.params.nr_of_strands">[1]</a>
@@ -3918,6 +4028,8 @@
 </li>
           <li><a href="api/pylimer_tools_cpp.RouseSolverType.html#pylimer_tools_cpp.RouseSolverType.numerator">(pylimer_tools_cpp.RouseSolverType attribute)</a>
 </li>
+          <li><a href="api/pylimer_tools_cpp.StrandCategory.html#pylimer_tools_cpp.StrandCategory.numerator">(pylimer_tools_cpp.StrandCategory attribute)</a>
+</li>
         </ul></li>
         <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.add_atoms.params.nx">nx (pylimer_tools_cpp.Universe.add_atoms parameter)</a>, <a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.add_atoms.params.nx">[1]</a>
 </li>
@@ -3988,6 +4100,8 @@
         <li><a href="pylimer_tools.utils.html#pylimer_tools.utils.optimize_dataframe.optimize_objects">optimize_objects() (in module pylimer_tools.utils.optimize_dataframe)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.ExitReason.html#pylimer_tools_cpp.ExitReason.OTHER">OTHER (pylimer_tools_cpp.ExitReason attribute)</a>
+</li>
+        <li><a href="api/pylimer_tools_cpp.Molecule.html#pylimer_tools_cpp.Molecule.params.other">other (pylimer_tools_cpp.Molecule parameter)</a>, <a href="pylimer_tools_cpp.html#pylimer_tools_cpp.Molecule.params.other">[1]</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.Atom.html#pylimer_tools_cpp.Atom.mean_position_with.params.other_atom">other_atom (pylimer_tools_cpp.Atom.mean_position_with parameter)</a>, <a href="api/pylimer_tools_cpp.Atom.html#pylimer_tools_cpp.Atom.mean_position_with.params.other_atom">[1]</a>
 
@@ -4130,7 +4244,11 @@
         <li><a href="api/pylimer_tools_cpp.ComputedDoubleValues.html#pylimer_tools_cpp.ComputedDoubleValues.PRESSURE">PRESSURE (pylimer_tools_cpp.ComputedDoubleValues attribute)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.MoleculeType.html#pylimer_tools_cpp.MoleculeType.PRIMARY_LOOP">PRIMARY_LOOP (pylimer_tools_cpp.MoleculeType attribute)</a>
+
+        <ul>
+          <li><a href="api/pylimer_tools_cpp.StrandCategory.html#pylimer_tools_cpp.StrandCategory.PRIMARY_LOOP">(pylimer_tools_cpp.StrandCategory attribute)</a>
 </li>
+        </ul></li>
         <li><a href="pylimer_tools.utils.html#pylimer_tools.utils.optimize_dataframe.reduce_mem_usage.params.print_stats">print_stats (pylimer_tools.utils.optimize_dataframe.reduce_mem_usage parameter)</a>
 </li>
         <li><a href="pylimer_tools.html#pylimer_tools.generate_network.print_with_time">print_with_time() (in module pylimer_tools.generate_network)</a>
@@ -4474,6 +4592,8 @@
 </li>
           <li><a href="api/pylimer_tools_cpp.RouseSolverType.html#pylimer_tools_cpp.RouseSolverType.real">(pylimer_tools_cpp.RouseSolverType attribute)</a>
 </li>
+          <li><a href="api/pylimer_tools_cpp.StrandCategory.html#pylimer_tools_cpp.StrandCategory.real">(pylimer_tools_cpp.StrandCategory attribute)</a>
+</li>
         </ul></li>
         <li><a href="pylimer_tools.utils.html#pylimer_tools.utils.optimize_dataframe.reduce_mem_usage">reduce_mem_usage() (in module pylimer_tools.utils.optimize_dataframe)</a>
 </li>
@@ -4483,10 +4603,10 @@
           <li><a href="api/pylimer_tools_cpp.UniverseSequence.html#pylimer_tools_cpp.UniverseSequence.compute_msd_for_atoms.params.reduce_memory">(pylimer_tools_cpp.UniverseSequence.compute_msd_for_atoms parameter)</a>, <a href="api/pylimer_tools_cpp.UniverseSequence.html#pylimer_tools_cpp.UniverseSequence.compute_msd_for_atoms.params.reduce_memory">[1]</a>
 </li>
         </ul></li>
-        <li><a href="api/pylimer_tools_cpp.DPDSimulator.html#pylimer_tools_cpp.DPDSimulator.refresh_current_state">refresh_current_state() (pylimer_tools_cpp.DPDSimulator method)</a>
-</li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/pylimer_tools_cpp.DPDSimulator.html#pylimer_tools_cpp.DPDSimulator.refresh_current_state">refresh_current_state() (pylimer_tools_cpp.DPDSimulator method)</a>
+</li>
         <li><a href="api/pylimer_tools_cpp.DataFileWriter.html#pylimer_tools_cpp.DataFileWriter.config_reindex_atoms.params.reindex_atoms">reindex_atoms (pylimer_tools_cpp.DataFileWriter.config_reindex_atoms parameter)</a>, <a href="api/pylimer_tools_cpp.DataFileWriter.html#pylimer_tools_cpp.DataFileWriter.config_reindex_atoms.params.reindex_atoms">[1]</a>
 </li>
         <li><a href="pylimer_tools.calc.html#pylimer_tools.calc.mehp_utilities.compute_cycle_rank.params.rel_tol">rel_tol (pylimer_tools.calc.mehp_utilities.compute_cycle_rank parameter)</a>
@@ -4503,10 +4623,6 @@
         </ul></li>
         <li><a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.relax_crosslinks">relax_crosslinks() (pylimer_tools_cpp.MCUniverseGenerator method)</a>
 </li>
-        <li><a href="api/pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation.params.remove_2functional_crosslinkers">remove_2functional_crosslinkers (pylimer_tools_cpp.MEHPForceRelaxation parameter)</a>, <a href="pylimer_tools_cpp.html#pylimer_tools_cpp.MEHPForceRelaxation.params.remove_2functional_crosslinkers">[1]</a>
-</li>
-        <li><a href="api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance.params.remove_2functionalCrosslinkers">remove_2functionalCrosslinkers (pylimer_tools_cpp.MEHPForceBalance parameter)</a>, <a href="pylimer_tools_cpp.html#pylimer_tools_cpp.MEHPForceBalance.params.remove_2functionalCrosslinkers">[1]</a>
-</li>
         <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.remove_all_angles">remove_all_angles() (pylimer_tools_cpp.Universe method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.remove_all_dihedral_angles">remove_all_dihedral_angles() (pylimer_tools_cpp.Universe method)</a>
@@ -4517,12 +4633,6 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.remove_bonds_by_type">remove_bonds_by_type() (pylimer_tools_cpp.Universe method)</a>
 </li>
-        <li><a href="api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance.params.remove_dangling_chains">remove_dangling_chains (pylimer_tools_cpp.MEHPForceBalance parameter)</a>, <a href="pylimer_tools_cpp.html#pylimer_tools_cpp.MEHPForceBalance.params.remove_dangling_chains">[1]</a>
-
-        <ul>
-          <li><a href="api/pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation.params.remove_dangling_chains">(pylimer_tools_cpp.MEHPForceRelaxation parameter)</a>, <a href="pylimer_tools_cpp.html#pylimer_tools_cpp.MEHPForceRelaxation.params.remove_dangling_chains">[1]</a>
-</li>
-        </ul></li>
         <li><a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.remove_soluble_fraction">remove_soluble_fraction() (pylimer_tools_cpp.MCUniverseGenerator method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.replace_atom">replace_atom() (pylimer_tools_cpp.Universe method)</a>
@@ -4602,6 +4712,8 @@
         <li><a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements_analytical">sample_entanglements_analytical() (pylimer_tools_cpp.MCUniverseGenerator method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements_on_demand">sample_entanglements_on_demand() (pylimer_tools_cpp.MCUniverseGenerator method)</a>
+</li>
+        <li><a href="api/pylimer_tools_cpp.sample_strand_beads_on_demand.html#pylimer_tools_cpp.sample_strand_beads_on_demand">sample_strand_beads_on_demand() (in module pylimer_tools_cpp)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.do_random_walk.html#pylimer_tools_cpp.do_random_walk.params.seed">seed (pylimer_tools_cpp.do_random_walk parameter)</a>, <a href="pylimer_tools_cpp.html#pylimer_tools_cpp.do_random_walk.params.seed">[1]</a>
 
@@ -4895,10 +5007,14 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.CrosslinkerUniverse.html#pylimer_tools_cpp.CrosslinkerUniverse.strand_from">strand_from (pylimer_tools_cpp.CrosslinkerUniverse attribute)</a>
 </li>
-        <li><a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.link_strand.params.strand_idx">strand_idx (pylimer_tools_cpp.MCUniverseGenerator.link_strand parameter)</a>, <a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.link_strand.params.strand_idx">[1]</a>
+        <li><a href="api/pylimer_tools_cpp.CrosslinkerUniverse.html#pylimer_tools_cpp.CrosslinkerUniverse.classify_strand.params.strand_idx">strand_idx (pylimer_tools_cpp.CrosslinkerUniverse.classify_strand parameter)</a>, <a href="api/pylimer_tools_cpp.CrosslinkerUniverse.html#pylimer_tools_cpp.CrosslinkerUniverse.classify_strand.params.strand_idx">[1]</a>
 
         <ul>
+          <li><a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.link_strand.params.strand_idx">(pylimer_tools_cpp.MCUniverseGenerator.link_strand parameter)</a>, <a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.link_strand.params.strand_idx">[1]</a>
+</li>
           <li><a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.link_strand_to.params.strand_idx">(pylimer_tools_cpp.MCUniverseGenerator.link_strand_to parameter)</a>, <a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.link_strand_to.params.strand_idx">[1]</a>
+</li>
+          <li><a href="api/pylimer_tools_cpp.sample_strand_beads_on_demand.html#pylimer_tools_cpp.sample_strand_beads_on_demand.params.strand_idx">(pylimer_tools_cpp.sample_strand_beads_on_demand parameter)</a>, <a href="pylimer_tools_cpp.html#pylimer_tools_cpp.sample_strand_beads_on_demand.params.strand_idx">[1]</a>
 </li>
         </ul></li>
         <li><a href="api/pylimer_tools_cpp.StrandPairEntanglements.html#pylimer_tools_cpp.StrandPairEntanglements.strand_idx_1">strand_idx_1 (pylimer_tools_cpp.StrandPairEntanglements attribute)</a>
@@ -4927,7 +5043,13 @@
           <li><a href="api/pylimer_tools_cpp.SimplifiedBalanceNetwork.html#pylimer_tools_cpp.SimplifiedBalanceNetwork.strand_of_spring">(pylimer_tools_cpp.SimplifiedBalanceNetwork attribute)</a>
 </li>
         </ul></li>
+        <li><a href="api/pylimer_tools_cpp.sample_strand_beads_on_demand.html#pylimer_tools_cpp.sample_strand_beads_on_demand.params.strand_seed">strand_seed (pylimer_tools_cpp.sample_strand_beads_on_demand parameter)</a>, <a href="pylimer_tools_cpp.html#pylimer_tools_cpp.sample_strand_beads_on_demand.params.strand_seed">[1]</a>
+</li>
+        <li><a href="api/pylimer_tools_cpp.CrosslinkerUniverse.html#pylimer_tools_cpp.CrosslinkerUniverse.strand_seeds">strand_seeds (pylimer_tools_cpp.CrosslinkerUniverse attribute)</a>
+</li>
         <li><a href="api/pylimer_tools_cpp.CrosslinkerUniverse.html#pylimer_tools_cpp.CrosslinkerUniverse.strand_to">strand_to (pylimer_tools_cpp.CrosslinkerUniverse attribute)</a>
+</li>
+        <li><a href="api/pylimer_tools_cpp.StrandCategory.html#pylimer_tools_cpp.StrandCategory">StrandCategory (class in pylimer_tools_cpp)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.StrandPairEntanglements.html#pylimer_tools_cpp.StrandPairEntanglements">StrandPairEntanglements (class in pylimer_tools_cpp)</a>
 </li>
@@ -5090,6 +5212,8 @@
 </li>
           <li><a href="api/pylimer_tools_cpp.RouseSolverType.html#pylimer_tools_cpp.RouseSolverType.to_bytes">(pylimer_tools_cpp.RouseSolverType method)</a>
 </li>
+          <li><a href="api/pylimer_tools_cpp.StrandCategory.html#pylimer_tools_cpp.StrandCategory.to_bytes">(pylimer_tools_cpp.StrandCategory method)</a>
+</li>
         </ul></li>
         <li><a href="api/pylimer_tools_cpp.do_linear_walk_chain_from_to.html#pylimer_tools_cpp.do_linear_walk_chain_from_to.params.to_coordinates">to_coordinates (pylimer_tools_cpp.do_linear_walk_chain_from_to parameter)</a>, <a href="pylimer_tools_cpp.html#pylimer_tools_cpp.do_linear_walk_chain_from_to.params.to_coordinates">[1]</a>
 
@@ -5179,11 +5303,11 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.AtomStyle.html#pylimer_tools_cpp.AtomStyle.TRI">TRI (pylimer_tools_cpp.AtomStyle attribute)</a>
 </li>
+        <li><a href="api/pylimer_tools_cpp.StrandCategory.html#pylimer_tools_cpp.StrandCategory.TWO_CROSSLINKERS_INCLUDING_LOOPS">TWO_CROSSLINKERS_INCLUDING_LOOPS (pylimer_tools_cpp.StrandCategory attribute)</a>
+</li>
         <li><a href="api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance.config_entanglement_type.params.type">type (pylimer_tools_cpp.MEHPForceBalance.config_entanglement_type parameter)</a>, <a href="api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance.config_entanglement_type.params.type">[1]</a>
 
         <ul>
-          <li><a href="api/pylimer_tools_cpp.Molecule.html#pylimer_tools_cpp.Molecule.params.type">(pylimer_tools_cpp.Molecule parameter)</a>, <a href="pylimer_tools_cpp.html#pylimer_tools_cpp.Molecule.params.type">[1]</a>
-</li>
           <li><a href="api/pylimer_tools_cpp.Molecule.html#pylimer_tools_cpp.Molecule.get_atoms_by_type.params.type">(pylimer_tools_cpp.Molecule.get_atoms_by_type parameter)</a>, <a href="api/pylimer_tools_cpp.Molecule.html#pylimer_tools_cpp.Molecule.get_atoms_by_type.params.type">[1]</a>
 </li>
         </ul></li>
@@ -5228,10 +5352,6 @@
 </li>
           <li><a href="api/pylimer_tools_cpp.DataFileWriter.html#pylimer_tools_cpp.DataFileWriter.set_universe_to_write.params.universe">(pylimer_tools_cpp.DataFileWriter.set_universe_to_write parameter)</a>, <a href="api/pylimer_tools_cpp.DataFileWriter.html#pylimer_tools_cpp.DataFileWriter.set_universe_to_write.params.universe">[1]</a>
 </li>
-          <li><a href="api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance.params.universe">(pylimer_tools_cpp.MEHPForceBalance parameter)</a>, <a href="pylimer_tools_cpp.html#pylimer_tools_cpp.MEHPForceBalance.params.universe">[1]</a>
-</li>
-          <li><a href="api/pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation.params.universe">(pylimer_tools_cpp.MEHPForceRelaxation parameter)</a>, <a href="pylimer_tools_cpp.html#pylimer_tools_cpp.MEHPForceRelaxation.params.universe">[1]</a>
-</li>
           <li><a href="api/pylimer_tools_cpp.randomly_sample_entanglements.html#pylimer_tools_cpp.randomly_sample_entanglements.params.universe">(pylimer_tools_cpp.randomly_sample_entanglements parameter)</a>, <a href="pylimer_tools_cpp.html#pylimer_tools_cpp.randomly_sample_entanglements.params.universe">[1]</a>
 </li>
         </ul></li>
@@ -5243,10 +5363,10 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.set_mean_squared_bead_distance.params.update_mean">update_mean (pylimer_tools_cpp.MCUniverseGenerator.set_mean_squared_bead_distance parameter)</a>, <a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.set_mean_squared_bead_distance.params.update_mean">[1]</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance.params.update_mean_squared">update_mean_squared (pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance parameter)</a>, <a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance.params.update_mean_squared">[1]</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements.params.upper_cutoff">upper_cutoff (pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements parameter)</a>, <a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements.params.upper_cutoff">[1]</a>
 
         <ul>

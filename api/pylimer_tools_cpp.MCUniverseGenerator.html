@@ -313,6 +313,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.randomly_sample_entanglements_analytical.html">randomly_sample_entanglements_analytical</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.randomly_sample_entanglements_on_demand.html">randomly_sample_entanglements_on_demand</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.randomly_sample_entanglements_v2.html">randomly_sample_entanglements_v2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.sample_strand_beads_on_demand.html">sample_strand_beads_on_demand</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.split_csv.html">split_csv</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.version_information.html">version_information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.Atom.html">Atom</a></li>
@@ -320,6 +321,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.AtomStyle.html">AtomStyle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.AveFileReader.html">AveFileReader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.BackTrackStatus.html">BackTrackStatus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.BondLengthStats.html">BondLengthStats</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.Box.html">Box</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.ComputedDoubleValues.html">ComputedDoubleValues</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.ComputedIntValues.html">ComputedIntValues</a></li>
@@ -328,6 +330,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.DataFileReader.html">DataFileReader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.DataFileWriter.html">DataFileWriter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.DumpFileReader.html">DumpFileReader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.EndToEndStats.html">EndToEndStats</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.EntanglementFilteringMode.html">EntanglementFilteringMode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.EntanglementSamplingMethod.html">EntanglementSamplingMethod</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.ExitReason.html">ExitReason</a></li>
@@ -357,6 +360,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedBalance2Network.html">SimplifiedBalance2Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedBalanceNetwork.html">SimplifiedBalanceNetwork</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedNetwork.html">SimplifiedNetwork</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.StrandCategory.html">StrandCategory</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.StrandPairEntanglements.html">StrandPairEntanglements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.StructureSimplificationMode.html">StructureSimplificationMode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.Universe.html">Universe</a></li>
@@ -479,14 +483,32 @@ Kuhn segment parameters conflicts with the generator producing Gaussian bond sta
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_strands" title="pylimer_tools_cpp.MCUniverseGenerator.add_strands"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_strands</span></code></a>(self, nr_of_strands, strand_lengths)</p></td>
 <td><p>Add strands.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.config_nr_of_mc_steps" title="pylimer_tools_cpp.MCUniverseGenerator.config_nr_of_mc_steps"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_nr_of_mc_steps</span></code></a>(self[, n_steps])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.compute_bond_length_stats" title="pylimer_tools_cpp.MCUniverseGenerator.compute_bond_length_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_bond_length_stats</span></code></a>(self)</p></td>
+<td><p>Stream over strands in O(1) strand memory to compute realized bond length statistics without constructing a Universe.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.compute_end_to_end_stats" title="pylimer_tools_cpp.MCUniverseGenerator.compute_end_to_end_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_end_to_end_stats</span></code></a>(self[, category])</p></td>
+<td><p>Stream over strands matching <cite>category</cite> to compute end-to-end distance statistics without constructing a Universe.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.compute_strand_bond_counts" title="pylimer_tools_cpp.MCUniverseGenerator.compute_strand_bond_counts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_strand_bond_counts</span></code></a>(self[, category])</p></td>
+<td><p>Return the number of bonds for each strand matching <cite>category</cite>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.config_nr_of_mc_steps" title="pylimer_tools_cpp.MCUniverseGenerator.config_nr_of_mc_steps"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_nr_of_mc_steps</span></code></a>(self[, n_steps])</p></td>
 <td><p>Set the number of Monte-Carlo steps during bond length equilibration.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.config_primary_loop_probability" title="pylimer_tools_cpp.MCUniverseGenerator.config_primary_loop_probability"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_primary_loop_probability</span></code></a>(self[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.config_primary_loop_probability" title="pylimer_tools_cpp.MCUniverseGenerator.config_primary_loop_probability"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_primary_loop_probability</span></code></a>(self[, ...])</p></td>
 <td><p>Configure an additional weight reduction for the primary loop formation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.config_secondary_loop_probability" title="pylimer_tools_cpp.MCUniverseGenerator.config_secondary_loop_probability"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_secondary_loop_probability</span></code></a>(self[, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.config_secondary_loop_probability" title="pylimer_tools_cpp.MCUniverseGenerator.config_secondary_loop_probability"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_secondary_loop_probability</span></code></a>(self[, ...])</p></td>
 <td><p>Configure an additional weight reduction for the secondary loop formation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.count_atom_types" title="pylimer_tools_cpp.MCUniverseGenerator.count_atom_types"><code class="xref py py-obj docutils literal notranslate"><span class="pre">count_atom_types</span></code></a>(self)</p></td>
+<td><p>Count atoms per atom type without constructing a Universe.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.count_atoms_by_degree" title="pylimer_tools_cpp.MCUniverseGenerator.count_atoms_by_degree"><code class="xref py py-obj docutils literal notranslate"><span class="pre">count_atoms_by_degree</span></code></a>(self)</p></td>
+<td><p>Count atoms per bond degree without constructing a Universe.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.determine_effective_functionality_per_type" title="pylimer_tools_cpp.MCUniverseGenerator.determine_effective_functionality_per_type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">determine_effective_functionality_per_type</span></code></a>(self)</p></td>
+<td><p>Compute effective functionality (mean degree) per atom type without constructing a Universe.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.disable_max_distance" title="pylimer_tools_cpp.MCUniverseGenerator.disable_max_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">disable_max_distance</span></code></a>(self)</p></td>
 <td><p>Disable the maximum distance provider to allow unlimited distance sampling.</p></td>
@@ -798,6 +820,47 @@ To link them to crosslinkers, use some of the <code class="code docutils literal
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.compute_bond_length_stats">
+<span class="sig-name descname"><span class="pre">compute_bond_length_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="pylimer_tools_cpp.BondLengthStats.html#pylimer_tools_cpp.BondLengthStats" title="pylimer_tools_cpp.BondLengthStats"><span class="pre">pylimer_tools_cpp.BondLengthStats</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.compute_bond_length_stats" title="Link to this definition">¶</a></dt>
+<dd><p>Stream over strands in O(1) strand memory to compute realized bond length statistics
+without constructing a Universe.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>BondLengthStats object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.compute_end_to_end_stats">
+<span class="sig-name descname"><span class="pre">compute_end_to_end_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">category</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.StrandCategory.html#pylimer_tools_cpp.StrandCategory" title="pylimer_tools_cpp.StrandCategory"><span class="pre">pylimer_tools_cpp.StrandCategory</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">StrandCategory.NETWORK_STRAND</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="pylimer_tools_cpp.EndToEndStats.html#pylimer_tools_cpp.EndToEndStats" title="pylimer_tools_cpp.EndToEndStats"><span class="pre">pylimer_tools_cpp.EndToEndStats</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.compute_end_to_end_stats" title="Link to this definition">¶</a></dt>
+<dd><p>Stream over strands matching <cite>category</cite> to compute end-to-end distance statistics
+without constructing a Universe.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.compute_end_to_end_stats.params.category"></span><strong>category</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.compute_end_to_end_stats.params.category">¶</a> – StrandCategory filter (default: NETWORK_STRAND).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>EndToEndStats object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.compute_strand_bond_counts">
+<span class="sig-name descname"><span class="pre">compute_strand_bond_counts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">category</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.StrandCategory.html#pylimer_tools_cpp.StrandCategory" title="pylimer_tools_cpp.StrandCategory"><span class="pre">pylimer_tools_cpp.StrandCategory</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">StrandCategory.ALL</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.compute_strand_bond_counts" title="Link to this definition">¶</a></dt>
+<dd><p>Return the number of bonds for each strand matching <cite>category</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.compute_strand_bond_counts.params.category"></span><strong>category</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.compute_strand_bond_counts.params.category">¶</a> – StrandCategory filter (default: ALL).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of bond counts per matching strand.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.config_nr_of_mc_steps">
 <span class="sig-name descname"><span class="pre">config_nr_of_mc_steps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsInt" title="(in Python v3.15)"><span class="pre">SupportsInt</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsIndex" title="(in Python v3.15)"><span class="pre">SupportsIndex</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.config_nr_of_mc_steps" title="Link to this definition">¶</a></dt>
 <dd><p>Set the number of Monte-Carlo steps during bond length equilibration.</p>
@@ -824,6 +887,39 @@ This results in more primary loops for shorter chains than for longer ones.</p>
 <p>Defaults to 1., which means the general <span class="math notranslate nohighlight">\(P(\vec{R})\)</span> is used without any bias.
 This results in more secondary loops for shorter chains than for longer ones.</p>
 <p>Set to 0. to disable the formation of secondary loops.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.count_atom_types">
+<span class="sig-name descname"><span class="pre">count_atom_types</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.count_atom_types" title="Link to this definition">¶</a></dt>
+<dd><p>Count atoms per atom type without constructing a Universe.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict mapping atom type to count.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.count_atoms_by_degree">
+<span class="sig-name descname"><span class="pre">count_atoms_by_degree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.count_atoms_by_degree" title="Link to this definition">¶</a></dt>
+<dd><p>Count atoms per bond degree without constructing a Universe.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict mapping degree to atom count.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.determine_effective_functionality_per_type">
+<span class="sig-name descname"><span class="pre">determine_effective_functionality_per_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.determine_effective_functionality_per_type" title="Link to this definition">¶</a></dt>
+<dd><p>Compute effective functionality (mean degree) per atom type without constructing a Universe.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict mapping atom type to mean degree.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -1490,9 +1586,15 @@ Should in principle always be valid when called from Python; if not, there is a 
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_solvent_chains"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.add_solvent_chains()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_star_crosslinkers"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.add_star_crosslinkers()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_strands"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.add_strands()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.compute_bond_length_stats"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.compute_bond_length_stats()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.compute_end_to_end_stats"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.compute_end_to_end_stats()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.compute_strand_bond_counts"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.compute_strand_bond_counts()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.config_nr_of_mc_steps"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.config_nr_of_mc_steps()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.config_primary_loop_probability"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.config_primary_loop_probability()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.config_secondary_loop_probability"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.config_secondary_loop_probability()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.count_atom_types"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.count_atom_types()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.count_atoms_by_degree"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.count_atoms_by_degree()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.determine_effective_functionality_per_type"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.determine_effective_functionality_per_type()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.disable_max_distance"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.disable_max_distance()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_box"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.get_box()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_crosslinker_universe"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.get_crosslinker_universe()</span></code></a></li>

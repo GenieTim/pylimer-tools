@@ -1,0 +1,57 @@
+StrandCategory
+==============
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: StrandCategory
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~StrandCategory.ALL
+      ~StrandCategory.DANGLING_CHAIN
+      ~StrandCategory.FREE_CHAIN
+      ~StrandCategory.NETWORK_STRAND
+      ~StrandCategory.PRIMARY_LOOP
+      ~StrandCategory.TWO_CROSSLINKERS_INCLUDING_LOOPS
+      ~StrandCategory.denominator
+      ~StrandCategory.imag
+      ~StrandCategory.numerator
+      ~StrandCategory.real
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~StrandCategory.as_integer_ratio
+      ~StrandCategory.bit_count
+      ~StrandCategory.bit_length
+      ~StrandCategory.conjugate
+      ~StrandCategory.from_bytes
+      ~StrandCategory.is_integer
+      ~StrandCategory.to_bytes
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: ALL
+   .. autoattribute:: DANGLING_CHAIN
+   .. autoattribute:: FREE_CHAIN
+   .. autoattribute:: NETWORK_STRAND
+   .. autoattribute:: PRIMARY_LOOP
+   .. autoattribute:: TWO_CROSSLINKERS_INCLUDING_LOOPS
+   .. autoattribute:: denominator
+   .. autoattribute:: imag
+   .. autoattribute:: numerator
+   .. autoattribute:: real
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: as_integer_ratio
+   .. automethod:: bit_count
+   .. automethod:: bit_length
+   .. automethod:: conjugate
+   .. automethod:: from_bytes
+   .. automethod:: is_integer
+   .. automethod:: to_bytes

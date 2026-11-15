@@ -1,0 +1,23 @@
+EndToEndStats
+=============
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: EndToEndStats
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~EndToEndStats.mean_end_to_end_distance
+      ~EndToEndStats.mean_squared_end_to_end_distance
+      ~EndToEndStats.nr_of_excluded_zero_length
+      ~EndToEndStats.nr_of_strands
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: mean_end_to_end_distance
+   .. autoattribute:: mean_squared_end_to_end_distance
+   .. autoattribute:: nr_of_excluded_zero_length
+   .. autoattribute:: nr_of_strands
