@@ -97,6 +97,17 @@ napoleon_preprocess_types = False
 napoleon_type_aliases = None
 napoleon_attr_annotations = True
 
+# sphinx-llm settings
+llms_txt_description = (
+    "pylimer-tools is a Python and C++ toolkit for simulating, analyzing, and "
+    "handling bead-spring polymer networks and LAMMPS molecular dynamics output "
+    "(Monte Carlo network generation, DPD simulations with slip-springs, "
+    "Maximum Entropy Homogenization / Force Balance, normal mode analysis, "
+    "and network topology analysis)."
+)
+llms_txt_full_build = True
+llms_txt_exclude = ["*sg_execution_times*"]
+
 # opengraph settings
 ogp_site_url = "https://genietim.github.io/pylimer-tools"
 ogp_custom_meta_tags = (
