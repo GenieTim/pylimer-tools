@@ -186,7 +186,7 @@ Below full conversion, dangling chains and sol fractions must be handled consist
 plot_sampling_conversion_sweep(data)
 ```
 
-**Total running time of the script:** (0 minutes 0.840 seconds)
+**Total running time of the script:** (0 minutes 1.751 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-entanglement-sampling-comparison-py"></a>
 
