@@ -34,8 +34,7 @@ class TestNormalModeAnalyzer(unittest.TestCase):
         for solver in solvers:
             with self.subTest(solver=solver):
                 nma = NormalModeAnalyzer(self.ring_from, self.ring_to)
-                nma.find_all_eigenvalues(
-                    solver=solver, decompose_components=False)
+                nma.find_all_eigenvalues(solver=solver, decompose_components=False)
                 evals = nma.get_eigenvalues()
                 self.assertEqual(len(evals), 3)
                 self.assertAlmostEqual(evals[0], 0.0, places=5)

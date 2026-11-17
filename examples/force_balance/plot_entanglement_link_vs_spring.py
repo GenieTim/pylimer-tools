@@ -66,8 +66,7 @@ print(
 cache_path = get_example_cache_path(
     "entanglement_link_vs_spring_cache.npz", "force_balance"
 )
-data = load_or_compute_cache(cache_path,
-                             run_entanglement_link_vs_spring_simulation)
+data = load_or_compute_cache(cache_path, run_entanglement_link_vs_spring_simulation)
 
 # %%
 # Equilibrium Shear Modulus & System Degrees of Freedom

@@ -67,7 +67,7 @@ TEST_CASE("Molecules work as intended", "[entity][Molecule]")
     CHECK(molecules[0].getAtomsOfDegree(2).size() == 1);
     CHECK(molecules[0].getAtomsOfDegree(1).size() == 2);
 
-    int iteration = 0;
+    size_t iteration = 0;
     for (pe::Molecule molecule : molecules) {
       CHECK(molecule.getKey() == expectedKeys[iteration]);
       REQUIRE(molecule.getLength() == expectedLengths[iteration]);
@@ -93,7 +93,8 @@ TEST_CASE("Molecules work as intended", "[entity][Molecule]")
     REQUIRE_THROWS(molecule1.getIdxByAtomId(19234121));
 
     std::vector<pe::Atom> atomsInLine = molecule1.getAtomsLinedUp();
-    REQUIRE(atomsInLine.size() == molecule1.getNrOfAtoms());
+    REQUIRE(atomsInLine.size() ==
+            static_cast<size_t>(molecule1.getNrOfAtoms()));
     REQUIRE(molecule1.getAtomsOfDegree(2).size() == 1);
     REQUIRE(molecule1.getAtomsOfDegree(1).size() == 2);
     REQUIRE(atomsInLine[0].getId() == 20000);
@@ -157,7 +158,8 @@ TEST_CASE("Molecules sum the bonds correctly", "[entity][Molecule]")
   CHECK(molecules[0].getNrOfBondsFromTo(2, 4, 2, true) == 2);
   CHECK(molecules[0].getNrOfBondsFromTo(2, 4, 2, false) == 2);
   CHECK(molecules[0].getNrOfBondsFromTo(4, 2, 2, false) == 2);
-  CHECK(molecules[0].getNrOfBondsFromTo(1, 5) == molecules[0].getNrOfBonds());
+  CHECK(molecules[0].getNrOfBondsFromTo(1, 5) ==
+        static_cast<size_t>(molecules[0].getNrOfBonds()));
 
   CHECK(molecules[0].getPathLength(0, 1) == 1);
   CHECK(molecules[0].getPathLength(1, 3, 1) == 0);
@@ -209,17 +211,22 @@ TEST_CASE("Molecules compute radius of gyration", "[entity][Molecule]")
   SECTION("Coordinates are computed appropriately")
   {
     igraph_vector_int_t all_vertices;
-    igraph_vector_int_init(&all_vertices, universe.getNrOfAtoms());
-    for (int i = 1; i <= universe.getNrOfAtoms(); ++i) {
+    igraph_vector_int_init(&all_vertices,
+                           static_cast<igraph_int_t>(universe.getNrOfAtoms()));
+    for (igraph_int_t i = 1;
+         i <= static_cast<igraph_int_t>(universe.getNrOfAtoms());
+         ++i) {
       igraph_vector_int_set(&all_vertices, i - 1, universe.getIdxByAtomId(i));
     }
-    CHECK(igraph_vector_int_size(&all_vertices) == universe.getNrOfAtoms());
+    CHECK(static_cast<size_t>(igraph_vector_int_size(&all_vertices)) ==
+          universe.getNrOfAtoms());
     Eigen::VectorXd coordinates =
       universe.getUnwrappedVertexCoordinates(all_vertices, box);
-    CHECK(coordinates.size() == universe.getNrOfAtoms() * 3);
+    CHECK(coordinates.size() ==
+          static_cast<Eigen::Index>(universe.getNrOfAtoms() * 3));
     igraph_vector_int_destroy(&all_vertices);
 
-    for (size_t i = 0; i < 4; ++i) {
+    for (Eigen::Index i = 0; i < 4; ++i) {
       pe::Atom atomI = universe.getAtom(5 + i);
       CHECK(atomI.getUnwrappedX(box) ==
             Catch::Approx(29. + static_cast<double>(i)));

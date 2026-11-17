@@ -32,7 +32,7 @@ TEST_CASE("Box can do PBC computations", "[entity][Box][header_tests]")
     distances3 << 10.2, 10.2, 10.2, -10.2, -10.2, -10.2, 1.0, 1.0, 1.0, -4.,
       -4., -4.;
     REQUIRE_NOTHROW(testBox.handlePBC(distances3));
-    for (size_t i = 0; i < 3; ++i) {
+    for (Eigen::Index i = 0; i < 3; ++i) {
       CHECK(distances3[i] == Catch::Approx(10.2 - 10.));
       CHECK(distances3[3 + i] == Catch::Approx(-10.2 + 10.));
       CHECK(distances3[6 + i] == Catch::Approx(1.));
@@ -103,7 +103,7 @@ TEST_CASE("Box can do PBC computations", "[entity][Box][header_tests]")
     SECTION("PBC")
     {
       REQUIRE_NOTHROW(testBox.handlePBC(distances3));
-      for (size_t i = 0; i < 3; ++i) {
+      for (Eigen::Index i = 0; i < 3; ++i) {
         CHECK(distances3[i] == Catch::Approx(10.2 - 20.));
         CHECK(distances3[3 + i] == Catch::Approx(-10.2 + 20.));
         CHECK(distances3[6 + i] == Catch::Approx(1.));
@@ -114,7 +114,7 @@ TEST_CASE("Box can do PBC computations", "[entity][Box][header_tests]")
     SECTION("Box placement")
     {
       REQUIRE_NOTHROW(testBox.minImageDistances(distances3));
-      for (size_t i = 0; i < 3; ++i) {
+      for (Eigen::Index i = 0; i < 3; ++i) {
         CHECK(distances3[i] == Catch::Approx(10.2 - 20.));
         CHECK(distances3[3 + i] == Catch::Approx(-10.2 + 20.));
         CHECK(distances3[6 + i] == Catch::Approx(1.));
@@ -126,7 +126,7 @@ TEST_CASE("Box can do PBC computations", "[entity][Box][header_tests]")
     {
       pe::Box testBox2 = pe::Box(-5.0, 5.0, -5.0, 5.0, -5.0, 5.0);
       REQUIRE_NOTHROW(testBox2.handlePBC(distances3));
-      for (size_t i = 0; i < 3; ++i) {
+      for (Eigen::Index i = 0; i < 3; ++i) {
         CHECK(distances3[i] == Catch::Approx(10.2 - 10.));
         CHECK(distances3[3 + i] == Catch::Approx(-10.2 + 10.));
         CHECK(distances3[6 + i] == Catch::Approx(1.));
@@ -205,12 +205,12 @@ TEST_CASE("Box works also after simple shear", "[entity][Box]")
     CHECK(testCoords[dir] == Catch::Approx(10.2 + 0.2 * 10.2));
     // deform back
     deformedBox2.adjustCoordinatesTo(testCoords, undeformedBox);
-    for (size_t i = 0; i < testCoords.size(); ++i) {
+    for (Eigen::Index i = 0; i < testCoords.size(); ++i) {
       CHECK(testCoords[i] == Catch::Approx(testCoordCopy[i]));
     }
     largeBox.applySimpleShear(0.0, dir);
     largeBox.handlePBC(testCoordCopy2);
-    for (size_t i = 0; i < testCoordCopy.size(); ++i) {
+    for (Eigen::Index i = 0; i < testCoordCopy.size(); ++i) {
       CHECK(testCoordCopy[i] == Catch::Approx(testCoordCopy2[i]));
     }
   }
@@ -275,8 +275,8 @@ TEST_CASE("Box can interpolate", "[entity][Box][header_tests]")
   CHECK(ls[1] == Catch::Approx(5.));
   CHECK(ls[2] == Catch::Approx(10.));
   Eigen::ArrayXd lsLong = ls.replicate(3, 1);
-  for (size_t i = 0; i < 3; ++i) {
-    for (size_t dir = 0; dir < 3; ++dir) {
+  for (Eigen::Index i = 0; i < 3; ++i) {
+    for (Eigen::Index dir = 0; dir < 3; ++dir) {
       CHECK(lsLong[i * 3 + dir] == Catch::Approx(ls[dir]));
     }
   }

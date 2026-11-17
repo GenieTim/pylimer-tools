@@ -26,51 +26,36 @@ class TestUtilFunctions(PandasComparingTestCase):
         )
         half_df = test_dataframe.tail(2)
         self.assertEqual(get_tail(test_dataframe), half_df)
+        self.assertEqual(get_tail(test_dataframe, max_percentage=1), test_dataframe)
         self.assertEqual(
-            get_tail(
-                test_dataframe,
-                max_percentage=1),
-            test_dataframe)
-        self.assertEqual(
-            get_tail(test_dataframe, percentage=0.1,
-                     max_percentage=0.5), half_df
+            get_tail(test_dataframe, percentage=0.1, max_percentage=0.5), half_df
         )
         self.assertEqual(
-            get_tail(test_dataframe, percentage=0.5,
-                     max_percentage=1, min_n=1), half_df
+            get_tail(test_dataframe, percentage=0.5, max_percentage=1, min_n=1), half_df
         )
         self.assertEqual(
-            get_tail(test_dataframe, percentage=0.1,
-                     max_percentage=1, min_n=2), half_df
+            get_tail(test_dataframe, percentage=0.1, max_percentage=1, min_n=2), half_df
         )
 
         self.assertEqual(get_tail([0, 1, 2, 3]), [2, 3])
 
     def test_unify_step_sizes(self):
         test_dataframe = pd.DataFrame(
-            [{"a": 1, "b": 0}, {"a": 2, "b": 0}, {
-                "a": 2.5, "b": 0}, {"a": 3, "b": 0}]
+            [{"a": 1, "b": 0}, {"a": 2, "b": 0}, {"a": 2.5, "b": 0}, {"a": 3, "b": 0}]
         )
         expected_result = pd.DataFrame(
             [{"a": 1.0, "b": 0}, {"a": 2.0, "b": 0}, {"a": 3.0, "b": 0}]
         ).reset_index(drop=True)
 
-        res = unify_data_stepsizes(
-            test_dataframe,
-            key="a").reset_index(
-            drop=True)
+        res = unify_data_stepsizes(test_dataframe, key="a").reset_index(drop=True)
         self.assertEqual(expected_result, res)
 
         with self.assertWarns(Warning):
-            unify_data_stepsizes(
-                test_dataframe,
-                key="a",
-                max_expected_step_size=0.5)
+            unify_data_stepsizes(test_dataframe, key="a", max_expected_step_size=0.5)
 
     def test_cache_utility(self):
         test_dataframe = pd.DataFrame(
-            [{"a": 1, "b": 0}, {"a": 2, "b": 0}, {
-                "a": 2.5, "b": 0}, {"a": 3, "b": 0}]
+            [{"a": 1, "b": 0}, {"a": 2, "b": 0}, {"a": 2.5, "b": 0}, {"a": 3, "b": 0}]
         )
         suffix = "test.out"
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -90,23 +75,14 @@ class TestUtilFunctions(PandasComparingTestCase):
 
             # and the receival of a warning for non-files
             do_cache(test_dataframe, "non-ex-file", suffix, tmp_dir=tmp_dir)
-            path = pl.Path(
-                get_cache_file_name(
-                    "non-ex-file",
-                    suffix,
-                    tmp_dir=tmp_dir))
+            path = pl.Path(get_cache_file_name("non-ex-file", suffix, tmp_dir=tmp_dir))
             self.assertTrue(path.is_file())
             with self.assertWarns(Warning):
-                loaded_data = load_cache(
-                    "non-ex-file", suffix, tmp_dir=tmp_dir)
+                loaded_data = load_cache("non-ex-file", suffix, tmp_dir=tmp_dir)
                 self.assertEqual(test_dataframe, loaded_data)
 
             # test that the cache returns empty if not written yet...
-            self.assertIsNone(
-                load_cache(
-                    file,
-                    "non-ex-suffix",
-                    tmp_dir=tmp_dir))
+            self.assertIsNone(load_cache(file, "non-ex-suffix", tmp_dir=tmp_dir))
             # ...or if the file has been modified
             future_time = time.time() + 10.0
             os.utime(file, (future_time, future_time))
@@ -176,8 +152,7 @@ class TestUtilFunctions(PandasComparingTestCase):
         bond_counts = gen.compute_strand_bond_counts(StrandCategory.ALL)
         self.assertEqual(sum(bond_counts), len(u_bonds))
 
-        coords0 = sample_strand_beads_on_demand(
-            box, cu, 0, cu.strand_seeds[0], 3)
+        coords0 = sample_strand_beads_on_demand(box, cu, 0, cu.strand_seeds[0], 3)
         self.assertEqual(len(coords0), 3 * cu.beads_in_strand[0])
 
         fr_cu = MEHPForceRelaxation(box, cu)

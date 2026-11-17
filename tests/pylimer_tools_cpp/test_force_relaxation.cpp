@@ -92,9 +92,12 @@ testGradient(pcm::MEHPForceEvaluator* forceEvaluator)
   Eigen::VectorXd springDistances =
     (coordinatesSpringEndB - coordinatesSpringEndA);
   for (size_t i = 0; i < 12; ++i) {
-    REQUIRE(coordinatesSpringEndA[i] == expectedCoordsA[i]);
-    REQUIRE(coordinatesSpringEndB[i] == expectedCoordsB[i]);
-    REQUIRE(springDistances[i] == expectedCoordsB[i] - expectedCoordsA[i]);
+    REQUIRE(coordinatesSpringEndA[static_cast<Eigen::Index>(i)] ==
+            expectedCoordsA[i]);
+    REQUIRE(coordinatesSpringEndB[static_cast<Eigen::Index>(i)] ==
+            expectedCoordsB[i]);
+    REQUIRE(springDistances[static_cast<Eigen::Index>(i)] ==
+            expectedCoordsB[i] - expectedCoordsA[i]);
   }
   // setup gradient and coordinates
   const double h = 1.e-5;
@@ -201,8 +204,9 @@ TEST_CASE("MEHP Force Relaxation does not collapse",
     REQUIRE(forceRelaxerConventional.getNrOfIterations() > 0);
     CHECK(forceRelaxerConventional.getExitReason() ==
           pcm::ExitReason::F_TOLERANCE);
-    CHECK(forceRelaxerConventional.getNrOfActiveSprings() ==
-          forceRelaxerConventional.getNrOfSprings());
+    CHECK(
+      static_cast<size_t>(forceRelaxerConventional.getNrOfActiveSprings()) ==
+      forceRelaxerConventional.getNrOfSprings());
     // compare to what we expect
     CHECK(forceRelaxerConventional.getNrOfActiveSprings() == 8);
     CHECK(forceRelaxerConventional.getNrOfActiveNodes() == 4);
@@ -217,7 +221,7 @@ TEST_CASE("MEHP Force Relaxation does not collapse",
     REQUIRE_NOTHROW(forceRelaxerNew.runForceRelaxation());
     REQUIRE(forceRelaxerNew.getNrOfIterations() > 0);
     CHECK(forceRelaxerNew.getExitReason() == pcm::ExitReason::F_TOLERANCE);
-    CHECK(forceRelaxerNew.getNrOfActiveSprings() ==
+    CHECK(static_cast<size_t>(forceRelaxerNew.getNrOfActiveSprings()) ==
           forceRelaxerNew.getNrOfSprings());
 
     // compare to what we expect
@@ -634,7 +638,8 @@ TEST_CASE("MEHP Force Relaxation returns the crosslinker universe",
       forceRelaxer.getEffectiveFunctionalityOfAtoms();
     REQUIRE(effectiveFunctionality.size() == forceRelaxer.getNrOfNodes());
     for (size_t i = 0; i < universe.getNrOfAtoms(); ++i) {
-      pe::Atom atom = universe.getAtomByVertexIdx(i);
+      pe::Atom atom =
+        universe.getAtomByVertexIdx(static_cast<igraph_integer_t>(i));
       if (atom.getType() == 2) {
         CHECK(effectiveFunctionality[atom.getId()] == 4);
       }
@@ -723,14 +728,16 @@ TEST_CASE("Manual NonGaussianSpringForceEvaluator gradient test",
   forceEvaluatorInstance.setNetwork(net);
   forceEvaluatorInstance.prepareForEvaluations();
   // setup other variables
-  Eigen::VectorXd springDistances = Eigen::VectorXd::Zero(3 * net.nrOfSprings);
-  Eigen::VectorXd u = Eigen::VectorXd::Zero(3 * net.nrOfNodes);
+  Eigen::VectorXd springDistances =
+    Eigen::VectorXd::Zero(static_cast<Eigen::Index>(3 * net.nrOfSprings));
+  Eigen::VectorXd u =
+    Eigen::VectorXd::Zero(static_cast<Eigen::Index>(3 * net.nrOfNodes));
   double* r = new double[3 * net.nrOfNodes];
   // actually check values
   // first, the zero positions
   CHECK(forceEvaluatorInstance.evaluateForceSetGradient(
           net.nrOfNodes * 3, springDistances, r) == 0.0);
-  for (int i = 0; i < net.nrOfNodes * 3; ++i) {
+  for (size_t i = 0; i < net.nrOfNodes * 3; ++i) {
     CHECK(r[i] == 0.0);
   }
   // then, some values as compared to what is obtained from a Mathematica script
@@ -801,13 +808,14 @@ TEST_CASE("Force Relaxation free chains collapse",
   std::vector<long int> bondTo;
   bondTo.reserve(nrOfBeads - 1);
   double offset = 10.0;
-  for (int i = 0; i < nrOfBeads; ++i) {
+  for (int i = 0; i < static_cast<int>(nrOfBeads); ++i) {
     xPositions.push_back(i * 1.0 + offset);
     yPositions.push_back(0.1 * static_cast<double>(i % 4 - i % 3) +
                          offset); // /!\ i needs to be int, not unsigned!
     zPositions.push_back(0.1 * static_cast<double>(i % 5 - i % 7) + offset); //
     atomIds.push_back(i);
-    atomTypes.push_back(i % nrOfBeadsPerChain == 0 ? 2 : 1);
+    atomTypes.push_back(static_cast<size_t>(i) % nrOfBeadsPerChain == 0 ? 2
+                                                                        : 1);
     zeroInts.push_back(0);
     if (i > 0) {
       bondFrom.push_back(i - 1);
@@ -938,7 +946,7 @@ TEST_CASE("Fully active chains are fully active",
       REQUIRE_NOTHROW(forceRelaxer.runForceRelaxation());
       REQUIRE(forceRelaxer.getNrOfIterations() > 0);
       CHECK(forceRelaxer.getExitReason() == pcm::ExitReason::F_TOLERANCE);
-      CHECK(forceRelaxer.getNrOfActiveSprings() ==
+      CHECK(static_cast<size_t>(forceRelaxer.getNrOfActiveSprings()) ==
             forceRelaxer.getNrOfSprings());
     }
   }

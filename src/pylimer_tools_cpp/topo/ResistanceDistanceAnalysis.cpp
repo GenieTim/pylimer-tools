@@ -89,7 +89,8 @@ ResistanceDistanceAnalysis::initializeFromEdges(
 
   std::vector<Eigen::Triplet<double>> triplets;
   triplets.reserve(springFrom.size() * 4);
-  Eigen::VectorXd diag = Eigen::VectorXd::Zero(numNodes_);
+  Eigen::VectorXd diag =
+    Eigen::VectorXd::Zero(static_cast<Eigen::Index>(numNodes_));
   totalWeight_ = 0.0;
 
   for (size_t e = 0; e < springFrom.size(); ++e) {
@@ -116,7 +117,8 @@ ResistanceDistanceAnalysis::initializeFromEdges(
     }
   }
 
-  L_.resize(numNodes_, numNodes_);
+  L_.resize(static_cast<Eigen::Index>(numNodes_),
+            static_cast<Eigen::Index>(numNodes_));
   L_.setFromTriplets(triplets.begin(), triplets.end());
 
   findComponentsAndSetupPinnedSystem();
@@ -173,7 +175,8 @@ ResistanceDistanceAnalysis::findComponentsAndSetupPinnedSystem()
   }
 
   std::vector<Eigen::Triplet<double>> pinnedTriplets;
-  pinnedTriplets.reserve(L_.nonZeros() + referenceNodePerComponent_.size());
+  pinnedTriplets.reserve(static_cast<size_t>(L_.nonZeros()) +
+                         referenceNodePerComponent_.size());
 
   for (int k = 0; k < L_.outerSize(); ++k) {
     for (Eigen::SparseMatrix<double>::InnerIterator it(L_, k); it; ++it) {
@@ -198,7 +201,8 @@ ResistanceDistanceAnalysis::findComponentsAndSetupPinnedSystem()
     pinnedTriplets.emplace_back(static_cast<int>(r), static_cast<int>(r), 1.0);
   }
 
-  L_pinned_.resize(numNodes_, numNodes_);
+  L_pinned_.resize(static_cast<Eigen::Index>(numNodes_),
+                   static_cast<Eigen::Index>(numNodes_));
   L_pinned_.setFromTriplets(pinnedTriplets.begin(), pinnedTriplets.end());
 
   solverFactorized_ = false;
@@ -233,7 +237,8 @@ ResistanceDistanceAnalysis::computeEffectiveResistance(size_t i, size_t j) const
   size_t comp = nodeComponentId_[i];
   size_t r = referenceNodePerComponent_[comp];
 
-  Eigen::VectorXd b = Eigen::VectorXd::Zero(numNodes_);
+  Eigen::VectorXd b =
+    Eigen::VectorXd::Zero(static_cast<Eigen::Index>(numNodes_));
   if (i != r) {
     b(static_cast<Eigen::Index>(i)) = 1.0;
   }
@@ -260,7 +265,8 @@ ResistanceDistanceAnalysis::computeEffectiveResistanceBatched(
 
   ensureFactorized();
 
-  Eigen::MatrixXd Brhs = Eigen::MatrixXd::Zero(numNodes_, B);
+  Eigen::MatrixXd Brhs = Eigen::MatrixXd::Zero(
+    static_cast<Eigen::Index>(numNodes_), static_cast<Eigen::Index>(B));
   std::vector<bool> isInfinite(B, false);
 
   for (size_t b = 0; b < B; ++b) {
@@ -445,7 +451,8 @@ ResistanceDistanceAnalysis::computeMoorePenrosePseudoInverse(
     X.col(static_cast<Eigen::Index>(r)).setZero();
   }
 
-  Eigen::MatrixXd Lplus = Eigen::MatrixXd::Zero(numNodes_, numNodes_);
+  Eigen::MatrixXd Lplus = Eigen::MatrixXd::Zero(
+    static_cast<Eigen::Index>(numNodes_), static_cast<Eigen::Index>(numNodes_));
 
   for (const auto& comp : connectedComponents_) {
     size_t nComp = comp.size();
@@ -462,9 +469,10 @@ ResistanceDistanceAnalysis::computeMoorePenrosePseudoInverse(
       }
     }
 
-    Eigen::MatrixXd Pc = Eigen::MatrixXd::Identity(nComp, nComp) -
+    const Eigen::Index nCompIdx = static_cast<Eigen::Index>(nComp);
+    Eigen::MatrixXd Pc = Eigen::MatrixXd::Identity(nCompIdx, nCompIdx) -
                          (1.0 / static_cast<double>(nComp)) *
-                           Eigen::MatrixXd::Constant(nComp, nComp, 1.0);
+                           Eigen::MatrixXd::Constant(nCompIdx, nCompIdx, 1.0);
 
     Eigen::MatrixXd Lplus_c = Pc * Xc * Pc;
 
@@ -510,7 +518,8 @@ Eigen::VectorXd
 ResistanceDistanceAnalysis::computeTotalResistancePerNode() const
 {
   Eigen::MatrixXd R = computeAllPairsEffectiveResistance();
-  Eigen::VectorXd tot = Eigen::VectorXd::Zero(numNodes_);
+  Eigen::VectorXd tot =
+    Eigen::VectorXd::Zero(static_cast<Eigen::Index>(numNodes_));
   for (size_t i = 0; i < numNodes_; ++i) {
     double s = 0.0;
     for (size_t j = 0; j < numNodes_; ++j) {
@@ -527,7 +536,8 @@ Eigen::VectorXd
 ResistanceDistanceAnalysis::computeResistanceCentrality() const
 {
   Eigen::VectorXd tot = computeTotalResistancePerNode();
-  Eigen::VectorXd centrality = Eigen::VectorXd::Zero(numNodes_);
+  Eigen::VectorXd centrality =
+    Eigen::VectorXd::Zero(static_cast<Eigen::Index>(numNodes_));
   double nMinusOne = static_cast<double>(numNodes_ > 1 ? numNodes_ - 1 : 1);
 
   for (size_t i = 0; i < numNodes_; ++i) {

@@ -35,13 +35,10 @@ class TestMEHPSimulatorBindings(UniverseUsingTestCase):
         force_relaxer = MEHPForceRelaxation(self.testUniverse)
         # gaussianForceEvaluator = forceRelaxer.getForceEvaluator()
         gaussian_force_evaluator = SimpleSpringMEHPForceEvaluator(1.0)
-        self.assertIsInstance(
-            gaussian_force_evaluator,
-            SimpleSpringMEHPForceEvaluator)
+        self.assertIsInstance(gaussian_force_evaluator, SimpleSpringMEHPForceEvaluator)
         self.assertFalse(gaussian_force_evaluator.is_2d)
         force_relaxer.set_force_evaluator(gaussian_force_evaluator)
-        non_gaussian_force_evaluator = NonGaussianSpringForceEvaluator(
-            1.0, 20.0, 0.98)
+        non_gaussian_force_evaluator = NonGaussianSpringForceEvaluator(1.0, 20.0, 0.98)
         self.assertFalse(non_gaussian_force_evaluator.is_2d)
         force_relaxer_2 = MEHPForceRelaxation(
             self.testUniverse, 2, False, non_gaussian_force_evaluator
@@ -79,8 +76,7 @@ class TestMEHPSimulatorBindings(UniverseUsingTestCase):
 
         def create_relaxer_with_temp_evaluator():
             evaluator = SimpleSpringMEHPForceEvaluator(2.5)
-            relaxer = MEHPForceRelaxation(
-                self.testUniverse, 2, False, evaluator)
+            relaxer = MEHPForceRelaxation(self.testUniverse, 2, False, evaluator)
             return relaxer
 
         relaxer = create_relaxer_with_temp_evaluator()
@@ -94,8 +90,7 @@ class TestMEHPSimulatorBindings(UniverseUsingTestCase):
     def test_non_gaussian_stress_contribution_at_zero(self):
         """Test stress contribution at r=0 returns 0.0 without NaN."""
         evaluator = NonGaussianSpringForceEvaluator(1.0, 10.0, 1.0)
-        stress = evaluator.evaluate_stress_contribution(
-            [0.0, 0.0, 0.0], 0, 0, 0)
+        stress = evaluator.evaluate_stress_contribution([0.0, 0.0, 0.0], 0, 0, 0)
         self.assertEqual(stress, 0.0)
         self.assertFalse(math.isnan(stress))
 
@@ -117,8 +112,7 @@ class TestMEHPSimulatorBindings(UniverseUsingTestCase):
         """Test that MEHPForceBalance2 with METAL_BARZILAI_BORWEIN completes force relaxation."""
         try:
             fb = MEHPForceBalance2(self.testUniverseSmall, 2, False)
-            fb.run_force_relaxation(
-                sle_solver=SLESolver.METAL_BARZILAI_BORWEIN)
+            fb.run_force_relaxation(sle_solver=SLESolver.METAL_BARZILAI_BORWEIN)
             self.assertGreater(fb.get_nr_of_iterations(), 0)
         except RuntimeError as e:
             if "Metal acceleration is not enabled" in str(

@@ -106,8 +106,8 @@ public:
     this->box = box;
     this->initialConfig = buildForceBalanceNetwork(
       box, cu, !removeDanglingChains, includeFreeChains);
-    this->currentSpringPartitionsVec =
-      Eigen::VectorXd::Ones(this->initialConfig.nrOfSprings);
+    this->currentSpringPartitionsVec = Eigen::VectorXd::Ones(
+      static_cast<Eigen::Index>(this->initialConfig.nrOfSprings));
     this->currentDisplacements =
       Eigen::VectorXd::Zero(this->initialConfig.coordinates.size());
     this->completeInitialization();
@@ -156,16 +156,19 @@ public:
       }
       std::vector<pylimer_tools::entities::Atom> linedUpAtoms =
         chain.getAtomsLinedUp(crossLinkerType, false, true);
-      if (vertexIdToLinkIdx[fb.universe.getIdxByAtomId(
-            linedUpAtoms[0].getId())] == -1) {
-        vertexIdToLinkIdx[fb.universe.getIdxByAtomId(linedUpAtoms[0].getId())] =
-          currentVertexId;
+      const size_t firstVertexIdx = static_cast<size_t>(
+        fb.universe.getIdxByAtomId(linedUpAtoms[0].getId()));
+      if (vertexIdToLinkIdx[firstVertexIdx] == -1) {
+        vertexIdToLinkIdx[firstVertexIdx] =
+          static_cast<long int>(currentVertexId);
         currentVertexId += 1;
       }
-      if (vertexIdToLinkIdx[fb.universe.getIdxByAtomId(
-            pylimer_tools::utils::last(linedUpAtoms).getId())] == -1) {
-        vertexIdToLinkIdx[fb.universe.getIdxByAtomId(
-          pylimer_tools::utils::last(linedUpAtoms).getId())] = currentVertexId;
+      const size_t lastVertexIdx =
+        static_cast<size_t>(fb.universe.getIdxByAtomId(
+          pylimer_tools::utils::last(linedUpAtoms).getId()));
+      if (vertexIdToLinkIdx[lastVertexIdx] == -1) {
+        vertexIdToLinkIdx[lastVertexIdx] =
+          static_cast<long int>(currentVertexId);
         currentVertexId += 1;
       }
       numUseableChains += 1;
@@ -175,32 +178,41 @@ public:
     // links
     fb.initialConfig.nrOfNodes = currentVertexId;
     fb.initialConfig.nrOfLinks = currentVertexId + pairsOfAtoms.size();
-    fb.initialConfig.oldAtomIds.resize(fb.initialConfig.nrOfNodes);
-    fb.initialConfig.oldAtomTypes.resize(fb.initialConfig.nrOfNodes);
-    fb.currentDisplacements.resize(3 * fb.initialConfig.nrOfLinks);
+    fb.initialConfig.oldAtomIds.resize(
+      static_cast<Eigen::Index>(fb.initialConfig.nrOfNodes));
+    fb.initialConfig.oldAtomTypes.resize(
+      static_cast<Eigen::Index>(fb.initialConfig.nrOfNodes));
+    fb.currentDisplacements.resize(
+      static_cast<Eigen::Index>(3 * fb.initialConfig.nrOfLinks));
     fb.currentDisplacements.setZero();
-    fb.initialConfig.coordinates.conservativeResize(3 *
-                                                    fb.initialConfig.nrOfLinks);
+    fb.initialConfig.coordinates.conservativeResize(
+      static_cast<Eigen::Index>(3 * fb.initialConfig.nrOfLinks));
     fb.initialConfig.linkIsSliplink.conservativeResize(
-      fb.initialConfig.nrOfLinks);
+      static_cast<Eigen::Index>(fb.initialConfig.nrOfLinks));
     fb.initialConfig.springIndicesOfLinks =
       pylimer_tools::utils::initializeWithValue(fb.initialConfig.nrOfLinks,
                                                 std::vector<size_t>());
     fb.initialConfig.nrOfCrosslinkSwapsEndured.conservativeResize(
-      fb.initialConfig.nrOfLinks - fb.initialConfig.nrOfNodes);
+      static_cast<Eigen::Index>(fb.initialConfig.nrOfLinks -
+                                fb.initialConfig.nrOfNodes));
     fb.initialConfig.nrOfCrosslinkSwapsEndured.setZero();
 
     // springs
     fb.initialConfig.nrOfSprings = numUseableChains;
-    fb.initialConfig.springIndexA.conservativeResize(numUseableChains);
-    fb.initialConfig.springIndexB.conservativeResize(numUseableChains);
+    fb.initialConfig.springIndexA.conservativeResize(
+      static_cast<Eigen::Index>(numUseableChains));
+    fb.initialConfig.springIndexB.conservativeResize(
+      static_cast<Eigen::Index>(numUseableChains));
     fb.initialConfig.springCoordinateIndexA.conservativeResize(
-      3 * numUseableChains);
+      static_cast<Eigen::Index>(3 * numUseableChains));
     fb.initialConfig.springCoordinateIndexB.conservativeResize(
-      3 * numUseableChains);
-    fb.initialConfig.springIsActive.conservativeResize(numUseableChains);
-    fb.initialConfig.springsContourLength.conservativeResize(numUseableChains);
-    fb.initialConfig.springsType.conservativeResize(numUseableChains);
+      static_cast<Eigen::Index>(3 * numUseableChains));
+    fb.initialConfig.springIsActive.conservativeResize(
+      static_cast<Eigen::Index>(numUseableChains));
+    fb.initialConfig.springsContourLength.conservativeResize(
+      static_cast<Eigen::Index>(numUseableChains));
+    fb.initialConfig.springsType.conservativeResize(
+      static_cast<Eigen::Index>(numUseableChains));
     fb.initialConfig.linkIndicesOfSprings =
       pylimer_tools::utils::initializeWithValue(numUseableChains,
                                                 std::vector<size_t>());
@@ -214,21 +226,22 @@ public:
     size_t numPartialSpringsEstimate =
       numUseableChains + 2 * pairsOfAtoms.size();
     fb.initialConfig.nrOfPartialSprings = numPartialSpringsEstimate;
-    fb.currentSpringPartitionsVec.resize(numPartialSpringsEstimate);
+    fb.currentSpringPartitionsVec.resize(
+      static_cast<Eigen::Index>(numPartialSpringsEstimate));
     fb.initialConfig.springPartBoxOffset.conservativeResize(
-      3 * numPartialSpringsEstimate);
+      static_cast<Eigen::Index>(3 * numPartialSpringsEstimate));
     fb.initialConfig.springPartCoordinateIndexA.conservativeResize(
-      3 * numPartialSpringsEstimate);
+      static_cast<Eigen::Index>(3 * numPartialSpringsEstimate));
     fb.initialConfig.springPartCoordinateIndexB.conservativeResize(
-      3 * numPartialSpringsEstimate);
+      static_cast<Eigen::Index>(3 * numPartialSpringsEstimate));
     fb.initialConfig.springPartIndexA.conservativeResize(
-      numPartialSpringsEstimate);
+      static_cast<Eigen::Index>(numPartialSpringsEstimate));
     fb.initialConfig.springPartIndexB.conservativeResize(
-      numPartialSpringsEstimate);
+      static_cast<Eigen::Index>(numPartialSpringsEstimate));
     fb.initialConfig.partialToFullSpringIndex.conservativeResize(
-      numPartialSpringsEstimate);
+      static_cast<Eigen::Index>(numPartialSpringsEstimate));
     fb.initialConfig.partialSpringIsPartial.conservativeResize(
-      numPartialSpringsEstimate);
+      static_cast<Eigen::Index>(numPartialSpringsEstimate));
 
     size_t springIdx = 0;
     size_t partialSpringIdx = 0;
@@ -246,7 +259,8 @@ public:
       size_t previousIdx = 0;
 
       size_t previousLinkIdx =
-        vertexIdToLinkIdx[fb.universe.getIdxByAtomId(linedUpAtoms[0].getId())];
+        static_cast<size_t>(vertexIdToLinkIdx[static_cast<size_t>(
+          fb.universe.getIdxByAtomId(linedUpAtoms[0].getId()))]);
       fb.setLinkPropertiesFromAtom(
         fb.initialConfig, previousLinkIdx, linedUpAtoms[0], fb.crossLinkerType);
       fb.initialConfig.linkIndicesOfSprings[springIdx].push_back(
@@ -256,32 +270,38 @@ public:
       pylimer_tools::entities::Atom lastAtom =
         pylimer_tools::utils::last(linedUpAtoms);
       size_t lastLinkIdx =
-        vertexIdToLinkIdx[fb.universe.getIdxByAtomId(lastAtom.getId())];
+        static_cast<size_t>(vertexIdToLinkIdx[static_cast<size_t>(
+          fb.universe.getIdxByAtomId(lastAtom.getId()))]);
       fb.setLinkPropertiesFromAtom(
         fb.initialConfig, lastLinkIdx, lastAtom, fb.crossLinkerType);
-      fb.initialConfig.springIndexA[springIdx] = previousLinkIdx;
-      assert(linedUpAtoms.size() == chain.getLength() ||
-             linedUpAtoms.size() == chain.getLength() + 1);
+      fb.initialConfig.springIndexA[static_cast<Eigen::Index>(springIdx)] =
+        static_cast<int>(previousLinkIdx);
+      assert(linedUpAtoms.size() == static_cast<size_t>(chain.getLength()) ||
+             linedUpAtoms.size() == static_cast<size_t>(chain.getLength() + 1));
       if (pairsOfAtoms.size() > 0) {
         for (size_t i = 1; i < linedUpAtoms.size() - 1; i++) {
           pylimer_tools::entities::Atom a = linedUpAtoms[i];
-          long int pairIdx = pairOfAtom[universe.getIdxByAtomId(a.getId())];
+          long int pairIdx =
+            pairOfAtom[static_cast<size_t>(universe.getIdxByAtomId(a.getId()))];
           if (pairIdx != -1) {
-            size_t thisLinkIdx = currentVertexId + pairIdx;
+            const size_t pairIdxU = static_cast<size_t>(pairIdx);
+            size_t thisLinkIdx = currentVertexId + pairIdxU;
             fb.initialConfig.linkIndicesOfSprings[springIdx].push_back(
               thisLinkIdx);
             pylimer_tools::utils::addIfNotContained(
               fb.initialConfig.springIndicesOfLinks[thisLinkIdx], springIdx);
             // set the mean x,y,z of the two involved atoms
             pylimer_tools::entities::Atom a1 =
-              universe.getAtom(pairsOfAtoms[pairIdx].first);
+              universe.getAtom(pairsOfAtoms[pairIdxU].first);
             pylimer_tools::entities::Atom a2 =
-              universe.getAtom(pairsOfAtoms[pairIdx].second);
+              universe.getAtom(pairsOfAtoms[pairIdxU].second);
             RUNTIME_EXP_IFN(
-              pairOfAtom[universe.getIdxByAtomId(a1.getId())] == pairIdx,
+              pairOfAtom[static_cast<size_t>(
+                universe.getIdxByAtomId(a1.getId()))] == pairIdx,
               "Atom 1 does not follow required atom pair pattern");
             RUNTIME_EXP_IFN(
-              pairOfAtom[universe.getIdxByAtomId(a2.getId())] == pairIdx,
+              pairOfAtom[static_cast<size_t>(
+                universe.getIdxByAtomId(a2.getId()))] == pairIdx,
               "Atom 2 does not follow required atom pair pattern");
             fb.setLinkPropertiesFromAtoms(
               fb.initialConfig, thisLinkIdx, a1, a2, fb.sliplinkType);
@@ -322,16 +342,18 @@ public:
       fb.initialConfig.localToGlobalSpringIndex[springIdx].push_back(
         partialSpringIdx);
 
-      fb.initialConfig.springIndexB[springIdx] = lastLinkIdx;
-      for (size_t dir = 0; dir < 3; ++dir) {
-        fb.initialConfig.springCoordinateIndexA[3 * springIdx + dir] =
-          3 * fb.initialConfig.springIndexA[springIdx] + dir;
-        fb.initialConfig.springCoordinateIndexB[3 * springIdx + dir] =
-          3 * fb.initialConfig.springIndexB[springIdx] + dir;
+      const Eigen::Index springIdxE = static_cast<Eigen::Index>(springIdx);
+      fb.initialConfig.springIndexB[springIdxE] = static_cast<int>(lastLinkIdx);
+      for (Eigen::Index dir = 0; dir < 3; ++dir) {
+        fb.initialConfig.springCoordinateIndexA[3 * springIdxE + dir] =
+          3 * fb.initialConfig.springIndexA[springIdxE] + static_cast<int>(dir);
+        fb.initialConfig.springCoordinateIndexB[3 * springIdxE + dir] =
+          3 * fb.initialConfig.springIndexB[springIdxE] + static_cast<int>(dir);
       }
-      fb.initialConfig.springsContourLength[springIdx] = chain.getNrOfBonds();
+      fb.initialConfig.springsContourLength[springIdxE] =
+        static_cast<double>(chain.getNrOfBonds());
       auto bondTypes = chain.getBonds()["bond_type"];
-      fb.initialConfig.springsType[springIdx] = MEAN(bondTypes);
+      fb.initialConfig.springsType[springIdxE] = MEAN(bondTypes);
 
 #ifndef NDEBUG
       Eigen::Vector3d overallDistanceNow = Eigen::Vector3d::Zero();
@@ -358,19 +380,21 @@ public:
     if (partialSpringIdx < numPartialSpringsEstimate) {
       // reduce sizes again
       fb.initialConfig.nrOfPartialSprings = partialSpringIdx;
-      fb.currentSpringPartitionsVec.conservativeResize(partialSpringIdx);
-      fb.initialConfig.springPartBoxOffset.conservativeResize(3 *
-                                                              partialSpringIdx);
+      const Eigen::Index partialSpringIdxE =
+        static_cast<Eigen::Index>(partialSpringIdx);
+      fb.currentSpringPartitionsVec.conservativeResize(partialSpringIdxE);
+      fb.initialConfig.springPartBoxOffset.conservativeResize(
+        3 * partialSpringIdxE);
       fb.initialConfig.springPartCoordinateIndexA.conservativeResize(
-        3 * partialSpringIdx);
+        3 * partialSpringIdxE);
       fb.initialConfig.springPartCoordinateIndexB.conservativeResize(
-        3 * partialSpringIdx);
-      fb.initialConfig.springPartIndexA.conservativeResize(partialSpringIdx);
-      fb.initialConfig.springPartIndexB.conservativeResize(partialSpringIdx);
+        3 * partialSpringIdxE);
+      fb.initialConfig.springPartIndexA.conservativeResize(partialSpringIdxE);
+      fb.initialConfig.springPartIndexB.conservativeResize(partialSpringIdxE);
       fb.initialConfig.partialToFullSpringIndex.conservativeResize(
-        partialSpringIdx);
+        partialSpringIdxE);
       fb.initialConfig.partialSpringIsPartial.conservativeResize(
-        partialSpringIdx);
+        partialSpringIdxE);
     }
 
     fb.completeInitialization();
@@ -526,11 +550,14 @@ public:
   {
     // TODO: revise, hard!
     assert(involvedPartitions.size() == 4);
-    const double firstMeanVal = 0.5 * (springPartitions[involvedPartitions[0]] +
-                                       springPartitions[involvedPartitions[1]]);
+    const Eigen::Index p0 = static_cast<Eigen::Index>(involvedPartitions[0]);
+    const Eigen::Index p1 = static_cast<Eigen::Index>(involvedPartitions[1]);
+    const Eigen::Index p2 = static_cast<Eigen::Index>(involvedPartitions[2]);
+    const Eigen::Index p3 = static_cast<Eigen::Index>(involvedPartitions[3]);
+    const double firstMeanVal =
+      0.5 * (springPartitions[p0] + springPartitions[p1]);
     const double secondMeanVal =
-      0.5 * (springPartitions[involvedPartitions[2]] +
-             springPartitions[involvedPartitions[3]]);
+      0.5 * (springPartitions[p2] + springPartitions[p3]);
     // Eigen::ArrayXi involvedCoordinateIndices = Eigen::ArrayXi(12);
     // for (size_t i = 0; i < 4; ++i) {
     //   involvedCoordinateIndices[3 * i] = 3 * involvedPartitions[i];
@@ -542,10 +569,10 @@ public:
     //   displacements(involvedCoordinateIndices);
     const Eigen::Vector4d partitionsBefore =
       springPartitions(involvedPartitions);
-    springPartitions[involvedPartitions[0]] = firstMeanVal;
-    springPartitions[involvedPartitions[1]] = firstMeanVal;
-    springPartitions[involvedPartitions[2]] = secondMeanVal;
-    springPartitions[involvedPartitions[3]] = secondMeanVal;
+    springPartitions[p0] = firstMeanVal;
+    springPartitions[p1] = firstMeanVal;
+    springPartitions[p2] = secondMeanVal;
+    springPartitions[p3] = secondMeanVal;
     // this->displaceToMeanPosition(
     //   this->initialConfig, displacements, springPartitions, link_idx);
     const double retVal =
@@ -874,9 +901,9 @@ public:
                                      link_idx,
                                      oneOverSpringPartitionUpperLimit);
       innerIterationsDone += 1;
-    } while ((innerIterationsDone < innerMaxNrOfSteps &&
+    } while ((static_cast<long int>(innerIterationsDone) < innerMaxNrOfSteps &&
               rOverr0 > innerAlphaTol && std::isfinite(rOverr0)) ||
-             innerIterationsDone < innerMinNrOfSteps);
+             static_cast<long int>(innerIterationsDone) < innerMinNrOfSteps);
     return std::make_tuple(displacements,
                            springPartitions,
                            innerIterationsDone,
@@ -902,17 +929,23 @@ public:
 
   int getNrOfLinks() const { return this->initialConfig.nrOfLinks; }
 
-  size_t getNumBonds() override { return this->getNrOfSprings(); }
+  size_t getNumBonds() override
+  {
+    return static_cast<size_t>(this->getNrOfSprings());
+  }
 
   size_t getNumExtraBonds() override { return 0; }
 
   long int getNumBondsToForm() override { return 0; }
 
-  size_t getNumAtoms() override { return this->getNrOfNodes(); }
+  size_t getNumAtoms() override
+  {
+    return static_cast<size_t>(this->getNrOfNodes());
+  }
 
   size_t getNumExtraAtoms() override
   {
-    return this->getNrOfLinks() - this->getNrOfNodes();
+    return static_cast<size_t>(this->getNrOfLinks() - this->getNrOfNodes());
   }
 
   int getNrOfSprings() const { return this->initialConfig.nrOfSprings; }
@@ -1109,9 +1142,11 @@ public:
                                      const Eigen::VectorXd& springPartitions,
                                      const double tolerance = 1e-3) const
   {
-    INVALIDARG_EXP_IFN(net->nrOfPartialSprings == springPartitions.size(),
+    INVALIDARG_EXP_IFN(static_cast<Eigen::Index>(net->nrOfPartialSprings) ==
+                         springPartitions.size(),
                        "Spring partitions and network don't match");
-    INVALIDARG_EXP_IFN(net->nrOfLinks * 3 == u.size(),
+    INVALIDARG_EXP_IFN(static_cast<Eigen::Index>(net->nrOfLinks * 3) ==
+                         u.size(),
                        "Link displacements and network don't match");
     if (net->nrOfSprings < 1) {
       return 0.;
@@ -1128,8 +1163,9 @@ public:
     // from crosslink to crosslink. therefore, the number of atoms of each
     // of these springs is one less
     Eigen::ArrayXd allActiveAtomsPerChains =
-      activeSprings.cast<double>() * (net->springsContourLength.array() -
-                                      Eigen::ArrayXd::Ones(net->nrOfSprings));
+      activeSprings.cast<double>() *
+      (net->springsContourLength.array() -
+       Eigen::ArrayXd::Ones(static_cast<Eigen::Index>(net->nrOfSprings)));
 
     // TODO: currently, the weight of the atoms is ignored
     // normalize by the number of atoms
@@ -1155,9 +1191,12 @@ public:
     const Eigen::VectorXd& springPartitions,
     const double tolerance = 1e-3) const
   {
-    INVALIDARG_EXP_IFN(springPartitions.size() == net->nrOfPartialSprings,
+    INVALIDARG_EXP_IFN(springPartitions.size() ==
+                         static_cast<Eigen::Index>(net->nrOfPartialSprings),
                        "Invalid sizes.");
-    INVALIDARG_EXP_IFN(u.size() == net->nrOfLinks * 3, "Invalid sizes.");
+    INVALIDARG_EXP_IFN(u.size() ==
+                         static_cast<Eigen::Index>(net->nrOfLinks * 3),
+                       "Invalid sizes.");
 
     // find all active springs
     Eigen::ArrayXb springIsActive =
@@ -1166,20 +1205,20 @@ public:
     // then, iteratively walk along the springs to mark those as "active"
     // that are connected to active springs
     bool hadChanged = true;
-    Eigen::ArrayXb linkIsActive =
-      Eigen::ArrayXb::Constant(net->nrOfNodes, false);
+    Eigen::ArrayXb linkIsActive = Eigen::ArrayXb::Constant(
+      static_cast<Eigen::Index>(net->nrOfNodes), false);
     while (hadChanged) {
       hadChanged = false;
       for (size_t i = 0; i < net->nrOfNodes; ++i) {
-        if (linkIsActive(i)) {
+        if (linkIsActive(static_cast<Eigen::Index>(i))) {
           continue;
         }
         for (const size_t springIdx : net->springIndicesOfLinks[i]) {
-          if (springIsActive[springIdx]) {
+          if (springIsActive[static_cast<Eigen::Index>(springIdx)]) {
             hadChanged = true;
-            linkIsActive(i) = true;
+            linkIsActive(static_cast<Eigen::Index>(i)) = true;
             for (const size_t innerSpringIdx : net->springIndicesOfLinks[i]) {
-              springIsActive[innerSpringIdx] = true;
+              springIsActive[static_cast<Eigen::Index>(innerSpringIdx)] = true;
             }
             break;
           }
@@ -1203,9 +1242,11 @@ public:
                                    const Eigen::VectorXd& springPartitions,
                                    const double tolerance = 1e-3) const
   {
-    INVALIDARG_EXP_IFN(net->nrOfPartialSprings == springPartitions.size(),
+    INVALIDARG_EXP_IFN(static_cast<Eigen::Index>(net->nrOfPartialSprings) ==
+                         springPartitions.size(),
                        "Spring partitions and network don't match");
-    INVALIDARG_EXP_IFN(net->nrOfLinks * 3 == u.size(),
+    INVALIDARG_EXP_IFN(static_cast<Eigen::Index>(net->nrOfLinks * 3) ==
+                         u.size(),
                        "Link displacements and network don't match");
     if (net->nrOfSprings < 1) {
       return 0.;
@@ -1217,7 +1258,7 @@ public:
       const Eigen::ArrayXd clusteredAtomsPerSpring =
         springIsActive.cast<double>() *
         (net->springsContourLength.array() -
-         Eigen::ArrayXd::Ones(net->nrOfSprings));
+         Eigen::ArrayXd::Ones(static_cast<Eigen::Index>(net->nrOfSprings)));
       return clusteredAtomsPerSpring.sum() +
              static_cast<double>(linkIsActive.count());
     }
@@ -1227,7 +1268,8 @@ public:
     std::vector<long int> atomIdxToClusterIdx(this->universe.getNrOfAtoms());
     for (size_t i = 0; i < clusters.size(); ++i) {
       for (const pylimer_tools::entities::Atom& atom : clusters[i].getAtoms()) {
-        atomIdxToClusterIdx[this->universe.getIdxByAtomId(atom.getId())] = i;
+        atomIdxToClusterIdx[static_cast<size_t>(this->universe.getIdxByAtomId(
+          atom.getId()))] = static_cast<long int>(i);
       }
     }
 
@@ -1240,7 +1282,8 @@ public:
     for (const long int& nodeIdx : activeNodeIndices) {
       const long int universeAtomIdx =
         this->universe.getIdxByAtomId(net->oldAtomIds[nodeIdx]);
-      clusterIsActive[atomIdxToClusterIdx[universeAtomIdx]] = true;
+      clusterIsActive[static_cast<size_t>(
+        atomIdxToClusterIdx[static_cast<size_t>(universeAtomIdx)])] = true;
     }
 
     double nClusteredAtoms = 0.;
@@ -1267,9 +1310,11 @@ public:
                                       const Eigen::VectorXd& springPartitions,
                                       const double tolerance = 1e-3) const
   {
-    INVALIDARG_EXP_IFN(net->nrOfPartialSprings == springPartitions.size(),
+    INVALIDARG_EXP_IFN(static_cast<Eigen::Index>(net->nrOfPartialSprings) ==
+                         springPartitions.size(),
                        "Spring partitions and network don't match");
-    INVALIDARG_EXP_IFN(net->nrOfLinks * 3 == u.size(),
+    INVALIDARG_EXP_IFN(static_cast<Eigen::Index>(net->nrOfLinks * 3) ==
+                         u.size(),
                        "Link displacements and network don't match");
     if (net->nrOfSprings < 1) {
       return 1.;
@@ -1342,7 +1387,9 @@ public:
     std::vector<double> results =
       std::vector<double>(this->initialConfig.nrOfSprings, 0.);
     for (size_t i = 0; i < this->initialConfig.nrOfPartialSprings; ++i) {
-      results[this->initialConfig.partialToFullSpringIndex[i]] +=
+      results[static_cast<size_t>(
+        this->initialConfig
+          .partialToFullSpringIndex[static_cast<Eigen::Index>(i)])] +=
         partialSpringDistances[i];
     }
 
@@ -1625,12 +1672,13 @@ public:
   {
     assert(net.isUpToDate);
 
+    const Eigen::Index springIdxE = static_cast<Eigen::Index>(springIdx);
     Eigen::Vector3d dist =
-      ((net.coordinates.segment(3 * net.springPartIndexB(springIdx), 3) +
-        u.segment(3 * net.springPartIndexB(springIdx), 3)) -
-       (net.coordinates.segment(3 * net.springPartIndexA(springIdx), 3) +
-        u.segment(3 * net.springPartIndexA(springIdx), 3))) +
-      net.springPartBoxOffset.segment(3 * springIdx, 3);
+      ((net.coordinates.segment(3 * net.springPartIndexB(springIdxE), 3) +
+        u.segment(3 * net.springPartIndexB(springIdxE), 3)) -
+       (net.coordinates.segment(3 * net.springPartIndexA(springIdxE), 3) +
+        u.segment(3 * net.springPartIndexA(springIdxE), 3))) +
+      net.springPartBoxOffset.segment(3 * springIdxE, 3);
 
     if (boxLargeEnough) {
       this->box.handlePBC<Eigen::Vector3d>(dist);
@@ -1672,13 +1720,15 @@ public:
     double alpha = 0.;
     for (size_t i = 0; i < net.localToGlobalSpringIndex[springIdx].size();
          ++i) {
-      const size_t currentPartialSpringIdx =
-        net.localToGlobalSpringIndex[springIdx][i];
-      if (net.springPartIndexA[currentPartialSpringIdx] == targetLink) {
+      const Eigen::Index currentPartialSpringIdx =
+        static_cast<Eigen::Index>(net.localToGlobalSpringIndex[springIdx][i]);
+      if (net.springPartIndexA[currentPartialSpringIdx] ==
+          static_cast<int>(targetLink)) {
         return alpha;
       }
       alpha += springPartition[currentPartialSpringIdx];
-      if (net.springPartIndexB[currentPartialSpringIdx] == targetLink) {
+      if (net.springPartIndexB[currentPartialSpringIdx] ==
+          static_cast<int>(targetLink)) {
         return alpha;
       }
     }
@@ -1689,11 +1739,13 @@ public:
                                     const size_t springIdx,
                                     const size_t linkIdx)
   {
-    assert(net.springPartIndexA[springIdx] == linkIdx ||
-           net.springPartIndexB[springIdx] == linkIdx);
-    return net.springPartIndexA[springIdx] == linkIdx
-             ? net.springPartIndexB[springIdx]
-             : net.springPartIndexA[springIdx];
+    const Eigen::Index springIdxE = static_cast<Eigen::Index>(springIdx);
+    const int linkIdxI = static_cast<int>(linkIdx);
+    assert(net.springPartIndexA[springIdxE] == linkIdxI ||
+           net.springPartIndexB[springIdxE] == linkIdxI);
+    return static_cast<size_t>(net.springPartIndexA[springIdxE] == linkIdxI
+                                 ? net.springPartIndexB[springIdxE]
+                                 : net.springPartIndexA[springIdxE]);
   }
 
   /**
@@ -1708,7 +1760,8 @@ public:
     const ForceBalanceNetwork& net,
     const size_t partialSpringIdx)
   {
-    return net.springPartBoxOffset.segment(3 * partialSpringIdx, 3);
+    return net.springPartBoxOffset.segment(
+      3 * static_cast<Eigen::Index>(partialSpringIdx), 3);
   }
 
   /**
@@ -1724,7 +1777,8 @@ public:
                                               const size_t partialSpringIdx,
                                               const size_t linkIdx) const
   {
-    return (net.springPartIndexA(partialSpringIdx) == linkIdx)
+    return (net.springPartIndexA(static_cast<Eigen::Index>(partialSpringIdx)) ==
+            static_cast<int>(linkIdx))
              ? (-1. * this->getPartialSpringBoxOffset(net, partialSpringIdx))
              : (this->getPartialSpringBoxOffset(net, partialSpringIdx));
   }
@@ -1770,7 +1824,10 @@ public:
     const Eigen::Vector3d dist = this->evaluatePartialSpringDistance(
       net, u, springIdx, is2d, boxLargeEnough);
 
-    return dist * (net.springPartIndexA(springIdx) == linkIdx ? -1. : 1.);
+    return dist * (net.springPartIndexA(static_cast<Eigen::Index>(springIdx)) ==
+                       static_cast<int>(linkIdx)
+                     ? -1.
+                     : 1.);
   }
 
   /**
@@ -1856,7 +1913,7 @@ public:
     Eigen::VectorXd weightedLengths =
       Eigen::VectorXd(this->initialConfig.nrOfPartialSprings);
     for (size_t i = 0; i < this->initialConfig.nrOfPartialSprings; ++i) {
-      weightedLengths(i) =
+      weightedLengths(static_cast<Eigen::Index>(i)) =
         this->getWeightedPartialSpringLength(this->initialConfig,
                                              this->currentDisplacements,
                                              this->currentSpringPartitionsVec,
@@ -1901,10 +1958,10 @@ public:
   Eigen::VectorXd getForceMagnitudeVector(
     const double oneOverSpringPartitionUpperLimit = 1.0) const
   {
-    Eigen::VectorXd forceMagnitude =
-      Eigen::VectorXd::Zero(this->initialConfig.nrOfLinks);
+    Eigen::VectorXd forceMagnitude = Eigen::VectorXd::Zero(
+      static_cast<Eigen::Index>(this->initialConfig.nrOfLinks));
     for (size_t i = 0; i < this->initialConfig.nrOfLinks; ++i) {
-      forceMagnitude[i] =
+      forceMagnitude[static_cast<Eigen::Index>(i)] =
         this->getForceOn(i, oneOverSpringPartitionUpperLimit).norm();
     }
     return forceMagnitude;
@@ -1921,8 +1978,8 @@ public:
     const size_t index,
     const double oneOverSpringPartitionUpperLimit = 1.0) const
   {
-    Eigen::VectorXi debugNrSpringsVisited =
-      Eigen::VectorXi::Zero(this->initialConfig.nrOfPartialSprings);
+    Eigen::VectorXi debugNrSpringsVisited = Eigen::VectorXi::Zero(
+      static_cast<Eigen::Index>(this->initialConfig.nrOfPartialSprings));
     return this->evaluateForceOnLink(index,
                                      this->initialConfig,
                                      this->currentDisplacements,
@@ -1966,8 +2023,8 @@ public:
     const size_t linkIdx,
     const double oneOverSpringPartitionUpperLimit = 1.0) const
   {
-    Eigen::VectorXi debugNrSpringsVisited =
-      Eigen::VectorXi::Zero(this->initialConfig.nrOfPartialSprings);
+    Eigen::VectorXi debugNrSpringsVisited = Eigen::VectorXi::Zero(
+      static_cast<Eigen::Index>(this->initialConfig.nrOfPartialSprings));
     return this->evaluateStressOnLink(linkIdx,
                                       this->initialConfig,
                                       this->currentDisplacements,
@@ -2261,11 +2318,17 @@ public:
     for (const size_t springIdx : net.springIndicesOfLinks[linkIdx]) {
       for (const size_t partialSpringIdx :
            net.localToGlobalSpringIndex[springIdx]) {
-        if (net.springPartIndexA[partialSpringIdx] == linkIdx) {
-          results.push_back(net.springPartIndexB[partialSpringIdx]);
+        const Eigen::Index partialSpringIdxE =
+          static_cast<Eigen::Index>(partialSpringIdx);
+        if (net.springPartIndexA[partialSpringIdxE] ==
+            static_cast<int>(linkIdx)) {
+          results.push_back(
+            static_cast<size_t>(net.springPartIndexB[partialSpringIdxE]));
         } //
-        else if (net.springPartIndexB[partialSpringIdx] == linkIdx) {
-          results.push_back(net.springPartIndexA[partialSpringIdx]);
+        else if (net.springPartIndexB[partialSpringIdxE] ==
+                 static_cast<int>(linkIdx)) {
+          results.push_back(
+            static_cast<size_t>(net.springPartIndexA[partialSpringIdxE]));
         }
       }
     }
@@ -2373,8 +2436,8 @@ public:
   void debugAtomVicinity(const size_t atomId) const
   {
     long int atomIdx = -1;
-    for (size_t i = 0; i < this->initialConfig.oldAtomIds.size(); ++i) {
-      if (this->initialConfig.oldAtomIds[i] == atomId) {
+    for (Eigen::Index i = 0; i < this->initialConfig.oldAtomIds.size(); ++i) {
+      if (this->initialConfig.oldAtomIds[i] == static_cast<int>(atomId)) {
         atomIdx = i;
         break;
       }
@@ -2382,26 +2445,35 @@ public:
     RUNTIME_EXP_IFN(atomIdx >= 0, "Atom not found.");
     std::cout << "Atom " << atomIdx << " (" << atomId << ")"
               << " connectivity:" << std::endl;
-    for (const long int parentSpringIdx :
-         this->initialConfig.springIndicesOfLinks[atomIdx]) {
+    for (const size_t parentSpringIdx :
+         this->initialConfig
+           .springIndicesOfLinks[static_cast<size_t>(atomIdx)]) {
       std::vector<size_t> allSpringIndices = this->getAllFullSpringIndicesAlong(
         this->initialConfig, parentSpringIdx);
       std::string prefix = "";
       for (const size_t springIdx : allSpringIndices) {
         prefix += "\t";
         std::cout << prefix << "Spring " << springIdx << " (";
-        std::cout << this->initialConfig.springPartIndexA[springIdx] << " ⟷ "
-                  << this->initialConfig.springPartIndexB[springIdx];
+        std::cout << this->initialConfig
+                       .springPartIndexA[static_cast<Eigen::Index>(springIdx)]
+                  << " ⟷ "
+                  << this->initialConfig
+                       .springPartIndexB[static_cast<Eigen::Index>(springIdx)];
         std::cout << ") with distance "
-                  << this->currentSpringVectors.segment(springIdx * 3, 3).norm()
+                  << this->currentSpringVectors
+                       .segment(static_cast<Eigen::Index>(springIdx * 3), 3)
+                       .norm()
                   << std::endl;
         std::cout << prefix << "\t";
 
-        for (const long int linkIdx :
+        for (const size_t linkIdx :
              this->initialConfig.linkIndicesOfSprings[springIdx]) {
           std::cout << linkIdx << " ";
           if (linkIdx < this->initialConfig.nrOfNodes) {
-            std::cout << "(" << this->initialConfig.oldAtomIds[linkIdx] << ") ";
+            std::cout << "("
+                      << this->initialConfig
+                           .oldAtomIds[static_cast<Eigen::Index>(linkIdx)]
+                      << ") ";
           }
         }
         std::cout << std::endl;
@@ -2584,9 +2656,12 @@ protected:
   {
     Eigen::ArrayXb activePartialSprings =
       this->findActivePartialSprings(net, u, springPartitions, tolerance);
-    Eigen::ArrayXb result = Eigen::ArrayXb::Constant(net->nrOfSprings, false);
+    Eigen::ArrayXb result = Eigen::ArrayXb::Constant(
+      static_cast<Eigen::Index>(net->nrOfSprings), false);
 
-    for (size_t i = 0; i < net->nrOfPartialSprings; ++i) {
+    for (Eigen::Index i = 0;
+         i < static_cast<Eigen::Index>(net->nrOfPartialSprings);
+         ++i) {
       result[net->partialToFullSpringIndex[i]] =
         result[net->partialToFullSpringIndex[i]] || activePartialSprings[i];
     }
@@ -2622,13 +2697,17 @@ protected:
     INVALIDARG_EXP_IFN(dir >= 0 && dir < 3, "Invalid direction");
     Eigen::VectorXd partialSpringVectors = this->evaluatePartialSpringVectors(
       *net, u, this->is2D, this->assumeBoxLargeEnough);
-    Eigen::ArrayXb result = Eigen::ArrayXb::Constant(net->nrOfSprings, false);
+    Eigen::ArrayXb result = Eigen::ArrayXb::Constant(
+      static_cast<Eigen::Index>(net->nrOfSprings), false);
 
-    for (size_t i = 0; i < net->nrOfPartialSprings; ++i) {
+    for (Eigen::Index i = 0;
+         i < static_cast<Eigen::Index>(net->nrOfPartialSprings);
+         ++i) {
       result[net->partialToFullSpringIndex[i]] =
         result[net->partialToFullSpringIndex[i]] ||
         !this->distanceIsWithinTolerance(
-          Eigen::Vector3d(partialSpringVectors[3 * i + dir], 0, 0),
+          Eigen::Vector3d(
+            partialSpringVectors[3 * i + static_cast<Eigen::Index>(dir)], 0, 0),
           tolerance,
           net->springsContourLength[net->partialToFullSpringIndex[i]],
           springPartitions[i]);
@@ -2650,11 +2729,12 @@ protected:
   Eigen::ArrayXb findActiveNodes(const double tolerance = 1e-3) const
   {
     Eigen::ArrayXb activeSprings = this->findActiveSprings(tolerance);
-    assert(activeSprings.size() == this->initialConfig.nrOfSprings);
+    assert(activeSprings.size() ==
+           static_cast<Eigen::Index>(this->initialConfig.nrOfSprings));
 
-    Eigen::ArrayXb activeNodes =
-      Eigen::ArrayXb::Constant(this->initialConfig.nrOfNodes, false);
-    for (size_t i = 0; i < activeSprings.size(); ++i) {
+    Eigen::ArrayXb activeNodes = Eigen::ArrayXb::Constant(
+      static_cast<Eigen::Index>(this->initialConfig.nrOfNodes), false);
+    for (Eigen::Index i = 0; i < activeSprings.size(); ++i) {
       if (activeSprings[i]) {
         activeNodes[this->initialConfig.springIndexA[i]] = true;
         activeNodes[this->initialConfig.springIndexB[i]] = true;
@@ -2671,10 +2751,12 @@ protected:
   {
     Eigen::VectorXd partialSpringVectors = this->evaluatePartialSpringVectors(
       *net, u, this->is2D, this->assumeBoxLargeEnough);
-    Eigen::ArrayXb result =
-      Eigen::ArrayXb::Constant(net->nrOfPartialSprings, false);
+    Eigen::ArrayXb result = Eigen::ArrayXb::Constant(
+      static_cast<Eigen::Index>(net->nrOfPartialSprings), false);
 
-    for (size_t i = 0; i < net->nrOfPartialSprings; ++i) {
+    for (Eigen::Index i = 0;
+         i < static_cast<Eigen::Index>(net->nrOfPartialSprings);
+         ++i) {
       result[i] = !this->distanceIsWithinTolerance(
         partialSpringVectors.segment(3 * i, 3),
         tolerance,
@@ -2706,11 +2788,14 @@ protected:
                                     const size_t linkFrom,
                                     const size_t linkTo)
   {
-    net.springPartIndexA[springIdx] = linkFrom;
-    net.springPartIndexB[springIdx] = linkTo;
-    for (size_t i = 0; i < 3; ++i) {
-      net.springPartCoordinateIndexA[3 * springIdx + i] = linkFrom * 3 + i;
-      net.springPartCoordinateIndexB[3 * springIdx + i] = linkTo * 3 + i;
+    const Eigen::Index springIdxE = static_cast<Eigen::Index>(springIdx);
+    net.springPartIndexA[springIdxE] = static_cast<int>(linkFrom);
+    net.springPartIndexB[springIdxE] = static_cast<int>(linkTo);
+    for (Eigen::Index i = 0; i < 3; ++i) {
+      net.springPartCoordinateIndexA[3 * springIdxE + i] =
+        static_cast<int>(linkFrom * 3) + static_cast<int>(i);
+      net.springPartCoordinateIndexB[3 * springIdxE + i] =
+        static_cast<int>(linkTo * 3) + static_cast<int>(i);
     }
   }
 
@@ -2744,8 +2829,9 @@ protected:
     this->box.handlePBC(dist);
     coords += 0.5 * dist;
 
-    net.coordinates.segment(3 * linkIdx, 3) = coords;
-    net.linkIsSliplink[linkIdx] = atomType != this->crossLinkerType;
+    net.coordinates.segment(3 * static_cast<Eigen::Index>(linkIdx), 3) = coords;
+    net.linkIsSliplink[static_cast<Eigen::Index>(linkIdx)] =
+      atomType != this->crossLinkerType;
   }
 
   /**
@@ -2767,11 +2853,12 @@ protected:
 
     Eigen::Vector3d coords = atom.getCoordinates();
     this->box.handlePBC(coords);
-    net.coordinates.segment(3 * linkIdx, 3) = coords;
-    net.linkIsSliplink[linkIdx] = atomType != this->crossLinkerType;
-    if (!net.linkIsSliplink[linkIdx]) {
-      net.oldAtomIds[linkIdx] = atom.getId();
-      net.oldAtomTypes[linkIdx] = atom.getType();
+    const Eigen::Index linkIdxE = static_cast<Eigen::Index>(linkIdx);
+    net.coordinates.segment(3 * linkIdxE, 3) = coords;
+    net.linkIsSliplink[linkIdxE] = atomType != this->crossLinkerType;
+    if (!net.linkIsSliplink[linkIdxE]) {
+      net.oldAtomIds[linkIdxE] = atom.getId();
+      net.oldAtomTypes[linkIdxE] = atom.getType();
     }
   }
 
@@ -2824,36 +2911,43 @@ protected:
     }
 
     // set the partition, remember the partial spring mapping
-    const size_t from = net.springPartIndexA[partialSpringIdx];
-    const size_t to = net.springPartIndexB[partialSpringIdx];
+    const Eigen::Index partialSpringIdxE =
+      static_cast<Eigen::Index>(partialSpringIdx);
+    const size_t from =
+      static_cast<size_t>(net.springPartIndexA[partialSpringIdxE]);
+    const size_t to =
+      static_cast<size_t>(net.springPartIndexB[partialSpringIdxE]);
     const std::vector<pylimer_tools::entities::Atom> linedUpAtoms =
       chain.getAtomsLinedUp(crossLinkerType, false, true);
-    partitions[partialSpringIdx] = static_cast<double>(atom2Idx - atom1Idx) /
-                                   static_cast<double>(chain.getNrOfBonds());
-    net.partialToFullSpringIndex[partialSpringIdx] = springIdx;
-    net.partialSpringIsPartial[partialSpringIdx] =
+    partitions[partialSpringIdxE] = static_cast<double>(atom2Idx - atom1Idx) /
+                                    static_cast<double>(chain.getNrOfBonds());
+    net.partialToFullSpringIndex[partialSpringIdxE] =
+      static_cast<int>(springIdx);
+    net.partialSpringIsPartial[partialSpringIdxE] =
       !(atom1Idx == 0 &&
-        atom2Idx == chain.getNrOfAtoms() -
+        atom2Idx == static_cast<size_t>(chain.getNrOfAtoms()) -
                       (chain.getType() ==
                            pylimer_tools::entities::MoleculeType::PRIMARY_LOOP
                          ? 0
                          : 1));
 
     // remember the ids -> springs
-    net.oldAtomIdToSpringIndex[linedUpAtoms[atom1Idx].getId()] = springIdx;
-    net.oldAtomIdToSpringIndex[linedUpAtoms[atom2Idx].getId()] = springIdx;
+    net.oldAtomIdToSpringIndex[static_cast<size_t>(
+      linedUpAtoms[atom1Idx].getId())] = springIdx;
+    net.oldAtomIdToSpringIndex[static_cast<size_t>(
+      linedUpAtoms[atom2Idx].getId())] = springIdx;
 
     // use the actual position of the vertices!
-    Eigen::Vector3d expectedDistance =
-      chain.getOverallBondSumFromTo(linedUpAtoms[atom1Idx].getId(),
-                                    linedUpAtoms[atom2Idx].getId(),
-                                    crossLinkerType);
+    Eigen::Vector3d expectedDistance = chain.getOverallBondSumFromTo(
+      static_cast<size_t>(linedUpAtoms[atom1Idx].getId()),
+      static_cast<size_t>(linedUpAtoms[atom2Idx].getId()),
+      crossLinkerType);
     Eigen::Vector3d additionalDistance1 =
       linedUpAtoms[atom1Idx].getCoordinates() -
-      net.coordinates.segment(3 * from, 3);
+      net.coordinates.segment(3 * static_cast<Eigen::Index>(from), 3);
     this->box.handlePBC(additionalDistance1);
     Eigen::Vector3d additionalDistance2 =
-      net.coordinates.segment(3 * to, 3) -
+      net.coordinates.segment(3 * static_cast<Eigen::Index>(to), 3) -
       linedUpAtoms[atom2Idx].getCoordinates();
     this->box.handlePBC(additionalDistance2);
     expectedDistance += additionalDistance1 + additionalDistance2;
@@ -2861,11 +2955,11 @@ protected:
       expectedDistance[2] = 0.0;
     }
 
-    net.springPartBoxOffset.segment(3 * partialSpringIdx, 3) =
+    net.springPartBoxOffset.segment(3 * partialSpringIdxE, 3) =
       Eigen::Vector3d::Zero();
     const Eigen::Vector3d actualDistance = this->evaluatePartialSpringDistance(
       net, Eigen::VectorXd::Zero(net.coordinates.size()), partialSpringIdx);
-    net.springPartBoxOffset.segment(3 * partialSpringIdx, 3) =
+    net.springPartBoxOffset.segment(3 * partialSpringIdxE, 3) =
       expectedDistance - actualDistance;
     assert(this->box.isValidOffset(expectedDistance - actualDistance));
 #ifndef NDEBUG
@@ -2892,9 +2986,12 @@ protected:
     const size_t aroundLinkIdx,
     const long int notPartialSpringIdx = -1) const
   {
-    assert(net.linkIsSliplink[aroundLinkIdx]);
+    assert(net.linkIsSliplink[static_cast<Eigen::Index>(aroundLinkIdx)]);
     assert(this->isPartOfSpring(net, aroundLinkIdx, partialSpringIdx));
-    const size_t fullSpringIdx = net.partialToFullSpringIndex[partialSpringIdx];
+    const Eigen::Index partialSpringIdxE =
+      static_cast<Eigen::Index>(partialSpringIdx);
+    const size_t fullSpringIdx =
+      static_cast<size_t>(net.partialToFullSpringIndex[partialSpringIdxE]);
 
     for (size_t i = 0; i < net.localToGlobalSpringIndex[fullSpringIdx].size();
          ++i) {
@@ -2914,8 +3011,8 @@ protected:
             this->isPartOfSpring(net, aroundLinkIdx, candidate2) &&
             // we cannot handle the case where `partialSpringIdx` is a
             // primary loop without `notPartialSpringIdx`
-            net.springPartIndexA[partialSpringIdx] !=
-              net.springPartIndexB[partialSpringIdx]) {
+            net.springPartIndexA[partialSpringIdxE] !=
+              net.springPartIndexB[partialSpringIdxE]) {
           // this is a b-a-b-a situation
           // check the ordered linkIndicesOfSprings
           if (net.linkIndicesOfSprings[fullSpringIdx][i] == aroundLinkIdx) {
@@ -2929,10 +3026,10 @@ protected:
         assert(this->isPartOfSpring(net, aroundLinkIdx, candidate1) ||
                this->isPartOfSpring(net, aroundLinkIdx, candidate2));
         size_t result = candidate1;
-        if (candidate1 == notPartialSpringIdx &&
+        if (static_cast<long int>(candidate1) == notPartialSpringIdx &&
             this->isPartOfSpring(net, aroundLinkIdx, candidate2)) {
           result = candidate2;
-        } else if (candidate2 == notPartialSpringIdx &&
+        } else if (static_cast<long int>(candidate2) == notPartialSpringIdx &&
                    this->isPartOfSpring(net, aroundLinkIdx, candidate1)) {
           result = candidate1;
         } else if (this->isPartOfSpring(net, aroundLinkIdx, candidate1)) {
@@ -2989,24 +3086,32 @@ protected:
                      const size_t linkIdx) const
   {
     assert(this->isPartOfSpring(net, linkIdx, partialSpringIdx));
-    return net.springPartIndexA[partialSpringIdx] == linkIdx
-             ? net.springPartIndexB[partialSpringIdx]
-             : net.springPartIndexA[partialSpringIdx];
+    const Eigen::Index partialSpringIdxE =
+      static_cast<Eigen::Index>(partialSpringIdx);
+    return static_cast<size_t>(net.springPartIndexA[partialSpringIdxE] ==
+                                   static_cast<int>(linkIdx)
+                                 ? net.springPartIndexB[partialSpringIdxE]
+                                 : net.springPartIndexA[partialSpringIdxE]);
   }
 
   static bool isPartOfSpring(const ForceBalanceNetwork& net,
                              const size_t linkIdx,
                              const size_t partialSpringIdx)
   {
-    return (net.springPartIndexA[partialSpringIdx] == linkIdx) ||
-           (net.springPartIndexB[partialSpringIdx] == linkIdx);
+    const Eigen::Index partialSpringIdxE =
+      static_cast<Eigen::Index>(partialSpringIdx);
+    const int linkIdxI = static_cast<int>(linkIdx);
+    return (net.springPartIndexA[partialSpringIdxE] == linkIdxI) ||
+           (net.springPartIndexB[partialSpringIdxE] == linkIdxI);
   }
 
   static bool isLoopingSpring(const ForceBalanceNetwork& net,
                               const size_t partialSpringIdx)
   {
-    return (net.springPartIndexA[partialSpringIdx] ==
-            net.springPartIndexB[partialSpringIdx]);
+    const Eigen::Index partialSpringIdxE =
+      static_cast<Eigen::Index>(partialSpringIdx);
+    return (net.springPartIndexA[partialSpringIdxE] ==
+            net.springPartIndexB[partialSpringIdxE]);
   }
 
   /**
@@ -3026,18 +3131,19 @@ protected:
   {
     INVALIDARG_EXP_IFN(springIdx < net.nrOfSprings,
                        "Spring index out of range.");
-    if (net.springIndexA[springIdx] == net.springIndexB[springIdx]) {
+    const Eigen::Index springIdxE = static_cast<Eigen::Index>(springIdx);
+    if (net.springIndexA[springIdxE] == net.springIndexB[springIdxE]) {
       // "primary loop" e.g. if entanglement is with the same strand
       // cannot use ignore in this case
-      return net.oldAtomTypes[net.springIndexA[springIdx]] ==
+      return net.oldAtomTypes[net.springIndexA[springIdxE]] ==
              this->entanglementType;
     }
-    return (net.oldAtomTypes[net.springIndexA[springIdx]] ==
+    return (net.oldAtomTypes[net.springIndexA[springIdxE]] ==
               this->entanglementType &&
-            net.springIndexA[springIdx] != ignoring) ||
-           (net.oldAtomTypes[net.springIndexB[springIdx]] ==
+            net.springIndexA[springIdxE] != ignoring) ||
+           (net.oldAtomTypes[net.springIndexB[springIdxE]] ==
               this->entanglementType &&
-            net.springIndexB[springIdx] != ignoring);
+            net.springIndexB[springIdxE] != ignoring);
   }
 
   size_t getInvolvedEntanglementBeadIndex(const ForceBalanceNetwork& net,
@@ -3046,23 +3152,24 @@ protected:
   {
     INVALIDARG_EXP_IFN(springIdx < net.nrOfSprings,
                        "Spring index out of range.");
-    if (net.springIndexB[springIdx] == net.springIndexA[springIdx]) {
+    const Eigen::Index springIdxE = static_cast<Eigen::Index>(springIdx);
+    if (net.springIndexB[springIdxE] == net.springIndexA[springIdxE]) {
       // "primary loop" e.g. if entanglement is with the same strand
       // cannot use ignore in this case
-      if (net.oldAtomTypes[net.springIndexA[springIdx]] ==
+      if (net.oldAtomTypes[net.springIndexA[springIdxE]] ==
           this->entanglementType) {
-        return net.springIndexA[springIdx];
+        return static_cast<size_t>(net.springIndexA[springIdxE]);
       }
     }
-    if (net.oldAtomTypes[net.springIndexA[springIdx]] ==
+    if (net.oldAtomTypes[net.springIndexA[springIdxE]] ==
           this->entanglementType &&
-        net.springIndexA[springIdx] != ignoring) {
-      return net.springIndexA[springIdx];
+        net.springIndexA[springIdxE] != ignoring) {
+      return static_cast<size_t>(net.springIndexA[springIdxE]);
     }
-    if (net.oldAtomTypes[net.springIndexB[springIdx]] ==
+    if (net.oldAtomTypes[net.springIndexB[springIdxE]] ==
           this->entanglementType &&
-        net.springIndexB[springIdx] != ignoring) {
-      return net.springIndexB[springIdx];
+        net.springIndexB[springIdxE] != ignoring) {
+      return static_cast<size_t>(net.springIndexB[springIdxE]);
     }
     throw std::runtime_error("Did not find involved entanglement bead.");
   }
@@ -3106,8 +3213,10 @@ protected:
     const ForceBalanceNetwork& net,
     const size_t nodeIdx) const
   {
-    INVALIDARG_EXP_IFN(!net.linkIsSliplink[nodeIdx], "Link must be crosslink.");
-    INVALIDARG_EXP_IFN(net.oldAtomTypes[nodeIdx] != this->entanglementType,
+    const Eigen::Index nodeIdxE = static_cast<Eigen::Index>(nodeIdx);
+    INVALIDARG_EXP_IFN(!net.linkIsSliplink[nodeIdxE],
+                       "Link must be crosslink.");
+    INVALIDARG_EXP_IFN(net.oldAtomTypes[nodeIdxE] != this->entanglementType,
                        "Link must be crosslink.");
 
     std::vector<size_t> result;
@@ -3135,11 +3244,14 @@ protected:
   {
     INVALIDARG_EXP_IFN(springIdx < net.nrOfSprings,
                        "Spring index out of range.");
-    INVALIDARG_EXP_IFN(net.springsType[springIdx] != this->entanglementType,
+    const Eigen::Index springIdxE = static_cast<Eigen::Index>(springIdx);
+    INVALIDARG_EXP_IFN(net.springsType[springIdxE] != this->entanglementType,
                        "Cannot follow entanglement springs");
     INVALIDARG_EXP_IFN(
-      net.oldAtomTypes[net.springIndexA[springIdx]] != this->entanglementType ||
-        net.oldAtomTypes[net.springIndexB[springIdx]] != this->entanglementType,
+      net.oldAtomTypes[net.springIndexA[springIdxE]] !=
+          this->entanglementType ||
+        net.oldAtomTypes[net.springIndexB[springIdxE]] !=
+          this->entanglementType,
       "Cannot follow springs consisting of entanglement beads");
 
     std::vector<size_t> result = { springIdx };
@@ -3149,39 +3261,41 @@ protected:
       net, currentSpringIdx, previousEntanglementLinkIdx)) {
       const size_t entanglementLinkIdx = this->getInvolvedEntanglementBeadIndex(
         net, currentSpringIdx, previousEntanglementLinkIdx);
-      RUNTIME_EXP_IFN(net.oldAtomTypes[entanglementLinkIdx] ==
-                        this->entanglementType,
-                      "Did not find involved entanglement bead.");
+      RUNTIME_EXP_IFN(
+        net.oldAtomTypes[static_cast<Eigen::Index>(entanglementLinkIdx)] ==
+          this->entanglementType,
+        "Did not find involved entanglement bead.");
       // cannot assert, since this method might be called in a cleanup loop
       assert(net.springIndicesOfLinks[entanglementLinkIdx].size() == 3 ||
              net.springIndicesOfLinks[entanglementLinkIdx].size() == 2);
       long int nextSpringIdx = -1;
       for (const size_t involvedSpringIdx :
            net.springIndicesOfLinks[entanglementLinkIdx]) {
-        if (net.springsType[involvedSpringIdx] == this->entanglementType) {
+        if (net.springsType[static_cast<Eigen::Index>(involvedSpringIdx)] ==
+            this->entanglementType) {
           continue;
         }
         if (involvedSpringIdx == currentSpringIdx) {
           continue;
         }
-        nextSpringIdx = involvedSpringIdx;
+        nextSpringIdx = static_cast<long int>(involvedSpringIdx);
       }
-      RUNTIME_EXP_IFN(nextSpringIdx != currentSpringIdx,
+      RUNTIME_EXP_IFN(nextSpringIdx != static_cast<long int>(currentSpringIdx),
                       "Did not find continuation spring.");
       RUNTIME_EXP_IFN(nextSpringIdx >= 0, "Spring index not found.");
       assert(net.springsType[nextSpringIdx] != this->entanglementType);
-      currentSpringIdx = nextSpringIdx;
+      currentSpringIdx = static_cast<size_t>(nextSpringIdx);
       result.push_back(currentSpringIdx);
-      previousEntanglementLinkIdx = entanglementLinkIdx;
+      previousEntanglementLinkIdx = static_cast<long int>(entanglementLinkIdx);
     }
-    assert((net.oldAtomTypes[net.springIndexA[result[0]]] !=
-              this->entanglementType ||
-            net.oldAtomTypes[net.springIndexB[result[0]]] !=
-              this->entanglementType) &&
-           (net.oldAtomTypes[net.springIndexA[result.back()]] !=
-              this->entanglementType ||
-            net.oldAtomTypes[net.springIndexB[result.back()]] !=
-              this->entanglementType));
+    assert((net.oldAtomTypes[net.springIndexA[static_cast<Eigen::Index>(
+              result[0])]] != this->entanglementType ||
+            net.oldAtomTypes[net.springIndexB[static_cast<Eigen::Index>(
+              result[0])]] != this->entanglementType) &&
+           (net.oldAtomTypes[net.springIndexA[static_cast<Eigen::Index>(
+              result.back())]] != this->entanglementType ||
+            net.oldAtomTypes[net.springIndexB[static_cast<Eigen::Index>(
+              result.back())]] != this->entanglementType));
     return result;
   }
 
@@ -3198,11 +3312,14 @@ protected:
   {
     INVALIDARG_EXP_IFN(springIdx < net.nrOfSprings,
                        "Spring index out of range.");
-    INVALIDARG_EXP_IFN(net.springsType[springIdx] != this->entanglementType,
+    const Eigen::Index springIdxE = static_cast<Eigen::Index>(springIdx);
+    INVALIDARG_EXP_IFN(net.springsType[springIdxE] != this->entanglementType,
                        "Cannot follow entanglement springs");
     INVALIDARG_EXP_IFN(
-      net.oldAtomTypes[net.springIndexA[springIdx]] != this->entanglementType ||
-        net.oldAtomTypes[net.springIndexB[springIdx]] != this->entanglementType,
+      net.oldAtomTypes[net.springIndexA[springIdxE]] !=
+          this->entanglementType ||
+        net.oldAtomTypes[net.springIndexB[springIdxE]] !=
+          this->entanglementType,
       "Cannot follow springs consisting of entanglement beads");
 
     std::vector<size_t> result = {};
@@ -3212,29 +3329,31 @@ protected:
       net, currentSpringIdx, previousEntanglementLinkIdx)) {
       size_t entanglementLinkIdx = this->getInvolvedEntanglementBeadIndex(
         net, currentSpringIdx, previousEntanglementLinkIdx);
-      RUNTIME_EXP_IFN(net.oldAtomTypes[entanglementLinkIdx] ==
-                        this->entanglementType,
-                      "Did not find involved entanglement bead.");
+      RUNTIME_EXP_IFN(
+        net.oldAtomTypes[static_cast<Eigen::Index>(entanglementLinkIdx)] ==
+          this->entanglementType,
+        "Did not find involved entanglement bead.");
       // cannot assert, since this method might be called in a cleanup loop
       assert(net.springIndicesOfLinks[entanglementLinkIdx].size() == 3 ||
              net.springIndicesOfLinks[entanglementLinkIdx].size() == 2);
       long int nextSpringIdx = -1;
       for (const size_t involvedSpringIdx :
            net.springIndicesOfLinks[entanglementLinkIdx]) {
-        if (net.springsType[involvedSpringIdx] == this->entanglementType) {
+        if (net.springsType[static_cast<Eigen::Index>(involvedSpringIdx)] ==
+            this->entanglementType) {
           continue;
         }
         if (involvedSpringIdx == currentSpringIdx) {
           continue;
         }
-        nextSpringIdx = involvedSpringIdx;
+        nextSpringIdx = static_cast<long int>(involvedSpringIdx);
       }
-      RUNTIME_EXP_IFN(nextSpringIdx != currentSpringIdx,
+      RUNTIME_EXP_IFN(nextSpringIdx != static_cast<long int>(currentSpringIdx),
                       "Did not find continuation spring.");
       RUNTIME_EXP_IFN(nextSpringIdx >= 0, "Spring index not found.");
-      currentSpringIdx = nextSpringIdx;
+      currentSpringIdx = static_cast<size_t>(nextSpringIdx);
       result.push_back(entanglementLinkIdx);
-      previousEntanglementLinkIdx = entanglementLinkIdx;
+      previousEntanglementLinkIdx = static_cast<long int>(entanglementLinkIdx);
     }
     return result;
   }
@@ -3260,23 +3379,30 @@ protected:
                        "Source and target must be different when moving "
                        "from one crosslink branch to another.");
 
-    const size_t involvedSlipLink =
-      net.linkIsSliplink[net.springPartIndexA[sourcePartialSpringIdx]]
-        ? net.springPartIndexA[sourcePartialSpringIdx]
-        : net.springPartIndexB[sourcePartialSpringIdx];
-    assert(net.linkIsSliplink[involvedSlipLink]);
-    const size_t involvedCrossLink =
-      net.linkIsSliplink[net.springPartIndexA[sourcePartialSpringIdx]]
-        ? net.springPartIndexB[sourcePartialSpringIdx]
-        : net.springPartIndexA[sourcePartialSpringIdx];
-    assert(!net.linkIsSliplink[involvedCrossLink]);
+    const Eigen::Index sourcePartialSpringIdxE =
+      static_cast<Eigen::Index>(sourcePartialSpringIdx);
+    const size_t involvedSlipLink = static_cast<size_t>(
+      net.linkIsSliplink[net.springPartIndexA[sourcePartialSpringIdxE]]
+        ? net.springPartIndexA[sourcePartialSpringIdxE]
+        : net.springPartIndexB[sourcePartialSpringIdxE]);
+    assert(net.linkIsSliplink[static_cast<Eigen::Index>(involvedSlipLink)]);
+    const size_t involvedCrossLink = static_cast<size_t>(
+      net.linkIsSliplink[net.springPartIndexA[sourcePartialSpringIdxE]]
+        ? net.springPartIndexB[sourcePartialSpringIdxE]
+        : net.springPartIndexA[sourcePartialSpringIdxE]);
+    assert(!net.linkIsSliplink[static_cast<Eigen::Index>(involvedCrossLink)]);
     assert(
-      (net.springPartIndexA[targetPartialSpringIdx] == involvedCrossLink) ||
-      (net.springPartIndexB[targetPartialSpringIdx] == involvedCrossLink));
-    const size_t targetFullSpringIdx =
-      net.partialToFullSpringIndex[targetPartialSpringIdx];
-    const size_t sourceFullSpringIdx =
-      net.partialToFullSpringIndex[sourcePartialSpringIdx];
+      (net
+         .springPartIndexA[static_cast<Eigen::Index>(targetPartialSpringIdx)] ==
+       static_cast<int>(involvedCrossLink)) ||
+      (net
+         .springPartIndexB[static_cast<Eigen::Index>(targetPartialSpringIdx)] ==
+       static_cast<int>(involvedCrossLink)));
+    const size_t targetFullSpringIdx = static_cast<size_t>(
+      net.partialToFullSpringIndex[static_cast<Eigen::Index>(
+        targetPartialSpringIdx)]);
+    const size_t sourceFullSpringIdx = static_cast<size_t>(
+      net.partialToFullSpringIndex[sourcePartialSpringIdxE]);
 
     assert(net.localToGlobalSpringIndex[sourceFullSpringIdx][0] ==
              sourcePartialSpringIdx ||
@@ -3285,7 +3411,8 @@ protected:
              sourcePartialSpringIdx);
 
     size_t otherInvolvedPartialSpring =
-      net.springPartIndexA[sourcePartialSpringIdx] == involvedCrossLink
+      net.springPartIndexA[sourcePartialSpringIdxE] ==
+          static_cast<int>(involvedCrossLink)
         ? net.localToGlobalSpringIndex[sourceFullSpringIdx][1]
         : net.localToGlobalSpringIndex
             [sourceFullSpringIdx]
@@ -3294,7 +3421,8 @@ protected:
     // check whether there is space on the target spring, at all.
     const double minAlpha =
       (oneOverSpringPartitionUpperLimit > 0.)
-        ? 1. / (net.springsContourLength[targetFullSpringIdx] -
+        ? 1. / (net.springsContourLength[static_cast<Eigen::Index>(
+                  targetFullSpringIdx)] -
                 1. / oneOverSpringPartitionUpperLimit)
         : 1e-9;
     if (minAlpha *
@@ -3350,24 +3478,30 @@ protected:
                                        oneOverSpringPartitionUpperLimit);
 
     // finally, return the idx of the new partial spring
+    const Eigen::Index targetPartialSpringIdxE =
+      static_cast<Eigen::Index>(targetPartialSpringIdx);
+    const Eigen::Index newPartialSpringIdxE =
+      static_cast<Eigen::Index>(newPartialSpringIdx);
+    const int involvedCrossLinkI = static_cast<int>(involvedCrossLink);
+    const int involvedSlipLinkI = static_cast<int>(involvedSlipLink);
     long int resultingPartialSpringIdx = 0;
     long int remainingPartialSpringIdx = 0;
-    if ((net.springPartIndexA[targetPartialSpringIdx] == involvedCrossLink &&
-         net.springPartIndexB[targetPartialSpringIdx] == involvedSlipLink) ||
-        (net.springPartIndexB[targetPartialSpringIdx] == involvedCrossLink &&
-         net.springPartIndexA[targetPartialSpringIdx] == involvedSlipLink)) {
-      resultingPartialSpringIdx = targetPartialSpringIdx;
-      remainingPartialSpringIdx = newPartialSpringIdx;
+    if ((net.springPartIndexA[targetPartialSpringIdxE] == involvedCrossLinkI &&
+         net.springPartIndexB[targetPartialSpringIdxE] == involvedSlipLinkI) ||
+        (net.springPartIndexB[targetPartialSpringIdxE] == involvedCrossLinkI &&
+         net.springPartIndexA[targetPartialSpringIdxE] == involvedSlipLinkI)) {
+      resultingPartialSpringIdx = static_cast<long int>(targetPartialSpringIdx);
+      remainingPartialSpringIdx = static_cast<long int>(newPartialSpringIdx);
     } else {
       RUNTIME_EXP_IFN(
-        (net.springPartIndexA[newPartialSpringIdx] == involvedCrossLink &&
-         net.springPartIndexB[newPartialSpringIdx] == involvedSlipLink) ||
-          (net.springPartIndexB[newPartialSpringIdx] == involvedCrossLink &&
-           net.springPartIndexA[newPartialSpringIdx] == involvedSlipLink),
+        (net.springPartIndexA[newPartialSpringIdxE] == involvedCrossLinkI &&
+         net.springPartIndexB[newPartialSpringIdxE] == involvedSlipLinkI) ||
+          (net.springPartIndexB[newPartialSpringIdxE] == involvedCrossLinkI &&
+           net.springPartIndexA[newPartialSpringIdxE] == involvedSlipLinkI),
         "Expected to find cross- and slip-link at either partial spring, "
         "but did not.");
-      resultingPartialSpringIdx = newPartialSpringIdx;
-      remainingPartialSpringIdx = targetPartialSpringIdx;
+      resultingPartialSpringIdx = static_cast<long int>(newPartialSpringIdx);
+      remainingPartialSpringIdx = static_cast<long int>(targetPartialSpringIdx);
     }
 
     // validation: check distances
@@ -3375,9 +3509,17 @@ protected:
       this->evaluatePartialSpringDistance(
         net, u, otherInvolvedPartialSpring, this->is2D, false) +
       this->evaluatePartialSpringDistance(
-        net, u, resultingPartialSpringIdx, this->is2D, false) +
+        net,
+        u,
+        static_cast<size_t>(resultingPartialSpringIdx),
+        this->is2D,
+        false) +
       this->evaluatePartialSpringDistance(
-        net, u, remainingPartialSpringIdx, this->is2D, false);
+        net,
+        u,
+        static_cast<size_t>(remainingPartialSpringIdx),
+        this->is2D,
+        false);
     assert(pylimer_tools::utils::vector_approx_equal<Eigen::Vector3d>(
       distanceAfter, distanceBefore));
 

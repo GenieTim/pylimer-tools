@@ -35,27 +35,31 @@ SimpleSpringMEHPForceEvaluator::evaluateForceSetGradient(
   double* grad) const
 {
   assert(n == this->net.nrOfNodes * 3);
-  assert(springDistances.size() == 3 * this->net.nrOfSprings);
+  assert(springDistances.size() ==
+         static_cast<Eigen::Index>(3 * this->net.nrOfSprings));
 
   double s2 = 0.0;
-  for (size_t i = 0; i < this->net.nrOfSprings; ++i) {
+  for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(this->net.nrOfSprings);
+       ++i) {
     s2 += springDistances.segment(3 * i, 3).squaredNorm() /
           this->net.springsContourLength[i];
   }
   if (grad != nullptr) {
     const double constantMultiplier = this->kappa; // * 0.5 / s2;
-    const int nrOfDim = this->is2D ? 2 : 3;
+    const Eigen::Index nrOfDim = this->is2D ? 2 : 3;
     for (size_t j = 0; j < n; ++j) {
       grad[j] = 0.0;
     }
-    for (size_t j = 0; j < this->net.nrOfSprings; ++j) {
-      const int a = this->net.springIndexA[j];
-      const int b = this->net.springIndexB[j];
+    for (Eigen::Index j = 0;
+         j < static_cast<Eigen::Index>(this->net.nrOfSprings);
+         ++j) {
+      const size_t a = static_cast<size_t>(this->net.springIndexA[j]);
+      const size_t b = static_cast<size_t>(this->net.springIndexB[j]);
       const double Nterm = 1.0 / this->net.springsContourLength[j];
-      for (size_t dir = 0; dir < nrOfDim; ++dir) {
-        grad[3 * a + dir] +=
+      for (Eigen::Index dir = 0; dir < nrOfDim; ++dir) {
+        grad[3 * a + static_cast<size_t>(dir)] +=
           springDistances[3 * j + dir] * constantMultiplier * Nterm;
-        grad[3 * b + dir] -=
+        grad[3 * b + static_cast<size_t>(dir)] -=
           springDistances[3 * j + dir] * constantMultiplier * Nterm;
       }
     }
@@ -190,10 +194,12 @@ NonGaussianSpringForceEvaluator::evaluateForceSetGradient(
     for (size_t j = 0; j < n; ++j) {
       grad[j] = 0.0;
     }
-    const int nrOfDim = this->is2D ? 2 : 3;
-    for (size_t i = 0; i < this->net.nrOfSprings; ++i) {
-      const int a = this->net.springIndexA[i];
-      const int b = this->net.springIndexB[i];
+    const Eigen::Index nrOfDim = this->is2D ? 2 : 3;
+    for (Eigen::Index i = 0;
+         i < static_cast<Eigen::Index>(this->net.nrOfSprings);
+         ++i) {
+      const size_t a = static_cast<size_t>(this->net.springIndexA[i]);
+      const size_t b = static_cast<size_t>(this->net.springIndexB[i]);
       const double r =
         sqrt(springDistances[3 * i] * springDistances[3 * i] +
              springDistances[3 * i + 1] * springDistances[3 * i + 1] +
@@ -210,7 +216,7 @@ NonGaussianSpringForceEvaluator::evaluateForceSetGradient(
       // dF/dr
       const double fr = (this->oneOverl) * linv;
 
-      for (size_t dir = 0; dir < nrOfDim; ++dir) {
+      for (Eigen::Index dir = 0; dir < nrOfDim; ++dir) {
         const double springDistance = springDistances[3 * i + dir];
         // dr/dui
         const double gradTerm = (springDistance / r) * fr;
@@ -220,13 +226,14 @@ NonGaussianSpringForceEvaluator::evaluateForceSetGradient(
                     << std::endl;
         }
 
-        grad[3 * a + dir] += gradTerm;
-        grad[3 * b + dir] -= gradTerm;
+        grad[3 * a + static_cast<size_t>(dir)] += gradTerm;
+        grad[3 * b + static_cast<size_t>(dir)] -= gradTerm;
       }
     }
   }
 
-  for (size_t i = 0; i < this->net.nrOfSprings; ++i) {
+  for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(this->net.nrOfSprings);
+       ++i) {
     const double r =
       std::sqrt(springDistances[3 * i] * springDistances[3 * i] +
                 springDistances[3 * i + 1] * springDistances[3 * i + 1] +

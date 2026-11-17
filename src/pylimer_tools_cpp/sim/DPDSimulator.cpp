@@ -36,9 +36,12 @@ DPDSimulator::DPDSimulator(const pylimer_tools::entities::Universe& u,
   this->box = u.getBox();
   this->coordinates = u.getUnwrappedVertexCoordinates(this->box);
   std::map<std::string, std::vector<long int>> edges = u.getEdges();
-  this->bondPartnersA = Eigen::ArrayXi::Zero(edges["edge_from"].size());
-  this->bondPartnersB = Eigen::ArrayXi::Zero(edges["edge_to"].size());
-  this->bondTypes = Eigen::ArrayXi::Zero(edges["edge_type"].size());
+  this->bondPartnersA =
+    Eigen::ArrayXi::Zero(static_cast<Eigen::Index>(edges["edge_from"].size()));
+  this->bondPartnersB =
+    Eigen::ArrayXi::Zero(static_cast<Eigen::Index>(edges["edge_to"].size()));
+  this->bondTypes =
+    Eigen::ArrayXi::Zero(static_cast<Eigen::Index>(edges["edge_type"].size()));
 
   this->numBonds = 0;
   this->numSlipSprings = 0;
@@ -75,8 +78,8 @@ DPDSimulator::DPDSimulator(const pylimer_tools::entities::Universe& u,
   this->crossLinkerType = crossLinkerType;
   this->slipspringBondType = slipspringBondType;
 
-  this->bondsOfIndex.reserve(this->numAtoms);
-  for (size_t i = 0; i < this->numAtoms; ++i) {
+  this->bondsOfIndex.reserve(static_cast<size_t>(this->numAtoms));
+  for (size_t i = 0; i < static_cast<size_t>(this->numAtoms); ++i) {
     std::vector<size_t> bonds;
     bonds.reserve(4);
     this->bondsOfIndex.push_back(bonds);
@@ -85,32 +88,38 @@ DPDSimulator::DPDSimulator(const pylimer_tools::entities::Universe& u,
     Eigen::ArrayXi(3 * this->bondPartnersA.size());
   this->bondPartnerCoordinatesB =
     Eigen::ArrayXi(3 * this->bondPartnersB.size());
-  for (size_t i = 0; i < this->numBonds + this->numSlipSprings; ++i) {
-    this->bondsOfIndex[this->bondPartnersA[i]].push_back(i);
-    this->bondsOfIndex[this->bondPartnersB[i]].push_back(i);
-    for (int dir = 0; dir < 3; ++dir) {
+  for (Eigen::Index i = 0;
+       i < static_cast<Eigen::Index>(this->numBonds + this->numSlipSprings);
+       ++i) {
+    this->bondsOfIndex[static_cast<size_t>(this->bondPartnersA[i])].push_back(
+      static_cast<size_t>(i));
+    this->bondsOfIndex[static_cast<size_t>(this->bondPartnersB[i])].push_back(
+      static_cast<size_t>(i));
+    for (Eigen::Index dir = 0; dir < 3; ++dir) {
       this->bondPartnerCoordinatesA[i * 3 + dir] =
-        this->bondPartnersA[i] * 3 + dir;
+        this->bondPartnersA[i] * 3 + static_cast<int>(dir);
       this->bondPartnerCoordinatesB[i * 3 + dir] =
-        this->bondPartnersB[i] * 3 + dir;
+        this->bondPartnersB[i] * 3 + static_cast<int>(dir);
     }
   }
   this->isRelocationTarget = Eigen::ArrayXb::Constant(this->numAtoms, false);
-  for (size_t i = 0; i < this->numAtoms; ++i) {
+  for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(this->numAtoms); ++i) {
     // if we already have slip-springs, the functionality must account for
     // that: The idxFunctionalities should not include the slip-springs
+    const size_t atomIdx = static_cast<size_t>(i);
     this->idxFunctionalities[i] =
       this->numSlipSprings == 0
-        ? this->bondsOfIndex[i].size()
-        : std::accumulate(this->bondsOfIndex[i].begin(),
-                          this->bondsOfIndex[i].end(),
+        ? static_cast<int>(this->bondsOfIndex[atomIdx].size())
+        : std::accumulate(this->bondsOfIndex[atomIdx].begin(),
+                          this->bondsOfIndex[atomIdx].end(),
                           0,
                           [&](const int val, const size_t bondIdx) {
-                            return val +
-                                   static_cast<int>(bondIdx < this->numBonds);
+                            return val + static_cast<int>(
+                                           bondIdx <
+                                           static_cast<size_t>(this->numBonds));
                           });
     if (this->idxFunctionalities[i] < 2) {
-      this->chainEndIndices.push_back(i);
+      this->chainEndIndices.push_back(atomIdx);
       this->isRelocationTarget[i] = true;
     }
   }
@@ -128,9 +137,10 @@ DPDSimulator::DPDSimulator(const pylimer_tools::entities::Universe& u,
     const std::vector<double> vy = universe.getPropertyValues<double>("vy");
     const std::vector<double> vz = universe.getPropertyValues<double>("vz");
     for (size_t i = 0; i < universe.getNrOfAtoms(); ++i) {
-      this->currentVelocities(i * 3) = vx[i];
-      this->currentVelocities(i * 3 + 1) = vy[i];
-      this->currentVelocities(i * 3 + 2) = vz[i];
+      const Eigen::Index coordBase = static_cast<Eigen::Index>(i * 3);
+      this->currentVelocities(coordBase) = vx[i];
+      this->currentVelocities(coordBase + 1) = vy[i];
+      this->currentVelocities(coordBase + 2) = vz[i];
     }
   }
 
@@ -222,7 +232,8 @@ DPDSimulator::runSimulation(const long int nSteps,
 
     // kinetic term of the stress/pressure
     const double m_over_boxv = 1. / (this->box.getVolume());
-    for (size_t i = 0; i < this->numAtoms; ++i) {
+    for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(this->numAtoms);
+         ++i) {
       this->currentStressTensor +=
         m_over_boxv * this->currentVelocities.segment(3 * i, 3) *
         this->currentVelocities.segment(3 * i, 3).transpose();
@@ -282,7 +293,7 @@ DPDSimulator::refreshCurrentState()
                                         1.0);
   // kinetic term of the stress/pressure
   const double m_over_boxv = 1. / (this->box.getVolume());
-  for (size_t i = 0; i < this->numAtoms; ++i) {
+  for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(this->numAtoms); ++i) {
     this->currentStressTensor +=
       (m_over_boxv * this->currentVelocities.segment(3 * i, 3) *
        this->currentVelocities.segment(3 * i, 3).transpose());
@@ -323,8 +334,8 @@ DPDSimulator::resetBondDuplicationPenalty()
     Eigen::ArrayXd::Constant(3 * (this->numBonds + this->numSlipSprings), 1.);
   // this->bondDuplicationPenalty.setConstant(1.);
 
-  for (size_t i = 0; i < this->numAtoms - 1; ++i) {
-    this->resetBondDuplicationPenalty(i);
+  for (int i = 0; i < this->numAtoms - 1; ++i) {
+    this->resetBondDuplicationPenalty(static_cast<size_t>(i));
   }
 }
 
@@ -335,18 +346,20 @@ DPDSimulator::resetBondDuplicationPenalty(const size_t atomIdx)
   partners.reserve(this->bondsOfIndex[atomIdx].size());
   // here as well, we rely on the bonds of index being sorted
   for (const size_t bondIdx : this->bondsOfIndex[atomIdx]) {
-    size_t atomPartnerIdx = this->bondPartnersA[bondIdx] == atomIdx
-                              ? this->bondPartnersB[bondIdx]
-                              : this->bondPartnersA[bondIdx];
-    if (bondIdx >= this->numBonds) {
+    const Eigen::Index bondEigenIdx = static_cast<Eigen::Index>(bondIdx);
+    const size_t atomPartnerIdx = static_cast<size_t>(
+      this->bondPartnersA[bondEigenIdx] == static_cast<int>(atomIdx)
+        ? this->bondPartnersB[bondEigenIdx]
+        : this->bondPartnersA[bondEigenIdx]);
+    if (bondIdx >= static_cast<size_t>(this->numBonds)) {
       // all others should stay 1 anyway
-      this->bondDuplicationPenalty.segment(3 * bondIdx, 3).setConstant(1.);
+      this->bondDuplicationPenalty.segment(3 * bondEigenIdx, 3).setConstant(1.);
     }
     if (partners.contains(atomPartnerIdx)) {
       // "real" bonds always contribute -> check that this is a
       // slip-spring
-      if (bondIdx >= this->numBonds) {
-        this->bondDuplicationPenalty.segment(3 * bondIdx, 3).setZero();
+      if (bondIdx >= static_cast<size_t>(this->numBonds)) {
+        this->bondDuplicationPenalty.segment(3 * bondEigenIdx, 3).setZero();
       }
     } else {
       partners.insert(atomPartnerIdx);
@@ -395,31 +408,34 @@ DPDSimulator::attemptBondFormation()
      this->box.getVolume())));
   std::vector<int> possibleCandidates;
   // iterate atoms - we want to start from the crosslinkers
-  for (size_t atom_idx = 0; atom_idx < this->numAtoms; ++atom_idx) {
+  for (size_t atom_idx = 0; atom_idx < static_cast<size_t>(this->numAtoms);
+       ++atom_idx) {
+    const Eigen::Index atomEigenIdx = static_cast<Eigen::Index>(atom_idx);
     possibleCandidates.clear();
     if (this->atomTypes[atom_idx] != this->atomTypeBondFormationFrom) {
       continue;
     }
-    if (this->idxFunctionalities[atom_idx] >=
+    if (this->idxFunctionalities[atomEigenIdx] >=
         this->maxBondsPerType[this->atomTypes[atom_idx]]) {
       continue;
     }
 
     // find neighbours
     const int numNeighbors = this->neighbourlist.getIndicesCloseToCoordinates(
-      neighbors, this->coordinates.segment(3 * atom_idx, 3), cutoff);
-    for (size_t neigh_idx = 0; neigh_idx < numNeighbors; ++neigh_idx) {
+      neighbors, this->coordinates.segment(3 * atomEigenIdx, 3), cutoff);
+    for (Eigen::Index neigh_idx = 0; neigh_idx < numNeighbors; ++neigh_idx) {
       // loop neighbours to find applicable partner
-      const size_t j = neighbors[neigh_idx];
-      Eigen::Vector3d vec = this->coordinates.segment(3 * atom_idx, 3) -
-                            this->coordinates.segment(3 * j, 3);
+      const size_t j = static_cast<size_t>(neighbors[neigh_idx]);
+      const Eigen::Index jEigen = static_cast<Eigen::Index>(j);
+      Eigen::Vector3d vec = this->coordinates.segment(3 * atomEigenIdx, 3) -
+                            this->coordinates.segment(3 * jEigen, 3);
       this->box.handlePBC(vec);
       const double r2 = (vec).norm();
       if (r2 <= cutoff && atom_idx != j &&
-          (this->idxFunctionalities[j] <
+          (this->idxFunctionalities[jEigen] <
            this->maxBondsPerType[this->atomTypes[j]]) &&
           (this->atomTypeBondFormationTo == this->atomTypes[j])) {
-        possibleCandidates.push_back(j);
+        possibleCandidates.push_back(static_cast<int>(j));
       }
     }
 
@@ -431,7 +447,7 @@ DPDSimulator::attemptBondFormation()
     // NOTE: currently, we build only 1
     std::ranges::shuffle(possibleCandidates, this->e2);
     this->addBond(
-      atom_idx,
+      static_cast<long int>(atom_idx),
       possibleCandidates[0],
       this->slipspringBondType == 3 ? 4 : 3); // TODO: decide on bond type
     this->bondsToForm -= 1;
@@ -498,9 +514,9 @@ DPDSimulator::addBond(const long int fromIdx,
   }
 
   // also update all other references to the slip-springs
-  for (size_t i = 0; i < this->numAtoms; ++i) {
+  for (size_t i = 0; i < static_cast<size_t>(this->numAtoms); ++i) {
     for (size_t j = 0; j < this->bondsOfIndex[i].size(); ++j) {
-      if (this->bondsOfIndex[i][j] >= newBondIdx) {
+      if (this->bondsOfIndex[i][j] >= static_cast<size_t>(newBondIdx)) {
         this->bondsOfIndex[i][j] += 1;
       }
     }
@@ -508,20 +524,24 @@ DPDSimulator::addBond(const long int fromIdx,
 
   // actually register the new bond
   this->bondTypes[newBondIdx] = bondType;
-  this->bondPartnersA[newBondIdx] = fromIdx;
-  this->bondPartnersB[newBondIdx] = toIdx;
-  for (size_t i = 0; i < 3; ++i) {
-    this->bondPartnerCoordinatesA[3 * newBondIdx + i] = 3 * fromIdx + i;
-    this->bondPartnerCoordinatesB[3 * newBondIdx + i] = 3 * toIdx + i;
+  this->bondPartnersA[newBondIdx] = static_cast<int>(fromIdx);
+  this->bondPartnersB[newBondIdx] = static_cast<int>(toIdx);
+  for (Eigen::Index i = 0; i < 3; ++i) {
+    this->bondPartnerCoordinatesA[3 * newBondIdx + i] =
+      3 * static_cast<int>(fromIdx) + static_cast<int>(i);
+    this->bondPartnerCoordinatesB[3 * newBondIdx + i] =
+      3 * static_cast<int>(toIdx) + static_cast<int>(i);
   }
-  pylimer_tools::utils::addToSorted<size_t>(this->bondsOfIndex[fromIdx],
-                                            newBondIdx);
-  pylimer_tools::utils::addToSorted<size_t>(this->bondsOfIndex[toIdx],
-                                            newBondIdx);
+  const size_t fromIdxU = static_cast<size_t>(fromIdx);
+  const size_t toIdxU = static_cast<size_t>(toIdx);
+  pylimer_tools::utils::addToSorted<size_t>(this->bondsOfIndex[fromIdxU],
+                                            static_cast<size_t>(newBondIdx));
+  pylimer_tools::utils::addToSorted<size_t>(this->bondsOfIndex[toIdxU],
+                                            static_cast<size_t>(newBondIdx));
 
   this->resetBondOffset(newBondIdx);
-  this->resetBondDuplicationPenalty(fromIdx);
-  this->resetBondDuplicationPenalty(toIdx);
+  this->resetBondDuplicationPenalty(fromIdxU);
+  this->resetBondDuplicationPenalty(toIdxU);
 
   // count the new bonds
   this->numBonds += 1;
@@ -534,11 +554,11 @@ DPDSimulator::addBond(const long int fromIdx,
     // remove the atoms from chain ends, if they were in there
     if (!this->isRelocationTarget[fromIdx]) {
       pylimer_tools::utils::removeIfContained<size_t>(this->chainEndIndices,
-                                                      fromIdx);
+                                                      fromIdxU);
     }
     if (!this->isRelocationTarget[toIdx]) {
       pylimer_tools::utils::removeIfContained<size_t>(this->chainEndIndices,
-                                                      toIdx);
+                                                      toIdxU);
     }
   }
 
@@ -571,8 +591,8 @@ DPDSimulator::deformBoxImmediately(const pylimer_tools::entities::Box& newBox)
   Eigen::Array3d scalingFactor = newBox.getL() / previousBox.getL();
 
   // rescale per-atom quantities
-  for (size_t i = 0; i < this->numAtoms; ++i) {
-    for (size_t dir = 0; dir < 3; ++dir) {
+  for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(this->numAtoms); ++i) {
+    for (Eigen::Index dir = 0; dir < 3; ++dir) {
       this->coordinates[3 * i + dir] *= scalingFactor[dir];
       this->currentVelocities[3 * i + dir] *= scalingFactor[dir];
       this->currentVelocitiesPlus[3 * i + dir] *= scalingFactor[dir];
@@ -652,7 +672,7 @@ DPDSimulator::computeForces(
   if (this->assumeBoxLargeEnough) {
     this->box.handlePBC(bondDistances);
 #ifndef NDEBUG
-    for (size_t i = 0; i < this->bondPartnersA.size(); ++i) {
+    for (Eigen::Index i = 0; i < this->bondPartnersA.size(); ++i) {
       if (bondDistances.segment(3 * i, 3).squaredNorm() >
           0.5 * this->box.getL().minCoeff()) {
         std::cerr
@@ -665,7 +685,7 @@ DPDSimulator::computeForces(
 #endif
   } else {
 #ifndef NDEBUG
-    for (size_t i = 0; i < this->bondPartnersA.size(); ++i) {
+    for (Eigen::Index i = 0; i < this->bondPartnersA.size(); ++i) {
       if (this->bondBoxOffsets.segment(3 * i, 3) !=
           this->box.getOffset(
             coords(this->bondPartnerCoordinatesB.segment(3 * i, 3)) -
@@ -685,7 +705,7 @@ DPDSimulator::computeForces(
   Eigen::setNbThreads(1);
 #pragma omp parallel for reduction(+ : stressTensor, pressure)                 \
   schedule(static, 16) if (this->bondPartnersA.size() > 500)
-  for (size_t i = 0; i < this->bondPartnersA.size(); ++i) {
+  for (Eigen::Index i = 0; i < this->bondPartnersA.size(); ++i) {
     // attractive force -> reduces pressure in the system
     pressure -= this->k * bondDistances.segment(3 * i, 3).squaredNorm();
     stressTensor -= this->k * bondDistances.segment(3 * i, 3) *
@@ -707,7 +727,7 @@ DPDSimulator::computeForces(
 #endif
     std::mt19937& localRng = (numThreads == 1 || this->threadRNGs.empty())
                                ? this->e2
-                               : this->threadRNGs[tid];
+                               : this->threadRNGs[static_cast<size_t>(tid)];
     std::uniform_real_distribution<double> localDist =
       this->uniform_rand_mean0std1;
 
@@ -728,9 +748,10 @@ DPDSimulator::computeForces(
     // less
 #pragma omp for reduction(+ : forces, stressTensor, pressure)                  \
   schedule(dynamic, 16)
-    for (size_t i = 0; i < this->numAtoms - 1; ++i) {
+    for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(this->numAtoms - 1);
+         ++i) {
       const int numNeighbors = this->neighbourlist.getHigherIndicesWithinCutoff(
-        neighbors, coords, i, cutoff);
+        neighbors, coords, static_cast<size_t>(i), cutoff);
 
       // pair forces
       // Eigen::ArrayXi neighbourCoordIndices =
@@ -752,8 +773,8 @@ DPDSimulator::computeForces(
       // 3).replicate(numNeighbors, 1) - velocities(neighbourCoordIndices);
 
       // pair forces
-      for (size_t neigh_idx = 0; neigh_idx < numNeighbors; ++neigh_idx) {
-        const size_t j = neighbors[neigh_idx];
+      for (Eigen::Index neigh_idx = 0; neigh_idx < numNeighbors; ++neigh_idx) {
+        const Eigen::Index j = static_cast<Eigen::Index>(neighbors[neigh_idx]);
         pairdistance = coords.segment(3 * i, 3) - coords.segment(3 * j, 3);
         this->box.handlePBC(pairdistance);
         // slight performance improvement, taking the square norm here
@@ -823,11 +844,14 @@ DPDSimulator::startMeasuringMSDForAtoms(
 {
   // Translate atom IDS to indices of the local structure
   Eigen::ArrayXi coordinateIndices =
-    Eigen::ArrayXi(3 * atomIdsToMeasure.size());
+    Eigen::ArrayXi(static_cast<Eigen::Index>(3 * atomIdsToMeasure.size()));
 #pragma omp parallel for if (atomIdsToMeasure.size() > 500)
-  for (size_t i = 0; i < atomIdsToMeasure.size(); ++i) {
-    const size_t atomId = atomIdsToMeasure[i];
-    const size_t index = this->universe.getIdxByAtomId(atomId);
+  for (Eigen::Index i = 0;
+       i < static_cast<Eigen::Index>(atomIdsToMeasure.size());
+       ++i) {
+    const size_t atomId = atomIdsToMeasure[static_cast<size_t>(i)];
+    const int index = static_cast<int>(
+      this->universe.getIdxByAtomId(static_cast<long int>(atomId)));
     coordinateIndices[3 * i] = 3 * index;
     coordinateIndices[3 * i + 1] = 3 * index + 1;
     coordinateIndices[3 * i + 2] = 3 * index + 2;
@@ -836,7 +860,7 @@ DPDSimulator::startMeasuringMSDForAtoms(
   // Remember to measure these relative to the current time-step
   msdMeasuredIndices.push_back(coordinateIndices);
   msdOrigins.push_back(this->coordinates(coordinateIndices));
-  msdOriginTimesteps.push_back(this->currentStep);
+  msdOriginTimesteps.push_back(static_cast<size_t>(this->currentStep));
 }
 
 /**
@@ -858,16 +882,16 @@ DPDSimulator::createSlipSprings(const int num, int bondType)
   candidates.reserve(5);
 
   std::vector<size_t> slipSpringFrom;
-  slipSpringFrom.reserve(num);
+  slipSpringFrom.reserve(static_cast<size_t>(num));
   std::vector<size_t> slipSpringTo;
-  slipSpringTo.reserve(num);
+  slipSpringTo.reserve(static_cast<size_t>(num));
 
   // randomly permute the atoms to start the search with
   // we do this over just randomly selecting an index
   // in order to reduce the probability of finding the same start twice
   std::vector<size_t> sourceIds;
-  sourceIds.reserve(this->numAtoms);
-  for (size_t i = 0; i < this->numAtoms; ++i) {
+  sourceIds.reserve(static_cast<size_t>(this->numAtoms));
+  for (size_t i = 0; i < static_cast<size_t>(this->numAtoms); ++i) {
     if (this->atomTypes[i] != this->crossLinkerType) {
       sourceIds.push_back(i);
     }
@@ -879,24 +903,27 @@ DPDSimulator::createSlipSprings(const int num, int bondType)
     createdLastIteration = 0;
     std::ranges::shuffle(sourceIds, this->e2);
     for (size_t i : sourceIds) {
+      const Eigen::Index iEigen = static_cast<Eigen::Index>(i);
       int numCandidates = 0;
       // for each atom, search for possible partners
       const int numNeighs = this->neighbourlist.getIndicesCloseToCoordinates(
-        neighbours, this->coordinates.segment(3 * i, 3), this->highCutoff);
-      for (size_t j = 0; j < numNeighs; ++j) {
-        if (this->atomTypes[neighbours[j]] == this->crossLinkerType) {
+        neighbours, this->coordinates.segment(3 * iEigen, 3), this->highCutoff);
+      for (Eigen::Index j = 0; j < numNeighs; ++j) {
+        const size_t neighAtom = static_cast<size_t>(neighbours[j]);
+        if (this->atomTypes[neighAtom] == this->crossLinkerType) {
           continue;
         }
         Eigen::Vector3d distance =
-          this->coordinates.segment(3 * i, 3) -
-          this->coordinates.segment(3 * neighbours[j], 3);
+          this->coordinates.segment(3 * iEigen, 3) -
+          this->coordinates.segment(3 * static_cast<Eigen::Index>(neighAtom),
+                                    3);
         this->box.handlePBC(distance);
         if (distance.norm() > this->lowCutoff &&
             distance.norm() <= this->highCutoff) {
-          if (numCandidates < candidates.size()) {
-            candidates[numCandidates] = neighbours[j];
+          if (numCandidates < static_cast<int>(candidates.size())) {
+            candidates[static_cast<size_t>(numCandidates)] = neighAtom;
           } else {
-            candidates.push_back(neighbours[j]);
+            candidates.push_back(neighAtom);
           }
           numCandidates += 1;
         }
@@ -908,7 +935,7 @@ DPDSimulator::createSlipSprings(const int num, int bondType)
       const int candidateIndex = dist(this->e2);
       // found a candidate to create a slip-spring to
       slipSpringFrom.push_back(i);
-      slipSpringTo.push_back(candidates[candidateIndex]);
+      slipSpringTo.push_back(candidates[static_cast<size_t>(candidateIndex)]);
       totalCreated += 1;
       createdLastIteration += 1;
       if (totalCreated >= num) {
@@ -936,46 +963,49 @@ DPDSimulator::addSlipSprings(std::vector<size_t>& partnerA,
   INVALIDARG_EXP_IFN(partnerA.size() == partnerB.size(),
                      "Require same size A & B");
   for (size_t i = 0; i < partnerA.size(); ++i) {
-    INVALIDINDEX_EXP_IFN(partnerA[i] < this->numAtoms, "Invalid partner id");
-    INVALIDINDEX_EXP_IFN(partnerB[i] < this->numAtoms, "Invalid partner id");
+    INVALIDINDEX_EXP_IFN(partnerA[i] < static_cast<size_t>(this->numAtoms),
+                         "Invalid partner id");
+    INVALIDINDEX_EXP_IFN(partnerB[i] < static_cast<size_t>(this->numAtoms),
+                         "Invalid partner id");
   }
-  const size_t sizeBefore = this->numBonds + this->numSlipSprings;
-  this->bondPartnersA.conservativeResize(sizeBefore + partnerA.size());
-  this->bondPartnersB.conservativeResize(sizeBefore + partnerB.size());
-  this->bondPartnerCoordinatesA.conservativeResize(
-    3 * (sizeBefore + partnerA.size()));
-  this->bondPartnerCoordinatesB.conservativeResize(
-    3 * (sizeBefore + partnerB.size()));
-  this->bondTypes.conservativeResize(sizeBefore + partnerB.size());
-  this->bondBoxOffsets.conservativeResize(3 * (sizeBefore + partnerA.size()));
-  this->bondDuplicationPenalty.conservativeResize(
-    3 * (sizeBefore + partnerA.size()));
+  const Eigen::Index sizeBefore =
+    static_cast<Eigen::Index>(this->numBonds + this->numSlipSprings);
+  const Eigen::Index numNew = static_cast<Eigen::Index>(partnerA.size());
+  this->bondPartnersA.conservativeResize(sizeBefore + numNew);
+  this->bondPartnersB.conservativeResize(sizeBefore + numNew);
+  this->bondPartnerCoordinatesA.conservativeResize(3 * (sizeBefore + numNew));
+  this->bondPartnerCoordinatesB.conservativeResize(3 * (sizeBefore + numNew));
+  this->bondTypes.conservativeResize(sizeBefore + numNew);
+  this->bondBoxOffsets.conservativeResize(3 * (sizeBefore + numNew));
+  this->bondDuplicationPenalty.conservativeResize(3 * (sizeBefore + numNew));
 
-  this->bondPartnersA.segment(sizeBefore, partnerA.size()) =
-    Eigen::Map<Eigen::ArrayXst, Eigen::Unaligned>(partnerA.data(),
-                                                  partnerA.size())
+  this->bondPartnersA.segment(sizeBefore, numNew) =
+    Eigen::Map<Eigen::ArrayXst, Eigen::Unaligned>(partnerA.data(), numNew)
       .cast<int>();
-  this->bondPartnersB.segment(sizeBefore, partnerB.size()) =
-    Eigen::Map<Eigen::ArrayXst, Eigen::Unaligned>(partnerB.data(),
-                                                  partnerB.size())
+  this->bondPartnersB.segment(sizeBefore, numNew) =
+    Eigen::Map<Eigen::ArrayXst, Eigen::Unaligned>(partnerB.data(), numNew)
       .cast<int>();
-  this->bondTypes.segment(sizeBefore, partnerB.size()) = bondType;
+  this->bondTypes.segment(sizeBefore, numNew) = bondType;
 
-  for (size_t i = sizeBefore; i < sizeBefore + partnerA.size(); ++i) {
-    this->bondsOfIndex[this->bondPartnersA[i]].push_back(i);
-    this->bondsOfIndex[this->bondPartnersB[i]].push_back(i);
-    for (int dir = 0; dir < 3; ++dir) {
+  for (Eigen::Index i = sizeBefore; i < sizeBefore + numNew; ++i) {
+    this->bondsOfIndex[static_cast<size_t>(this->bondPartnersA[i])].push_back(
+      static_cast<size_t>(i));
+    this->bondsOfIndex[static_cast<size_t>(this->bondPartnersB[i])].push_back(
+      static_cast<size_t>(i));
+    for (Eigen::Index dir = 0; dir < 3; ++dir) {
       this->bondPartnerCoordinatesA[i * 3 + dir] =
-        this->bondPartnersA[i] * 3 + dir;
+        this->bondPartnersA[i] * 3 + static_cast<int>(dir);
       this->bondPartnerCoordinatesB[i * 3 + dir] =
-        this->bondPartnersB[i] * 3 + dir;
+        this->bondPartnersB[i] * 3 + static_cast<int>(dir);
     }
-    this->resetBondOffset(i);
-    this->resetBondDuplicationPenalty(this->bondPartnersA[i]);
-    this->resetBondDuplicationPenalty(this->bondPartnersB[i]);
+    this->resetBondOffset(static_cast<int>(i));
+    this->resetBondDuplicationPenalty(
+      static_cast<size_t>(this->bondPartnersA[i]));
+    this->resetBondDuplicationPenalty(
+      static_cast<size_t>(this->bondPartnersB[i]));
   }
 
-  this->numSlipSprings += partnerA.size();
+  this->numSlipSprings += static_cast<int>(partnerA.size());
 }
 
 /**
@@ -990,51 +1020,55 @@ DPDSimulator::relocateSlipSprings(const double kbT)
   int nAccept = 0;
   std::vector<size_t> candidates;
   Eigen::ArrayXi neighbours = Eigen::ArrayXi(12);
-  std::uniform_int_distribution<int> chainendDist(
+  std::uniform_int_distribution<size_t> chainendDist(
     0, this->chainEndIndices.size() - 1);
-  for (size_t springIdx = this->numBonds;
-       springIdx < (this->numBonds + this->numSlipSprings);
+  for (size_t springIdx = static_cast<size_t>(this->numBonds);
+       springIdx < static_cast<size_t>(this->numBonds + this->numSlipSprings);
        ++springIdx) {
-    if ((!(this->isRelocationTarget[this->bondPartnersA[springIdx]] ||
-           this->isRelocationTarget[this->bondPartnersB[springIdx]])) &&
+    const Eigen::Index springEigenIdx = static_cast<Eigen::Index>(springIdx);
+    const size_t partnerA =
+      static_cast<size_t>(this->bondPartnersA[springEigenIdx]);
+    const size_t partnerB =
+      static_cast<size_t>(this->bondPartnersB[springEigenIdx]);
+    if ((!(this->isRelocationTarget[static_cast<Eigen::Index>(partnerA)] ||
+           this->isRelocationTarget[static_cast<Eigen::Index>(partnerB)])) &&
         // always relocate from crosslinkers away, e.g. in case the
         // crosslink has gained an additional bond and is no longer a
         // relocation target.
         // consequently, we are inconsistent for crosslinkers with f = 2
-        !(this->atomTypes[this->bondPartnersA[springIdx]] ==
-            this->crossLinkerType ||
-          this->atomTypes[this->bondPartnersB[springIdx]] ==
-            this->crossLinkerType)) {
+        !(this->atomTypes[partnerA] == this->crossLinkerType ||
+          this->atomTypes[partnerB] == this->crossLinkerType)) {
       continue;
     }
     // design & attempt move
-    const size_t partnerA = this->bondPartnersA[springIdx];
-    const size_t partnerB = this->bondPartnersB[springIdx];
 
-    const int candidateIndex = this->chainEndIndices[chainendDist(this->e2)];
+    const size_t candidateIndex = this->chainEndIndices[chainendDist(this->e2)];
+    const Eigen::Index candidateEigenIdx =
+      static_cast<Eigen::Index>(candidateIndex);
 
     // search for neighbours
     int numCandidates = 0;
     // for each atom, search for possible partners
     const int numNeighs = this->neighbourlist.getIndicesCloseToCoordinates(
       neighbours,
-      this->coordinates.segment(3 * candidateIndex, 3),
+      this->coordinates.segment(3 * candidateEigenIdx, 3),
       this->highCutoff);
-    for (size_t j = 0; j < numNeighs; ++j) {
+    for (Eigen::Index j = 0; j < numNeighs; ++j) {
+      const size_t neighAtom = static_cast<size_t>(neighbours[j]);
       // slip-springs to crosslinkers are not allowed
-      if (this->atomTypes[neighbours[j]] == this->crossLinkerType) {
+      if (this->atomTypes[neighAtom] == this->crossLinkerType) {
         continue;
       }
       Eigen::Vector3d distance =
-        this->coordinates.segment(3 * candidateIndex, 3) -
-        this->coordinates.segment(3 * neighbours[j], 3);
+        this->coordinates.segment(3 * candidateEigenIdx, 3) -
+        this->coordinates.segment(3 * static_cast<Eigen::Index>(neighAtom), 3);
       this->box.handlePBC(distance);
       if (distance.norm() > this->lowCutoff &&
           distance.norm() <= this->highCutoff) {
-        if (numCandidates >= candidates.size()) {
-          candidates.push_back(neighbours[j]);
+        if (numCandidates >= static_cast<int>(candidates.size())) {
+          candidates.push_back(neighAtom);
         } else {
-          candidates[numCandidates] = neighbours[j];
+          candidates[static_cast<size_t>(numCandidates)] = neighAtom;
         }
         numCandidates += 1;
       }
@@ -1043,13 +1077,14 @@ DPDSimulator::relocateSlipSprings(const double kbT)
       continue;
     }
     std::uniform_int_distribution<int> candidateDist(0, numCandidates - 1);
-    const int candidatePartnerIndex = candidates[candidateDist(this->e2)];
+    const size_t candidatePartnerIndex =
+      candidates[static_cast<size_t>(candidateDist(this->e2))];
 
     // compute the Metropolis criterion
     Eigen::Vector3d bondDistanceNow =
-      (this->coordinates.segment(partnerA * 3, 3) -
-       this->coordinates.segment(partnerB * 3, 3)) +
-      this->bondBoxOffsets.segment(3 * springIdx, 3);
+      (this->coordinates.segment(static_cast<Eigen::Index>(partnerA * 3), 3) -
+       this->coordinates.segment(static_cast<Eigen::Index>(partnerB * 3), 3)) +
+      this->bondBoxOffsets.segment(3 * springEigenIdx, 3);
     if (this->assumeBoxLargeEnough) {
       this->box.handlePBC(bondDistanceNow);
     }
@@ -1057,8 +1092,9 @@ DPDSimulator::relocateSlipSprings(const double kbT)
     // for the new slip-spring, we cannot rely on bond box offsets.
     // it really is a new slip-spring
     Eigen::Vector3d bondDistanceNew =
-      this->coordinates.segment(candidateIndex * 3, 3) -
-      this->coordinates.segment(candidatePartnerIndex * 3, 3);
+      this->coordinates.segment(candidateEigenIdx * 3, 3) -
+      this->coordinates.segment(
+        static_cast<Eigen::Index>(candidatePartnerIndex * 3), 3);
     this->box.handlePBC(bondDistanceNew);
     const double bondEnergyNew = k * bondDistanceNew.squaredNorm();
     const double deltaEnergy = bondEnergyNew - bondEnergyNow;
@@ -1098,11 +1134,14 @@ DPDSimulator::shiftSlipSprings(const double kbT)
   Eigen::ArrayXi neighbours = Eigen::ArrayXi(12);
 
   std::uniform_int_distribution<int> uniformDistNatoms(0, this->numAtoms - 1);
-  for (size_t springIdx = this->numBonds;
-       springIdx < (this->numBonds + this->numSlipSprings);
+  for (size_t springIdx = static_cast<size_t>(this->numBonds);
+       springIdx < static_cast<size_t>(this->numBonds + this->numSlipSprings);
        ++springIdx) {
-    const size_t partnerA = this->bondPartnersA[springIdx];
-    const size_t partnerB = this->bondPartnersB[springIdx];
+    const Eigen::Index springEigenIdx = static_cast<Eigen::Index>(springIdx);
+    const size_t partnerA =
+      static_cast<size_t>(this->bondPartnersA[springEigenIdx]);
+    const size_t partnerB =
+      static_cast<size_t>(this->bondPartnersB[springEigenIdx]);
     // attempt to shift the spring around partnerA
     if (this->shiftOneAtATime) {
       n_accept += this->attemptSlipSpringShift(springIdx, partnerA);
@@ -1110,11 +1149,13 @@ DPDSimulator::shiftSlipSprings(const double kbT)
     } else {
       n_accept += this->attemptSlipSpringShift(springIdx);
     }
-    if (this->bondPartnersA[springIdx] == this->bondPartnersB[springIdx]) {
+    if (this->bondPartnersA[springEigenIdx] ==
+        this->bondPartnersB[springEigenIdx]) {
       // complete relocation of this bond
       int firstPartner = uniformDistNatoms(this->e2);
       size_t n_attempts = 0;
-      while (this->atomTypes[firstPartner] == this->crossLinkerType) {
+      while (this->atomTypes[static_cast<size_t>(firstPartner)] ==
+             this->crossLinkerType) {
         firstPartner = uniformDistNatoms(this->e2);
         n_attempts++;
         RUNTIME_EXP_IFN(n_attempts < 1000,
@@ -1129,25 +1170,28 @@ DPDSimulator::shiftSlipSprings(const double kbT)
         this->highCutoff);
       RUNTIME_EXP_IFN(numNeighs <= neighbours.size(),
                       "Neighbourlist does not act as it should.");
-      for (size_t j = 0; j < numNeighs; ++j) {
+      for (Eigen::Index j = 0; j < numNeighs; ++j) {
+        const Eigen::Index neighAtomEigen =
+          static_cast<Eigen::Index>(neighbours[j]);
+        const size_t neighAtom = static_cast<size_t>(neighbours[j]);
         RUNTIME_EXP_IFN(neighbours[j] < this->numAtoms,
                         "Neighbourlist seems inconsequent.");
-        if (this->idxFunctionalities[neighbours[j]] > 2) {
+        if (this->idxFunctionalities[neighAtomEigen] > 2) {
           // we won't relocate to crosslinkers
           continue;
         }
         Eigen::Vector3d distance =
           this->coordinates.segment(3 * firstPartner, 3) -
-          this->coordinates.segment(3 * neighbours[j], 3);
+          this->coordinates.segment(3 * neighAtomEigen, 3);
         // here as well, we cannot rely on the bond box offsets,
         // as this is a completely new slip-spring (bond)
         this->box.handlePBC(distance);
         if (distance.norm() > this->lowCutoff &&
             distance.norm() <= this->highCutoff) {
-          if (numCandidates >= candidates.size()) {
-            candidates.push_back(neighbours[j]);
+          if (numCandidates >= static_cast<int>(candidates.size())) {
+            candidates.push_back(neighAtom);
           } else {
-            candidates[numCandidates] = neighbours[j];
+            candidates[static_cast<size_t>(numCandidates)] = neighAtom;
           }
           numCandidates += 1;
         }
@@ -1157,12 +1201,17 @@ DPDSimulator::shiftSlipSprings(const double kbT)
         continue;
       }
       std::uniform_int_distribution<int> candidateDist(0, numCandidates - 1);
-      const int secondPartner = candidates[candidateDist(this->e2)];
+      const size_t secondPartner =
+        candidates[static_cast<size_t>(candidateDist(this->e2))];
       // actually relocate both ends
       this->replaceSlipSpringPartner(
-        springIdx, this->bondPartnersA[springIdx], firstPartner);
+        springIdx,
+        static_cast<size_t>(this->bondPartnersA[springEigenIdx]),
+        static_cast<size_t>(firstPartner));
       this->replaceSlipSpringPartner(
-        springIdx, this->bondPartnersB[springIdx], secondPartner);
+        springIdx,
+        static_cast<size_t>(this->bondPartnersB[springEigenIdx]),
+        secondPartner);
       RUNTIME_EXP_IFN(
         this->computeBondLength(springIdx) <= this->highCutoff,
         "By shifting, newly created bonds should not be too long.");
@@ -1181,12 +1230,17 @@ DPDSimulator::shiftSlipSprings(const double kbT)
 bool
 DPDSimulator::attemptSlipSpringShift(const size_t springIdx, const double kbT)
 {
-  const size_t partnerA = this->bondPartnersA[springIdx];
-  const size_t partnerB = this->bondPartnersB[springIdx];
+  const Eigen::Index springEigenIdx = static_cast<Eigen::Index>(springIdx);
+  const size_t partnerA =
+    static_cast<size_t>(this->bondPartnersA[springEigenIdx]);
+  const size_t partnerB =
+    static_cast<size_t>(this->bondPartnersB[springEigenIdx]);
+  const Eigen::Index partnerAEigen = static_cast<Eigen::Index>(partnerA);
+  const Eigen::Index partnerBEigen = static_cast<Eigen::Index>(partnerB);
   size_t newPartnerA = partnerA;
   size_t newPartnerB = partnerB;
   // attempt to shift the spring around partnerA
-  int distrLimitA = this->idxFunctionalities[partnerA] - 1;
+  int distrLimitA = this->idxFunctionalities[partnerAEigen] - 1;
   if (distrLimitA < 0) {
     RUNTIME_EXP_IFN(this->atomTypes[partnerA] == this->crossLinkerType,
                     "Only crosslinkers are allowed to be single beads.");
@@ -1199,22 +1253,25 @@ DPDSimulator::attemptSlipSpringShift(const size_t springIdx, const double kbT)
   size_t selectedRailBondA;
   bool shiftEndAIsFirstOnRailBond;
   const int randomIdxA = dista(this->e2);
-  if (randomIdxA >= this->idxFunctionalities[partnerA]) {
+  if (randomIdxA >= this->idxFunctionalities[partnerAEigen]) {
     RUNTIME_EXP_IFN(this->shiftPossibilityEmpty, "Invalid state.");
     return false;
   } else {
-    selectedRailBondA = this->bondsOfIndex[partnerA][randomIdxA];
-    assert(this->bondPartnersA[selectedRailBondA] == partnerA ||
-           this->bondPartnersB[selectedRailBondA] == partnerA);
+    selectedRailBondA =
+      this->bondsOfIndex[partnerA][static_cast<size_t>(randomIdxA)];
+    const Eigen::Index railBondAEigen =
+      static_cast<Eigen::Index>(selectedRailBondA);
+    assert(this->bondPartnersA[railBondAEigen] == static_cast<int>(partnerA) ||
+           this->bondPartnersB[railBondAEigen] == static_cast<int>(partnerA));
     shiftEndAIsFirstOnRailBond =
-      this->bondPartnersA[selectedRailBondA] == partnerA;
-    newPartnerA = shiftEndAIsFirstOnRailBond
-                    ? this->bondPartnersB[selectedRailBondA]
-                    : this->bondPartnersA[selectedRailBondA];
+      this->bondPartnersA[railBondAEigen] == static_cast<int>(partnerA);
+    newPartnerA = static_cast<size_t>(shiftEndAIsFirstOnRailBond
+                                        ? this->bondPartnersB[railBondAEigen]
+                                        : this->bondPartnersA[railBondAEigen]);
   }
 
   // and around B
-  int distrLimitB = this->idxFunctionalities[partnerB] - 1;
+  int distrLimitB = this->idxFunctionalities[partnerBEigen] - 1;
   if (distrLimitB < 0) {
     RUNTIME_EXP_IFN(this->atomTypes[partnerB] == this->crossLinkerType,
                     "Only crosslinkers are allowed to be single beads.");
@@ -1227,47 +1284,52 @@ DPDSimulator::attemptSlipSpringShift(const size_t springIdx, const double kbT)
   size_t selectedRailBondB;
   bool shiftEndBIsFirstOnRailBond;
   const int randomIdxB = distb(this->e2);
-  if (randomIdxB >= this->idxFunctionalities[partnerB]) {
+  if (randomIdxB >= this->idxFunctionalities[partnerBEigen]) {
     RUNTIME_EXP_IFN(this->shiftPossibilityEmpty, "Invalid state.");
     return false;
   } else {
-    selectedRailBondB = this->bondsOfIndex[partnerB][randomIdxB];
-    assert(this->bondPartnersA[selectedRailBondB] == partnerB ||
-           this->bondPartnersB[selectedRailBondB] == partnerB);
+    selectedRailBondB =
+      this->bondsOfIndex[partnerB][static_cast<size_t>(randomIdxB)];
+    const Eigen::Index railBondBEigen =
+      static_cast<Eigen::Index>(selectedRailBondB);
+    assert(this->bondPartnersA[railBondBEigen] == static_cast<int>(partnerB) ||
+           this->bondPartnersB[railBondBEigen] == static_cast<int>(partnerB));
     shiftEndBIsFirstOnRailBond =
-      this->bondPartnersA[selectedRailBondB] == partnerB;
-    newPartnerB = shiftEndBIsFirstOnRailBond
-                    ? this->bondPartnersB[selectedRailBondB]
-                    : this->bondPartnersA[selectedRailBondB];
+      this->bondPartnersA[railBondBEigen] == static_cast<int>(partnerB);
+    newPartnerB = static_cast<size_t>(shiftEndBIsFirstOnRailBond
+                                        ? this->bondPartnersB[railBondBEigen]
+                                        : this->bondPartnersA[railBondBEigen]);
   }
 
   // if it's a crosslink, we don't allow shifting
-  if (this->idxFunctionalities[newPartnerA] > 2 ||
-      this->idxFunctionalities[newPartnerB] > 2) {
+  if (this->idxFunctionalities[static_cast<Eigen::Index>(newPartnerA)] > 2 ||
+      this->idxFunctionalities[static_cast<Eigen::Index>(newPartnerB)] > 2) {
     return false;
   }
 
   // compute the Metropolis criterion
   Eigen::Vector3d bondDistanceNow =
-    (this->coordinates.segment(partnerA * 3, 3) -
-     this->coordinates.segment(partnerB * 3, 3)) +
-    this->bondBoxOffsets.segment(3 * springIdx, 3);
+    (this->coordinates.segment(partnerAEigen * 3, 3) -
+     this->coordinates.segment(partnerBEigen * 3, 3)) +
+    this->bondBoxOffsets.segment(3 * springEigenIdx, 3);
   if (this->assumeBoxLargeEnough) {
     this->box.handlePBC(bondDistanceNow);
   }
   const double bondEnergyNow = this->k * bondDistanceNow.squaredNorm();
   const Eigen::Vector3d originalOffsets =
-    this->bondBoxOffsets.segment(3 * springIdx, 3);
+    this->bondBoxOffsets.segment(3 * springEigenIdx, 3);
   const Eigen::Vector3d bondDistanceRailA =
-    this->coordinates.segment(newPartnerA * 3, 3) -
-    this->coordinates.segment(partnerA * 3, 3) +
+    this->coordinates.segment(static_cast<Eigen::Index>(newPartnerA) * 3, 3) -
+    this->coordinates.segment(partnerAEigen * 3, 3) +
     (shiftEndAIsFirstOnRailBond ? 1. : -1.) *
-      this->bondBoxOffsets.segment(3 * selectedRailBondA, 3);
+      this->bondBoxOffsets.segment(
+        3 * static_cast<Eigen::Index>(selectedRailBondA), 3);
   const Eigen::Vector3d bondDistanceRailB =
-    this->coordinates.segment(newPartnerB * 3, 3) -
-    this->coordinates.segment(partnerB * 3, 3) +
+    this->coordinates.segment(static_cast<Eigen::Index>(newPartnerB) * 3, 3) -
+    this->coordinates.segment(partnerBEigen * 3, 3) +
     (shiftEndBIsFirstOnRailBond ? 1. : -1.) *
-      this->bondBoxOffsets.segment(3 * selectedRailBondB, 3);
+      this->bondBoxOffsets.segment(
+        3 * static_cast<Eigen::Index>(selectedRailBondB), 3);
   Eigen::Vector3d bondDistanceNew =
     bondDistanceNow + bondDistanceRailA - bondDistanceRailB;
   if (this->assumeBoxLargeEnough) {
@@ -1288,30 +1350,36 @@ DPDSimulator::attemptSlipSpringShift(const size_t springIdx, const double kbT)
     this->replaceSlipSpringPartner(springIdx, partnerA, newPartnerA);
     this->replaceSlipSpringPartner(springIdx, partnerB, newPartnerB);
 #ifndef NDEBUG
-    if (!((this->bondBoxOffsets.segment(3 * springIdx, 3) -
+    if (!((this->bondBoxOffsets.segment(3 * springEigenIdx, 3) -
            (originalOffsets +
             ((shiftEndAIsFirstOnRailBond ? 1. : -1.) *
-             this->bondBoxOffsets.segment(3 * selectedRailBondA, 3)) -
+             this->bondBoxOffsets.segment(
+               3 * static_cast<Eigen::Index>(selectedRailBondA), 3)) -
             ((shiftEndBIsFirstOnRailBond ? 1. : -1.) *
-             this->bondBoxOffsets.segment(3 * selectedRailBondB, 3))))
+             this->bondBoxOffsets.segment(
+               3 * static_cast<Eigen::Index>(selectedRailBondB), 3))))
             .maxCoeff() < 1e-10)) {
       std::cerr << "Expected bond offset is not fulfilled: got "
-                << this->bondBoxOffsets.segment(3 * springIdx, 3)
+                << this->bondBoxOffsets.segment(3 * springEigenIdx, 3)
                 << " instead of "
                 << originalOffsets +
                      ((shiftEndAIsFirstOnRailBond ? 1. : -1.) *
-                      this->bondBoxOffsets.segment(3 * selectedRailBondA, 3)) -
+                      this->bondBoxOffsets.segment(
+                        3 * static_cast<Eigen::Index>(selectedRailBondA), 3)) -
                      ((shiftEndBIsFirstOnRailBond ? 1. : -1.) *
-                      this->bondBoxOffsets.segment(3 * selectedRailBondB, 3))
+                      this->bondBoxOffsets.segment(
+                        3 * static_cast<Eigen::Index>(selectedRailBondB), 3))
                 << std::endl;
     }
 #endif
-    this->bondBoxOffsets.segment(3 * springIdx, 3) =
+    this->bondBoxOffsets.segment(3 * springEigenIdx, 3) =
       originalOffsets +
       ((shiftEndAIsFirstOnRailBond ? 1. : -1.) *
-       this->bondBoxOffsets.segment(3 * selectedRailBondA, 3)) -
+       this->bondBoxOffsets.segment(
+         3 * static_cast<Eigen::Index>(selectedRailBondA), 3)) -
       ((shiftEndBIsFirstOnRailBond ? 1. : -1.) *
-       this->bondBoxOffsets.segment(3 * selectedRailBondB, 3));
+       this->bondBoxOffsets.segment(
+         3 * static_cast<Eigen::Index>(selectedRailBondB), 3));
 #ifndef NDEBUG
     if (!((this->computeBondDistance(springIdx).cwiseAbs() -
            bondDistanceNew.cwiseAbs())
@@ -1322,18 +1390,25 @@ DPDSimulator::attemptSlipSpringShift(const size_t springIdx, const double kbT)
       std::cerr << "Instead, got " << this->computeBondDistance(springIdx)
                 << std::endl;
       std::cerr << "Involved coordinates: "
-                << this->coordinates.segment(partnerA * 3, 3) << ", "
-                << this->coordinates.segment(partnerB * 3, 3) << ", and new "
-                << this->coordinates.segment(newPartnerA * 3, 3) << ", "
-                << this->coordinates.segment(newPartnerB * 3, 3) << " in box "
-                << this->box.getL() << " with offsets " << originalOffsets
-                << " on original slip-link between A & B, "
-                << this->bondBoxOffsets.segment(3 * selectedRailBondA, 3)
+                << this->coordinates.segment(partnerAEigen * 3, 3) << ", "
+                << this->coordinates.segment(partnerBEigen * 3, 3)
+                << ", and new "
+                << this->coordinates.segment(
+                     static_cast<Eigen::Index>(newPartnerA) * 3, 3)
+                << ", "
+                << this->coordinates.segment(
+                     static_cast<Eigen::Index>(newPartnerB) * 3, 3)
+                << " in box " << this->box.getL() << " with offsets "
+                << originalOffsets << " on original slip-link between A & B, "
+                << this->bondBoxOffsets.segment(
+                     3 * static_cast<Eigen::Index>(selectedRailBondA), 3)
                 << " on rail A and "
-                << this->bondBoxOffsets.segment(3 * selectedRailBondB, 3)
+                << this->bondBoxOffsets.segment(
+                     3 * static_cast<Eigen::Index>(selectedRailBondB), 3)
                 << " on rail B. " << std::endl;
       std::cerr << "Currently stored offsets are "
-                << this->bondBoxOffsets.segment(3 * springIdx, 3) << std::endl;
+                << this->bondBoxOffsets.segment(3 * springEigenIdx, 3)
+                << std::endl;
     }
 #endif
     if (this->computeBondLength(springIdx) > this->maxBondLen) {
@@ -1363,18 +1438,24 @@ DPDSimulator::attemptSlipSpringShift(const size_t springIdx,
                                      const size_t endToShift,
                                      const double kbT)
 {
+  const Eigen::Index springEigenIdx = static_cast<Eigen::Index>(springIdx);
   INVALIDARG_EXP_IFN(
-    this->bondPartnersA[springIdx] == endToShift ||
-      this->bondPartnersB[springIdx] == endToShift,
+    this->bondPartnersA[springEigenIdx] == static_cast<int>(endToShift) ||
+      this->bondPartnersB[springEigenIdx] == static_cast<int>(endToShift),
     "This spring and its partners do not match, cannot attempt shift.");
-  const bool shiftEndIsFirst = this->bondPartnersA[springIdx] == endToShift;
-  const size_t partnerA = shiftEndIsFirst ? this->bondPartnersA[springIdx]
-                                          : this->bondPartnersB[springIdx];
-  const size_t partnerB = shiftEndIsFirst ? this->bondPartnersB[springIdx]
-                                          : this->bondPartnersA[springIdx];
+  const bool shiftEndIsFirst =
+    this->bondPartnersA[springEigenIdx] == static_cast<int>(endToShift);
+  const size_t partnerA =
+    static_cast<size_t>(shiftEndIsFirst ? this->bondPartnersA[springEigenIdx]
+                                        : this->bondPartnersB[springEigenIdx]);
+  const size_t partnerB =
+    static_cast<size_t>(shiftEndIsFirst ? this->bondPartnersB[springEigenIdx]
+                                        : this->bondPartnersA[springEigenIdx]);
+  const Eigen::Index partnerAEigen = static_cast<Eigen::Index>(partnerA);
+  const Eigen::Index partnerBEigen = static_cast<Eigen::Index>(partnerB);
   assert(partnerA == endToShift);
   // attempt to shift the spring around partnerA
-  int distr_limit = this->idxFunctionalities[partnerA] - 1;
+  int distr_limit = this->idxFunctionalities[partnerAEigen] - 1;
   if (distr_limit < 0) {
     RUNTIME_EXP_IFN(
       this->atomTypes[partnerA] == this->crossLinkerType,
@@ -1392,37 +1473,42 @@ DPDSimulator::attemptSlipSpringShift(const size_t springIdx,
   }
   std::uniform_int_distribution<int> dist(0, distr_limit);
   const int random_idx = dist(this->e2);
-  if (random_idx >= this->idxFunctionalities[partnerA]) {
+  if (random_idx >= this->idxFunctionalities[partnerAEigen]) {
     assert(this->shiftPossibilityEmpty);
     return false;
   }
-  const size_t selectedRailBond = this->bondsOfIndex[partnerA][random_idx];
+  const size_t selectedRailBond =
+    this->bondsOfIndex[partnerA][static_cast<size_t>(random_idx)];
+  const Eigen::Index selectedRailBondEigen =
+    static_cast<Eigen::Index>(selectedRailBond);
   const bool shiftEndIsFirstOnRailBond =
-    this->bondPartnersA[selectedRailBond] == partnerA;
-  const size_t replacementForA = shiftEndIsFirstOnRailBond
-                                   ? this->bondPartnersB[selectedRailBond]
-                                   : this->bondPartnersA[selectedRailBond];
+    this->bondPartnersA[selectedRailBondEigen] == static_cast<int>(partnerA);
+  const size_t replacementForA = static_cast<size_t>(
+    shiftEndIsFirstOnRailBond ? this->bondPartnersB[selectedRailBondEigen]
+                              : this->bondPartnersA[selectedRailBondEigen]);
   // if it's a crosslink, we don't allow shifting
-  if (this->idxFunctionalities[replacementForA] > 2) {
+  if (this->idxFunctionalities[static_cast<Eigen::Index>(replacementForA)] >
+      2) {
     return false;
   }
   // compute the Metropolis criterion
   const Eigen::Vector3d originalOffsets =
-    this->bondBoxOffsets.segment(3 * springIdx, 3);
+    this->bondBoxOffsets.segment(3 * springEigenIdx, 3);
   Eigen::Vector3d bondDistanceNow =
-    (this->coordinates.segment(partnerA * 3, 3) -
-     this->coordinates.segment(partnerB * 3, 3)) +
+    (this->coordinates.segment(partnerAEigen * 3, 3) -
+     this->coordinates.segment(partnerBEigen * 3, 3)) +
     ((shiftEndIsFirst ? 1. : -1.) *
-     this->bondBoxOffsets.segment(3 * springIdx, 3));
+     this->bondBoxOffsets.segment(3 * springEigenIdx, 3));
   if (this->assumeBoxLargeEnough) {
     this->box.handlePBC(bondDistanceNow);
   }
   const double bondEnergyNow = this->k * bondDistanceNow.squaredNorm();
   const Eigen::Vector3d railDistance =
-    (this->coordinates.segment(replacementForA * 3, 3) -
-     this->coordinates.segment(partnerA * 3, 3)) +
+    (this->coordinates.segment(static_cast<Eigen::Index>(replacementForA) * 3,
+                               3) -
+     this->coordinates.segment(partnerAEigen * 3, 3)) +
     ((shiftEndIsFirstOnRailBond ? 1. : -1.) *
-     this->bondBoxOffsets.segment(3 * selectedRailBond, 3));
+     this->bondBoxOffsets.segment(3 * selectedRailBondEigen, 3));
   Eigen::Vector3d bondDistanceNew = bondDistanceNow + railDistance;
   if (this->assumeBoxLargeEnough) {
     this->box.handlePBC(bondDistanceNew);
@@ -1441,23 +1527,24 @@ DPDSimulator::attemptSlipSpringShift(const size_t springIdx,
   if (accept) {
     this->replaceSlipSpringPartner(springIdx, partnerA, replacementForA);
 #ifndef NDEBUG
-    if (!((this->bondBoxOffsets.segment(3 * springIdx, 3) -
+    if (!((this->bondBoxOffsets.segment(3 * springEigenIdx, 3) -
            (originalOffsets +
             (shiftEndIsFirstOnRailBond ? 1. : -1.) *
-              this->bondBoxOffsets.segment(3 * selectedRailBond, 3)))
+              this->bondBoxOffsets.segment(3 * selectedRailBondEigen, 3)))
             .maxCoeff() < 1e-10)) {
       std::cerr << "Expected bond offset is not fulfilled: got "
-                << this->bondBoxOffsets.segment(3 * springIdx, 3)
+                << this->bondBoxOffsets.segment(3 * springEigenIdx, 3)
                 << " instead of "
-                << (originalOffsets +
-                    (shiftEndIsFirstOnRailBond ? 1. : -1.) *
-                      this->bondBoxOffsets.segment(3 * selectedRailBond, 3))
+                << (originalOffsets + (shiftEndIsFirstOnRailBond ? 1. : -1.) *
+                                        this->bondBoxOffsets.segment(
+                                          3 * selectedRailBondEigen, 3))
                 << std::endl;
     }
 #endif
-    this->bondBoxOffsets.segment(3 * springIdx, 3) =
-      originalOffsets + (shiftEndIsFirstOnRailBond ? 1. : -1.) *
-                          this->bondBoxOffsets.segment(3 * selectedRailBond, 3);
+    this->bondBoxOffsets.segment(3 * springEigenIdx, 3) =
+      originalOffsets +
+      (shiftEndIsFirstOnRailBond ? 1. : -1.) *
+        this->bondBoxOffsets.segment(3 * selectedRailBondEigen, 3);
 #ifndef NDEBUG
     if (!((this->computeBondDistance(springIdx).cwiseAbs() -
            bondDistanceNew.cwiseAbs())
@@ -1467,15 +1554,18 @@ DPDSimulator::attemptSlipSpringShift(const size_t springIdx,
       std::cerr << "Instead, got " << this->computeBondDistance(springIdx)
                 << std::endl;
       std::cerr << "Involved coordinates: "
-                << this->coordinates.segment(partnerA * 3, 3) << ", "
-                << this->coordinates.segment(partnerB * 3, 3) << ", and new "
-                << this->coordinates.segment(replacementForA * 3, 3)
+                << this->coordinates.segment(partnerAEigen * 3, 3) << ", "
+                << this->coordinates.segment(partnerBEigen * 3, 3)
+                << ", and new "
+                << this->coordinates.segment(
+                     static_cast<Eigen::Index>(replacementForA) * 3, 3)
                 << " in box " << this->box.getL() << " with offsets "
                 << originalOffsets << " on original slip-link between A & B, "
-                << this->bondBoxOffsets.segment(3 * selectedRailBond, 3)
+                << this->bondBoxOffsets.segment(3 * selectedRailBondEigen, 3)
                 << " on rail A. " << std::endl;
       std::cerr << "Currently stored offsets are "
-                << this->bondBoxOffsets.segment(3 * springIdx, 3) << std::endl;
+                << this->bondBoxOffsets.segment(3 * springEigenIdx, 3)
+                << std::endl;
     }
 #endif
   }
@@ -1497,43 +1587,51 @@ DPDSimulator::replaceSlipSpringPartner(const size_t springIdx,
   if (partnerAfter == partnerBefore) {
     return;
   }
-  INVALIDINDEX_EXP_IFN(springIdx < this->bondPartnersA.size(),
+  const Eigen::Index springEigenIdx = static_cast<Eigen::Index>(springIdx);
+  const Eigen::Index partnerBeforeEigen =
+    static_cast<Eigen::Index>(partnerBefore);
+  const Eigen::Index partnerAfterEigen =
+    static_cast<Eigen::Index>(partnerAfter);
+  INVALIDINDEX_EXP_IFN(springEigenIdx < this->bondPartnersA.size(),
                        "Cannot replace on a non-existing spring.");
-  INVALIDINDEX_EXP_IFN(partnerBefore < this->numAtoms,
+  INVALIDINDEX_EXP_IFN(partnerBefore < static_cast<size_t>(this->numAtoms),
                        "Cannot replace with a non-existing bead.");
-  INVALIDINDEX_EXP_IFN(partnerAfter < this->numAtoms,
+  INVALIDINDEX_EXP_IFN(partnerAfter < static_cast<size_t>(this->numAtoms),
                        "Cannot replace with a non-existing bead.");
-  INVALIDARG_EXP_IFN(this->bondPartnersA[springIdx] == partnerBefore ||
-                       this->bondPartnersB[springIdx] == partnerBefore,
-                     "This spring and its partners do not match.");
+  INVALIDARG_EXP_IFN(
+    this->bondPartnersA[springEigenIdx] == static_cast<int>(partnerBefore) ||
+      this->bondPartnersB[springEigenIdx] == static_cast<int>(partnerBefore),
+    "This spring and its partners do not match.");
   INVALIDARG_EXP_IFN((this->atomTypes[partnerAfter] != this->crossLinkerType ||
-                      this->idxFunctionalities[partnerAfter] <= 2),
+                      this->idxFunctionalities[partnerAfterEigen] <= 2),
                      "Cannot form slip-springs with crosslinkers.");
-  if (this->bondPartnersA[springIdx] == partnerBefore) {
-    this->bondPartnersA[springIdx] = partnerAfter;
-    for (int dir = 0; dir < 3; ++dir) {
-      this->bondPartnerCoordinatesA[3 * springIdx + dir] =
-        3 * partnerAfter + dir;
+  if (this->bondPartnersA[springEigenIdx] == static_cast<int>(partnerBefore)) {
+    this->bondPartnersA[springEigenIdx] = static_cast<int>(partnerAfter);
+    for (Eigen::Index dir = 0; dir < 3; ++dir) {
+      this->bondPartnerCoordinatesA[3 * springEigenIdx + dir] =
+        3 * static_cast<int>(partnerAfter) + static_cast<int>(dir);
     }
   } else {
-    this->bondPartnersB[springIdx] = partnerAfter;
-    for (int dir = 0; dir < 3; ++dir) {
-      this->bondPartnerCoordinatesB[3 * springIdx + dir] =
-        3 * partnerAfter + dir;
+    this->bondPartnersB[springEigenIdx] = static_cast<int>(partnerAfter);
+    for (Eigen::Index dir = 0; dir < 3; ++dir) {
+      this->bondPartnerCoordinatesB[3 * springEigenIdx + dir] =
+        3 * static_cast<int>(partnerAfter) + static_cast<int>(dir);
     }
   }
-  this->resetBondOffset(springIdx);
+  this->resetBondOffset(static_cast<int>(springIdx));
   // add to the bonds of the new bond partner
   pylimer_tools::utils::addToSorted<size_t>(this->bondsOfIndex[partnerAfter],
                                             springIdx);
   // remove from the bonds of the previous bond partner
-  for (size_t i = this->idxFunctionalities[partnerBefore];
+  for (size_t i =
+         static_cast<size_t>(this->idxFunctionalities[partnerBeforeEigen]);
        i < this->bondsOfIndex[partnerBefore].size();
        ++i) {
     if (this->bondsOfIndex[partnerBefore][i] == springIdx) {
       // remove this
       this->bondsOfIndex[partnerBefore].erase(
-        this->bondsOfIndex[partnerBefore].begin() + i);
+        this->bondsOfIndex[partnerBefore].begin() +
+        static_cast<std::ptrdiff_t>(i));
       this->resetBondDuplicationPenalty(partnerAfter);
       this->resetBondDuplicationPenalty(partnerBefore);
       // this->resetBondDuplicationPenalty(otherPartner);
@@ -1556,16 +1654,18 @@ DPDSimulator::getUniverse(const bool withSlipsprings) const
   pylimer_tools::entities::Universe result =
     pylimer_tools::entities::Universe(this->box);
 
+  const size_t nAtomsU = static_cast<size_t>(this->numAtoms);
   std::vector<double> xs;
-  xs.reserve(this->numAtoms);
+  xs.reserve(nAtomsU);
   std::vector<double> ys;
-  ys.reserve(this->numAtoms);
+  ys.reserve(nAtomsU);
   std::vector<double> zs;
-  zs.reserve(this->numAtoms);
+  zs.reserve(nAtomsU);
   std::vector<int> zeros;
-  zeros.reserve(this->numAtoms);
+  zeros.reserve(nAtomsU);
 
-  for (size_t i = 0; i < this->numAtoms * 3; i += 3) {
+  for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(this->numAtoms * 3);
+       i += 3) {
     xs.push_back(this->coordinates[i]);
     ys.push_back(this->coordinates[i + 1]);
     zs.push_back(this->coordinates[i + 2]);
@@ -1575,8 +1675,8 @@ DPDSimulator::getUniverse(const bool withSlipsprings) const
   result.addAtoms(
     this->atomIds, this->atomTypes, xs, ys, zs, zeros, zeros, zeros);
 
-  const size_t numBondsToAdd =
-    withSlipsprings ? (this->numBonds + this->numSlipSprings) : this->numBonds;
+  const size_t numBondsToAdd = static_cast<size_t>(
+    withSlipsprings ? (this->numBonds + this->numSlipSprings) : this->numBonds);
   std::vector<long int> bondFrom;
   bondFrom.reserve(numBondsToAdd);
   std::vector<long int> bondTo;
@@ -1584,7 +1684,7 @@ DPDSimulator::getUniverse(const bool withSlipsprings) const
   std::vector<int> newBondTypes;
   newBondTypes.reserve(numBondsToAdd);
 
-  for (size_t i = 0; i < numBondsToAdd; ++i) {
+  for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(numBondsToAdd); ++i) {
     bondTo.push_back(this->universe.getAtomIdByIdx(this->bondPartnersA[i]));
     bondFrom.push_back(this->universe.getAtomIdByIdx(this->bondPartnersB[i]));
     newBondTypes.push_back(this->bondTypes[i]);
@@ -1612,12 +1712,13 @@ DPDSimulator::validateNeighbourlist(const double cutoff)
      this->box.getVolume())));
 
   // actually loop the atoms
-  for (size_t i = 0; i < this->numAtoms; ++i) {
+  for (size_t i = 0; i < static_cast<size_t>(this->numAtoms); ++i) {
+    const Eigen::Index iEigen = static_cast<Eigen::Index>(i);
     const int numNeighbors = this->neighbourlist.getIndicesCloseToCoordinates(
-      neighbors, this->coordinates.segment(3 * i, 3), cutoff);
+      neighbors, this->coordinates.segment(3 * iEigen, 3), cutoff);
     Eigen::ArrayXi neighbors2 =
       this->neighbourlist.getIndicesCloseToCoordinates(
-        this->coordinates.segment(3 * i, 3), cutoff);
+        this->coordinates.segment(3 * iEigen, 3), cutoff);
     RUNTIME_EXP_IFN(
       (neighbors.segment(0, numNeighbors) == neighbors2).all(),
       "Neighbors should be equal no matter the method, but apparently, "
@@ -1627,13 +1728,14 @@ DPDSimulator::validateNeighbourlist(const double cutoff)
     std::vector<size_t> relevantPairs;
 
     // neighbour-list
-    for (size_t neigh_idx = 0; neigh_idx < numNeighbors; ++neigh_idx) {
-      const size_t j = neighbors[neigh_idx];
+    for (Eigen::Index neigh_idx = 0; neigh_idx < numNeighbors; ++neigh_idx) {
+      const size_t j = static_cast<size_t>(neighbors[neigh_idx]);
       if (j <= i) {
         continue;
       }
-      Eigen::Vector3d pairDistance = this->coordinates.segment(3 * i, 3) -
-                                     this->coordinates.segment(3 * j, 3);
+      const Eigen::Index jEigen = static_cast<Eigen::Index>(j);
+      Eigen::Vector3d pairDistance = this->coordinates.segment(3 * iEigen, 3) -
+                                     this->coordinates.segment(3 * jEigen, 3);
       this->box.handlePBC(pairDistance);
       const double rNorm = pairDistance.norm();
       if (rNorm >= cutoff || rNorm < 1e-12) {
@@ -1643,12 +1745,13 @@ DPDSimulator::validateNeighbourlist(const double cutoff)
       relevantNeighbors.push_back(j);
     }
 
-    assert(relevantNeighbors.size() <= numNeighbors);
+    assert(relevantNeighbors.size() <= static_cast<size_t>(numNeighbors));
 
     // pairs
-    for (size_t j = i + 1; j < this->numAtoms; ++j) {
-      Eigen::Vector3d pairDistance = this->coordinates.segment(3 * i, 3) -
-                                     this->coordinates.segment(3 * j, 3);
+    for (size_t j = i + 1; j < static_cast<size_t>(this->numAtoms); ++j) {
+      const Eigen::Index jEigen = static_cast<Eigen::Index>(j);
+      Eigen::Vector3d pairDistance = this->coordinates.segment(3 * iEigen, 3) -
+                                     this->coordinates.segment(3 * jEigen, 3);
       this->box.handlePBC(pairDistance);
       const double rNorm = pairDistance.norm();
       if (rNorm >= cutoff || rNorm < 1e-12) {
@@ -1683,8 +1786,8 @@ DPDSimulator::validateNeighbourlist(const double cutoff)
       // figure out why not included
       for (const size_t diff_j : diff) {
         this->neighbourlist.validateWhyNotIncluded(
-          this->coordinates.segment(3 * i, 3),
-          this->coordinates.segment(3 * diff_j, 3),
+          this->coordinates.segment(3 * iEigen, 3),
+          this->coordinates.segment(3 * static_cast<Eigen::Index>(diff_j), 3),
           cutoff);
       }
     }
@@ -1731,7 +1834,7 @@ DPDSimulator::getBondLengths()
 
   Eigen::VectorXd bondLengths(this->numBonds + this->numSlipSprings);
 #pragma omp parallel for if ((this->numBonds + this->numSlipSprings) > 1000)
-  for (size_t i = 0; i < (this->numBonds + this->numSlipSprings); ++i) {
+  for (Eigen::Index i = 0; i < (this->numBonds + this->numSlipSprings); ++i) {
     const double b = bondDistances.segment(3 * i, 3).norm();
     bondLengths[i] = b;
   }
@@ -1771,45 +1874,51 @@ DPDSimulator::validateState()
                   "State violation: size of coordinates incorrect.");
   RUNTIME_EXP_IFN(this->idxFunctionalities.size() == this->numAtoms,
                   "State violation: size of functionalities incorrect.");
-  RUNTIME_EXP_IFN(this->atomTypes.size() == this->numAtoms,
+  RUNTIME_EXP_IFN(this->atomTypes.size() == static_cast<size_t>(this->numAtoms),
                   "State violation: size of atom types incorrect.");
-  RUNTIME_EXP_IFN(this->atomIds.size() == this->numAtoms,
+  RUNTIME_EXP_IFN(this->atomIds.size() == static_cast<size_t>(this->numAtoms),
                   "State violation: size of atom ids incorrect.");
-  RUNTIME_EXP_IFN(this->bondsOfIndex.size() == this->numAtoms,
+  RUNTIME_EXP_IFN(this->bondsOfIndex.size() ==
+                    static_cast<size_t>(this->numAtoms),
                   "State violation: bonds of indices distributed incorrectly.");
-  for (size_t i = 0; i < this->numAtoms; ++i) {
-    const int num_actual_bonds =
-      std::accumulate(this->bondsOfIndex[i].begin(),
-                      this->bondsOfIndex[i].end(),
-                      0,
-                      [&](const int val, const size_t bondIdx) {
-                        return val + static_cast<int>(bondIdx < this->numBonds);
-                      });
+  for (size_t i = 0; i < static_cast<size_t>(this->numAtoms); ++i) {
+    const Eigen::Index iEigen = static_cast<Eigen::Index>(i);
+    const int num_actual_bonds = std::accumulate(
+      this->bondsOfIndex[i].begin(),
+      this->bondsOfIndex[i].end(),
+      0,
+      [&](const int val, const size_t bondIdx) {
+        return val +
+               static_cast<int>(bondIdx < static_cast<size_t>(this->numBonds));
+      });
     if (this->numSlipSprings == 0) {
-      RUNTIME_EXP_IFN(num_actual_bonds == this->bondsOfIndex[i].size(),
+      RUNTIME_EXP_IFN(num_actual_bonds ==
+                        static_cast<int>(this->bondsOfIndex[i].size()),
                       "State violation: bonds of index " + std::to_string(i) +
                         " were not counted appropriately.");
     }
-    RUNTIME_EXP_IFN(this->idxFunctionalities[i] == num_actual_bonds,
+    RUNTIME_EXP_IFN(this->idxFunctionalities[iEigen] == num_actual_bonds,
                     "State violation: inconsistent idx functionalities");
     RUNTIME_EXP_IFN(
-      this->idxFunctionalities[i] >= 1 ||
+      this->idxFunctionalities[iEigen] >= 1 ||
         this->atomTypes[i] == this->crossLinkerType,
       "Only crosslinkers are allowed to be single beads. Found bead " +
         std::to_string(i) + " to have type " +
         std::to_string(this->atomTypes[i]) + " with functionality " +
-        std::to_string(this->idxFunctionalities[i]) + ".");
-    if (this->idxFunctionalities[i] == 1) {
+        std::to_string(this->idxFunctionalities[iEigen]) + ".");
+    if (this->idxFunctionalities[iEigen] == 1) {
       RUNTIME_EXP_IFN(
-        this->isRelocationTarget[i],
+        this->isRelocationTarget[iEigen],
         "Expected functionalities of 1 to be relocation targets.");
     }
     for (size_t j = 0; j < this->bondsOfIndex[i].size(); ++j) {
-      if (j < this->idxFunctionalities[i]) {
-        RUNTIME_EXP_IFN(this->bondsOfIndex[i][j] < this->numBonds,
+      if (j < static_cast<size_t>(this->idxFunctionalities[iEigen])) {
+        RUNTIME_EXP_IFN(this->bondsOfIndex[i][j] <
+                          static_cast<size_t>(this->numBonds),
                         "Expect bonds to come before slip springs.");
       } else {
-        RUNTIME_EXP_IFN(this->bondsOfIndex[i][j] >= this->numBonds,
+        RUNTIME_EXP_IFN(this->bondsOfIndex[i][j] >=
+                          static_cast<size_t>(this->numBonds),
                         "Expect bonds to come before slip springs.");
       }
       if (j > 0) {
@@ -1821,12 +1930,13 @@ DPDSimulator::validateState()
   RUNTIME_EXP_IFN(this->isRelocationTarget.size() == this->numAtoms,
                   "State violation: size of relocation targets incorrect.");
   RUNTIME_EXP_IFN(this->isRelocationTarget.cast<int>().sum() ==
-                    this->chainEndIndices.size(),
+                    static_cast<Eigen::Index>(this->chainEndIndices.size()),
                   "Expect relocation targets to be equal to chain ends.");
   for (const size_t i : this->chainEndIndices) {
-    RUNTIME_EXP_IFN(this->isRelocationTarget[i],
+    const Eigen::Index iEigen = static_cast<Eigen::Index>(i);
+    RUNTIME_EXP_IFN(this->isRelocationTarget[iEigen],
                     "Expect chain ends to be relocation targets.");
-    RUNTIME_EXP_IFN(this->idxFunctionalities[i] <= 1 ||
+    RUNTIME_EXP_IFN(this->idxFunctionalities[iEigen] <= 1 ||
                       this->allowRelocationInNetwork,
                     "Expect chain ends to have a functionality of 1, have "
                     "relocation in network enabled");
@@ -1857,32 +1967,34 @@ DPDSimulator::validateState()
 
   // bond duplication penalty
   std::unordered_set<size_t> partners;
-  for (size_t i = 0; i < this->numAtoms; ++i) {
+  for (size_t i = 0; i < static_cast<size_t>(this->numAtoms); ++i) {
     partners.clear();
     // here as well, we rely on the bonds of index being sorted
     for (const size_t bondIdx : this->bondsOfIndex[i]) {
-      size_t atomPartnerIdx = this->bondPartnersA[bondIdx] == i
-                                ? this->bondPartnersB[bondIdx]
-                                : this->bondPartnersA[bondIdx];
+      const Eigen::Index bondEigenIdx = static_cast<Eigen::Index>(bondIdx);
+      const size_t atomPartnerIdx = static_cast<size_t>(
+        this->bondPartnersA[bondEigenIdx] == static_cast<int>(i)
+          ? this->bondPartnersB[bondEigenIdx]
+          : this->bondPartnersA[bondEigenIdx]);
       bool expectZero = false;
       if (partners.contains(atomPartnerIdx)) {
         // "real" bonds always contribute -> check that this is a
         // slip-spring
-        if (bondIdx >= this->numBonds) {
+        if (bondIdx >= static_cast<size_t>(this->numBonds)) {
           expectZero = true;
         }
       } else {
         partners.insert(atomPartnerIdx);
       }
       RUNTIME_EXP_IFN(
-        this->bondDuplicationPenalty.segment(3 * bondIdx, 3)
+        this->bondDuplicationPenalty.segment(3 * bondEigenIdx, 3)
           .isApprox(Eigen::Array3d::Constant(expectZero ? 0. : 1.)),
         "Incorrect bondDuplicationPenalty: found bond " +
           std::to_string(bondIdx) + " of " + std::to_string(this->numBonds) +
           " (+ " + std::to_string(this->numSlipSprings) + ") to should have " +
           std::to_string(expectZero ? 0 : 1) + " but it did not (" +
           std::to_string(
-            this->bondDuplicationPenalty.segment(3 * bondIdx, 3).sum()) +
+            this->bondDuplicationPenalty.segment(3 * bondEigenIdx, 3).sum()) +
           ").");
     }
   }
@@ -1900,37 +2012,43 @@ DPDSimulator::validateState()
     !(this->bondPartnersA.array() == this->bondPartnersB.array()).any(),
     "Bonds with oneself are not allowed.");
   // loop springs
-  for (size_t i = 0; i < this->numBonds + this->numSlipSprings; ++i) {
-    for (int dir = 0; dir < 3; ++dir) {
+  for (Eigen::Index i = 0; i < this->numBonds + this->numSlipSprings; ++i) {
+    for (Eigen::Index dir = 0; dir < 3; ++dir) {
       RUNTIME_EXP_IFN(
         this->bondPartnerCoordinatesA[i * 3 + dir] ==
-          this->bondPartnersA[i] * 3 + dir,
+          this->bondPartnersA[i] * 3 + static_cast<int>(dir),
         "Bond partners not accurate: got partner coordinate idx " +
           std::to_string(this->bondPartnerCoordinatesA[i * 3 + dir]) +
-          " but expected " + std::to_string(this->bondPartnersA[i] * 3 + dir) +
+          " but expected " +
+          std::to_string(this->bondPartnersA[i] * 3 + static_cast<int>(dir)) +
           " at index " + std::to_string(i) + " and dir " + std::to_string(dir) +
           ".");
       RUNTIME_EXP_IFN(
         this->bondPartnerCoordinatesB[i * 3 + dir] ==
-          this->bondPartnersB[i] * 3 + dir,
+          this->bondPartnersB[i] * 3 + static_cast<int>(dir),
         "Bond partners not accurate: got partner coordinate idx " +
           std::to_string(this->bondPartnerCoordinatesB[i * 3 + dir]) +
-          " but expected " + std::to_string(this->bondPartnersB[i] * 3 + dir) +
+          " but expected " +
+          std::to_string(this->bondPartnersB[i] * 3 + static_cast<int>(dir)) +
           " at index " + std::to_string(i) + " and dir " + std::to_string(dir) +
           ".");
     }
-    RUNTIME_EXP_IFN(pylimer_tools::utils::contains(
-                      this->bondsOfIndex[this->bondPartnersA[i]], i),
-                    "Reverse-link is incorrect. Bond " + std::to_string(i) +
-                      " (of " + std::to_string(this->numBonds) +
-                      ") was not found in bonds of partner A, " +
-                      std::to_string(this->bondPartnersA[i]) + ".");
-    RUNTIME_EXP_IFN(pylimer_tools::utils::contains(
-                      this->bondsOfIndex[this->bondPartnersB[i]], i),
-                    "Reverse-link is incorrect. Bond " + std::to_string(i) +
-                      " (of " + std::to_string(this->numBonds) +
-                      ") was not found in bonds of partner B, " +
-                      std::to_string(this->bondPartnersA[i]) + ".");
+    RUNTIME_EXP_IFN(
+      pylimer_tools::utils::contains(
+        this->bondsOfIndex[static_cast<size_t>(this->bondPartnersA[i])],
+        static_cast<size_t>(i)),
+      "Reverse-link is incorrect. Bond " + std::to_string(i) + " (of " +
+        std::to_string(this->numBonds) +
+        ") was not found in bonds of partner A, " +
+        std::to_string(this->bondPartnersA[i]) + ".");
+    RUNTIME_EXP_IFN(
+      pylimer_tools::utils::contains(
+        this->bondsOfIndex[static_cast<size_t>(this->bondPartnersB[i])],
+        static_cast<size_t>(i)),
+      "Reverse-link is incorrect. Bond " + std::to_string(i) + " (of " +
+        std::to_string(this->numBonds) +
+        ") was not found in bonds of partner B, " +
+        std::to_string(this->bondPartnersA[i]) + ".");
     // the following check is incorrect, as crosslinkers may have
     // slip-springs for f < 2, and during crosslinking might have one while
     // being upgraded to f > 2

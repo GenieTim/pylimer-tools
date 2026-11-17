@@ -330,15 +330,17 @@ randomlyFindEntanglements(const pylimer_tools::entities::Universe& universe,
         sampleIdx, vertexIdsToSample.size() - 1)(rng);
       std::swap(vertexIdsToSample[sampleIdx], vertexIdsToSample[randSampleIdx]);
       const long int atomVertexIdx1 = vertexIdsToSample[sampleIdx];
-      if (pairOfAtom[atomVertexIdx1] != -1) {
+      const size_t atomIdx1 = static_cast<size_t>(atomVertexIdx1);
+      if (pairOfAtom[atomIdx1] != -1) {
         continue;
       }
-      vertexIsEligible[atomVertexIdx1] = 0;
+      vertexIsEligible[atomIdx1] = 0;
 
-      const size_t nNeighbours = neighbourList.getIndicesCloseToCoordinates(
-        neighbourIndices,
-        coordinates.segment<3>(3 * atomVertexIdx1),
-        upperCutoff);
+      const size_t nNeighbours =
+        static_cast<size_t>(neighbourList.getIndicesCloseToCoordinates(
+          neighbourIndices,
+          coordinates.segment<3>(3 * atomVertexIdx1),
+          upperCutoff));
       long int atomVertexIdx2 = -1;
       bool hasBfsForSource = false;
 
@@ -351,8 +353,8 @@ randomlyFindEntanglements(const pylimer_tools::entities::Universe& universe,
         std::swap(neighbourIndices[idxInNeighbours],
                   neighbourIndices[randNeighbourIdx]);
         const long int candidateVertex = neighbourIndices[idxInNeighbours];
-        if (vertexIsEligible[candidateVertex] == 0 ||
-            pairOfAtom[candidateVertex] != -1) {
+        const size_t candIdx = static_cast<size_t>(candidateVertex);
+        if (vertexIsEligible[candIdx] == 0 || pairOfAtom[candIdx] != -1) {
           continue;
         }
 
@@ -423,36 +425,35 @@ randomlyFindEntanglements(const pylimer_tools::entities::Universe& universe,
       if (atomVertexIdx2 < 0) {
         continue;
       }
+      const size_t atomIdx2 = static_cast<size_t>(atomVertexIdx2);
 
-      RUNTIME_EXP_IFN(pairOfAtom[atomVertexIdx2] == -1,
+      RUNTIME_EXP_IFN(pairOfAtom[atomIdx2] == -1,
                       "Expected not to be able to sample the same atom twice.");
 
       if (filteringMode == EntanglementFilteringMode::PRUNE_UPFRONT) {
-        pairOfAtom[atomVertexIdx2] = static_cast<long int>(pairsOfAtoms.size());
-        pairOfAtom[atomVertexIdx1] = static_cast<long int>(pairsOfAtoms.size());
+        pairOfAtom[atomIdx2] = static_cast<long int>(pairsOfAtoms.size());
+        pairOfAtom[atomIdx1] = static_cast<long int>(pairsOfAtoms.size());
         pairsOfAtoms.emplace_back(universe.getAtomIdByIdx(atomVertexIdx1),
                                   universe.getAtomIdByIdx(atomVertexIdx2));
       } else if (filteringMode == EntanglementFilteringMode::OMIT_INACTIVE) {
-        if (activeAtoms.empty() || (activeAtoms[atomVertexIdx1] != 0 &&
-                                    activeAtoms[atomVertexIdx2] != 0)) {
-          pairOfAtom[atomVertexIdx2] =
-            static_cast<long int>(pairsOfAtoms.size());
-          pairOfAtom[atomVertexIdx1] =
-            static_cast<long int>(pairsOfAtoms.size());
+        if (activeAtoms.empty() ||
+            (activeAtoms[atomIdx1] != 0 && activeAtoms[atomIdx2] != 0)) {
+          pairOfAtom[atomIdx2] = static_cast<long int>(pairsOfAtoms.size());
+          pairOfAtom[atomIdx1] = static_cast<long int>(pairsOfAtoms.size());
           pairsOfAtoms.emplace_back(universe.getAtomIdByIdx(atomVertexIdx1),
                                     universe.getAtomIdByIdx(atomVertexIdx2));
         } else {
-          pairOfAtom[atomVertexIdx2] = -2;
-          pairOfAtom[atomVertexIdx1] = -2;
+          pairOfAtom[atomIdx2] = -2;
+          pairOfAtom[atomIdx1] = -2;
         }
       } else { // NONE
-        pairOfAtom[atomVertexIdx2] = static_cast<long int>(pairsOfAtoms.size());
-        pairOfAtom[atomVertexIdx1] = static_cast<long int>(pairsOfAtoms.size());
+        pairOfAtom[atomIdx2] = static_cast<long int>(pairsOfAtoms.size());
+        pairOfAtom[atomIdx1] = static_cast<long int>(pairsOfAtoms.size());
         pairsOfAtoms.emplace_back(universe.getAtomIdByIdx(atomVertexIdx1),
                                   universe.getAtomIdByIdx(atomVertexIdx2));
       }
 
-      vertexIsEligible[atomVertexIdx2] = 0;
+      vertexIsEligible[atomIdx2] = 0;
       numEntanglementsSampled += 1;
       numLinksFoundInIteration += 1;
 
@@ -558,17 +559,18 @@ peelTopologicalLeavesDetailed(
     if (u < 0 || v < 0) {
       result.strandIsIgnored[s] = true;
     } else {
+      const size_t uIdx = static_cast<size_t>(u);
+      const size_t vIdx = static_cast<size_t>(v);
       INVALIDARG_EXP_IFN(
-        static_cast<size_t>(u) < nCrosslinks &&
-          static_cast<size_t>(v) < nCrosslinks,
+        uIdx < nCrosslinks && vIdx < nCrosslinks,
         "Crosslinker index out of bounds in strandFrom / strandTo.");
-      if (u == v) {
-        primaryLoopCount[u] += 1;
+      if (uIdx == vIdx) {
+        primaryLoopCount[uIdx] += 1;
       } else {
-        incidentStrands[u].push_back(s);
-        incidentStrands[v].push_back(s);
-        activeNonLoopDegree[u] += 1;
-        activeNonLoopDegree[v] += 1;
+        incidentStrands[uIdx].push_back(s);
+        incidentStrands[vIdx].push_back(s);
+        activeNonLoopDegree[uIdx] += 1;
+        activeNonLoopDegree[vIdx] += 1;
       }
     }
   }
@@ -829,14 +831,21 @@ sampleStrandBeadsOnDemand(
   const long int to = cu.strandTo[strandIdx];
 
   if (from >= 0 && to >= 0) {
+    const size_t fromIdx = static_cast<size_t>(from);
+    const size_t toIdx = static_cast<size_t>(to);
     const Eigen::Vector3d rFrom(
-      cu.xlinkX[from], cu.xlinkY[from], cu.xlinkZ[from]);
-    const Eigen::Vector3d rTo(cu.xlinkX[to], cu.xlinkY[to], cu.xlinkZ[to]);
+      cu.xlinkX[fromIdx], cu.xlinkY[fromIdx], cu.xlinkZ[fromIdx]);
+    const Eigen::Vector3d rTo(
+      cu.xlinkX[toIdx], cu.xlinkY[toIdx], cu.xlinkZ[toIdx]);
     Eigen::VectorXd positions = pylimer_tools::utils::doRandomWalkChainFromTo(
       box, rFrom, rTo, nBeads, beadDist, meanSqDist, strandRng, true);
     if (nMcSteps > 0) {
-      pylimer_tools::sim::equilibrateChainWithMC(
-        positions, meanSqDist, strandRng, true, true, nMcSteps);
+      pylimer_tools::sim::equilibrateChainWithMC(positions,
+                                                 meanSqDist,
+                                                 strandRng,
+                                                 true,
+                                                 true,
+                                                 static_cast<size_t>(nMcSteps));
     }
     return positions.segment(3, 3 * nBeads);
   } else if (from >= 0 || to >= 0) {
@@ -846,8 +855,12 @@ sampleStrandBeadsOnDemand(
     Eigen::VectorXd positions = pylimer_tools::utils::doRandomWalkChain(
       nBeads, beadDist, meanSqDist, strandRng);
     if (nMcSteps > 0) {
-      pylimer_tools::sim::equilibrateChainWithMC(
-        positions, meanSqDist, strandRng, true, false, nMcSteps);
+      pylimer_tools::sim::equilibrateChainWithMC(positions,
+                                                 meanSqDist,
+                                                 strandRng,
+                                                 true,
+                                                 false,
+                                                 static_cast<size_t>(nMcSteps));
     }
     positions += rAnchor.replicate(nBeads, 1);
     return positions;
@@ -860,8 +873,12 @@ sampleStrandBeadsOnDemand(
     Eigen::VectorXd positions = pylimer_tools::utils::doRandomWalkChain(
       nBeads, beadDist, meanSqDist, strandRng);
     if (nMcSteps > 0) {
-      pylimer_tools::sim::equilibrateChainWithMC(
-        positions, meanSqDist, strandRng, true, false, nMcSteps);
+      pylimer_tools::sim::equilibrateChainWithMC(positions,
+                                                 meanSqDist,
+                                                 strandRng,
+                                                 true,
+                                                 false,
+                                                 static_cast<size_t>(nMcSteps));
     }
     positions += rFrom.replicate(nBeads, 1);
     return positions;
@@ -1018,8 +1035,9 @@ randomlyFindEntanglementsOnDemand(
   double medianRadius = 0.0;
   if (!activeRadii.empty()) {
     const size_t midIdx = activeRadii.size() / 2;
-    std::nth_element(
-      activeRadii.begin(), activeRadii.begin() + midIdx, activeRadii.end());
+    std::nth_element(activeRadii.begin(),
+                     activeRadii.begin() + static_cast<std::ptrdiff_t>(midIdx),
+                     activeRadii.end());
     medianRadius = activeRadii[midIdx];
   }
   StrandSpatialGrid strandGrid(box, 2.0 * medianRadius + upperCutoff, nStrands);
@@ -1145,7 +1163,8 @@ randomlyFindEntanglementsOnDemand(
           return sampleStrandBeadsOnDemand(
             box, crosslinkerUniverse, s1, strandSeeds[s1], nMcSteps);
         });
-        const Eigen::Vector3d r1 = coords1.segment<3>(3 * k1);
+        const Eigen::Vector3d r1 =
+          coords1.segment<3>(static_cast<Eigen::Index>(3 * k1));
         Eigen::Vector3d r1Wrapped = r1;
         box.handlePBC(r1Wrapped);
 
@@ -1173,8 +1192,8 @@ randomlyFindEntanglementsOnDemand(
           if (beadIsPaired[g2]) {
             continue;
           }
-          const Eigen::Vector3d r2 =
-            coords1.segment<3>(3 * (firstOffset1 + m2));
+          const Eigen::Vector3d r2 = coords1.segment<3>(
+            static_cast<Eigen::Index>(3 * (firstOffset1 + m2)));
           Eigen::Vector3d delta = r2 - r1;
           box.handlePBC(delta);
           const double d2 = delta.squaredNorm();
@@ -1218,8 +1237,8 @@ randomlyFindEntanglementsOnDemand(
             if (beadIsPaired[g2]) {
               continue;
             }
-            const Eigen::Vector3d r2 =
-              coords2.segment<3>(3 * (firstOffset2 + m2));
+            const Eigen::Vector3d r2 = coords2.segment<3>(
+              static_cast<Eigen::Index>(3 * (firstOffset2 + m2)));
             Eigen::Vector3d delta = r2 - r1;
             box.handlePBC(delta);
             const double d2 = delta.squaredNorm();
@@ -1294,17 +1313,19 @@ randomlyFindEntanglementsOnDemand(
            numLinksFoundInIteration > 0);
 
   const size_t nRecorded = result.strandIdx1.size();
-  result.x.resize(nRecorded);
-  result.y.resize(nRecorded);
-  result.z.resize(nRecorded);
-  result.position1.resize(3 * nRecorded);
-  result.position2.resize(3 * nRecorded);
+  const Eigen::Index nRecordedIdx = static_cast<Eigen::Index>(nRecorded);
+  result.x.resize(nRecordedIdx);
+  result.y.resize(nRecordedIdx);
+  result.z.resize(nRecordedIdx);
+  result.position1.resize(3 * nRecordedIdx);
+  result.position2.resize(3 * nRecordedIdx);
   for (size_t e = 0; e < nRecorded; ++e) {
-    result.x[e] = sampledMidpoints[e].x();
-    result.y[e] = sampledMidpoints[e].y();
-    result.z[e] = sampledMidpoints[e].z();
-    result.position1.segment<3>(3 * e) = sampledPos1[e];
-    result.position2.segment<3>(3 * e) = sampledPos2[e];
+    const Eigen::Index eIdx = static_cast<Eigen::Index>(e);
+    result.x[eIdx] = sampledMidpoints[e].x();
+    result.y[eIdx] = sampledMidpoints[e].y();
+    result.z[eIdx] = sampledMidpoints[e].z();
+    result.position1.segment<3>(3 * eIdx) = sampledPos1[e];
+    result.position2.segment<3>(3 * eIdx) = sampledPos2[e];
   }
 
   return result;

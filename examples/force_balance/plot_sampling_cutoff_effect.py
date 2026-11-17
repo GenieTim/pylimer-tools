@@ -60,14 +60,9 @@ for r_cut in (1.2, 2.6):
     )
     fb = gen.get_force_balance2(es, entanglements_as_springs=False)
     fb.run_force_relaxation()
-    print(
-        f"r_cut={r_cut}: sampled={
-            len(es)}, iterations={
-            fb.get_nr_of_iterations()}")
+    print(f"r_cut={r_cut}: sampled={len(es)}, iterations={fb.get_nr_of_iterations()}")
 
-cache_path = get_example_cache_path(
-    "sampling_cutoff_effect_cache.npz",
-    "force_balance")
+cache_path = get_example_cache_path("sampling_cutoff_effect_cache.npz", "force_balance")
 data = load_or_compute_cache(cache_path, run_sampling_cutoff_simulation)
 
 # %%

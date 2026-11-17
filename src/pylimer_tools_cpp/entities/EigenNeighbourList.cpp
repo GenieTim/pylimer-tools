@@ -107,7 +107,7 @@ namespace entities {
 
     this->bucketWidths = this->box.getL() / this->nrOfBuckets.cast<double>();
 
-    this->totalNrOfBuckets = this->nrOfBuckets.prod();
+    this->totalNrOfBuckets = static_cast<size_t>(this->nrOfBuckets.prod());
 
     this->neighbourBuckets.clear();
     this->neighbourBuckets.reserve(this->totalNrOfBuckets);
@@ -119,9 +119,9 @@ namespace entities {
 
     // prepare the default buckets
     long int nB1x2 = (this->nrOfBuckets[0] * this->nrOfBuckets[1]);
-    int currentX = this->nrOfBuckets[0] - 1;
-    int currentY = nB1x2 - 1;
-    int currentZ = this->totalNrOfBuckets - 1;
+    long int currentX = this->nrOfBuckets[0] - 1;
+    long int currentY = nB1x2 - 1;
+    long int currentZ = static_cast<long int>(this->totalNrOfBuckets) - 1;
     for (bucket_idx_t bucketIndex = 0;
          bucketIndex < static_cast<bucket_idx_t>(this->totalNrOfBuckets);
          ++bucketIndex) {
@@ -136,21 +136,23 @@ namespace entities {
       assert(currentX >= 0 && currentY >= 0 && currentZ >= 0);
       std::vector<bucket_idx_t> vectorToPlace = std::vector<bucket_idx_t>();
       // reserve a sensible capacity as estimated
-      vectorToPlace.reserve((coordinates.size() / 3) / this->totalNrOfBuckets);
+      vectorToPlace.reserve(static_cast<size_t>(coordinates.size() / 3) /
+                            this->totalNrOfBuckets);
       this->neighbourBuckets.push_back(vectorToPlace);
       // assemble the neighbouring buckets with the default cut-off
       std::vector<bucket_idx_t> neighbouringBuckets;
       int lowerLim = scalingFactor * -1;
       int upperLim = scalingFactor * 1;
-      neighbouringBuckets.reserve(
-        (upperLim - lowerLim) * (upperLim - lowerLim) * (upperLim - lowerLim));
+      neighbouringBuckets.reserve(static_cast<size_t>(
+        (upperLim - lowerLim) * (upperLim - lowerLim) * (upperLim - lowerLim)));
       for (int dx = lowerLim; dx <= upperLim; ++dx) {
         for (int dy = lowerLim; dy <= upperLim; ++dy) {
           for (int dz = lowerLim; dz <= upperLim; ++dz) {
             neighbouringBuckets.push_back(
               (currentX + dx) % this->nrOfBuckets[0] +
               ((currentY + dy) * this->nrOfBuckets[0]) % nB1x2 +
-              ((currentZ + dz) * nB1x2) % this->totalNrOfBuckets);
+              ((currentZ + dz) * nB1x2) %
+                static_cast<long int>(this->totalNrOfBuckets));
           }
         }
       }
@@ -171,12 +173,14 @@ namespace entities {
     // std::cout << "Filling buckets" << std::endl;
 
     // fill neighbour buckets
-    this->neighbourBucketSizes = Eigen::ArrayXi::Zero(this->totalNrOfBuckets);
+    this->neighbourBucketSizes =
+      Eigen::ArrayXi::Zero(static_cast<Eigen::Index>(this->totalNrOfBuckets));
     for (Eigen::Index i = 0; i < (coordinates.size() / 3); ++i) {
       bucket_idx_t bucketIndex = this->getBucketIndexForTriplet(
         this->getBucketTripletForCoordinates(coordinates.segment(3 * i, 3)));
-      assert(bucketIndex >= 0 && bucketIndex < this->totalNrOfBuckets);
-      this->neighbourBuckets[bucketIndex].push_back(i);
+      assert(bucketIndex >= 0 &&
+             static_cast<size_t>(bucketIndex) < this->totalNrOfBuckets);
+      this->neighbourBuckets[static_cast<size_t>(bucketIndex)].push_back(i);
       this->neighbourBucketSizes[bucketIndex]++;
     }
   };
@@ -191,14 +195,15 @@ namespace entities {
     // just override all the buckets.
     this->neighbourBucketSizes.setZero();
     for (Eigen::Index i = 0; i < (newCoordinates.size() / 3); ++i) {
-      int bucketIndex = this->getBucketIndexForTriplet(
+      const bucket_idx_t bucketIndex = this->getBucketIndexForTriplet(
         this->getBucketTripletForCoordinates(newCoordinates.segment(3 * i, 3)));
-      if (static_cast<int>(this->neighbourBuckets[bucketIndex].size()) <=
+      const size_t bucketIdx = static_cast<size_t>(bucketIndex);
+      if (static_cast<int>(this->neighbourBuckets[bucketIdx].size()) <=
           this->neighbourBucketSizes[bucketIndex]) {
-        this->neighbourBuckets[bucketIndex].push_back(i);
+        this->neighbourBuckets[bucketIdx].push_back(i);
       } else {
-        this->neighbourBuckets[bucketIndex]
-                              [this->neighbourBucketSizes[bucketIndex]] = i;
+        this->neighbourBuckets[bucketIdx][static_cast<size_t>(
+          this->neighbourBucketSizes[bucketIndex])] = i;
       }
       this->neighbourBucketSizes[bucketIndex]++;
     }
@@ -208,17 +213,18 @@ namespace entities {
     Eigen::VectorXd& newCoordinates)
   {
     Eigen::ArrayXi neighbourBucketSizes2 =
-      Eigen::ArrayXi::Zero(this->totalNrOfBuckets);
+      Eigen::ArrayXi::Zero(static_cast<Eigen::Index>(this->totalNrOfBuckets));
     std::unordered_map<bucket_idx_t, std::vector<coordinate_idx_t>>
       neighbourBuckets2;
-    for (size_t i = 0; i < (newCoordinates.size() / 3); ++i) {
-      int bucketIndex = this->getBucketIndexForTriplet(
+    for (Eigen::Index i = 0; i < (newCoordinates.size() / 3); ++i) {
+      const bucket_idx_t bucketIndex = this->getBucketIndexForTriplet(
         this->getBucketTripletForCoordinates(newCoordinates.segment(3 * i, 3)));
       if (neighbourBuckets2[bucketIndex].size() <=
-          neighbourBucketSizes2[bucketIndex]) {
+          static_cast<size_t>(neighbourBucketSizes2[bucketIndex])) {
         neighbourBuckets2[bucketIndex].push_back(i);
       } else {
-        neighbourBuckets2[bucketIndex][neighbourBucketSizes2[bucketIndex]] = i;
+        neighbourBuckets2[bucketIndex][static_cast<size_t>(
+          neighbourBucketSizes2[bucketIndex])] = i;
       }
       neighbourBucketSizes2[bucketIndex]++;
     }
@@ -228,7 +234,7 @@ namespace entities {
     for (auto& it : neighbourBuckets2) {
       for (size_t i = 0; i < neighbourBuckets2[it.first].size(); ++i) {
         if (neighbourBuckets2[it.first][i] !=
-            this->neighbourBuckets[it.first][i]) {
+            this->neighbourBuckets[static_cast<size_t>(it.first)][i]) {
           return false;
         }
       }
@@ -256,7 +262,8 @@ namespace entities {
     std::vector<bucket_idx_t> bucketIdxs;
     if (newCutoff == this->cutoff) {
       bucketIdxs =
-        this->neighbourBucketNeighboursDefaultCutoff[baseBucketIndex];
+        this->neighbourBucketNeighboursDefaultCutoff[static_cast<size_t>(
+          baseBucketIndex)];
       for (bucket_idx_t bucketIndex : bucketIdxs) {
         foundSource = foundSource || (baseBucketIndex == bucketIndex);
         foundTarget = foundTarget || (targetBucketIndex == bucketIndex);
@@ -370,7 +377,8 @@ namespace entities {
       result, coordinates.segment(3 * source, 3), newCutoff);
     int actualNumNeighbours = 0;
     const double cutoff2 = newCutoff * newCutoff;
-    for (size_t i = 0; i < numNeighbours; ++i) {
+    for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(numNeighbours);
+         ++i) {
       if (result[i] > source) {
         Eigen::Vector3d dist = coordinates.segment(3 * source, 3) -
                                coordinates.segment(result[i] * 3, 3);
@@ -406,8 +414,10 @@ namespace entities {
     const bool expectDefault) const
   {
     if (this->totalNrOfBuckets < 2) {
-      size_t nResults = this->neighbourBucketSizes.sum();
-      result = Eigen::ArrayXi::LinSpaced(nResults, 0, nResults - 1);
+      const Eigen::Index nResults =
+        static_cast<Eigen::Index>(this->neighbourBucketSizes.sum());
+      result =
+        Eigen::ArrayXi::LinSpaced(nResults, 0, static_cast<int>(nResults - 1));
       return result.size();
     }
 
@@ -425,7 +435,8 @@ namespace entities {
       long int nResults =
         this
           ->neighbourBucketSizes(
-            this->neighbourBucketNeighboursDefaultCutoff[coordinatesBucketIdx])
+            this->neighbourBucketNeighboursDefaultCutoff[static_cast<size_t>(
+              coordinatesBucketIdx)])
           .sum();
 
       if (result.size() < nResults) {
@@ -433,12 +444,14 @@ namespace entities {
         result.conservativeResize(nResults);
       }
       for (bucket_idx_t bucketIndex :
-           this->neighbourBucketNeighboursDefaultCutoff[coordinatesBucketIdx]) {
+           this->neighbourBucketNeighboursDefaultCutoff[static_cast<size_t>(
+             coordinatesBucketIdx)]) {
         for (int indexInBucket = 0;
              indexInBucket < this->neighbourBucketSizes[bucketIndex];
              indexInBucket++) {
           coordinate_idx_t atomIndex =
-            this->neighbourBuckets[bucketIndex][indexInBucket];
+            this->neighbourBuckets[static_cast<size_t>(bucketIndex)]
+                                  [static_cast<size_t>(indexInBucket)];
           result[results_idx] = atomIndex;
           results_idx += 1;
         }
@@ -479,13 +492,15 @@ namespace entities {
               this->getBucketIndexForTriplet(indexTriplet);
             // found the bucket, insert its contents into the results if
             // desired
-            if (bucketIndex >= 0 && !visitedBuckets[bucketIndex]) {
-              visitedBuckets[bucketIndex] = true;
+            if (bucketIndex >= 0 &&
+                !visitedBuckets[static_cast<size_t>(bucketIndex)]) {
+              visitedBuckets[static_cast<size_t>(bucketIndex)] = true;
               for (int indexInBucket = 0;
                    indexInBucket < this->neighbourBucketSizes[bucketIndex];
                    ++indexInBucket) {
                 coordinate_idx_t atomIndex =
-                  this->neighbourBuckets[bucketIndex][indexInBucket];
+                  this->neighbourBuckets[static_cast<size_t>(bucketIndex)]
+                                        [static_cast<size_t>(indexInBucket)];
                 result[results_idx] = atomIndex;
                 results_idx += 1;
 
@@ -582,7 +597,8 @@ namespace entities {
     const size_t newNrOfBuckets) const
   {
     bucketIndex %= static_cast<long int>(newNrOfBuckets);
-    bucketIndex += newNrOfBuckets * static_cast<long int>(bucketIndex < 0);
+    bucketIndex += static_cast<long int>(newNrOfBuckets) *
+                   static_cast<long int>(bucketIndex < 0);
     return static_cast<bucket_idx_t>(bucketIndex);
   }
 

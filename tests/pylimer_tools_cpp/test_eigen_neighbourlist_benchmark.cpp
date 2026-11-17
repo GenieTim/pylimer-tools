@@ -32,9 +32,9 @@ runBenchmarkWithConfig(const double neighbourBinSize = 1.0,
   // random [?] access atom list
   // std::cout << "Coordinates set up" << std::endl;
   std::vector<size_t> ids;
-  ids.reserve(numAtoms);
-  for (size_t i = 0; i < numAtoms; ++i) {
-    ids.push_back(i);
+  ids.reserve(static_cast<size_t>(numAtoms));
+  for (int i = 0; i < numAtoms; ++i) {
+    ids.push_back(static_cast<size_t>(i));
   }
   // std::cout << "Ids set up" << std::endl;
   std::shuffle(ids.begin(), ids.end(), gen);
@@ -77,10 +77,12 @@ runBenchmarkWithConfig(const double neighbourBinSize = 1.0,
         //   expectDefaultCutoff);
         int actualNumNeighs = 0;
         // pair forces
-        for (size_t neigh_idx = 0; neigh_idx < numNeighbors; ++neigh_idx) {
-          const size_t j = neighbors[neigh_idx];
+        for (Eigen::Index neigh_idx = 0; neigh_idx < numNeighbors;
+             ++neigh_idx) {
+          const Eigen::Index j = neighbors[neigh_idx];
           pairdistance =
-            coordinates.segment(3 * i, 3) - coordinates.segment(3 * j, 3);
+            coordinates.segment(3 * static_cast<Eigen::Index>(i), 3) -
+            coordinates.segment(3 * j, 3);
           box.handlePBC(pairdistance);
           const double rNorm = pairdistance.norm();
           if (rNorm >= cutoff || rNorm < 1e-12) {

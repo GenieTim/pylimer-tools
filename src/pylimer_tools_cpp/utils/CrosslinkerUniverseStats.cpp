@@ -107,9 +107,12 @@ computeBondLengthStats(const pylimer_tools::entities::Box& box,
 
     if (nBeads == 0) {
       if (from >= 0 && to >= 0) {
+        const size_t fromIdx = static_cast<size_t>(from);
+        const size_t toIdx = static_cast<size_t>(to);
         const Eigen::Vector3d rFrom(
-          cu.xlinkX[from], cu.xlinkY[from], cu.xlinkZ[from]);
-        const Eigen::Vector3d rTo(cu.xlinkX[to], cu.xlinkY[to], cu.xlinkZ[to]);
+          cu.xlinkX[fromIdx], cu.xlinkY[fromIdx], cu.xlinkZ[fromIdx]);
+        const Eigen::Vector3d rTo(
+          cu.xlinkX[toIdx], cu.xlinkY[toIdx], cu.xlinkZ[toIdx]);
         accumulateBond(box, rFrom, rTo, stats, sumB, sumB2);
       }
       continue;
@@ -120,9 +123,12 @@ computeBondLengthStats(const pylimer_tools::entities::Box& box,
         box, cu, s, seeds[s], nMcSteps);
 
     if (from >= 0 && to >= 0) {
+      const size_t fromIdx = static_cast<size_t>(from);
+      const size_t toIdx = static_cast<size_t>(to);
       const Eigen::Vector3d rFrom(
-        cu.xlinkX[from], cu.xlinkY[from], cu.xlinkZ[from]);
-      const Eigen::Vector3d rTo(cu.xlinkX[to], cu.xlinkY[to], cu.xlinkZ[to]);
+        cu.xlinkX[fromIdx], cu.xlinkY[fromIdx], cu.xlinkZ[fromIdx]);
+      const Eigen::Vector3d rTo(
+        cu.xlinkX[toIdx], cu.xlinkY[toIdx], cu.xlinkZ[toIdx]);
       accumulateBond(box, rFrom, coords.segment<3>(0), stats, sumB, sumB2);
       for (int i = 0; i < nBeads - 1; ++i) {
         accumulateBond(box,
@@ -195,9 +201,12 @@ computeEndToEndStats(const pylimer_tools::entities::Box& box,
 
     if (from >= 0 && to >= 0) {
       if (from != to) {
+        const size_t fromIdx = static_cast<size_t>(from);
+        const size_t toIdx = static_cast<size_t>(to);
         const Eigen::Vector3d rFrom(
-          cu.xlinkX[from], cu.xlinkY[from], cu.xlinkZ[from]);
-        const Eigen::Vector3d rTo(cu.xlinkX[to], cu.xlinkY[to], cu.xlinkZ[to]);
+          cu.xlinkX[fromIdx], cu.xlinkY[fromIdx], cu.xlinkZ[fromIdx]);
+        const Eigen::Vector3d rTo(
+          cu.xlinkX[toIdx], cu.xlinkY[toIdx], cu.xlinkZ[toIdx]);
         Eigen::Vector3d delta = rTo - rFrom;
         box.handlePBC(delta);
         dist = delta.norm();

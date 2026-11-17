@@ -41,8 +41,7 @@ from pylimer_tools_cpp import MEHPForceBalance2, Universe
 # providing the mean-squared bond distance :math:`\langle R_0^2 \rangle`,
 # melt entanglement density, and unit conversions.
 
-params = get_parameters_for_polymer(
-    "PDMS", parameter_type=ParameterType.GAUSSIAN)
+params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
 assert isinstance(params, Parameters)
 
 r02_slope = params.get("R02")
@@ -99,8 +98,7 @@ mehp_fb = MEHPForceBalance2(
 mehp_fb.run_force_relaxation()
 
 print(
-    f"Entangled final residual norm: {
-        mehp_fb.get_displacement_residual_norm():.3e} "
+    f"Entangled final residual norm: {mehp_fb.get_displacement_residual_norm():.3e} "
     f"(iterations: {mehp_fb.get_nr_of_iterations()})"
 )
 

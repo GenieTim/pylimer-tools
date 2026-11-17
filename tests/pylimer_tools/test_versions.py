@@ -16,9 +16,7 @@ class TestVersions(unittest.TestCase):
 
     def test_equivalent_versions(self):
         self.assertEqual(pt.__version__, ptc.__version__)
-        self.assertEqual(
-            importlib_metadata.version("pylimer-tools"),
-            pt.__version__)
+        self.assertEqual(importlib_metadata.version("pylimer-tools"), pt.__version__)
 
 
 if __name__ == "__main__":

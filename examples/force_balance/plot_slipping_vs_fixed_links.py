@@ -61,9 +61,7 @@ print(
     f"slipping: {fb_slip.get_nr_of_iterations()}"
 )
 
-cache_path = get_example_cache_path(
-    "slipping_vs_fixed_cache.npz",
-    "force_balance")
+cache_path = get_example_cache_path("slipping_vs_fixed_cache.npz", "force_balance")
 data = load_or_compute_cache(cache_path, run_slipping_vs_fixed_simulation)
 
 # %%

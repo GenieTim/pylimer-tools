@@ -181,15 +181,16 @@ UniverseSequence::readDumpFileAtIndex(size_t universeIndex)
     nAtoms = this->dataFileParser.getNrOfAtoms();
   }
 
+  const size_t nAtomsUnsigned = static_cast<size_t>(nAtoms);
   if (this->dumpFileParser.keyHasDirectionalColumn("ATOMS", "i", "") &&
       !isUnwrapped) {
     nx = this->dumpFileParser.getValuesForAt<int>(universeIndex, "ATOMS", "ix");
     ny = this->dumpFileParser.getValuesForAt<int>(universeIndex, "ATOMS", "iy");
     nz = this->dumpFileParser.getValuesForAt<int>(universeIndex, "ATOMS", "iz");
   } else {
-    nx = pylimer_tools::utils::initializeWithValue(nAtoms, 0);
-    ny = pylimer_tools::utils::initializeWithValue(nAtoms, 0);
-    nz = pylimer_tools::utils::initializeWithValue(nAtoms, 0);
+    nx = pylimer_tools::utils::initializeWithValue(nAtomsUnsigned, 0);
+    ny = pylimer_tools::utils::initializeWithValue(nAtomsUnsigned, 0);
+    nz = pylimer_tools::utils::initializeWithValue(nAtomsUnsigned, 0);
   }
 
   // read/parse/process atom ids
@@ -200,7 +201,7 @@ UniverseSequence::readDumpFileAtIndex(size_t universeIndex)
       universeIndex, "ATOMS", "id");
     hasAtomIds = true;
   } else {
-    atomIds.reserve(nAtoms);
+    atomIds.reserve(nAtomsUnsigned);
     for (long int j = 0; j < nAtoms; ++j) {
       atomIds.push_back(j);
     }
@@ -208,7 +209,7 @@ UniverseSequence::readDumpFileAtIndex(size_t universeIndex)
 
   // read/parse/process atom types
   std::vector<int> atomTypes;
-  atomTypes.reserve(nAtoms);
+  atomTypes.reserve(nAtomsUnsigned);
   if (this->dumpFileParser.keyHasColumn("ATOMS", "type")) {
     atomTypes =
       this->dumpFileParser.getValuesForAt<int>(universeIndex, "ATOMS", "type");
@@ -226,7 +227,7 @@ UniverseSequence::readDumpFileAtIndex(size_t universeIndex)
                                 this->dataFileParser.getAtomNx(),
                                 this->dataFileParser.getAtomNy(),
                                 this->dataFileParser.getAtomNz());
-      for (long int j = 0; j < nAtoms; ++j) {
+      for (size_t j = 0; j < nAtomsUnsigned; ++j) {
         // std::cout << "Inferring type from data file for " << j << " atom id
         // "
         // << atomIds[j] << std::endl;
@@ -240,10 +241,11 @@ UniverseSequence::readDumpFileAtIndex(size_t universeIndex)
   }
 
   // some checking
-  if (atomTypes.size() != nAtoms || atomIds.size() != nAtoms ||
-      nx.size() != nAtoms || ny.size() != nAtoms || nz.size() != nAtoms ||
-      positionsX.size() != nAtoms || positionsY.size() != nAtoms ||
-      positionsZ.size() != nAtoms) {
+  if (atomTypes.size() != nAtomsUnsigned || atomIds.size() != nAtomsUnsigned ||
+      nx.size() != nAtomsUnsigned || ny.size() != nAtomsUnsigned ||
+      nz.size() != nAtomsUnsigned || positionsX.size() != nAtomsUnsigned ||
+      positionsY.size() != nAtomsUnsigned ||
+      positionsZ.size() != nAtomsUnsigned) {
     throw std::runtime_error("Failed to read timestep " +
                              std::to_string(newUniverse.getTimestep()) +
                              " due to different nr of atom properties");
@@ -253,7 +255,7 @@ UniverseSequence::readDumpFileAtIndex(size_t universeIndex)
     atomIds, atomTypes, positionsX, positionsY, positionsZ, nx, ny, nz);
   // ignore it if the bond atoms do not exist, as we want to be compatible for
   // dumps of only certain atom groups
-  newUniverse.addBonds(this->dataFileParser.getNrOfBonds(),
+  newUniverse.addBonds(static_cast<size_t>(this->dataFileParser.getNrOfBonds()),
                        this->dataFileParser.getBondFrom(),
                        this->dataFileParser.getBondTo(),
                        this->dataFileParser.getBondTypes(),
@@ -293,7 +295,7 @@ UniverseSequence::readDataFile(const std::string& filePath) const
                     fileParser.getAtomNy(),
                     fileParser.getAtomNz(),
                     fileParser.getAdditionalAtomData());
-  universe.addBonds(fileParser.getNrOfBonds(),
+  universe.addBonds(static_cast<size_t>(fileParser.getNrOfBonds()),
                     fileParser.getBondFrom(),
                     fileParser.getBondTo(),
                     fileParser.getBondTypes(),
@@ -401,10 +403,10 @@ UniverseSequence::computeDistanceFromToAtoms(
 #endif
   for (size_t f = 0; f < numFrames; ++f) {
     size_t universe_idx = startingIndex + f;
-    std::unordered_map<long int, int> atomIdToAtomIndex;
+    std::unordered_map<long int, size_t> atomIdToAtomIndex;
     atomIdToAtomIndex.reserve(atoms[universe_idx].size());
     for (size_t j = 0; j < atoms[universe_idx].size(); ++j) {
-      atomIdToAtomIndex[atoms[universe_idx][j].getId()] = static_cast<int>(j);
+      atomIdToAtomIndex[atoms[universe_idx][j].getId()] = j;
     }
     for (size_t j = 0; j < pairsPerFrame; ++j) {
       Atom atomFrom = atoms[universe_idx][atomIdToAtomIndex.at(atomIdsFrom[j])];
@@ -481,10 +483,10 @@ UniverseSequence::computeVectorFromToAtoms(
 #endif
   for (size_t f = 0; f < numFrames; ++f) {
     size_t universe_idx = startingIndex + f;
-    std::unordered_map<long int, int> atomIdToAtomIndex;
+    std::unordered_map<long int, size_t> atomIdToAtomIndex;
     atomIdToAtomIndex.reserve(atoms[universe_idx].size());
     for (size_t j = 0; j < atoms[universe_idx].size(); ++j) {
-      atomIdToAtomIndex[atoms[universe_idx][j].getId()] = static_cast<int>(j);
+      atomIdToAtomIndex[atoms[universe_idx][j].getId()] = j;
     }
     for (size_t j = 0; j < pairsPerFrame; ++j) {
       Atom atomFrom = atoms[universe_idx][atomIdToAtomIndex.at(atomIdsFrom[j])];
@@ -555,21 +557,21 @@ UniverseSequence::computeDistanceAutocorrelationFromToAtoms(
   std::vector<Eigen::VectorXd> endToEndVectors;
   endToEndVectors.reserve(this->getLength() - startingIndex);
   for (size_t i = startingIndex; i < this->getLength(); ++i) {
-    std::unordered_map<long int, int> atomIdToAtomIndex;
+    std::unordered_map<long int, size_t> atomIdToAtomIndex;
     atomIdToAtomIndex.reserve(atoms[i].size());
     for (size_t j = 0; j < atoms[i].size(); ++j) {
       atomIdToAtomIndex[atoms[i][j].getId()] = j;
     }
     Eigen::VectorXd localCoordinatesFrom =
-      Eigen::VectorXd::Zero(3 * atomIdsFrom.size());
+      Eigen::VectorXd::Zero(static_cast<Eigen::Index>(3 * atomIdsFrom.size()));
     Eigen::VectorXd localCoordinatesTo =
-      Eigen::VectorXd::Zero(3 * atomIdsTo.size());
+      Eigen::VectorXd::Zero(static_cast<Eigen::Index>(3 * atomIdsTo.size()));
     for (size_t j = 0; j < atomIdsFrom.size(); ++j) {
       Atom atomFrom = atoms[i][atomIdToAtomIndex.at(atomIdsFrom[j])];
-      localCoordinatesFrom.segment(3 * j, 3) =
+      localCoordinatesFrom.segment(static_cast<Eigen::Index>(3 * j), 3) =
         atomFrom.getUnwrappedCoordinates(boxes[i]);
       Atom atomTo = atoms[i][atomIdToAtomIndex.at(atomIdsTo[j])];
-      localCoordinatesTo.segment(3 * j, 3) =
+      localCoordinatesTo.segment(static_cast<Eigen::Index>(3 * j), 3) =
         atomTo.getUnwrappedCoordinates(boxes[i]);
     }
     endToEndVectors.push_back(localCoordinatesTo - localCoordinatesFrom);
@@ -583,10 +585,11 @@ UniverseSequence::computeDistanceAutocorrelationFromToAtoms(
   // this is a highly inefficient algorithm, but no idea how to do better
   // (except for omitting some data, skipping the graph, or other minor
   // optimizations)
-  const int stepSize =
+  const size_t stepSize = static_cast<size_t>(
     std::max(1,
-             static_cast<int>(
-               std::floor((this->getLength() - startingIndex) / nrOfOrigins)));
+             static_cast<int>(std::floor(
+               static_cast<double>(this->getLength() - startingIndex) /
+               static_cast<double>(nrOfOrigins)))));
   for (size_t parent_universe_idx = startingIndex;
        parent_universe_idx < this->getLength();
        parent_universe_idx += stepSize) {
@@ -605,9 +608,11 @@ UniverseSequence::computeDistanceAutocorrelationFromToAtoms(
       }
 
       // verify
-      assert(endToEndVectors[universe_idx - startingIndex].size() ==
+      assert(static_cast<size_t>(
+               endToEndVectors[universe_idx - startingIndex].size()) ==
              atomIdsFrom.size() * 3);
-      assert(endToEndVectors[parent_universe_idx - startingIndex].size() ==
+      assert(static_cast<size_t>(
+               endToEndVectors[parent_universe_idx - startingIndex].size()) ==
              atomIdsFrom.size() * 3);
       // compute the mean for all atoms between these two universes
       double localMean =
@@ -629,7 +634,8 @@ UniverseSequence::computeDistanceAutocorrelationFromToAtoms(
       continue;
     }
     actual_means[result_pair.first] =
-      (Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(sds.data(), sds.size()))
+      (Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
+         sds.data(), static_cast<Eigen::Index>(sds.size())))
         .mean();
   }
 
@@ -737,13 +743,13 @@ UniverseSequence::computeMsdForAtomProperties(
   std::vector<Eigen::VectorXd> coordinates;
   coordinates.reserve(this->getLength() - startingIndex);
   for (size_t i = startingIndex; i < this->getLength(); ++i) {
-    std::unordered_map<long int, int> atomIdToAtomIndex;
+    std::unordered_map<long int, size_t> atomIdToAtomIndex;
     atomIdToAtomIndex.reserve(atoms[i].size());
     for (size_t j = 0; j < atoms[i].size(); ++j) {
       atomIdToAtomIndex[atoms[i][j].getId()] = j;
     }
     Eigen::VectorXd localCoordinates =
-      Eigen::VectorXd::Zero(3 * atomIds.size());
+      Eigen::VectorXd::Zero(static_cast<Eigen::Index>(3 * atomIds.size()));
     RUNTIME_EXP_IFN(extraAtomData[i].at(x).size() == atoms[i].size(),
                     "Wrong size");
     RUNTIME_EXP_IFN(extraAtomData[i].at(y).size() == atoms[i].size(),
@@ -755,7 +761,7 @@ UniverseSequence::computeMsdForAtomProperties(
       Eigen::Vector3d coords;
       coords << extraAtomData[i].at(x)[row], extraAtomData[i].at(y)[row],
         extraAtomData[i].at(z)[row];
-      localCoordinates.segment(3 * j, 3) = coords;
+      localCoordinates.segment(static_cast<Eigen::Index>(3 * j), 3) = coords;
     }
     coordinates.push_back(localCoordinates);
   }
@@ -768,11 +774,13 @@ UniverseSequence::computeMsdForAtomProperties(
   // this is a highly inefficient algorithm, but no idea how to do better
   // (except for omitting some data, skipping the graph, or other minor
   // optimizations)
-  const int stepSize =
+  const size_t stepSize = static_cast<size_t>(
     std::max(1,
-             static_cast<int>(
-               std::floor((this->getLength() - startingIndex) / nrOfOrigins)));
-  Eigen::VectorXd distance = Eigen::VectorXd::Zero(3 * atomIds.size());
+             static_cast<int>(std::floor(
+               static_cast<double>(this->getLength() - startingIndex) /
+               static_cast<double>(nrOfOrigins)))));
+  Eigen::VectorXd distance =
+    Eigen::VectorXd::Zero(static_cast<Eigen::Index>(3 * atomIds.size()));
   for (size_t parent_universe_idx = startingIndex;
        parent_universe_idx < this->getLength();
        parent_universe_idx += stepSize) {
@@ -800,8 +808,9 @@ UniverseSequence::computeMsdForAtomProperties(
       double localMean = 0.0;
       double localMeanDenominator = 1. / static_cast<double>(atomIds.size());
       for (size_t atom_id = 0; atom_id < atomIds.size(); ++atom_id) {
-        localMean +=
-          distance.segment(3 * atom_id, 3).squaredNorm() * localMeanDenominator;
+        localMean += distance.segment(static_cast<Eigen::Index>(3 * atom_id), 3)
+                       .squaredNorm() *
+                     localMeanDenominator;
       }
       results[delta_t].push_back(localMean);
     }
@@ -818,7 +827,8 @@ UniverseSequence::computeMsdForAtomProperties(
       continue;
     }
     actual_means[result_pair.first] =
-      (Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(sds.data(), sds.size()))
+      (Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
+         sds.data(), static_cast<Eigen::Index>(sds.size())))
         .mean();
   }
 
@@ -888,18 +898,18 @@ UniverseSequence::computeMsdForAtomsFromDumpFile(
   std::vector<Eigen::VectorXd> coordinates;
   coordinates.reserve(this->getLength() - startingIndex);
   for (size_t i = startingIndex; i < this->getLength(); ++i) {
-    std::unordered_map<long int, int> atomIdToAtomIndex;
+    std::unordered_map<long int, size_t> atomIdToAtomIndex;
     atomIdToAtomIndex.reserve(atoms[i].size());
     for (size_t j = 0; j < atoms[i].size(); ++j) {
       atomIdToAtomIndex[atoms[i][j].getId()] = j;
     }
     Eigen::VectorXd localCoordinates =
-      Eigen::VectorXd::Zero(3 * atomIds.size());
+      Eigen::VectorXd::Zero(static_cast<Eigen::Index>(3 * atomIds.size()));
     for (size_t j = 0; j < atomIds.size(); ++j) {
       Atom atom = atoms[i][atomIdToAtomIndex.at(atomIds[j])];
       Eigen::Vector3d coords;
       atom.getUnwrappedCoordinates<Eigen::Vector3d>(coords, boxes[i]);
-      localCoordinates.segment(3 * j, 3) = coords;
+      localCoordinates.segment(static_cast<Eigen::Index>(3 * j), 3) = coords;
     }
     coordinates.push_back(localCoordinates);
   }
@@ -912,11 +922,13 @@ UniverseSequence::computeMsdForAtomsFromDumpFile(
   // this is a highly inefficient algorithm, but no idea how to do better
   // (except for omitting some data, skipping the graph, or other minor
   // optimizations)
-  const int stepSize =
+  const size_t stepSize = static_cast<size_t>(
     std::max(1,
-             static_cast<int>(
-               std::floor((this->getLength() - startingIndex) / nrOfOrigins)));
-  Eigen::VectorXd distance = Eigen::VectorXd::Zero(3 * atomIds.size());
+             static_cast<int>(std::floor(
+               static_cast<double>(this->getLength() - startingIndex) /
+               static_cast<double>(nrOfOrigins)))));
+  Eigen::VectorXd distance =
+    Eigen::VectorXd::Zero(static_cast<Eigen::Index>(3 * atomIds.size()));
   for (size_t parent_universe_idx = startingIndex;
        parent_universe_idx < this->getLength();
        parent_universe_idx += stepSize) {
@@ -944,8 +956,9 @@ UniverseSequence::computeMsdForAtomsFromDumpFile(
       double localMean = 0.0;
       double localMeanDenominator = 1. / static_cast<double>(atomIds.size());
       for (size_t atom_id = 0; atom_id < atomIds.size(); ++atom_id) {
-        localMean +=
-          distance.segment(3 * atom_id, 3).squaredNorm() * localMeanDenominator;
+        localMean += distance.segment(static_cast<Eigen::Index>(3 * atom_id), 3)
+                       .squaredNorm() *
+                     localMeanDenominator;
       }
       results[delta_t].push_back(localMean);
     }
@@ -962,7 +975,8 @@ UniverseSequence::computeMsdForAtomsFromDumpFile(
       continue;
     }
     actual_means[result_pair.first] =
-      (Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(sds.data(), sds.size()))
+      (Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
+         sds.data(), static_cast<Eigen::Index>(sds.size())))
         .mean();
   }
 
@@ -985,7 +999,8 @@ UniverseSequence::computeMsdForAtomsFromDataFiles(
   int max_tau)
 {
   igraph_vector_int_t vertex_ids;
-  igraph_vector_int_init(&vertex_ids, atomIds.size());
+  igraph_vector_int_init(&vertex_ids,
+                         static_cast<igraph_int_t>(atomIds.size()));
   pylimer_tools::entities::Universe initialUniverse = this->atIndex(0);
   for (long int atomId : atomIds) {
     igraph_vector_int_push_back(&vertex_ids,
@@ -1026,9 +1041,12 @@ UniverseSequence::computeMsdForAtomsFromDataFiles(
   // this is a highly inefficient algorithm, but no idea how to do better
   // (except for omitting some data, skipping the graph, or other minor
   // optimizations)
-  const int stepSize =
-    std::max(1, static_cast<int>(std::floor(this->getLength() / nrOfOrigins)));
-  Eigen::VectorXd distance = Eigen::VectorXd::Zero(3 * atomIds.size());
+  const size_t stepSize = static_cast<size_t>(std::max(
+    1,
+    static_cast<int>(std::floor(static_cast<double>(this->getLength()) /
+                                static_cast<double>(nrOfOrigins)))));
+  Eigen::VectorXd distance =
+    Eigen::VectorXd::Zero(static_cast<Eigen::Index>(3 * atomIds.size()));
   for (size_t parent_universe_idx = 0; parent_universe_idx < this->getLength();
        parent_universe_idx += stepSize) {
 
@@ -1046,7 +1064,8 @@ UniverseSequence::computeMsdForAtomsFromDataFiles(
       distance = coordinates[parent_universe_idx] - coordinates[universe_idx];
       for (size_t atom_id = 0; atom_id < atomIds.size(); ++atom_id) {
         results[delta_t].push_back(
-          distance.segment(3 * atom_id, 3).squaredNorm());
+          distance.segment(static_cast<Eigen::Index>(3 * atom_id), 3)
+            .squaredNorm());
       }
     }
     std::cout << "Universe " << parent_universe_idx
@@ -1063,7 +1082,8 @@ UniverseSequence::computeMsdForAtomsFromDataFiles(
       continue;
     }
     actual_means[result_pair.first] =
-      (Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(sds.data(), sds.size()))
+      (Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
+         sds.data(), static_cast<Eigen::Index>(sds.size())))
         .mean();
   }
 

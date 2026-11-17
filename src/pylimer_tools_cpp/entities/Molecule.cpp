@@ -200,11 +200,14 @@ Molecule::computeEndToEndVectorWithDerivedImageFlags(
     return Eigen::Vector3d::Zero();
   }
 
-  Eigen::VectorXd coordinates = Eigen::VectorXd(vertices.size() * 3);
+  Eigen::VectorXd coordinates =
+    Eigen::VectorXd(static_cast<Eigen::Index>(vertices.size() * 3));
   this->getAssumedVertexCoordinates(coordinates, this->parent, vertices);
 
-  Eigen::Vector3d distance = coordinates.segment(3 * (vertices.size() - 1), 3) -
-                             coordinates.segment(0, 3);
+  Eigen::Vector3d distance =
+    coordinates.segment(static_cast<Eigen::Index>(3 * (vertices.size() - 1)),
+                        3) -
+    coordinates.segment(0, 3);
   // For closed loops within the same periodic box, floating-point accumulation
   // along the loop can leave ~1e-15 residual; clamp to exact zero so
   // non-winding primary loops are excluded consistently.
@@ -380,7 +383,7 @@ Molecule::computeRadiusOfGyrationWithDerivedImageFlags() const
   // Atom lastAtom = this->getAtomByVertexIdx(vertices[0]);
   std::vector<int> atomTypes = this->getPropertyValues<int>("type", vertices);
   Eigen::VectorXd assumedCoordinates =
-    Eigen::VectorXd::Zero(vertices.size() * 3);
+    Eigen::VectorXd::Zero(static_cast<Eigen::Index>(vertices.size() * 3));
   this->getAssumedVertexCoordinates<Eigen::VectorXd>(
     assumedCoordinates, this->parent, vertices);
   double totalMass = 0.0;
@@ -390,7 +393,8 @@ Molecule::computeRadiusOfGyrationWithDerivedImageFlags() const
     double localMultiplier = multiplier * this->massPerType.at(atomTypes[i]);
 
     totalMass += this->massPerType.at(atomTypes[i]);
-    meanCoords += localMultiplier * assumedCoordinates.segment(3 * i, 3);
+    meanCoords += localMultiplier * assumedCoordinates.segment(
+                                      static_cast<Eigen::Index>(3 * i), 3);
   }
 
   // use it to compute the r_g
@@ -400,7 +404,8 @@ Molecule::computeRadiusOfGyrationWithDerivedImageFlags() const
   for (size_t i = 0; i < vertices.size(); ++i) {
     double localMultiplier = multiplier * this->massPerType.at(atomTypes[i]);
     Eigen::Vector3d distanceFromMean =
-      assumedCoordinates.segment(3 * i, 3) - meanCoords;
+      assumedCoordinates.segment(static_cast<Eigen::Index>(3 * i), 3) -
+      meanCoords;
     Rg2 += localMultiplier * distanceFromMean.squaredNorm();
   }
 
@@ -417,10 +422,11 @@ std::vector<Atom>
 Molecule::getAtoms() const
 {
   std::vector<Atom> results;
-  size_t nrOfAtoms = this->getNrOfAtoms();
+  const size_t nrOfAtoms = static_cast<size_t>(this->getNrOfAtoms());
   results.reserve(nrOfAtoms);
   for (size_t i = 0; i < nrOfAtoms; ++i) {
-    results.push_back(this->getAtomByVertexIdx(i));
+    results.push_back(
+      this->getAtomByVertexIdx(static_cast<igraph_integer_t>(i)));
   }
 
   return results;
@@ -505,13 +511,15 @@ Molecule::getOverallBondSum(const int crossLinkerType,
 {
   std::vector<igraph_integer_t> alignedVertices =
     this->getVerticesLinedUp(crossLinkerType, closeLoop);
-  Eigen::VectorXd alignedCoordinates =
-    Eigen::VectorXd::Zero(3 * alignedVertices.size());
+  Eigen::VectorXd alignedCoordinates = Eigen::VectorXd::Zero(
+    static_cast<Eigen::Index>(3 * alignedVertices.size()));
   this->getAssumedVertexCoordinates(
     alignedCoordinates, this->parent, alignedVertices);
   Eigen::Vector3d result = Eigen::Vector3d::Zero();
-  for (size_t i = 1; i < alignedVertices.size(); ++i) {
-    Eigen::Vector3d distance = alignedCoordinates.segment((i) * 3, 3) -
+  for (Eigen::Index i = 1;
+       i < static_cast<Eigen::Index>(alignedVertices.size());
+       ++i) {
+    Eigen::Vector3d distance = alignedCoordinates.segment(i * 3, 3) -
                                alignedCoordinates.segment((i - 1) * 3, 3);
     this->parent.handlePBC(distance);
     result += distance;
@@ -539,8 +547,10 @@ Molecule::getOverallBondSumFromTo(const size_t atomIdFrom,
                                   const int crossLinkerType,
                                   const bool requireOrder) const
 {
-  igraph_integer_t vertexIdFrom = this->atomIdToVertexIdx.at(atomIdFrom);
-  igraph_integer_t vertexIdTo = this->atomIdToVertexIdx.at(atomIdTo);
+  igraph_integer_t vertexIdFrom =
+    this->atomIdToVertexIdx.at(static_cast<long int>(atomIdFrom));
+  igraph_integer_t vertexIdTo =
+    this->atomIdToVertexIdx.at(static_cast<long int>(atomIdTo));
   std::vector<igraph_integer_t> alignedVertices =
     this->getVerticesLinedUp(crossLinkerType, true);
 
@@ -548,16 +558,17 @@ Molecule::getOverallBondSumFromTo(const size_t atomIdFrom,
     return Eigen::Vector3d::Zero();
   }
 
-  Eigen::VectorXd alignedCoordinates =
-    Eigen::VectorXd::Zero(3 * alignedVertices.size());
+  Eigen::VectorXd alignedCoordinates = Eigen::VectorXd::Zero(
+    static_cast<Eigen::Index>(3 * alignedVertices.size()));
   this->getAssumedVertexCoordinates(
     alignedCoordinates, this->parent, alignedVertices);
   Eigen::Vector3d result = Eigen::Vector3d::Zero();
   bool recording = false;
   for (size_t i = 0; i < alignedVertices.size(); ++i) {
     if (recording) {
-      Eigen::Vector3d distance = alignedCoordinates.segment((i) * 3, 3) -
-                                 alignedCoordinates.segment((i - 1) * 3, 3);
+      Eigen::Vector3d distance =
+        alignedCoordinates.segment(static_cast<Eigen::Index>(i * 3), 3) -
+        alignedCoordinates.segment(static_cast<Eigen::Index>((i - 1) * 3), 3);
       this->parent.handlePBC(distance);
       result += distance;
 
@@ -589,17 +600,18 @@ Molecule::getNrOfBondsFromTo(const size_t atomIdFrom,
 {
   std::vector<igraph_integer_t> alignedVertices =
     this->getVerticesLinedUp(crossLinkerType, true);
-  size_t vertexIdFrom = this->atomIdToVertexIdx.at(atomIdFrom);
-  size_t vertexIdTo = this->atomIdToVertexIdx.at(atomIdTo);
+  const igraph_integer_t vertexIdFrom =
+    this->atomIdToVertexIdx.at(static_cast<long int>(atomIdFrom));
+  const igraph_integer_t vertexIdTo =
+    this->atomIdToVertexIdx.at(static_cast<long int>(atomIdTo));
   bool recording = false;
   size_t result = 0;
   for (igraph_integer_t alignedVertex : alignedVertices) {
     if (recording) {
       result += 1;
 
-      if ((alignedVertex == static_cast<igraph_integer_t>(vertexIdFrom) &&
-           !requireOrder) ||
-          alignedVertex == static_cast<igraph_integer_t>(vertexIdTo)) {
+      if ((alignedVertex == vertexIdFrom && !requireOrder) ||
+          alignedVertex == vertexIdTo) {
         return result;
       }
     }
@@ -631,7 +643,7 @@ Molecule::getVerticesLinedUp(const int crossLinkerType,
                              const bool closeLoop) const
 {
   std::vector<igraph_integer_t> results;
-  size_t nrOfAtoms = this->getNrOfAtoms();
+  const size_t nrOfAtoms = static_cast<size_t>(this->getNrOfAtoms());
   results.reserve(nrOfAtoms);
 
   if (nrOfAtoms == 1) {
@@ -670,7 +682,8 @@ Molecule::getVerticesLinedUp(const int crossLinkerType,
           std::to_string(subConnections.size()) +
           " was found and 1 or 2 expected.");
 
-      int subConnectionDirection = (subConnections[0] == lastCenter) ? 1 : 0;
+      const size_t subConnectionDirection =
+        (subConnections[0] == lastCenter) ? 1 : 0;
       if (subConnections[subConnectionDirection] == vertexIdToStartWith) {
         loopFound = true;
         break;

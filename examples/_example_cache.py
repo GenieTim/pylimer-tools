@@ -57,8 +57,7 @@ def get_example_cache_path(
                 return (p / "data" / filename).resolve()
             # Check p/examples/<example_folder>/data/filename
             if (p / "examples" / example_folder / "data" / filename).is_file():
-                return (p / "examples" / example_folder /
-                        "data" / filename).resolve()
+                return (p / "examples" / example_folder / "data" / filename).resolve()
             # Check p/<example_folder>/data/filename
             if (p / example_folder / "data" / filename).is_file():
                 return (p / example_folder / "data" / filename).resolve()
@@ -270,8 +269,7 @@ def should_recompute(recompute_flag: bool = False) -> bool:
         return True
     if "--recompute" in sys.argv:
         return True
-    if os.environ.get("PYLIMER_RECOMPUTE_CACHE",
-                      "").lower() in ("1", "true", "yes"):
+    if os.environ.get("PYLIMER_RECOMPUTE_CACHE", "").lower() in ("1", "true", "yes"):
         return True
     return False
 

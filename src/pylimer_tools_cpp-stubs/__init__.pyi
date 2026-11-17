@@ -5516,4 +5516,4 @@ DIRECT_LLT: RouseSolverType  # value = <RouseSolverType.DIRECT_LLT: 1>
 STOP: BackTrackStatus  # value = <BackTrackStatus.STOP: 0>
 TRACK_BACKWARD: BackTrackStatus  # value = <BackTrackStatus.TRACK_BACKWARD: 2>
 TRACK_FORWARD: BackTrackStatus  # value = <BackTrackStatus.TRACK_FORWARD: 1>
-__version__: str = '0.4.1'
+__version__: str = '0.6.0'

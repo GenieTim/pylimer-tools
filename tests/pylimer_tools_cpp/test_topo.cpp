@@ -33,15 +33,16 @@ TEST_CASE("Entanglement Detector can ignore soluble chains",
   std::vector<long int> bondTo;
   bondTo.reserve(nrOfBeads - 1);
   double offset = 10.0;
-  for (int i = 0; i < nrOfBeads; ++i) {
+  for (int i = 0; i < static_cast<int>(nrOfBeads); ++i) {
     xPositions.push_back(i * 1.0 + offset);
     yPositions.push_back(0.1 * static_cast<double>(i % 4 - i % 3) +
                          offset); // /!\ i needs to be int, not unsigned!
     zPositions.push_back(0.1 * static_cast<double>(i % 5 - i % 7) + offset); //
     atomIds.push_back(i + 1);
-    atomTypes.push_back(i % nrOfBeadsPerChain == 0 ? 2 : 1);
+    atomTypes.push_back(static_cast<size_t>(i) % nrOfBeadsPerChain == 0 ? 2
+                                                                        : 1);
     zeroInts.push_back(0);
-    if (i > 0 && !(i % nrOfBeadsPerChain == 0)) {
+    if (i > 0 && !(static_cast<size_t>(i) % nrOfBeadsPerChain == 0)) {
       bondFrom.push_back(i);
       bondTo.push_back(i + 1);
     }
@@ -103,8 +104,10 @@ TEST_CASE("Entanglement Detector enforces sameStrandCutoff on rings and "
     pt::AtomPairEntanglements es3 = pt::randomlyFindEntanglements(
       universe, 1, 5.0, 0.0, 1, 3.0, "ring_seed", 2, true, false);
     REQUIRE(es3.pairsOfAtoms.size() == 1);
-    const size_t v1 = universe.getIdxByAtomId(es3.pairsOfAtoms[0].first);
-    const size_t v2 = universe.getIdxByAtomId(es3.pairsOfAtoms[0].second);
+    const igraph_integer_t v1 =
+      universe.getIdxByAtomId(static_cast<long int>(es3.pairsOfAtoms[0].first));
+    const igraph_integer_t v2 = universe.getIdxByAtomId(
+      static_cast<long int>(es3.pairsOfAtoms[0].second));
     CHECK(universe.getPathLength(static_cast<long int>(v1),
                                  static_cast<long int>(v2)) >= 3);
 
@@ -141,10 +144,10 @@ TEST_CASE("Entanglement Detector enforces sameStrandCutoff on rings and "
       universe, 1, 5.0, 0.0, 1, 2.0, "loop_seed", 2, true, false);
     REQUIRE(es2.pairsOfAtoms.size() == 1);
     for (const std::pair<size_t, size_t>& pair : es2.pairsOfAtoms) {
-      const long int v1 =
-        static_cast<long int>(universe.getIdxByAtomId(pair.first));
-      const long int v2 =
-        static_cast<long int>(universe.getIdxByAtomId(pair.second));
+      const long int v1 = static_cast<long int>(
+        universe.getIdxByAtomId(static_cast<long int>(pair.first)));
+      const long int v2 = static_cast<long int>(
+        universe.getIdxByAtomId(static_cast<long int>(pair.second)));
       CHECK(universe.getPathLength(v1, v2) >= 2);
     }
   }
@@ -177,10 +180,12 @@ TEST_CASE("On-Demand Entanglement Detector samples valid entanglements on "
     cu.beadDistanceInStrand.push_back(0.96);
     cu.meanSquaredBeadDistanceInStrand.push_back(1.0);
     if (from >= 0) {
-      cu.strandsOfXlink[from].push_back(sIdx);
+      cu.strandsOfXlink[static_cast<size_t>(from)].push_back(
+        static_cast<long int>(sIdx));
     }
     if (to >= 0 && to != from) {
-      cu.strandsOfXlink[to].push_back(sIdx);
+      cu.strandsOfXlink[static_cast<size_t>(to)].push_back(
+        static_cast<long int>(sIdx));
     }
   };
 
@@ -260,8 +265,10 @@ TEST_CASE("On-Demand Entanglement Detector samples valid entanglements on "
         CHECK(contourDiff >= sameStrandCutoff);
       }
 
-      Eigen::Vector3d p1 = es1.position1.segment<3>(3 * e);
-      Eigen::Vector3d p2 = es1.position2.segment<3>(3 * e);
+      Eigen::Vector3d p1 =
+        es1.position1.segment<3>(3 * static_cast<Eigen::Index>(e));
+      Eigen::Vector3d p2 =
+        es1.position2.segment<3>(3 * static_cast<Eigen::Index>(e));
       Eigen::Vector3d diff = p2 - p1;
       box.handlePBC(diff);
       CHECK(diff.norm() >= lowerCutoff - 1e-9);
@@ -443,17 +450,23 @@ TEST_CASE("Universe toCrosslinkerUniverse and topological leaf peeling",
     REQUIRE(activeAtoms.size() == universe.getNrOfAtoms());
 
     // c0..c3 are active
-    CHECK(activeAtoms[universe.getIdxByAtomId(c0)] == true);
-    CHECK(activeAtoms[universe.getIdxByAtomId(c1)] == true);
-    CHECK(activeAtoms[universe.getIdxByAtomId(c2)] == true);
-    CHECK(activeAtoms[universe.getIdxByAtomId(c3)] == true);
+    CHECK(activeAtoms[static_cast<size_t>(universe.getIdxByAtomId(c0))] ==
+          true);
+    CHECK(activeAtoms[static_cast<size_t>(universe.getIdxByAtomId(c1))] ==
+          true);
+    CHECK(activeAtoms[static_cast<size_t>(universe.getIdxByAtomId(c2))] ==
+          true);
+    CHECK(activeAtoms[static_cast<size_t>(universe.getIdxByAtomId(c3))] ==
+          true);
 
     // c4 is a leaf crosslinker (degree 1) -> must be inactive
-    CHECK(activeAtoms[universe.getIdxByAtomId(c4)] == false);
+    CHECK(activeAtoms[static_cast<size_t>(universe.getIdxByAtomId(c4))] ==
+          false);
 
     // Soluble chain atoms must be inactive
     long int solEndId = atomIds.back();
-    CHECK(activeAtoms[universe.getIdxByAtomId(solEndId)] == false);
+    CHECK(activeAtoms[static_cast<size_t>(universe.getIdxByAtomId(solEndId))] ==
+          false);
   }
 
   SECTION("EntanglementFilteringMode behavior in randomlyFindEntanglements")
@@ -474,8 +487,10 @@ TEST_CASE("Universe toCrosslinkerUniverse and topological leaf peeling",
       pt::EntanglementFilteringMode::PRUNE_UPFRONT);
 
     for (const std::pair<size_t, size_t>& pair : upfront.pairsOfAtoms) {
-      size_t v1 = universe.getIdxByAtomId(pair.first);
-      size_t v2 = universe.getIdxByAtomId(pair.second);
+      size_t v1 = static_cast<size_t>(
+        universe.getIdxByAtomId(static_cast<long int>(pair.first)));
+      size_t v2 = static_cast<size_t>(
+        universe.getIdxByAtomId(static_cast<long int>(pair.second)));
       CHECK(activeAtoms[v1] == true);
       CHECK(activeAtoms[v2] == true);
     }

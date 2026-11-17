@@ -53,9 +53,7 @@ class TestEntityCalculations(unittest.TestCase):
                 coords_df["ny"].tolist(),
                 coords_df["nz"].tolist(),
             )
-            universe.add_bonds(
-                bonds_df["from"].tolist(),
-                bonds_df["to"].tolist())
+            universe.add_bonds(bonds_df["from"].tolist(), bonds_df["to"].tolist())
             self.assertEqual(len(universe.get_molecules(-1)), 1)
             molecule = universe.get_molecules(-1)[0]
             self.assertEqual(molecule.get_nr_of_atoms(), 3)
@@ -86,9 +84,7 @@ class TestEntityCalculations(unittest.TestCase):
             coords_df["ny"].tolist(),
             coords_df["nz"].tolist(),
         )
-        universe.add_bonds(
-            bonds_df["bondFrom"].tolist(),
-            bonds_df["to"].tolist())
+        universe.add_bonds(bonds_df["bondFrom"].tolist(), bonds_df["to"].tolist())
         molecules = universe.get_molecules(-1)
         self.assertEqual(len(molecules), 1)
         self.assertEqual(molecules[0].compute_end_to_end_distance(), 0)
@@ -116,9 +112,7 @@ class TestEntityCalculations(unittest.TestCase):
             coords_df["ny"].tolist(),
             coords_df["nz"].tolist(),
         )
-        universe.add_bonds(
-            bonds_df["bondFrom"].tolist(),
-            bonds_df["to"].tolist())
+        universe.add_bonds(bonds_df["bondFrom"].tolist(), bonds_df["to"].tolist())
         molecules = universe.get_molecules(-1)
         self.assertEqual(len(molecules), 1)
         self.assertRaises(
@@ -154,13 +148,10 @@ class TestEntityCalculations(unittest.TestCase):
                 coords_df["ny"].tolist(),
                 coords_df["nz"].tolist(),
             )
-            universe.add_bonds(
-                bonds_df["bondFrom"].tolist(),
-                bonds_df["to"].tolist())
+            universe.add_bonds(bonds_df["bondFrom"].tolist(), bonds_df["to"].tolist())
             self.assertEqual(len(universe.get_molecules(-1)), 1)
             self.assertEqual(
-                0.0, np.mean(universe.get_molecules(-1)
-                             [0].compute_bond_lengths())
+                0.0, np.mean(universe.get_molecules(-1)[0].compute_bond_lengths())
             )
 
 

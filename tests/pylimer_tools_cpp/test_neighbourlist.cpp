@@ -39,8 +39,10 @@ TEST_CASE("Random coordinates EigenNeighbourList",
 
     std::vector<size_t> relevantNeighbors;
     std::vector<size_t> relevantPairs;
-    for (size_t neigh_idx = 0; neigh_idx < numNeighbors; ++neigh_idx) {
-      const size_t j = neighbors[neigh_idx];
+    for (Eigen::Index neigh_idx = 0;
+         neigh_idx < static_cast<Eigen::Index>(numNeighbors);
+         ++neigh_idx) {
+      const int j = neighbors[neigh_idx];
       if (j <= i) {
         continue;
       }
@@ -52,9 +54,9 @@ TEST_CASE("Random coordinates EigenNeighbourList",
         continue;
       }
 
-      relevantNeighbors.push_back(j);
+      relevantNeighbors.push_back(static_cast<size_t>(j));
     }
-    for (size_t j = i + 1; j < numAtoms; ++j) {
+    for (int j = i + 1; j < numAtoms; ++j) {
       Eigen::Vector3d pairdistance =
         coordinates.segment(3 * i, 3) - coordinates.segment(3 * j, 3);
       box.handlePBC(pairdistance);
@@ -63,7 +65,7 @@ TEST_CASE("Random coordinates EigenNeighbourList",
         continue;
       }
 
-      relevantPairs.push_back(j);
+      relevantPairs.push_back(static_cast<size_t>(j));
     }
 
     CHECK(relevantPairs.size() == relevantNeighbors.size());
@@ -116,21 +118,24 @@ TEST_CASE("Manually accurate EigenNeighbourList",
   std::vector<pe::coordinate_idx_t> indices;
   Eigen::VectorXi bucketSizes = neighbourList.getNeighbourBucketSizes();
   for (size_t bucketIndex = 0; bucketIndex < buckets.size(); ++bucketIndex) {
-    CHECK(buckets[bucketIndex].size() == bucketSizes[bucketIndex]);
+    CHECK(
+      buckets[bucketIndex].size() ==
+      static_cast<size_t>(bucketSizes[static_cast<Eigen::Index>(bucketIndex)]));
     Eigen::Vector3d centralCoordinates =
       neighbourList.getCentralCoordinatesOfBucket(bucketIndex);
     indices = neighbourList.getCombinedBucketIndicesForCoordinates(
       centralCoordinates, 0.01);
     CHECK(indices.size() == 1);
-    CHECK(indices[0] == bucketIndex);
+    CHECK(static_cast<size_t>(indices[0]) == bucketIndex);
     // small enough cut-off to only query this one bucket
     Eigen::ArrayXi atomsInThisBucket =
       neighbourList.getIndicesCloseToCoordinates(centralCoordinates, 0.01);
-    CHECK(atomsInThisBucket.size() == bucketSizes[bucketIndex]);
+    CHECK(atomsInThisBucket.size() ==
+          bucketSizes[static_cast<Eigen::Index>(bucketIndex)]);
     int numA = neighbourList.getIndicesCloseToCoordinates(
       resizableResults, centralCoordinates, 0.01);
-    CHECK(numA == bucketSizes[bucketIndex]);
-    for (size_t i = 0; i < numA; ++i) {
+    CHECK(numA == bucketSizes[static_cast<Eigen::Index>(bucketIndex)]);
+    for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(numA); ++i) {
       CHECK(atomsInThisBucket[i] == resizableResults[i]);
     }
   }
@@ -166,7 +171,7 @@ TEST_CASE("EigenNeighbourList Works as intended",
     pe::EigenNeighbourList(coordinates, box, 1.1 * distanceBetweenAtoms);
 
   Eigen::ArrayXi neighbours;
-  for (size_t i = 0; i < 20; ++i) {
+  for (int i = 0; i < 20; ++i) {
     INFO("Checking neighbours within default distance of atom " << i);
     neighbourList.getIndicesCloseToCoordinates(neighbours,
                                                coordinates.segment(3 * i, 3),
@@ -178,7 +183,7 @@ TEST_CASE("EigenNeighbourList Works as intended",
     bool foundItself = false;
     bool foundBefore = false;
     bool foundAfter = false;
-    for (size_t j = 0; j < neighbours.size(); ++j) {
+    for (Eigen::Index j = 0; j < neighbours.size(); ++j) {
       foundItself = (neighbours[j] == i) || foundItself;
       foundBefore = (neighbours[j] == ((20 + (i - 1)) % 20)) || foundBefore;
       foundAfter = (neighbours[j] == ((i + 1) % 20)) || foundAfter;
@@ -198,7 +203,7 @@ TEST_CASE("EigenNeighbourList Works as intended",
     foundItself = false;
     foundBefore = false;
     foundAfter = false;
-    for (size_t j = 0; j < neighbours.size(); ++j) {
+    for (Eigen::Index j = 0; j < neighbours.size(); ++j) {
       foundItself = (neighbours[j] == i) || foundItself;
       foundBefore = (neighbours[j] == ((20 + (i - 1)) % 20)) || foundBefore;
       foundAfter = (neighbours[j] == ((i + 1) % 20)) || foundAfter;

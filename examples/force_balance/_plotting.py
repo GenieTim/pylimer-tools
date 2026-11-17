@@ -521,11 +521,8 @@ def plot_cutoff_residual_vs_rcut(data: Any) -> None:
     ax_res.axvline(b, color="#7570b3", linestyle="--")
     ax_res.axvline(default_cutoff, color="#e7298a", linestyle=":")
     ax_res.set_xlabel(r"Sampling Cut-off $r_{\mathrm{cut}}$ [distance units]")
-    ax_res.set_ylabel(
-        r"Initial Residual Norm $\|\mathbf{R}_{\mathrm{init}}\|$")
-    ax_res.set_title(
-        "(b) Topological Pre-Strain Distortion",
-        fontweight="bold")
+    ax_res.set_ylabel(r"Initial Residual Norm $\|\mathbf{R}_{\mathrm{init}}\|$")
+    ax_res.set_title("(b) Topological Pre-Strain Distortion", fontweight="bold")
     ax_res.grid(True, linestyle="--", alpha=0.5)
     ax_res.legend(fontsize=9, frameon=True)
     plt.tight_layout()
@@ -573,9 +570,7 @@ def plot_cutoff_strand_length_interaction(data: Any) -> None:
     ax_len.axvline(b, color="#7570b3", linestyle="--")
     ax_len.set_xlabel(r"Sampling Cut-off $r_{\mathrm{cut}}$ [distance units]")
     ax_len.set_ylabel(r"Normalized Modulus $G / G(r_{\mathrm{cut}}=1.2)$")
-    ax_len.set_title(
-        r"(c) Relative Inflation vs. Strand Length $N$",
-        fontweight="bold")
+    ax_len.set_title(r"(c) Relative Inflation vs. Strand Length $N$", fontweight="bold")
     ax_len.grid(True, linestyle="--", alpha=0.5)
     ax_len.legend(fontsize=9, frameon=True)
     plt.tight_layout()
@@ -1059,9 +1054,7 @@ def plot_inactive_solver_complexity(data: Any) -> None:
     )
 
     ax1.set_xlabel("Crosslinker Conversion $p$", fontsize=12)
-    ax1.set_ylabel(
-        "Linear System Dimension ($3 N_{\\text{links}}$)",
-        fontsize=12)
+    ax1.set_ylabel("Linear System Dimension ($3 N_{\\text{links}}$)", fontsize=12)
     ax1.set_title(
         "Degrees of Freedom in Sparse Force Balance",
         fontsize=13,
@@ -1265,10 +1258,7 @@ def plot_sampling_strand_length_scaling(data: Any) -> None:
             data.get(f"strlen_time_q25_{mode}"),
             data.get(f"strlen_time_q75_{mode}"),
         )
-        r_iqr = (
-            data.get(
-                f"strlen_rss_q25_{mode}"), data.get(
-                f"strlen_rss_q75_{mode}"))
+        r_iqr = (data.get(f"strlen_rss_q25_{mode}"), data.get(f"strlen_rss_q75_{mode}"))
         _plot_with_iqr(ax_sl_t, strlen_lens, t_vals, t_iqr, fmt, col, lbl)
         _plot_with_iqr(ax_sl_m, strlen_lens, r_vals, r_iqr, fmt, col, lbl)
 
@@ -1305,12 +1295,9 @@ def plot_sampling_phase_breakdown(data: Any) -> None:
 
     methods = ("discrete", "on_demand")
     labels = ["Discrete", "On-Demand"]
-    t_univ = np.array(
-        [float(data[f"scaling_time_universe_{m}"][-1]) for m in methods])
-    t_samp = np.array(
-        [float(data[f"scaling_time_sample_{m}"][-1]) for m in methods])
-    t_build = np.array(
-        [float(data[f"scaling_time_build_{m}"][-1]) for m in methods])
+    t_univ = np.array([float(data[f"scaling_time_universe_{m}"][-1]) for m in methods])
+    t_samp = np.array([float(data[f"scaling_time_sample_{m}"][-1]) for m in methods])
+    t_build = np.array([float(data[f"scaling_time_build_{m}"][-1]) for m in methods])
 
     fig, ax_ph = plt.subplots(figsize=(6.5, 4.5))
     x = np.arange(len(methods))
@@ -1331,12 +1318,7 @@ def plot_sampling_phase_breakdown(data: Any) -> None:
     )
     for xi, u_v, s_v, b_v in zip(x, t_univ, t_samp, t_build):
         tot = u_v + s_v + b_v
-        ax_ph.text(xi,
-                   tot * 1.02,
-                   f"{tot:.2f} s",
-                   ha="center",
-                   va="bottom",
-                   fontsize=9)
+        ax_ph.text(xi, tot * 1.02, f"{tot:.2f} s", ha="center", va="bottom", fontsize=9)
 
     ax_ph.set_xticks(x)
     ax_ph.set_xticklabels(labels)
@@ -1482,12 +1464,7 @@ def plot_sampling_conversion_sweep(data: Any) -> None:
             conversions, y, fmt, color=col, linewidth=2, markersize=6, label=lbl
         )
         if ci is not None:
-            ax_mod.fill_between(
-                conversions,
-                y - ci,
-                y + ci,
-                color=col,
-                alpha=0.18)
+            ax_mod.fill_between(conversions, y - ci, y + ci, color=col, alpha=0.18)
 
     ax_mod.set_xlabel(r"Crosslinker Conversion $p$")
     ax_mod.set_ylabel("Equilibrium Shear Modulus $G$ [kPa]")
@@ -1513,12 +1490,7 @@ def plot_sampling_conversion_sweep(data: Any) -> None:
             conversions, y, fmt, color=col, linewidth=2, markersize=6, label=lbl
         )
         if ci is not None:
-            ax_ent.fill_between(
-                conversions,
-                y - ci,
-                y + ci,
-                color=col,
-                alpha=0.18)
+            ax_ent.fill_between(conversions, y - ci, y + ci, color=col, alpha=0.18)
 
     ax_ent.axhline(
         target_n_ent,
@@ -1745,9 +1717,7 @@ def plot_rve_chain_length_study(data: Any) -> None:
 
     _style_rve_box_axis(ax1, box_lengths)
     ax1.set_ylabel(r"Shear Modulus $G$ [MPa]")
-    ax1.set_title(
-        f"Modulus Convergence vs. Box Size ($p=0.95, r=1.0, n={n_repeats}$)"
-    )
+    ax1.set_title(f"Modulus Convergence vs. Box Size ($p=0.95, r=1.0, n={n_repeats}$)")
     ax1.grid(True, which="both", linestyle="--", alpha=0.45)
     ax1.legend(frameon=True, fontsize=8.5)
 
@@ -1827,9 +1797,7 @@ def plot_rve_sample_count_study(data: Any) -> None:
     g_ci = data["s_g_total_ci"]
     n_samples_max = int(data.get("n_samples_study", 24))
 
-    sample_counts = np.array(
-        [2, 3, 4, 6, 8, 12, 16, 20, n_samples_max], dtype=int
-    )
+    sample_counts = np.array([2, 3, 4, 6, 8, 12, 16, 20, n_samples_max], dtype=int)
     sample_counts = sample_counts[sample_counts <= n_samples_max]
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4.8))
@@ -1859,9 +1827,7 @@ def plot_rve_sample_count_study(data: Any) -> None:
     ax1.set_yscale("log")
     ax1.set_xlabel(r"Number of Independent Samples $n_{\mathrm{samples}}$")
     ax1.set_ylabel(r"Relative 95% CI Half-Width [%]")
-    ax1.set_title(
-        r"Statistical Precision vs. Number of Samples ($N=100, p=0.925$)"
-    )
+    ax1.set_title(r"Statistical Precision vs. Number of Samples ($N=100, p=0.925$)")
     ax1.grid(True, which="both", linestyle="--", alpha=0.45)
     ax1.legend(frameon=True, fontsize=8, ncol=2)
 
@@ -1886,9 +1852,7 @@ def plot_rve_sample_count_study(data: Any) -> None:
         markersize=6,
         label=rf"95% CI half-width ($n={n_samples_max}$)",
     )
-    ax2.axhline(
-        2.0, color="black", linestyle=":", linewidth=1.1, label="2% threshold"
-    )
+    ax2.axhline(2.0, color="black", linestyle=":", linewidth=1.1, label="2% threshold")
     _style_rve_box_axis(ax2, box_lengths)
     ax2.set_yscale("log")
     ax2.set_ylabel("Relative Error [%]")

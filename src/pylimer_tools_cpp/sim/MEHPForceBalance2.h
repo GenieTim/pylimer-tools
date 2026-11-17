@@ -1165,10 +1165,13 @@ public:
                                      const size_t springIdx,
                                      const size_t linkIdx)
   {
-    assert(net.springIndexA[springIdx] == linkIdx ||
-           net.springIndexB[springIdx] == linkIdx);
-    return net.springIndexA[springIdx] == linkIdx ? net.springIndexB[springIdx]
-                                                  : net.springIndexA[springIdx];
+    const Eigen::Index sIdx = static_cast<Eigen::Index>(springIdx);
+    assert(net.springIndexA[sIdx] == static_cast<int>(linkIdx) ||
+           net.springIndexB[sIdx] == static_cast<int>(linkIdx));
+    return static_cast<size_t>(net.springIndexA[sIdx] ==
+                                   static_cast<int>(linkIdx)
+                                 ? net.springIndexB[sIdx]
+                                 : net.springIndexA[sIdx]);
   }
 
   /**
@@ -1181,7 +1184,8 @@ public:
   static Eigen::Vector3d getSpringBoxOffset(const ForceBalance2Network& net,
                                             const size_t partialSpringIdx)
   {
-    return net.springBoxOffset.segment(3 * partialSpringIdx, 3);
+    return net.springBoxOffset.segment(
+      3 * static_cast<Eigen::Index>(partialSpringIdx), 3);
   }
 
   /**
@@ -1197,7 +1201,8 @@ public:
                                        const size_t springIdx,
                                        const size_t linkIdx) const
   {
-    return (net.springIndexA(springIdx) == linkIdx)
+    return (net.springIndexA(static_cast<Eigen::Index>(springIdx)) ==
+            static_cast<int>(linkIdx))
              ? (-1. * this->getSpringBoxOffset(net, springIdx))
              : (this->getSpringBoxOffset(net, springIdx));
   }
@@ -1237,7 +1242,10 @@ public:
     const Eigen::Vector3d dist =
       this->evaluateSpringVector(net, u, springIdx, is2d);
 
-    return dist * (net.springIndexA(springIdx) == linkIdx ? -1. : 1.);
+    return dist * (net.springIndexA(static_cast<Eigen::Index>(springIdx)) ==
+                       static_cast<int>(linkIdx)
+                     ? -1.
+                     : 1.);
   }
 
   /**
@@ -1285,11 +1293,12 @@ public:
    */
   Eigen::VectorXd getWeightedSpringLengths() const
   {
-    Eigen::VectorXd weightedLengths =
-      Eigen::VectorXd(this->initialConfig.nrOfSprings);
+    Eigen::VectorXd weightedLengths = Eigen::VectorXd(
+      static_cast<Eigen::Index>(this->initialConfig.nrOfSprings));
     for (size_t i = 0; i < this->initialConfig.nrOfSprings; ++i) {
-      weightedLengths(i) = this->getWeightedSpringLength(
-        this->initialConfig, this->currentDisplacements, i);
+      weightedLengths(static_cast<Eigen::Index>(i)) =
+        this->getWeightedSpringLength(
+          this->initialConfig, this->currentDisplacements, i);
     }
 
     return weightedLengths;
@@ -1309,10 +1318,10 @@ public:
 
   Eigen::VectorXd getForceMagnitudeVector() const
   {
-    Eigen::VectorXd forceMagnitude =
-      Eigen::VectorXd::Zero(this->initialConfig.nrOfLinks);
+    Eigen::VectorXd forceMagnitude = Eigen::VectorXd::Zero(
+      static_cast<Eigen::Index>(this->initialConfig.nrOfLinks));
     for (size_t i = 0; i < this->initialConfig.nrOfLinks; ++i) {
-      forceMagnitude[i] = this->getForceOn(i).norm();
+      forceMagnitude[static_cast<Eigen::Index>(i)] = this->getForceOn(i).norm();
     }
     return forceMagnitude;
   }
@@ -1325,8 +1334,8 @@ public:
    */
   Eigen::Vector3d getForceOn(const size_t index) const
   {
-    Eigen::VectorXi debugNrSpringsVisited =
-      Eigen::VectorXi::Zero(this->initialConfig.nrOfSprings);
+    Eigen::VectorXi debugNrSpringsVisited = Eigen::VectorXi::Zero(
+      static_cast<Eigen::Index>(this->initialConfig.nrOfSprings));
     return this->evaluateForceOnLink(index,
                                      this->initialConfig,
                                      this->currentDisplacements,
@@ -1358,8 +1367,8 @@ public:
    */
   Eigen::Matrix3d getStressOn(const size_t linkIdx) const
   {
-    Eigen::VectorXi debugNrSpringsVisited =
-      Eigen::VectorXi::Zero(this->initialConfig.nrOfSprings);
+    Eigen::VectorXi debugNrSpringsVisited = Eigen::VectorXi::Zero(
+      static_cast<Eigen::Index>(this->initialConfig.nrOfSprings));
     return this->evaluateStressOnLink(linkIdx,
                                       this->initialConfig,
                                       this->currentDisplacements,
@@ -1651,9 +1660,10 @@ protected:
                                    const Eigen::VectorXd& u,
                                    const double tolerance = 1e-3) const
   {
-    Eigen::ArrayXb result = Eigen::ArrayXb::Constant(net.nrOfStrands, false);
+    Eigen::ArrayXb result = Eigen::ArrayXb::Constant(
+      static_cast<Eigen::Index>(net.nrOfStrands), false);
     Eigen::ArrayXb activeSprings = this->findActiveSprings(net, u, tolerance);
-    const size_t nActiveSprings = activeSprings.count();
+    const size_t nActiveSprings = static_cast<size_t>(activeSprings.count());
 
     for (size_t strandIdx = 0; strandIdx < net.nrOfStrands; ++strandIdx) {
       // without any springs, the strand is inactive
@@ -1662,8 +1672,9 @@ protected:
       }
       // with one spring, the strand is active if the spring is active
       if (net.springIndicesOfStrand[strandIdx].size() == 1) {
-        result[strandIdx] =
-          activeSprings[net.springIndicesOfStrand[strandIdx][0]];
+        result[static_cast<Eigen::Index>(strandIdx)] =
+          activeSprings[static_cast<Eigen::Index>(
+            net.springIndicesOfStrand[strandIdx][0])];
         continue;
       }
       // with more springs, the strand is certainly active,
@@ -1671,17 +1682,18 @@ protected:
       // (springs in between may be active due to the other involved strands)
       assert(
         !this->isLoopingSpring(net, net.springIndicesOfStrand[strandIdx][0]));
-      bool isActive0 = activeSprings[net.springIndicesOfStrand[strandIdx][0]];
+      bool isActive0 = activeSprings[static_cast<Eigen::Index>(
+        net.springIndicesOfStrand[strandIdx][0])];
       assert(!this->isLoopingSpring(
         net, net.springIndicesOfStrand[strandIdx].back()));
-      bool isActiveN =
-        activeSprings[net.springIndicesOfStrand[strandIdx].back()];
+      bool isActiveN = activeSprings[static_cast<Eigen::Index>(
+        net.springIndicesOfStrand[strandIdx].back())];
 
-      const bool isAnyActive =
-        std::ranges::any_of(net.springIndicesOfStrand[strandIdx],
-                            [&activeSprings](const long int springIdx) {
-                              return activeSprings[springIdx];
-                            });
+      const bool isAnyActive = std::ranges::any_of(
+        net.springIndicesOfStrand[strandIdx],
+        [&activeSprings](const size_t springIdx) {
+          return activeSprings[static_cast<Eigen::Index>(springIdx)];
+        });
       if (!isAnyActive) {
         continue;
       }
@@ -1698,7 +1710,8 @@ protected:
         }
         for (const size_t sIdx : net.strandIndicesOfLink[linkA]) {
           if (net.springIndicesOfStrand[sIdx].size() == 1 &&
-              net.springIsEntanglement[net.springIndicesOfStrand[sIdx][0]]) {
+              net.springIsEntanglement[static_cast<Eigen::Index>(
+                net.springIndicesOfStrand[sIdx][0])]) {
             const std::vector<size_t>& links = net.linkIndicesOfStrand[sIdx];
             if (links.size() == 2 && (links[0] == linkB || links[1] == linkB)) {
               return true;
@@ -1712,8 +1725,10 @@ protected:
         const size_t crossLinkIdx0 = net.linkIndicesOfStrand[strandIdx][0];
         const size_t entanglementLinkIdx0 =
           net.linkIndicesOfStrand[strandIdx][1];
-        assert(!net.linkIsEntanglement[crossLinkIdx0]);
-        assert(net.linkIsEntanglement[entanglementLinkIdx0]);
+        assert(
+          !net.linkIsEntanglement[static_cast<Eigen::Index>(crossLinkIdx0)]);
+        assert(net.linkIsEntanglement[static_cast<Eigen::Index>(
+          entanglementLinkIdx0)]);
         for (const size_t strandOfXlink :
              net.strandIndicesOfLink[crossLinkIdx0]) {
           if (strandOfXlink == strandIdx ||
@@ -1744,8 +1759,10 @@ protected:
           net
             .linkIndicesOfStrand[strandIdx]
                                 [net.linkIndicesOfStrand[strandIdx].size() - 2];
-        assert(!net.linkIsEntanglement[crossLinkIdxN]);
-        assert(net.linkIsEntanglement[entanglementLinkIdxN]);
+        assert(
+          !net.linkIsEntanglement[static_cast<Eigen::Index>(crossLinkIdxN)]);
+        assert(net.linkIsEntanglement[static_cast<Eigen::Index>(
+          entanglementLinkIdxN)]);
         for (const size_t strandOfXlink :
              net.strandIndicesOfLink[crossLinkIdxN]) {
           if (strandOfXlink == strandIdx ||
@@ -1773,24 +1790,25 @@ protected:
       // and mark the strand as inactive in that case
       if (net.linkIndicesOfStrand[strandIdx][0] !=
           net.linkIndicesOfStrand[strandIdx].back()) {
-        assert(!net.linkIsEntanglement[net.linkIndicesOfStrand[strandIdx][0]]);
+        assert(!net.linkIsEntanglement[static_cast<Eigen::Index>(
+          net.linkIndicesOfStrand[strandIdx][0])]);
         if (net.strandIndicesOfLink[net.linkIndicesOfStrand[strandIdx][0]]
               .size() == 1) {
           isActive0 = false;
         }
-        assert(
-          !net.linkIsEntanglement[net.linkIndicesOfStrand[strandIdx].back()]);
+        assert(!net.linkIsEntanglement[static_cast<Eigen::Index>(
+          net.linkIndicesOfStrand[strandIdx].back())]);
         if (net.strandIndicesOfLink[net.linkIndicesOfStrand[strandIdx].back()]
               .size() == 1) {
           isActiveN = false;
         }
       }
 
-      result[strandIdx] = isActive0 && isActiveN;
+      result[static_cast<Eigen::Index>(strandIdx)] = isActive0 && isActiveN;
     }
 
 #ifndef NDEBUG
-    const size_t nActiveStrands = result.count();
+    const size_t nActiveStrands = static_cast<size_t>(result.count());
     assert(nActiveStrands <= nActiveSprings);
 #endif
 
@@ -1822,15 +1840,22 @@ protected:
     INVALIDARG_EXP_IFN(dir >= 0 && dir < 3, "Invalid direction");
     Eigen::VectorXd partialSpringVectors =
       this->evaluateSpringVectors(net, u, this->is2D);
-    Eigen::ArrayXb result = Eigen::ArrayXb::Constant(net.nrOfStrands, false);
+    Eigen::ArrayXb result = Eigen::ArrayXb::Constant(
+      static_cast<Eigen::Index>(net.nrOfStrands), false);
 
     for (size_t i = 0; i < net.nrOfSprings; ++i) {
-      result[net.strandIndexOfSpring[i]] =
-        result[net.strandIndexOfSpring[i]] ||
+      const Eigen::Index sIdx = static_cast<Eigen::Index>(i);
+      const Eigen::Index strandIdx =
+        static_cast<Eigen::Index>(net.strandIndexOfSpring[sIdx]);
+      result[strandIdx] =
+        result[strandIdx] ||
         !this->distanceIsWithinTolerance(
-          Eigen::Vector3d(partialSpringVectors[3 * i + dir], 0, 0),
+          Eigen::Vector3d(
+            partialSpringVectors[3 * sIdx + static_cast<Eigen::Index>(dir)],
+            0,
+            0),
           tolerance,
-          net.springContourLength[i]);
+          net.springContourLength[sIdx]);
     }
 
     return result;
@@ -1853,15 +1878,17 @@ protected:
   Eigen::ArrayXb findActiveLinks(const double tolerance = 1e-3) const
   {
     Eigen::ArrayXb activeStrands = this->findActiveStrands(tolerance);
-    assert(activeStrands.size() == this->initialConfig.nrOfStrands);
+    assert(activeStrands.size() ==
+           static_cast<Eigen::Index>(this->initialConfig.nrOfStrands));
 
-    Eigen::ArrayXb activeLinks =
-      Eigen::ArrayXb::Constant(this->initialConfig.nrOfLinks, false);
-    for (size_t i = 0; i < activeStrands.size(); ++i) {
-      if (activeStrands[i]) {
-        activeLinks[this->initialConfig.linkIndicesOfStrand[i][0]] = true;
-        activeLinks[pylimer_tools::utils::last(
-          this->initialConfig.linkIndicesOfStrand[i])] = true;
+    Eigen::ArrayXb activeLinks = Eigen::ArrayXb::Constant(
+      static_cast<Eigen::Index>(this->initialConfig.nrOfLinks), false);
+    for (size_t i = 0; i < static_cast<size_t>(activeStrands.size()); ++i) {
+      if (activeStrands[static_cast<Eigen::Index>(i)]) {
+        activeLinks[static_cast<Eigen::Index>(
+          this->initialConfig.linkIndicesOfStrand[i][0])] = true;
+        activeLinks[static_cast<Eigen::Index>(pylimer_tools::utils::last(
+          this->initialConfig.linkIndicesOfStrand[i]))] = true;
       }
     }
 
@@ -1878,12 +1905,13 @@ protected:
   Eigen::ArrayXb findActiveNodes(const double tolerance = 1e-3) const
   {
     Eigen::ArrayXb activeLinks = this->findActiveLinks(tolerance);
-    Eigen::ArrayXb activeNodes =
-      Eigen::ArrayXb::Constant(this->initialConfig.nrOfNodes, false);
+    Eigen::ArrayXb activeNodes = Eigen::ArrayXb::Constant(
+      static_cast<Eigen::Index>(this->initialConfig.nrOfNodes), false);
     size_t nodeIdx = 0;
     for (size_t i = 0; i < this->initialConfig.nrOfLinks; ++i) {
-      if (!this->initialConfig.linkIsEntanglement[i]) {
-        activeNodes[nodeIdx] = activeLinks[i];
+      const Eigen::Index linkIdx = static_cast<Eigen::Index>(i);
+      if (!this->initialConfig.linkIsEntanglement[linkIdx]) {
+        activeNodes[static_cast<Eigen::Index>(nodeIdx)] = activeLinks[linkIdx];
         ++nodeIdx;
       }
     }
@@ -1906,11 +1934,15 @@ protected:
   {
     Eigen::VectorXd springVectors =
       this->evaluateSpringVectors(net, u, this->is2D);
-    Eigen::ArrayXb result = Eigen::ArrayXb::Constant(net.nrOfSprings, false);
+    Eigen::ArrayXb result = Eigen::ArrayXb::Constant(
+      static_cast<Eigen::Index>(net.nrOfSprings), false);
 
     for (size_t i = 0; i < net.nrOfSprings; ++i) {
-      result[i] = !this->distanceIsWithinTolerance(
-        springVectors.segment(3 * i, 3), tolerance, net.springContourLength[i]);
+      const Eigen::Index sIdx = static_cast<Eigen::Index>(i);
+      result[sIdx] =
+        !this->distanceIsWithinTolerance(springVectors.segment(3 * sIdx, 3),
+                                         tolerance,
+                                         net.springContourLength[sIdx]);
     }
 
     return result;
@@ -1946,14 +1978,16 @@ protected:
                              const size_t linkIdx,
                              const size_t springIdx)
   {
-    return (net.springIndexA[springIdx] == linkIdx) ||
-           (net.springIndexB[springIdx] == linkIdx);
+    const Eigen::Index sIdx = static_cast<Eigen::Index>(springIdx);
+    return (net.springIndexA[sIdx] == static_cast<int>(linkIdx)) ||
+           (net.springIndexB[sIdx] == static_cast<int>(linkIdx));
   }
 
   static bool isLoopingSpring(const ForceBalance2Network& net,
                               const size_t springIdx)
   {
-    return (net.springIndexA[springIdx] == net.springIndexB[springIdx]);
+    const Eigen::Index sIdx = static_cast<Eigen::Index>(springIdx);
+    return (net.springIndexA[sIdx] == net.springIndexB[sIdx]);
   }
 
   static bool isLoopingStrand(const ForceBalance2Network& net,

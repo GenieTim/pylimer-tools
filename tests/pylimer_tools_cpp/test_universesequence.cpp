@@ -129,7 +129,7 @@ TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]")
     std::unordered_map<long int, double> ree =
       universeSeq.computeDistanceAutocorrelationFromToAtoms(
         atomIdsFrom, atomIdsTo, 1, true);
-    for (size_t dt = 0; dt < 2; ++dt) {
+    for (long int dt = 0; dt < 2; ++dt) {
       CHECK(ree[dt + 1] == 0.0);
     }
     atomIdsFrom = { 70000 };
@@ -142,7 +142,7 @@ TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]")
       universe.getAtom(70000).getUnwrappedCoordinates(box);
     Eigen::Vector3d coords2 =
       universe.getAtom(80000).getUnwrappedCoordinates(box);
-    for (size_t dt = 0; dt < 2; ++dt) {
+    for (long int dt = 0; dt < 2; ++dt) {
       CHECK(ree[dt + 1] == Catch::Approx((coords2 - coords1).squaredNorm()));
     }
     // std::cout << "R_ee computation works." << std::endl;
@@ -167,7 +167,7 @@ TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]")
     }
     ree = universeSeq.computeDistanceAutocorrelationFromToAtoms(
       atomIdsFrom, atomIdsTo, 1, true);
-    for (size_t dt = 0; dt < 2; ++dt) {
+    for (long int dt = 0; dt < 2; ++dt) {
       double distMean = 0.0;
       for (size_t i = 0; i < atomIdsTo.size(); ++i) {
         coords1 = universe.getAtom(atomIdsFrom[i]).getUnwrappedCoordinates(box);

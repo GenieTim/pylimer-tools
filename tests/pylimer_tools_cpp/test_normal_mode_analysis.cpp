@@ -98,8 +98,8 @@ TEST_CASE("NormalModeAnalyzer computes correct eigenvalues",
 
   Eigen::Matrix3d assembledMatrix =
     normalModeAnalyzer.getAssembledConnectivityMatrix();
-  for (size_t i = 0; i < 3; ++i) {
-    for (size_t j = 0; j < 3; ++j) {
+  for (Eigen::Index i = 0; i < 3; ++i) {
+    for (Eigen::Index j = 0; j < 3; ++j) {
       CHECK(assembledMatrix(i, j) == (i == j ? 2 : -1));
     }
   }

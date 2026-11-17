@@ -416,21 +416,23 @@ namespace dpd {
                                    this->crossLinkerType) {
           // check if this is a bead that's connected to a crosslinker
           if (this->idxFunctionalities[i] == 2) {
-            const bool oneOfTheBeadsIsXlink =
-              std::ranges::any_of(this->bondsOfIndex[static_cast<size_t>(i)],
-                                  [&](const size_t bondIdx) {
-                                    if (bondIdx >= this->numBonds) {
-                                      return false;
-                                    }
-                                    assert(this->bondPartnersA[bondIdx] == i ||
-                                           this->bondPartnersB[bondIdx] == i);
-                                    return this->atomTypes[static_cast<size_t>(
-                                             this->bondPartnersA[bondIdx])] ==
-                                             this->crossLinkerType ||
-                                           this->atomTypes[static_cast<size_t>(
-                                             this->bondPartnersB[bondIdx])] ==
-                                             this->crossLinkerType;
-                                  });
+            const bool oneOfTheBeadsIsXlink = std::ranges::any_of(
+              this->bondsOfIndex[static_cast<size_t>(i)],
+              [&](const size_t bondIdx) {
+                if (bondIdx >= static_cast<size_t>(this->numBonds)) {
+                  return false;
+                }
+                const Eigen::Index bondEigenIdx =
+                  static_cast<Eigen::Index>(bondIdx);
+                assert(this->bondPartnersA[bondEigenIdx] == i ||
+                       this->bondPartnersB[bondEigenIdx] == i);
+                return this->atomTypes[static_cast<size_t>(
+                         this->bondPartnersA[bondEigenIdx])] ==
+                         this->crossLinkerType ||
+                       this->atomTypes[static_cast<size_t>(
+                         this->bondPartnersB[bondEigenIdx])] ==
+                         this->crossLinkerType;
+              });
             if (oneOfTheBeadsIsXlink) {
               this->isRelocationTarget[i] = true;
               this->chainEndIndices.push_back(static_cast<size_t>(i));

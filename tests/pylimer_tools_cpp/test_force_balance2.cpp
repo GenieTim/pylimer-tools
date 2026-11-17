@@ -58,15 +58,15 @@ TEST_CASE("MEHP Force Balance2 runs", "[analysis][MEHPForceBalance2][long]")
           Catch::Approx(nrOfChains));
     pcm::MEHPForceBalance2 forceBalancer2 =
       pcm::MEHPForceBalance2(universe2, 2);
-    size_t nStrandsFb = forceBalancer2.getNrOfStrands();
+    size_t nStrandsFb = static_cast<size_t>(forceBalancer2.getNrOfStrands());
     CHECK(nStrandsFb <= nrOfChains);
-    size_t nSpringsFb = forceBalancer2.getNrOfSprings();
+    size_t nSpringsFb = static_cast<size_t>(forceBalancer2.getNrOfSprings());
     CHECK(nSpringsFb <= nrOfChains);
 
     Eigen::Matrix3d stressTensor1 = forceBalancer2.getStressTensor();
     Eigen::Matrix3d stressTensor2 = forceBalancer2.getStressTensorLinkBased();
-    for (size_t i = 0; i < 3; ++i) {
-      for (size_t j = 0; j < 3; ++j) {
+    for (Eigen::Index i = 0; i < 3; ++i) {
+      for (Eigen::Index j = 0; j < 3; ++j) {
         CHECK(stressTensor1(i, j) == Catch::Approx(stressTensor2(i, j)));
       }
     }
@@ -97,8 +97,8 @@ TEST_CASE("MEHP Force Balance2 runs", "[analysis][MEHPForceBalance2][long]")
       // run force relaxation
       CHECK_NOTHROW(forceBalancer2.runForceRelaxation());
       CHECK_NOTHROW(forceBalancer2.validateNetwork());
-      CHECK(forceBalancer2.getNrOfStrands() == nStrandsFb);
-      CHECK(forceBalancer2.getNrOfSprings() == nSpringsFb);
+      CHECK(static_cast<size_t>(forceBalancer2.getNrOfStrands()) == nStrandsFb);
+      CHECK(static_cast<size_t>(forceBalancer2.getNrOfSprings()) == nSpringsFb);
       CHECK(forceBalancer2.getNrOfIterations() > 1);
       CHECK(forceBalancer2.getResidual() < 1e-5);
       CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
@@ -161,7 +161,7 @@ TEST_CASE("MEHP Force Balance2 runs", "[analysis][MEHPForceBalance2][long]")
              forceBalancer2.getNrOfActiveStrandsInDir(2)));
       CHECK(forceBalancer2.getAverageStrandLength() > 1.0);
       CHECK(forceBalancer2.getEffectiveFunctionalityOfAtoms().size() ==
-            forceBalancer2.getNrOfNodes());
+            static_cast<size_t>(forceBalancer2.getNrOfNodes()));
     }
   }
 
@@ -180,7 +180,8 @@ TEST_CASE("MEHP Force Balance2 runs", "[analysis][MEHPForceBalance2][long]")
     CHECK(forceBalancer.getNrOfIterations() == 0);
     CHECK(forceBalancer.getVolume() == Catch::Approx(universe.getVolume()));
     forceBalancer.runForceRelaxation();
-    CHECK(forceBalancer.getNrOfNodes() < universe.getNrOfAtoms());
+    CHECK(static_cast<size_t>(forceBalancer.getNrOfNodes()) <
+          universe.getNrOfAtoms());
     CHECK(forceBalancer.getNrOfIterations() >= 1);
     CHECK(universe.getAtomsOfType(2).size() == 7200);
     CHECK_NOTHROW(forceBalancer.validateNetwork());
@@ -197,11 +198,13 @@ TEST_CASE("MEHP Force Balance2 runs", "[analysis][MEHPForceBalance2][long]")
     CHECK(forceBalancer.getNrOfActiveStrands() > 1);
     CHECK(forceBalancer.getAverageStrandLength() > 1.0);
     CHECK(forceBalancer.getEffectiveFunctionalityOfAtoms().size() ==
-          forceBalancer.getNrOfNodes());
+          static_cast<size_t>(forceBalancer.getNrOfNodes()));
 
     pe::Universe universe3 = forceBalancer.getCrosslinkerVerse();
-    CHECK(universe3.getNrOfAtoms() == forceBalancer.getNrOfNodes());
-    CHECK(universe3.getNrOfBonds() == forceBalancer.getNrOfStrands());
+    CHECK(universe3.getNrOfAtoms() ==
+          static_cast<size_t>(forceBalancer.getNrOfNodes()));
+    CHECK(universe3.getNrOfBonds() ==
+          static_cast<size_t>(forceBalancer.getNrOfStrands()));
     CHECK(universe3.getAtomsOfType(2).size() == universe3.getNrOfAtoms());
   }
 }
@@ -228,8 +231,8 @@ TEST_CASE(
   std::cout << "Read file. " << std::endl;
   pcm::MEHPForceBalance2 forceBalancer =
     pcm::MEHPForceBalance2(universe, 250, 2.0, 0.0, 100);
-  size_t nrOfAddedLinks =
-    forceBalancer.getNrOfLinks() - forceBalancer.getNrOfNodes();
+  size_t nrOfAddedLinks = static_cast<size_t>(forceBalancer.getNrOfLinks()) -
+                          static_cast<size_t>(forceBalancer.getNrOfNodes());
   CHECK(nrOfAddedLinks >= 50);
   CHECK_NOTHROW(forceBalancer.validateNetwork());
   std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
@@ -287,8 +290,8 @@ TEST_CASE("MEHP Force Balance2 can randomly add and remove entanglements",
   std::cout << "Read file. " << std::endl;
   pcm::MEHPForceBalance2 forceBalancer =
     pcm::MEHPForceBalance2(universe, 1000, 2.0, 0.0, 100);
-  size_t nrOfAddedLinks =
-    forceBalancer.getNrOfLinks() - forceBalancer.getNrOfNodes();
+  size_t nrOfAddedLinks = static_cast<size_t>(forceBalancer.getNrOfLinks()) -
+                          static_cast<size_t>(forceBalancer.getNrOfNodes());
   CHECK(nrOfAddedLinks >= 100);
   // std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
 
@@ -314,7 +317,8 @@ TEST_CASE("MEHP Force Balance2 can randomly add and remove entanglements",
 
   ////////////////////////////////////////////////////////////////
   forceBalancer = pcm::MEHPForceBalance2(universe, 1000, 2.0, 0.0, 100);
-  nrOfAddedLinks = forceBalancer.getNrOfLinks() - forceBalancer.getNrOfNodes();
+  nrOfAddedLinks = static_cast<size_t>(forceBalancer.getNrOfLinks()) -
+                   static_cast<size_t>(forceBalancer.getNrOfNodes());
   CHECK(nrOfAddedLinks >= 100);
   // std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
   // check that all f = 2 have already been removed
@@ -393,14 +397,15 @@ TEST_CASE("MEHP Force Balance2 Free chains collapse",
   bondFrom.reserve(nrOfBeads - 1);
   std::vector<long int> bondTo;
   bondTo.reserve(nrOfBeads - 1);
-  for (int i = 0; i < nrOfBeads; ++i) {
+  for (int i = 0; i < static_cast<int>(nrOfBeads); ++i) {
     const double offset = 10.0;
     xPositions.push_back(i * 1.0 + offset);
     yPositions.push_back(0.1 * static_cast<double>(i % 4 - i % 3) +
                          offset); // /!\ i needs to be int, not unsigned!
     zPositions.push_back(0.1 * static_cast<double>(i % 5 - i % 7) + offset); //
     atomIds.push_back(i + 1);
-    atomTypes.push_back(i % nrOfBeadsPerChain == 0 ? 2 : 1);
+    atomTypes.push_back(static_cast<size_t>(i) % nrOfBeadsPerChain == 0 ? 2
+                                                                        : 1);
     zeroInts.push_back(0);
     if (i > 0) {
       bondFrom.push_back(i);
@@ -459,14 +464,15 @@ TEST_CASE("MEHP Force Balance2 Entanglement Beads Are Removed",
   std::vector<long int> bondFrom;
   std::vector<long int> bondTo;
   std::vector<int> bondTypes;
-  for (int i = 0; i < nrOfBeads; ++i) {
+  for (int i = 0; i < static_cast<int>(nrOfBeads); ++i) {
     const double offset = 10.0;
     xPositions.push_back(i * 1.0 + offset);
     yPositions.push_back(0.1 * static_cast<double>(i % 4 - i % 3) +
                          offset); // /!\ i needs to be int, not unsigned!
     zPositions.push_back(0.1 * static_cast<double>(i % 5 - i % 7) + offset); //
     atomIds.push_back(i + 1);
-    atomTypes.push_back(i % nrOfBeadsPerChain == 0 ? 2 : 1);
+    atomTypes.push_back(static_cast<size_t>(i) % nrOfBeadsPerChain == 0 ? 2
+                                                                        : 1);
     zeroInts.push_back(0);
     if (i > 0) {
       bondFrom.push_back(i);
@@ -561,7 +567,8 @@ TEST_CASE("MEHP Force Balance2 fully active chains are fully active",
     {
       pcm::MEHPForceBalance2 forceBalancer =
         pcm::MEHPForceBalance2(universe, 2, false);
-      size_t initialNSprings = forceBalancer.getNrOfStrands();
+      size_t initialNSprings =
+        static_cast<size_t>(forceBalancer.getNrOfStrands());
 
       CHECK(forceBalancer.getNrOfActiveStrands() ==
             forceBalancer.getNrOfStrands());
@@ -573,7 +580,8 @@ TEST_CASE("MEHP Force Balance2 fully active chains are fully active",
       CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
       CHECK(forceBalancer.getNrOfActiveStrands() ==
             forceBalancer.getNrOfStrands());
-      CHECK(forceBalancer.getNrOfStrands() == initialNSprings);
+      CHECK(static_cast<size_t>(forceBalancer.getNrOfStrands()) ==
+            initialNSprings);
       CHECK_THAT(forceBalancer.getActiveWeightFraction(),
                  Catch::Matchers::WithinRel(1.0));
       CHECK_THAT(forceBalancer.getSolubleWeightFraction(),
@@ -906,7 +914,7 @@ TEST_CASE("MEHP Force Balance2 correctly collapses melts even with random "
     CHECK(net0.nrOfStrands == 83);
     CHECK(net0.nrOfNodes == 2 * 83);
     for (size_t i = 0; i < net0.nrOfLinks; ++i) {
-      CHECK(!net0.linkIsEntanglement[i]);
+      CHECK(!net0.linkIsEntanglement[static_cast<Eigen::Index>(i)]);
       CHECK(net0.strandIndicesOfLink[i].size() == 1);
     }
 
@@ -938,7 +946,7 @@ TEST_CASE("MEHP Force Balance2 correctly collapses melts even with random "
     CHECK(net0.nrOfStrands == 83);
     CHECK(net0.nrOfNodes == 2 * 83);
     for (size_t i = 0; i < net0.nrOfLinks; ++i) {
-      if (!net0.linkIsEntanglement[i]) {
+      if (!net0.linkIsEntanglement[static_cast<Eigen::Index>(i)]) {
         CHECK(net0.strandIndicesOfLink[i].size() == 1);
         bool any =
           net0.linkIndicesOfStrand[net0.strandIndicesOfLink[i][0]][0] == i ||
@@ -972,7 +980,8 @@ TEST_CASE("MEHP Force Balance2 correctly collapses melts even with random "
     pcm::MEHPForceBalance2 forceBalancer = pcm::MEHPForceBalance2(
       universe, 1000, 2.0, 0.0, 100, 5, "my_seed_fb12", 2, false, false, true);
     pcm::ForceBalance2Network net0 = forceBalancer.getNetwork();
-    CHECK(net0.nrOfStrands == 83 + net0.springIsEntanglement.count());
+    CHECK(net0.nrOfStrands ==
+          83 + static_cast<size_t>(net0.springIsEntanglement.count()));
     CHECK(net0.nrOfNodes == 2 * 83);
 
     CHECK_NOTHROW(forceBalancer.validateNetwork());
@@ -1101,17 +1110,19 @@ TEST_CASE("MEHPForceBalance2 Bugfix Validations 1A.1 1A.2 1A.4",
   Eigen::VectorXd allStrandVectors =
     fb.evaluateStrandVectors(fb.getNetwork(), fb.getCurrentDisplacements());
   REQUIRE(allStrandVectors.size() == 3 * fb.getNrOfStrands());
-  for (size_t s = 0; s < fb.getNrOfStrands(); ++s) {
+  for (size_t s = 0; s < static_cast<size_t>(fb.getNrOfStrands()); ++s) {
     Eigen::Vector3d single =
       fb.evaluateStrandVector(fb.getNetwork(), fb.getCurrentDisplacements(), s);
-    Eigen::Vector3d fromAll = allStrandVectors.segment(3 * s, 3);
+    Eigen::Vector3d fromAll =
+      allStrandVectors.segment(3 * static_cast<Eigen::Index>(s), 3);
     CHECK(single.isApprox(fromAll));
   }
 
   // 1A.2: findSpringsAndLinksClusteredToActive size
   auto clustered = fb.findSpringsAndLinksClusteredToActive(
     fb.getNetwork(), fb.getCurrentDisplacements());
-  CHECK(clustered.second.size() == fb.getNetwork().nrOfLinks);
+  CHECK(static_cast<size_t>(clustered.second.size()) ==
+        fb.getNetwork().nrOfLinks);
 
   // 1A.4: getDisplacementResidualNormFor with kappa != 1.0
   fb.configSpringConstant(2.5);
@@ -1446,8 +1457,8 @@ TEST_CASE(
   REQUIRE(coordsZ.size() == coordsY.size());
   std::vector<long int> ids = {};
   ids.reserve(coordsX.size());
-  for (long int i = 0; i < coordsX.size(); ++i) {
-    ids.push_back(i);
+  for (size_t i = 0; i < coordsX.size(); ++i) {
+    ids.push_back(static_cast<long int>(i));
   }
   std::vector<int> types =
     pylimer_tools::utils::initializeWithValue(ids.size(), 1);
@@ -1580,9 +1591,9 @@ TEST_CASE(
   for (size_t i = 0; i < 40; ++i) {
     coords.push_back(
       i * 1.); // + 0.025 * (i % 3) + 0.025 * (i % 5) + 0.025 * (i % 7));
-    ids.push_back(i);
-    bondFrom.push_back(i);
-    bondTo.push_back((i + 1) % 40);
+    ids.push_back(static_cast<long int>(i));
+    bondFrom.push_back(static_cast<long int>(i));
+    bondTo.push_back(static_cast<long int>((i + 1) % 40));
   }
   std::vector<int> types =
     pylimer_tools::utils::initializeWithValue(ids.size(), 1);
@@ -1689,15 +1700,17 @@ TEST_CASE(
                Catch::Matchers::WithinRel(fb2.getForceOn(1).norm()));
 
     // more manual checks unfortunately coupled to implementation details
-    Eigen::ArrayXi expectedA = Eigen::ArrayXi::Zero(net2.nrOfSprings);
+    Eigen::ArrayXi expectedA =
+      Eigen::ArrayXi::Zero(static_cast<Eigen::Index>(net2.nrOfSprings));
     expectedA << 0, 1, 1, 1, 2, 3, 3, 2;
     CHECK(net2.springIndexA.isApprox(expectedA));
-    Eigen::ArrayXi expectedB = Eigen::ArrayXi::Zero(net2.nrOfSprings);
+    Eigen::ArrayXi expectedB =
+      Eigen::ArrayXi::Zero(static_cast<Eigen::Index>(net2.nrOfSprings));
     expectedB << 1, 0, 0, 2, 3, 3, 2, 0;
     CHECK(net2.springIndexB.isApprox(expectedB));
     Eigen::VectorXd springVectors2 =
       fb2.evaluateSpringVectors(net2, fb2.getCurrentDisplacements());
-    for (const size_t springIdx : { 0, 1, 2 }) {
+    for (const Eigen::Index springIdx : { 0, 1, 2 }) {
       CHECK(springVectors2.segment(springIdx * 3, 3)
               .cwiseAbs()
               .isApproxToConstant(2. - 0.));
@@ -1714,10 +1727,12 @@ TEST_CASE(
     // averaging positions of the two involved beads
     Eigen::VectorXd springVectors1 =
       fb1.evaluatePartialSpringVectors(net1, fb1.getCurrentDisplacements());
-    Eigen::ArrayXi expectedA1 = Eigen::ArrayXi::Zero(net1.nrOfPartialSprings);
+    Eigen::ArrayXi expectedA1 =
+      Eigen::ArrayXi::Zero(static_cast<Eigen::Index>(net1.nrOfPartialSprings));
     expectedA1 << 0, 0, 2, 3, 3, 2, 0, 0;
     CHECK(net1.springPartIndexA.isApprox(expectedA1));
-    Eigen::ArrayXi expectedB1 = Eigen::ArrayXi::Zero(net1.nrOfPartialSprings);
+    Eigen::ArrayXi expectedB1 =
+      Eigen::ArrayXi::Zero(static_cast<Eigen::Index>(net1.nrOfPartialSprings));
     expectedB1 << 1, 2, 3, 3, 2, 1, 1, 1;
     CHECK(net1.springPartIndexB.isApprox(expectedB1));
     CHECK(springVectors1.segment(0 * 3, 3).isApproxToConstant(2. - 0.));
@@ -1762,7 +1777,8 @@ TEST_CASE(
       fb1.evaluatePartialSpringVectors(net1, fb1.getCurrentDisplacements());
     Eigen::VectorXd springVectorsAfter2 =
       fb2.evaluateSpringVectors(net2, fb2.getCurrentDisplacements());
-    for (size_t i = 0; i < net2.nrOfLinks; ++i) {
+    for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(net2.nrOfLinks);
+         ++i) {
       // check that everything is on the diagonal
       CHECK(finalPositions1.segment(3 * i, 3).isApproxToConstant(
         finalPositions1[3 * i]));
@@ -1838,7 +1854,7 @@ TEST_CASE(
         net1, fb1.getCurrentDisplacements(), i);
       Eigen::Vector3d springVec2 =
         fb2.evaluateSpringVector(net2, fb2.getCurrentDisplacements(), i);
-      for (size_t dir = 0; dir < 3; ++dir) {
+      for (Eigen::Index dir = 0; dir < 3; ++dir) {
         CHECK_THAT(springVec1[dir],
                    Catch::Matchers::WithinRel(springVec2[dir], 1e-5));
       }
@@ -1871,7 +1887,7 @@ TEST_CASE(
         net1, fb1.getCurrentDisplacements(), i);
       Eigen::Vector3d springVec2 =
         fb2.evaluateSpringVector(net2, fb2.getCurrentDisplacements(), i);
-      for (size_t dir = 0; dir < 3; ++dir) {
+      for (Eigen::Index dir = 0; dir < 3; ++dir) {
         CHECK_THAT(springVec1[dir],
                    Catch::Matchers::WithinRel(springVec2[dir], 1e-5));
       }
@@ -1914,9 +1930,9 @@ TEST_CASE(
       coordsX.push_back(i);
       coordsY.push_back(y * 5.);
       assert(ids.size() == y * 10 + i);
-      ids.push_back(y * 10 + i);
-      bondFrom.push_back(y * 10 + i);
-      bondTo.push_back(y * 10 + ((i + 1) % (10)));
+      ids.push_back(static_cast<long int>(y * 10 + i));
+      bondFrom.push_back(static_cast<long int>(y * 10 + i));
+      bondTo.push_back(static_cast<long int>(y * 10 + ((i + 1) % (10))));
     }
   }
   // two horizontal "lines"
@@ -1925,7 +1941,7 @@ TEST_CASE(
       if (i != 5) {
         coordsX.push_back(x * 5.);
         coordsY.push_back(i);
-        ids.push_back(ids.size());
+        ids.push_back(static_cast<long int>(ids.size()));
       }
     }
   }
@@ -1937,9 +1953,9 @@ TEST_CASE(
   };
   for (size_t i = 0; i < additionalBonds.size(); ++i) {
     if (i % 2 == 0) {
-      bondFrom.push_back(additionalBonds[i]);
+      bondFrom.push_back(static_cast<long int>(additionalBonds[i]));
     } else {
-      bondTo.push_back(additionalBonds[i]);
+      bondTo.push_back(static_cast<long int>(additionalBonds[i]));
     }
   }
   // register types to make the two FBs equivalent
@@ -2019,10 +2035,14 @@ TEST_CASE(
     CHECK(net2.nrOfSprings == net2.nrOfStrands);
     CHECK(net1.nrOfSprings == 8);
     CHECK(net1.nrOfSprings == net1.nrOfPartialSprings);
-    CHECK(fb1_phantom.getNrOfActiveSprings() == net1.nrOfSprings);
-    CHECK(fb2_phantom.getNrOfActiveSprings() == net2.nrOfSprings);
-    CHECK(fb2_phantom.getNrOfActiveStrands() == net2.nrOfStrands);
-    CHECK(fb2_phantom.getNrOfActiveNodes() == net2.nrOfNodes);
+    CHECK(static_cast<size_t>(fb1_phantom.getNrOfActiveSprings()) ==
+          net1.nrOfSprings);
+    CHECK(static_cast<size_t>(fb2_phantom.getNrOfActiveSprings()) ==
+          net2.nrOfSprings);
+    CHECK(static_cast<size_t>(fb2_phantom.getNrOfActiveStrands()) ==
+          net2.nrOfStrands);
+    CHECK(static_cast<size_t>(fb2_phantom.getNrOfActiveNodes()) ==
+          net2.nrOfNodes);
     CHECK(net2.springContourLength.isApproxToConstant(5.));
 
     fb2_phantom.configSpringBreakingDistance(100.);
@@ -2064,9 +2084,10 @@ TEST_CASE(
     CHECK(fb2.getNumParticles() == fb2.getNumAtoms());
     CHECK(fb2.getNumAtoms() == 4);
     CHECK(fb2.getNumParticles() == net1.nrOfNodes);
-    CHECK(fb2.getNrOfActiveSprings() == net2.nrOfSprings);
-    CHECK(fb1.getNrOfActiveSprings() == net1.nrOfSprings);
-    CHECK(fb1.getNrOfActivePartialSprings() == net1.nrOfPartialSprings);
+    CHECK(static_cast<size_t>(fb2.getNrOfActiveSprings()) == net2.nrOfSprings);
+    CHECK(static_cast<size_t>(fb1.getNrOfActiveSprings()) == net1.nrOfSprings);
+    CHECK(static_cast<size_t>(fb1.getNrOfActivePartialSprings()) ==
+          net1.nrOfPartialSprings);
 
     // internal checks, unfortunately testing implementation details
     CHECK_FALSE(net1.springPartBoxOffset.isZero());
@@ -2109,9 +2130,10 @@ TEST_CASE(
     Eigen::VectorXd g1 = fb1.getGammaFactors(1.0, -1.);
     Eigen::VectorXd g2 = fb2.getGammaFactors(1.0);
     CHECK_THAT(g1.mean(), Catch::Matchers::WithinRel(g2.mean(), 1e-3));
-    CHECK(fb2.getNrOfActiveSprings() == net2.nrOfSprings);
-    CHECK(fb1.getNrOfActiveSprings() == net1.nrOfSprings);
-    CHECK(fb1.getNrOfActivePartialSprings() == net1.nrOfPartialSprings);
+    CHECK(static_cast<size_t>(fb2.getNrOfActiveSprings()) == net2.nrOfSprings);
+    CHECK(static_cast<size_t>(fb1.getNrOfActiveSprings()) == net1.nrOfSprings);
+    CHECK(static_cast<size_t>(fb1.getNrOfActivePartialSprings()) ==
+          net1.nrOfPartialSprings);
 
     CHECK(fb2.getSolubleWeightFraction() == 0.);
     CHECK(fb1.getSolubleWeightFraction() == 0.);
@@ -2309,8 +2331,10 @@ TEST_CASE("Selective MC Generated Structure Solves",
     2,
     1);
   int nStrands = 886 / scaleDownBy;
-  generator.addStrands(
-    nStrands, pylimer_tools::utils::initializeWithValue(nStrands, 318), 1);
+  generator.addStrands(static_cast<size_t>(nStrands),
+                       pylimer_tools::utils::initializeWithValue(
+                         static_cast<size_t>(nStrands), 318),
+                       1);
   // int nStrandsMono = 114 / scaleDownBy;
   // generator.addMonofunctionalStrands(
   //   nStrandsMono, pylimer_tools::utils::initializeWithValue(nStrandsMono,
@@ -2697,7 +2721,7 @@ TEST_CASE("All MEHPForceBalance2 solvers solve simple melt systems",
   pe::Universe universe =
     pe::Universe(nrOfBeads * 10.0, nrOfBeads * 10.0, nrOfBeads * 10.0);
   for (size_t i = 0; i < nrOfChains; ++i) {
-    long int beadOffset = i * nrOfBeads;
+    long int beadOffset = static_cast<long int>(i * nrOfBeads);
     std::vector<long int> atomIds(nrOfBeads);
     std::iota(atomIds.begin(), atomIds.end(), 1 + beadOffset);
     std::vector<double> coords(nrOfBeads);
@@ -2750,10 +2774,12 @@ TEST_CASE("All MEHPForceBalance2 solvers solve simple melt systems",
                             << ")");
     pcm::MEHPForceBalance2 forceBalancer =
       pcm::MEHPForceBalance2(universe, 2, false);
-    CHECK(forceBalancer.getNrOfSprings() == nrOfChains + 5);
+    CHECK(static_cast<size_t>(forceBalancer.getNrOfSprings()) ==
+          nrOfChains + 5);
     CHECK_NOTHROW(forceBalancer.runForceRelaxation(
       pcm::StructureSimplificationMode::NO_SIMPLIFICATION, 1e-6, solver));
-    CHECK(forceBalancer.getNrOfSprings() == nrOfChains + 5);
+    CHECK(static_cast<size_t>(forceBalancer.getNrOfSprings()) ==
+          nrOfChains + 5);
     CHECK(forceBalancer.getNrOfActiveSprings() == 0);
   }
 }
@@ -2770,7 +2796,7 @@ TEST_CASE("All MEHPForceBalance2 solvers solve simple network systems",
   size_t nrOfChains = 5;
   pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
   for (size_t i = 0; i < nrOfChains; ++i) {
-    long int beadOffset = i * nrOfBeads;
+    long int beadOffset = static_cast<long int>(i * nrOfBeads);
     std::vector<long int> atomIds(nrOfBeads);
     std::iota(atomIds.begin(), atomIds.end(), 1 + beadOffset);
     std::vector<double> coords(nrOfBeads);
@@ -2836,10 +2862,12 @@ TEST_CASE("All MEHPForceBalance2 solvers solve simple network systems",
     INFO("Testing solver: " << solver);
     pcm::MEHPForceBalance2 forceBalancer =
       pcm::MEHPForceBalance2(universe, 2, false);
-    CHECK(forceBalancer.getNrOfSprings() == nrOfChains + 9);
+    CHECK(static_cast<size_t>(forceBalancer.getNrOfSprings()) ==
+          nrOfChains + 9);
     CHECK_NOTHROW(forceBalancer.runForceRelaxation(
       pcm::StructureSimplificationMode::NO_SIMPLIFICATION, 1e-6, solver));
-    CHECK(forceBalancer.getNrOfSprings() == nrOfChains + 9);
+    CHECK(static_cast<size_t>(forceBalancer.getNrOfSprings()) ==
+          nrOfChains + 9);
     CHECK(forceBalancer.getNrOfActiveSprings() > 0);
     CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
     CHECK(forceBalancer.getResidual() < 1e-5);
@@ -2915,7 +2943,7 @@ TEST_CASE("All MEHP compute correct dangling and soluble fractions",
     std::vector<long int> bondFrom;
     std::vector<long int> bondTo;
     for (size_t beadI = 0; beadI < nBeadsPerSolventChain; ++beadI) {
-      ids[beadI] = currentAtomId;
+      ids[beadI] = static_cast<long int>(currentAtomId);
       currentAtomId += 1;
       if (beadI > 0) {
         bondFrom.push_back(ids[beadI - 1]);
@@ -2933,8 +2961,14 @@ TEST_CASE("All MEHP compute correct dangling and soluble fractions",
     universe.addBonds(bondFrom, bondTo);
   }
 
-  for (size_t nExtraChains : { 0, 1, 3, 5 }) {
-    for (size_t nDanglingAtoms : { 1, 3, 5, 6, 9, 14 }) {
+  for (size_t nExtraChains :
+       { size_t{ 0 }, size_t{ 1 }, size_t{ 3 }, size_t{ 5 } }) {
+    for (size_t nDanglingAtoms : { size_t{ 1 },
+                                   size_t{ 3 },
+                                   size_t{ 5 },
+                                   size_t{ 6 },
+                                   size_t{ 9 },
+                                   size_t{ 14 } }) {
       INFO("Testing with " << nExtraChains << " extra chains and "
                            << nDanglingAtoms << " dangling atoms each");
       pe::Universe u2 = pe::Universe(universe);
@@ -2943,7 +2977,8 @@ TEST_CASE("All MEHP compute correct dangling and soluble fractions",
       // add this number of atoms connected dangling to any other atom
       for (size_t extraChainI = 0; extraChainI < nExtraChains; ++extraChainI) {
         std::vector<long int> ids(nDanglingAtoms);
-        long int attachedToId = (extraChainI * nDanglingAtoms) % 12 + 1;
+        long int attachedToId =
+          static_cast<long int>((extraChainI * nDanglingAtoms) % 12 + 1);
         std::vector<double> coordX(
           nDanglingAtoms,
           universe.getAtom(attachedToId).getUnwrappedX(universe.getBox()));
@@ -2958,10 +2993,10 @@ TEST_CASE("All MEHP compute correct dangling and soluble fractions",
           if (danglingAtomI == 0) {
             bondFrom.push_back(attachedToId);
           } else {
-            bondFrom.push_back(currentAtomId - 1);
+            bondFrom.push_back(static_cast<long int>(currentAtomId - 1));
           }
-          ids[danglingAtomI] = currentAtomId;
-          bondTo.push_back(currentAtomId);
+          ids[danglingAtomI] = static_cast<long int>(currentAtomId);
+          bondTo.push_back(static_cast<long int>(currentAtomId));
           currentAtomId += 1;
           // add some randomness to the coordinates
           coordX[danglingAtomI] += (std::rand() % 1000) / 1000.0 - 0.5;
@@ -2987,7 +3022,7 @@ TEST_CASE("All MEHP compute correct dangling and soluble fractions",
       int totalNDanglingAtoms = nDanglingAtoms * nExtraChains;
       int totalNSolventAtoms = nSolventChains * nBeadsPerSolventChain;
       int totalNAtoms = 12 + totalNDanglingAtoms + totalNSolventAtoms;
-      CHECK(u2.getNrOfAtoms() == totalNAtoms);
+      CHECK(u2.getNrOfAtoms() == static_cast<size_t>(totalNAtoms));
 
       // for force balance 1 & 2 as well as force relaxation,
       // run and find expected dangling fractions
@@ -3167,7 +3202,7 @@ TEST_CASE("MEHPForceBalance2 Metal vs CPU Network Relaxation Benchmark",
   size_t nrOfChains = 25;
   pe::Universe universe = pe::Universe(20.0, 20.0, 20.0);
   for (size_t i = 0; i < nrOfChains; ++i) {
-    long int beadOffset = i * nrOfBeads;
+    long int beadOffset = static_cast<long int>(i * nrOfBeads);
     std::vector<long int> atomIds(nrOfBeads);
     std::iota(atomIds.begin(), atomIds.end(), 1 + beadOffset);
     std::vector<double> coords(nrOfBeads);
@@ -3189,10 +3224,11 @@ TEST_CASE("MEHPForceBalance2 Metal vs CPU Network Relaxation Benchmark",
   // Add crosslinks across boundaries
   std::vector<long int> crossFrom, crossTo;
   for (size_t i = 0; i < nrOfChains - 1; ++i) {
-    crossFrom.push_back(i * nrOfBeads + 10);
-    crossTo.push_back((i + 1) * nrOfBeads + 20);
-    crossFrom.push_back(i * nrOfBeads + 40);
-    crossTo.push_back(((i + 2) % nrOfChains) * nrOfBeads + 50);
+    crossFrom.push_back(static_cast<long int>(i * nrOfBeads + 10));
+    crossTo.push_back(static_cast<long int>((i + 1) * nrOfBeads + 20));
+    crossFrom.push_back(static_cast<long int>(i * nrOfBeads + 40));
+    crossTo.push_back(
+      static_cast<long int>(((i + 2) % nrOfChains) * nrOfBeads + 50));
   }
   universe.addBonds(crossFrom, crossTo);
 
@@ -3894,11 +3930,13 @@ TEST_CASE("MEHPForceBalance2 Metal End-to-End GPU Relaxation",
     size_t nrOfChains = 20;
     pe::Universe universe = pe::Universe(20.0, 20.0, 20.0);
     for (size_t i = 0; i < nrOfChains; ++i) {
-      long int beadOffset = i * nrOfBeads;
+      long int beadOffset = static_cast<long int>(i * nrOfBeads);
       std::vector<long int> atomIds(nrOfBeads);
       std::iota(atomIds.begin(), atomIds.end(), 1 + beadOffset);
       std::vector<double> coords(nrOfBeads);
-      std::iota(coords.begin(), coords.end(), 1. + beadOffset * 0.5);
+      std::iota(coords.begin(),
+                coords.end(),
+                1. + static_cast<double>(beadOffset) * 0.5);
       universe.addAtoms(
         atomIds,
         pylimer_tools::utils::initializeWithValue(nrOfBeads, 1),
@@ -3916,10 +3954,11 @@ TEST_CASE("MEHPForceBalance2 Metal End-to-End GPU Relaxation",
     }
     std::vector<long int> crossFrom, crossTo;
     for (size_t i = 0; i < nrOfChains - 1; ++i) {
-      crossFrom.push_back(i * nrOfBeads + 10);
-      crossTo.push_back((i + 1) * nrOfBeads + 20);
-      crossFrom.push_back(i * nrOfBeads + 40);
-      crossTo.push_back(((i + 2) % nrOfChains) * nrOfBeads + 50);
+      crossFrom.push_back(static_cast<long int>(i * nrOfBeads + 10));
+      crossTo.push_back(static_cast<long int>((i + 1) * nrOfBeads + 20));
+      crossFrom.push_back(static_cast<long int>(i * nrOfBeads + 40));
+      crossTo.push_back(
+        static_cast<long int>(((i + 2) % nrOfChains) * nrOfBeads + 50));
     }
     universe.addBonds(crossFrom, crossTo);
 
@@ -3992,14 +4031,16 @@ TEST_CASE("MEHPForceBalance2 Metal End-to-End GPU Relaxation",
       }
     }
     // Set diagonal
-    Eigen::VectorXd diag = Eigen::VectorXd::Zero(numNodes);
+    Eigen::VectorXd diag =
+      Eigen::VectorXd::Zero(static_cast<Eigen::Index>(numNodes));
     for (const auto& tr : trips) {
       diag[tr.row()] -= tr.value();
     }
     for (size_t i = 0; i < numNodes; ++i) {
-      trips.emplace_back(i, i, diag[i] + 0.1);
+      trips.emplace_back(i, i, diag[static_cast<Eigen::Index>(i)] + 0.1);
     }
-    Eigen::SparseMatrix<double> scalarL(numNodes, numNodes);
+    Eigen::SparseMatrix<double> scalarL(static_cast<Eigen::Index>(numNodes),
+                                        static_cast<Eigen::Index>(numNodes));
     scalarL.setFromTriplets(trips.begin(), trips.end());
     scalarL.makeCompressed();
 
@@ -4036,13 +4077,14 @@ TEST_CASE("MEHPForceBalance2 Metal End-to-End GPU Relaxation",
         tripsScalar.emplace_back(b, a, -1.0);
       }
     }
-    Eigen::VectorXd diag = Eigen::VectorXd::Zero(N);
+    Eigen::VectorXd diag = Eigen::VectorXd::Zero(static_cast<Eigen::Index>(N));
     for (const auto& tr : tripsScalar)
       diag[tr.row()] -= tr.value();
     for (size_t i = 0; i < N; ++i)
-      tripsScalar.emplace_back(i, i, diag[i] + 1.0);
+      tripsScalar.emplace_back(i, i, diag[static_cast<Eigen::Index>(i)] + 1.0);
 
-    Eigen::SparseMatrix<double> L(N, N);
+    Eigen::SparseMatrix<double> L(static_cast<Eigen::Index>(N),
+                                  static_cast<Eigen::Index>(N));
     L.setFromTriplets(tripsScalar.begin(), tripsScalar.end());
     L.makeCompressed();
 
@@ -4054,13 +4096,15 @@ TEST_CASE("MEHPForceBalance2 Metal End-to-End GPU Relaxation",
         trips3N.emplace_back(tr.row() * 3 + d, tr.col() * 3 + d, tr.value());
       }
     }
-    Eigen::SparseMatrix<double> K3N(3 * N, 3 * N);
+    Eigen::SparseMatrix<double> K3N(3 * static_cast<Eigen::Index>(N),
+                                    3 * static_cast<Eigen::Index>(N));
     K3N.setFromTriplets(trips3N.begin(), trips3N.end());
     K3N.makeCompressed();
 
-    Eigen::VectorXd b3N = Eigen::VectorXd::Random(3 * N);
-    Eigen::MatrixX3d B(N, 3);
-    for (size_t i = 0; i < N; ++i) {
+    Eigen::VectorXd b3N =
+      Eigen::VectorXd::Random(3 * static_cast<Eigen::Index>(N));
+    Eigen::MatrixX3d B(static_cast<Eigen::Index>(N), 3);
+    for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(N); ++i) {
       B.row(i) = b3N.segment<3>(3 * i);
     }
 
@@ -4083,7 +4127,7 @@ TEST_CASE("MEHPForceBalance2 Metal End-to-End GPU Relaxation",
       std::chrono::duration<double, std::milli>(t3 - t2).count();
 
     // Verify solutions match
-    for (size_t i = 0; i < N; ++i) {
+    for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(N); ++i) {
       CHECK_THAT(sol3N[3 * i],
                  Catch::Matchers::WithinRel(solScalar(i, 0), 1e-10));
       CHECK_THAT(sol3N[3 * i + 1],
@@ -4125,18 +4169,21 @@ TEST_CASE("MEHPForceBalance2 Metal Single-Precision Solvers & Robust CPU "
   trips.emplace_back(numNodes - 2, numNodes - 1, -1e-3);
   trips.emplace_back(numNodes - 1, numNodes - 2, -1e-3);
 
-  Eigen::VectorXd diag = Eigen::VectorXd::Zero(numNodes);
+  Eigen::VectorXd diag =
+    Eigen::VectorXd::Zero(static_cast<Eigen::Index>(numNodes));
   for (const auto& tr : trips) {
     diag[tr.row()] -= tr.value();
   }
   for (size_t i = 0; i < numNodes; ++i) {
-    trips.emplace_back(i, i, diag[i] + 0.01);
+    trips.emplace_back(i, i, diag[static_cast<Eigen::Index>(i)] + 0.01);
   }
-  Eigen::SparseMatrix<double> scalarL(numNodes, numNodes);
+  Eigen::SparseMatrix<double> scalarL(static_cast<Eigen::Index>(numNodes),
+                                      static_cast<Eigen::Index>(numNodes));
   scalarL.setFromTriplets(trips.begin(), trips.end());
   scalarL.makeCompressed();
 
-  Eigen::VectorXd b = Eigen::VectorXd::Random(numNodes * 3);
+  Eigen::VectorXd b =
+    Eigen::VectorXd::Random(static_cast<Eigen::Index>(numNodes * 3));
   double bNorm = b.norm();
   const double targetTol = 1e-8;
 
@@ -4177,8 +4224,9 @@ TEST_CASE("MEHPForceBalance2 Metal Single-Precision Solvers & Robust CPU "
                                                        true);
 
     // Compute residual in double precision on CPU
-    Eigen::MatrixXd xMat(numNodes, 3), bMat(numNodes, 3);
-    for (size_t i = 0; i < numNodes; ++i) {
+    Eigen::MatrixXd xMat(static_cast<Eigen::Index>(numNodes), 3),
+      bMat(static_cast<Eigen::Index>(numNodes), 3);
+    for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(numNodes); ++i) {
       xMat(i, 0) = xFallback[3 * i + 0];
       xMat(i, 1) = xFallback[3 * i + 1];
       xMat(i, 2) = xFallback[3 * i + 2];
@@ -4224,26 +4272,32 @@ TEST_CASE(
     }
   }
 
-  Eigen::VectorXd diag = Eigen::VectorXd::Zero(numNodes);
+  Eigen::VectorXd diag =
+    Eigen::VectorXd::Zero(static_cast<Eigen::Index>(numNodes));
   for (const auto& tr : trips) {
     diag[tr.row()] -= tr.value();
   }
   for (size_t i = 0; i < numNodes; ++i) {
     trips.emplace_back(
-      i, i, diag[i]); // Periodic Laplacian with zero eigenvalue
+      i,
+      i,
+      diag[static_cast<Eigen::Index>(i)]); // Periodic Laplacian with zero
+                                           // eigenvalue
   }
-  Eigen::SparseMatrix<double> L_periodic(numNodes, numNodes);
+  Eigen::SparseMatrix<double> L_periodic(static_cast<Eigen::Index>(numNodes),
+                                         static_cast<Eigen::Index>(numNodes));
   L_periodic.setFromTriplets(trips.begin(), trips.end());
   L_periodic.makeCompressed();
 
   // RHS with zero net force (sum b = 0)
-  Eigen::VectorXd b = Eigen::VectorXd::Random(numNodes * 3);
+  Eigen::VectorXd b =
+    Eigen::VectorXd::Random(static_cast<Eigen::Index>(numNodes * 3));
   for (int d = 0; d < 3; ++d) {
     double mean = 0.0;
-    for (size_t i = 0; i < numNodes; ++i)
+    for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(numNodes); ++i)
       mean += b[3 * i + d];
     mean /= static_cast<double>(numNodes);
-    for (size_t i = 0; i < numNodes; ++i)
+    for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(numNodes); ++i)
       b[3 * i + d] -= mean;
   }
 
@@ -4290,9 +4344,10 @@ TEST_CASE(
                "==========\n";
 
   // Check residuals
-  Eigen::MatrixXd xComMat(numNodes, 3), xPinnedMat(numNodes, 3),
-    bMat(numNodes, 3);
-  for (size_t i = 0; i < numNodes; ++i) {
+  Eigen::MatrixXd xComMat(static_cast<Eigen::Index>(numNodes), 3),
+    xPinnedMat(static_cast<Eigen::Index>(numNodes), 3),
+    bMat(static_cast<Eigen::Index>(numNodes), 3);
+  for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(numNodes); ++i) {
     xComMat(i, 0) = xCom[3 * i + 0];
     xComMat(i, 1) = xCom[3 * i + 1];
     xComMat(i, 2) = xCom[3 * i + 2];
@@ -4346,18 +4401,21 @@ TEST_CASE(
     }
   }
 
-  Eigen::VectorXd diag = Eigen::VectorXd::Zero(numNodes);
+  Eigen::VectorXd diag =
+    Eigen::VectorXd::Zero(static_cast<Eigen::Index>(numNodes));
   for (const auto& tr : trips) {
     diag[tr.row()] -= tr.value();
   }
   for (size_t i = 0; i < numNodes; ++i) {
-    trips.emplace_back(i, i, diag[i] + 0.1);
+    trips.emplace_back(i, i, diag[static_cast<Eigen::Index>(i)] + 0.1);
   }
-  Eigen::SparseMatrix<double> scalarL(numNodes, numNodes);
+  Eigen::SparseMatrix<double> scalarL(static_cast<Eigen::Index>(numNodes),
+                                      static_cast<Eigen::Index>(numNodes));
   scalarL.setFromTriplets(trips.begin(), trips.end());
   scalarL.makeCompressed();
 
-  Eigen::VectorXd x = Eigen::VectorXd::Random(numNodes * 3);
+  Eigen::VectorXd x =
+    Eigen::VectorXd::Random(static_cast<Eigen::Index>(numNodes * 3));
 
   // 1. Verify Numerical Accuracy of Hybrid Kernel vs Uniform SpMV
   Eigen::VectorXd yUniform = pcm::spmvMetal3D(scalarL, x);
@@ -4395,7 +4453,8 @@ TEST_CASE("MEHPForceBalance2 Metal Zero-Copy End-to-End Simulation Pipeline",
             << std::endl;
   // Construct small test network for runGpuRelaxationStep
   const size_t numNodes = 6;
-  Eigen::SparseMatrix<double> scalarA(numNodes, numNodes);
+  Eigen::SparseMatrix<double> scalarA(static_cast<Eigen::Index>(numNodes),
+                                      static_cast<Eigen::Index>(numNodes));
   std::vector<Eigen::Triplet<double>> trips;
   for (size_t i = 0; i < numNodes - 1; ++i) {
     trips.emplace_back(i, i + 1, -1.0);
@@ -4407,9 +4466,10 @@ TEST_CASE("MEHPForceBalance2 Metal Zero-Copy End-to-End Simulation Pipeline",
   scalarA.setFromTriplets(trips.begin(), trips.end());
   scalarA.makeCompressed();
 
-  Eigen::VectorXd b = Eigen::VectorXd::Zero(numNodes * 3);
+  Eigen::VectorXd b =
+    Eigen::VectorXd::Zero(static_cast<Eigen::Index>(numNodes * 3));
   b[0] = 1.0;
-  b[3 * (numNodes - 1)] = -1.0;
+  b[3 * static_cast<Eigen::Index>(numNodes - 1)] = -1.0;
 
   std::vector<int> sA = { 0, 1, 2, 3, 4 };
   std::vector<int> sB = { 1, 2, 3, 4, 5 };
@@ -4458,7 +4518,7 @@ TEST_CASE("MEHPForceBalance2 in-place CSR matrix update on strand breaking",
   size_t nrOfChains = 4;
   pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
   for (size_t i = 0; i < nrOfChains; ++i) {
-    long int beadOffset = i * nrOfBeads;
+    long int beadOffset = static_cast<long int>(i * nrOfBeads);
     std::vector<long int> atomIds(nrOfBeads);
     std::iota(atomIds.begin(), atomIds.end(), 1 + beadOffset);
     std::vector<double> coords(nrOfBeads);
@@ -4485,7 +4545,7 @@ TEST_CASE("MEHPForceBalance2 in-place CSR matrix update on strand breaking",
   // relaxation
   fb.configSpringBreakingDistance(5.0);
 
-  size_t initSprings = fb.getNrOfSprings();
+  size_t initSprings = static_cast<size_t>(fb.getNrOfSprings());
   CHECK_NOTHROW(
     fb.runForceRelaxation(pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
                           1e-6,
@@ -4614,7 +4674,9 @@ TEST_CASE("MEHPForceBalance2 2D Mode and Gamma Normalization (1A.5, 1A.8)",
                             1e-6,
                             pcm::SLESolver::DEFAULT);
     const Eigen::VectorXd u = fb2D.getCurrentDisplacements();
-    for (size_t link = 0; link < fb2D.getNrOfLinks(); ++link) {
+    for (Eigen::Index link = 0;
+         link < static_cast<Eigen::Index>(fb2D.getNrOfLinks());
+         ++link) {
       CHECK(std::abs(u[3 * link + 2]) < 1e-12);
     }
   }

@@ -32,8 +32,7 @@ def cli(files):
             else None
             for m in molecules
         ]
-        non_none_bond_lengths = [
-            bl for bl in bond_lengths if bl is not None and bl > 0]
+        non_none_bond_lengths = [bl for bl in bond_lengths if bl is not None and bl > 0]
         click.echo(
             "Mean bond length: {} u, (min: {}, max: {}, median: {}) u".format(
                 statistics.mean(non_none_bond_lengths),
@@ -42,8 +41,7 @@ def cli(files):
                 statistics.median(non_none_bond_lengths),
             )
         )
-        end_to_end_distances = [m.compute_end_to_end_distance()
-                                for m in molecules]
+        end_to_end_distances = [m.compute_end_to_end_distance() for m in molecules]
         click.echo(
             "Mean end to end distance: {} u".format(
                 statistics.mean(

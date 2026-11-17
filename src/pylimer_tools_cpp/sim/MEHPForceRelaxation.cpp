@@ -87,8 +87,9 @@ MEHPForceRelaxation::runForceRelaxation(const char* algorithm,
   // query solution & exit reason
   assert(u0.size() == 3 * net.nrOfNodes);
   bool require_rerun = false;
-  for (Eigen::Index i = 0; i < u0.size(); ++i) {
-    this->forceRelaxationNetwork.coordinates[i] += u0[i];
+  for (size_t i = 0; i < u0.size(); ++i) {
+    this->forceRelaxationNetwork.coordinates[static_cast<Eigen::Index>(i)] +=
+      u0[i];
     if (!(u0[i] < upperBounds[i] - this->suggestRerunEps) ||
         !(u0[i] > lowerBounds[i] + this->suggestRerunEps)) {
       require_rerun = true;
@@ -165,7 +166,8 @@ MEHPForceRelaxation::evaluateSpringDistances(const Network* net,
       springDistances[static_cast<Eigen::Index>(i)] = 0.0;
     }
   }
-  assert(springDistances.size() == net->nrOfSprings * 3);
+  assert(springDistances.size() ==
+         static_cast<Eigen::Index>(net->nrOfSprings * 3));
 
   return springDistances;
 }
@@ -206,7 +208,7 @@ MEHPForceRelaxation::getCrosslinkerVerse() const
     ids.push_back(this->forceRelaxationNetwork.oldAtomIds[i]);
     // override type, since the types may be different from crossLinkerType
     // if converted with dangling chains
-    types[i] = this->universe.getPropertyValue<int>(
+    types[static_cast<size_t>(i)] = this->universe.getPropertyValue<int>(
       "type",
       this->universe.getIdxByAtomId(
         this->forceRelaxationNetwork.oldAtomIds[i]));
@@ -216,7 +218,9 @@ MEHPForceRelaxation::getCrosslinkerVerse() const
   std::vector<long int> bondTo;
   bondFrom.reserve(this->forceRelaxationNetwork.nrOfSprings);
   bondTo.reserve(this->forceRelaxationNetwork.nrOfSprings);
-  for (int i = 0; i < this->forceRelaxationNetwork.nrOfSprings; ++i) {
+  for (Eigen::Index i = 0;
+       i < static_cast<Eigen::Index>(this->forceRelaxationNetwork.nrOfSprings);
+       ++i) {
     bondFrom.push_back(
       this->forceRelaxationNetwork.oldAtomIds[static_cast<Eigen::Index>(
         this->forceRelaxationNetwork.springIndexA[i])]);
@@ -243,9 +247,9 @@ double
 MEHPForceRelaxation::getAverageSpringLength() const
 {
   double r2 = 0.0;
-  for (int i = 0; i < this->forceRelaxationNetwork.nrOfSprings; i++) {
+  for (size_t i = 0; i < this->forceRelaxationNetwork.nrOfSprings; ++i) {
     double r2local = 0.0;
-    for (int j = 0; j < 3; ++j) {
+    for (size_t j = 0; j < 3; ++j) {
       r2local +=
         this->currentSpringDistances[static_cast<Eigen::Index>(i * 3 + j)] *
         this->currentSpringDistances[static_cast<Eigen::Index>(i * 3 + j)];
@@ -264,7 +268,7 @@ MEHPForceRelaxation::findActiveSprings(const Network* net,
 
   Eigen::ArrayXb result =
     Eigen::ArrayXb::Constant(springVectors.size() / 3, false);
-  for (size_t i = 0; i < springVectors.size() / 3; ++i) {
+  for (Eigen::Index i = 0; i < springVectors.size() / 3; ++i) {
     result[i] = !this->distanceIsWithinTolerance(
       springVectors.segment(3 * i, 3), tolerance, net->springsContourLength[i]);
   }
@@ -284,7 +288,8 @@ MEHPForceRelaxation::ConvertNetwork(Network* net,
     for (pylimer_tools::entities::Atom xlinker : springEndAtoms) {
       // change type of crosslinkers with a degree <= 2 to "normal",
       // non-crosslink beads
-      size_t vertexId = this->universe.getIdxByAtomId(xlinker.getId());
+      const igraph_integer_t vertexId =
+        this->universe.getIdxByAtomId(xlinker.getId());
       if (this->universe.computeFunctionalityForVertex(vertexId) <= 2) {
         this->universe.setPropertyValue(vertexId, "type", xlinkType - 1);
       }
@@ -294,8 +299,8 @@ MEHPForceRelaxation::ConvertNetwork(Network* net,
 
   std::vector<pylimer_tools::entities::Molecule> crossLinkerChains =
     this->universe.getChainsWithCrosslinker(xlinkType);
-  net->moleculeIdxToSpring =
-    Eigen::VectorXi::Constant(crossLinkerChains.size(), -1);
+  net->moleculeIdxToSpring = Eigen::VectorXi::Constant(
+    static_cast<Eigen::Index>(crossLinkerChains.size()), -1);
 
   // need to include all but dangling and free chains in order to
   // model entanglement
@@ -325,7 +330,8 @@ MEHPForceRelaxation::ConvertNetwork(Network* net,
         (!removeDanglingChains &&
          crossLinkerChains[i].getType() ==
            pylimer_tools::entities::MoleculeType::DANGLING_CHAIN)) {
-      net->moleculeIdxToSpring[i] = static_cast<int>(nrOfSprings);
+      net->moleculeIdxToSpring[static_cast<Eigen::Index>(i)] =
+        static_cast<int>(nrOfSprings);
       nrOfSprings += 1;
     }
   }
@@ -339,16 +345,26 @@ MEHPForceRelaxation::ConvertNetwork(Network* net,
   net->L[2] = box.getLz();
   net->nrOfNodes = nrOfSpringEnds;
   net->nrOfSprings = nrOfSprings;
-  net->coordinates = Eigen::VectorXd::Zero(3 * net->nrOfNodes);
-  net->oldAtomIds = Eigen::ArrayXi::Zero(net->nrOfNodes);
-  net->springIndexA = Eigen::ArrayXi::Zero(net->nrOfSprings);
-  net->springIndexB = Eigen::ArrayXi::Zero(net->nrOfSprings);
-  net->springCoordinateIndexA = Eigen::ArrayXi::Zero(3 * net->nrOfSprings);
-  net->springBoxOffset = Eigen::VectorXd::Zero(3 * net->nrOfSprings);
-  net->springCoordinateIndexB = Eigen::ArrayXi::Zero(3 * net->nrOfSprings);
-  net->springIsActive = Eigen::ArrayXb::Constant(net->nrOfSprings, false);
-  net->springsContourLength = Eigen::VectorXd::Zero(net->nrOfSprings);
-  Eigen::VectorXd targetDistances = Eigen::VectorXd::Zero(3 * net->nrOfSprings);
+  net->coordinates =
+    Eigen::VectorXd::Zero(static_cast<Eigen::Index>(3 * net->nrOfNodes));
+  net->oldAtomIds =
+    Eigen::ArrayXi::Zero(static_cast<Eigen::Index>(net->nrOfNodes));
+  net->springIndexA =
+    Eigen::ArrayXi::Zero(static_cast<Eigen::Index>(net->nrOfSprings));
+  net->springIndexB =
+    Eigen::ArrayXi::Zero(static_cast<Eigen::Index>(net->nrOfSprings));
+  net->springCoordinateIndexA =
+    Eigen::ArrayXi::Zero(static_cast<Eigen::Index>(3 * net->nrOfSprings));
+  net->springBoxOffset =
+    Eigen::VectorXd::Zero(static_cast<Eigen::Index>(3 * net->nrOfSprings));
+  net->springCoordinateIndexB =
+    Eigen::ArrayXi::Zero(static_cast<Eigen::Index>(3 * net->nrOfSprings));
+  net->springIsActive = Eigen::ArrayXb::Constant(
+    static_cast<Eigen::Index>(net->nrOfSprings), false);
+  net->springsContourLength =
+    Eigen::VectorXd::Zero(static_cast<Eigen::Index>(net->nrOfSprings));
+  Eigen::VectorXd targetDistances =
+    Eigen::VectorXd::Zero(static_cast<Eigen::Index>(3 * net->nrOfSprings));
 
   net->springIndicesOfLinks.reserve(net->nrOfNodes);
   for (size_t i = 0; i < net->nrOfNodes; ++i) {
@@ -357,9 +373,9 @@ MEHPForceRelaxation::ConvertNetwork(Network* net,
 
   // convert beads
   std::map<long int, long int> atomIdToNode;
-  for (long int i = 0; i < springEndAtoms.size(); ++i) {
+  for (size_t i = 0; i < springEndAtoms.size(); ++i) {
     pylimer_tools::entities::Atom atom = springEndAtoms[i];
-    atomIdToNode[atom.getId()] = i;
+    atomIdToNode[atom.getId()] = static_cast<long int>(i);
     net->oldAtomIds[static_cast<Eigen::Index>(i)] = atom.getId();
     net->coordinates[3 * static_cast<Eigen::Index>(i) + 0] = atom.getX();
     net->coordinates[3 * static_cast<Eigen::Index>(i) + 1] = atom.getY();
@@ -379,58 +395,64 @@ MEHPForceRelaxation::ConvertNetwork(Network* net,
     assert(endsOfChain.size() == 2);
     long int nodeIdxFrom = atomIdToNode.at(endsOfChain[0].getId());
     long int nodeIdxTo = atomIdToNode.at(endsOfChain[1].getId());
+    const Eigen::Index springEigenIdx = static_cast<Eigen::Index>(spring_idx);
     bool addChain = false;
     if (crossLinkerChains[i].getType() ==
         pylimer_tools::entities::MoleculeType::NETWORK_STRAND) {
       addChain = true;
       // spring contour length = nr of bonds between two crosslinkers
-      net->springsContourLength[spring_idx] =
+      net->springsContourLength[springEigenIdx] =
         crossLinkerChains[i].getNrOfBonds();
     } else if (crossLinkerChains[i].getType() ==
                pylimer_tools::entities::MoleculeType::PRIMARY_LOOP) {
       addChain = true;
 
-      net->springsContourLength[spring_idx] =
+      net->springsContourLength[springEigenIdx] =
         crossLinkerChains[i].getNrOfBonds();
     } else if (crossLinkerChains[i].getType() ==
                pylimer_tools::entities::MoleculeType::DANGLING_CHAIN) {
       if (!removeDanglingChains) {
         // to keep dangling chains, we convert the trailing atom to a
         // crosslink
-        net->springsContourLength[spring_idx] =
+        net->springsContourLength[springEigenIdx] =
           crossLinkerChains[i].getNrOfBonds();
         addChain = true;
       }
     }
 
     if (addChain) {
-      RUNTIME_EXP_IFN(net->moleculeIdxToSpring[i] == spring_idx,
+      RUNTIME_EXP_IFN(net->moleculeIdxToSpring[static_cast<Eigen::Index>(i)] ==
+                        static_cast<int>(spring_idx),
                       "Expected spring mapping to be consistent.");
       std::vector<pylimer_tools::entities::Atom> allChainAtoms =
         crossLinkerChains[i].getAtomsLinedUp();
-      targetDistances.segment(3 * spring_idx, 3) =
+      targetDistances.segment(3 * springEigenIdx, 3) =
         crossLinkerChains[i].getOverallBondSum(xlinkType);
 
       if (atomIdToNode.at(allChainAtoms[0].getId()) == nodeIdxTo) {
-        targetDistances.segment(3 * spring_idx, 3) *= -1;
+        targetDistances.segment(3 * springEigenIdx, 3) *= -1;
       } else {
         assert(atomIdToNode.at(allChainAtoms[0].getId()) == nodeIdxFrom);
       }
 
       pylimer_tools::utils::addIfNotContained(
-        net->springIndicesOfLinks[nodeIdxFrom], spring_idx);
+        net->springIndicesOfLinks[static_cast<size_t>(nodeIdxFrom)],
+        spring_idx);
       if (nodeIdxFrom != nodeIdxTo) {
         pylimer_tools::utils::addIfNotContained(
-          net->springIndicesOfLinks[nodeIdxTo], spring_idx);
+          net->springIndicesOfLinks[static_cast<size_t>(nodeIdxTo)],
+          spring_idx);
       }
 
-      net->springIndexA[spring_idx] = nodeIdxFrom;
-      net->springIndexB[spring_idx] = nodeIdxTo;
+      net->springIndexA[springEigenIdx] = nodeIdxFrom;
+      net->springIndexB[springEigenIdx] = nodeIdxTo;
       for (size_t j = 0; j < 3; j++) {
-        net->springCoordinateIndexA[3 * spring_idx + j] =
-          static_cast<int>(nodeIdxFrom * 3 + j);
-        net->springCoordinateIndexB[3 * spring_idx + j] =
-          static_cast<int>(nodeIdxTo * 3 + j);
+        net->springCoordinateIndexA[3 * springEigenIdx +
+                                    static_cast<Eigen::Index>(j)] =
+          static_cast<int>(nodeIdxFrom * 3 + static_cast<long int>(j));
+        net->springCoordinateIndexB[3 * springEigenIdx +
+                                    static_cast<Eigen::Index>(j)] =
+          static_cast<int>(nodeIdxTo * 3 + static_cast<long int>(j));
       }
 
       spring_idx += 1;
@@ -456,7 +478,8 @@ MEHPForceRelaxation::ConvertNetwork(Network* net,
   // check whether spring contour lengths are what we want them to be
   size_t numCrosslinkers = springEndAtoms.size();
   // this->universe.countPropertyValue<int>("type", crossLinkerType);
-  assert(net->springsContourLength.size() == net->nrOfSprings);
+  assert(net->springsContourLength.size() ==
+         static_cast<Eigen::Index>(net->nrOfSprings));
   assert(numCrosslinkers == net->nrOfNodes);
 
   return true; // crossLinkerUniverse.getNrOfBonds() == net->nrOfSprings;
@@ -481,14 +504,15 @@ MEHPForceRelaxation::evaluateStressTensor(
     }
   }
 
-  for (size_t i = 0; i < springDistances.size() / 3; ++i) {
-    double s[3] = { springDistances[static_cast<Eigen::Index>(3 * i + 0)],
-                    springDistances[static_cast<Eigen::Index>(3 * i + 1)],
-                    springDistances[static_cast<Eigen::Index>(3 * i + 2)] };
+  for (Eigen::Index i = 0; i < springDistances.size() / 3; ++i) {
+    double s[3] = { springDistances[3 * i + 0],
+                    springDistances[3 * i + 1],
+                    springDistances[3 * i + 2] };
     for (size_t j = 0; j < 3; j++) {
       for (size_t k = 0; k < 3; k++) {
         const double contribution =
-          this->forceEvaluator->evaluateStressContribution(s, j, k, i);
+          this->forceEvaluator->evaluateStressContribution(
+            s, j, k, static_cast<size_t>(i));
         stress[j][k] += contribution;
       }
     }
@@ -538,8 +562,9 @@ MEHPForceRelaxation::computeActiveWeightFraction(Network* net,
   // from crosslink to crosslink. therefore, the number of atoms of each
   // of these springs is one less
   Eigen::ArrayXd allActiveAtomsPerChains =
-    activeSprings.cast<double>() * (net->springsContourLength.array() -
-                                    Eigen::ArrayXd::Ones(net->nrOfSprings));
+    activeSprings.cast<double>() *
+    (net->springsContourLength.array() -
+     Eigen::ArrayXd::Ones(static_cast<Eigen::Index>(net->nrOfSprings)));
   // finally, add the cross-links and normalize by the number of atoms.
   return static_cast<double>(allActiveAtomsPerChains.sum() +
                              this->getNrOfActiveNodes()) /
@@ -563,15 +588,16 @@ MEHPForceRelaxation::countActiveClusteredAtoms(Network* net,
       this->findClusteredToActive(net, tolerance);
     // find all active springs
     const Eigen::ArrayXb activeSprings = clusteredToActive.first;
-    assert(activeSprings.size() == net->nrOfSprings);
+    assert(activeSprings.size() == static_cast<Eigen::Index>(net->nrOfSprings));
     const Eigen::ArrayXb nodeIsActive = clusteredToActive.second;
-    assert(nodeIsActive.size() == net->nrOfNodes);
+    assert(nodeIsActive.size() == static_cast<Eigen::Index>(net->nrOfNodes));
     // as of now, the springsContourLength is equal to the number of bonds
     // from crosslink to crosslink. therefore, the number of atoms of each
     // of these springs is one less
     Eigen::ArrayXd allActiveAtomsPerChains =
-      activeSprings.cast<double>() * (net->springsContourLength.array() -
-                                      Eigen::ArrayXd::Ones(net->nrOfSprings));
+      activeSprings.cast<double>() *
+      (net->springsContourLength.array() -
+       Eigen::ArrayXd::Ones(static_cast<Eigen::Index>(net->nrOfSprings)));
     const double activeNodes = nodeIsActive.count();
     return ((allActiveAtomsPerChains).matrix().sum() + activeNodes);
   }
@@ -589,7 +615,8 @@ MEHPForceRelaxation::countActiveClusteredAtoms(Network* net,
   std::vector<long int> vertexIdxToClusterIdx(this->universe.getNrOfAtoms());
   for (size_t i = 0; i < clusters.size(); ++i) {
     for (const pylimer_tools::entities::Atom& atom : clusters[i].getAtoms()) {
-      vertexIdxToClusterIdx[this->universe.getIdxByAtomId(atom.getId())] = i;
+      vertexIdxToClusterIdx[static_cast<size_t>(this->universe.getIdxByAtomId(
+        atom.getId()))] = static_cast<long int>(i);
     }
   }
 
@@ -602,7 +629,8 @@ MEHPForceRelaxation::countActiveClusteredAtoms(Network* net,
   for (const int nodeIdx : activeNodeIndices) {
     const long int universeAtomIdx =
       this->universe.getIdxByAtomId(net->oldAtomIds[nodeIdx]);
-    clusterIsActive[vertexIdxToClusterIdx[universeAtomIdx]] = true;
+    clusterIsActive[static_cast<size_t>(
+      vertexIdxToClusterIdx[static_cast<size_t>(universeAtomIdx)])] = true;
   }
 
   double nClusteredAtoms = 0.;
@@ -625,7 +653,7 @@ MEHPForceRelaxation::getIndicesOfActiveNodes(const Network* net,
   // find all active springs
   Eigen::ArrayXb strandIsActive = this->findActiveSprings(net, tolerance);
 
-  for (Eigen::Index i = 0; i < net->nrOfNodes; i++) {
+  for (size_t i = 0; i < net->nrOfNodes; i++) {
     for (const int springIdx : net->springIndicesOfLinks[i]) {
       if (strandIsActive[springIdx]) {
         results.push_back(static_cast<int>(i));
@@ -731,8 +759,8 @@ MEHPForceRelaxation::getIdsOfActiveNodes(
 Eigen::VectorXi
 MEHPForceRelaxation::getNrOfActiveSpringsConnected(const double tolerance) const
 {
-  Eigen::VectorXi nrOfActiveSpringsConnected =
-    Eigen::VectorXi::Zero(this->forceRelaxationNetwork.nrOfNodes);
+  Eigen::VectorXi nrOfActiveSpringsConnected = Eigen::VectorXi::Zero(
+    static_cast<Eigen::Index>(this->forceRelaxationNetwork.nrOfNodes));
   Eigen::ArrayXb springIsActive =
     this->findActiveSprings(&this->forceRelaxationNetwork, tolerance);
   for (Eigen::Index i = 0;

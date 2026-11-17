@@ -160,7 +160,7 @@ AtomGraphParent::getShortestPath(const long int vertexIdxFrom,
                            vertexIdxTo,
                            IGRAPH_ALL);
 
-  result.reserve(igraph_vector_int_size(&vertices));
+  result.reserve(static_cast<size_t>(igraph_vector_int_size(&vertices)));
   for (igraph_integer_t i = 0; i < igraph_vector_int_size(&vertices); i++) {
     result.push_back(
       this->getAtomByVertexIdx(igraph_vector_int_get(&vertices, i)));
@@ -276,7 +276,7 @@ AtomGraphParent::getIncidentEdgeIds(const igraph_integer_t vertexId) const
   igraph_eit_t iterator;
   igraph_eit_create(&this->graph, edgeSelector, &iterator);
   std::vector<igraph_integer_t> results;
-  results.reserve(IGRAPH_EIT_SIZE(iterator));
+  results.reserve(static_cast<size_t>(IGRAPH_EIT_SIZE(iterator)));
   while (!IGRAPH_EIT_END(iterator)) {
     igraph_integer_t edgeId = IGRAPH_EIT_GET(iterator);
     results.push_back(edgeId);
@@ -384,7 +384,7 @@ AtomGraphParent::getComplexAtomByVertexIdx(const long int vertexIdx) const
 
   // fetch all atom properties
   std::unordered_map<std::string, double> atomProperties;
-  atomProperties.reserve(igraph_strvector_size(&vnames));
+  atomProperties.reserve(static_cast<size_t>(igraph_strvector_size(&vnames)));
   for (igraph_integer_t i = 0; i < igraph_strvector_size(&vnames); ++i) {
     atomProperties[igraph_strvector_get(&vnames, i)] = igraph_cattribute_VAN(
       &this->graph, igraph_strvector_get(&vnames, i), vertexIdx);
@@ -496,15 +496,17 @@ AtomGraphParent::getUnwrappedVertexCoordinates(
     throw std::runtime_error("Failed to query property nz of graph.");
   }
 
-  const size_t size = igraph_vector_size(&xvalues);
-  Eigen::VectorXd results = Eigen::VectorXd::Zero(size * 3);
-  for (size_t i = 0; i < size; i++) {
-    results[3 * i] = igraph_vector_get(&xvalues, i) +
-                     (box.getLx() * igraph_vector_get(&nxvalues, i));
-    results[3 * i + 1] = igraph_vector_get(&yvalues, i) +
-                         (box.getLy() * igraph_vector_get(&nyvalues, i));
-    results[3 * i + 2] = igraph_vector_get(&zvalues, i) +
-                         (box.getLz() * igraph_vector_get(&nzvalues, i));
+  const igraph_int_t size = igraph_vector_size(&xvalues);
+  Eigen::VectorXd results =
+    Eigen::VectorXd::Zero(static_cast<Eigen::Index>(size) * 3);
+  for (igraph_int_t i = 0; i < size; i++) {
+    const Eigen::Index baseIdx = static_cast<Eigen::Index>(3 * i);
+    results[baseIdx] = igraph_vector_get(&xvalues, i) +
+                       (box.getLx() * igraph_vector_get(&nxvalues, i));
+    results[baseIdx + 1] = igraph_vector_get(&yvalues, i) +
+                           (box.getLy() * igraph_vector_get(&nyvalues, i));
+    results[baseIdx + 2] = igraph_vector_get(&zvalues, i) +
+                           (box.getLz() * igraph_vector_get(&nzvalues, i));
   }
 
   igraph_vector_destroy(&xvalues);
@@ -538,11 +540,12 @@ AtomGraphParent::getUnwrappedVertexCoordinates(
   const pylimer_tools::entities::Box& box) const
 {
   igraph_vector_int_t vertices_v;
-  igraph_vector_int_init(&vertices_v, vertices.size());
+  igraph_vector_int_init(&vertices_v,
+                         static_cast<igraph_int_t>(vertices.size()));
   pylimer_tools::utils::StdVectorToIgraphVectorT(vertices, &vertices_v);
   Eigen::VectorXd result = this->getUnwrappedVertexCoordinates(vertices_v, box);
   igraph_vector_int_destroy(&vertices_v);
-  assert(result.size() == vertices.size() * 3);
+  assert(static_cast<size_t>(result.size()) == vertices.size() * 3);
   return result;
 }
 
@@ -660,7 +663,8 @@ AtomGraphParent::getAtomsOfDegree(const int degree) const
 {
   std::vector<long int> endNodeIndices = this->getVerticesWithDegree(degree);
   igraph_vector_int_t endNodeSelectorVector;
-  igraph_vector_int_init(&endNodeSelectorVector, endNodeIndices.size());
+  igraph_vector_int_init(&endNodeSelectorVector,
+                         static_cast<igraph_int_t>(endNodeIndices.size()));
   pylimer_tools::utils::StdVectorToIgraphVectorT(endNodeIndices,
                                                  &endNodeSelectorVector);
   igraph_vit_t vit;
@@ -668,7 +672,7 @@ AtomGraphParent::getAtomsOfDegree(const int degree) const
     &this->graph, igraph_vss_vector(&endNodeSelectorVector), &vit);
 
   std::vector<Atom> results;
-  results.reserve(IGRAPH_VIT_SIZE(vit));
+  results.reserve(static_cast<size_t>(IGRAPH_VIT_SIZE(vit)));
   while (!IGRAPH_VIT_END(vit)) {
     long int vertexId1 = static_cast<long int>(IGRAPH_VIT_GET(vit));
     Atom atom = this->getAtomByVertexIdx(vertexId1);
@@ -690,7 +694,7 @@ std::vector<double>
 AtomGraphParent::computeBondLengths(const Box& box) const
 {
   std::vector<double> lengths;
-  lengths.reserve(this->getNrOfEdges());
+  lengths.reserve(static_cast<size_t>(this->getNrOfEdges()));
   if (this->getNrOfEdges() == 0) {
     return lengths;
   }
@@ -724,7 +728,7 @@ std::vector<Eigen::Vector3d>
 AtomGraphParent::computeBondVectors(const Box& box) const
 {
   std::vector<Eigen::Vector3d> lengths;
-  lengths.reserve(this->getNrOfEdges());
+  lengths.reserve(static_cast<size_t>(this->getNrOfEdges()));
   if (this->getNrOfEdges() == 0) {
     return lengths;
   }
@@ -866,11 +870,11 @@ AtomGraphParent::getEdges() const
   }
 
   std::vector<long int> from;
-  from.reserve(this->getNrOfEdges());
+  from.reserve(static_cast<size_t>(this->getNrOfEdges()));
   std::vector<long int> to;
-  to.reserve(this->getNrOfEdges());
+  to.reserve(static_cast<size_t>(this->getNrOfEdges()));
   std::vector<long int> type;
-  type.reserve(this->getNrOfEdges());
+  type.reserve(static_cast<size_t>(this->getNrOfEdges()));
 
   for (long int i = 0; i < igraph_vector_int_size(&allEdges); i++) {
     if (i % 2 == 0) {
@@ -921,23 +925,24 @@ AtomGraphParent::getBonds() const
 {
   std::map<std::string, std::vector<long int>> vertexResults = this->getEdges();
 
+  const size_t nrOfEdges = static_cast<size_t>(this->getNrOfEdges());
   std::vector<long int> newFrom;
   std::vector<long int> newTo;
-  newFrom.reserve(this->getNrOfEdges());
-  newTo.reserve(this->getNrOfEdges());
+  newFrom.reserve(nrOfEdges);
+  newTo.reserve(nrOfEdges);
 
   std::vector<long int> oldFrom = vertexResults.at("edge_from");
-  assert(oldFrom.size() == this->getNrOfEdges());
+  assert(oldFrom.size() == nrOfEdges);
   std::vector<long int> oldTo = vertexResults.at("edge_to");
-  assert(oldTo.size() == this->getNrOfEdges());
+  assert(oldTo.size() == nrOfEdges);
 
-  for (int i = 0; i < this->getNrOfEdges(); ++i) {
+  for (size_t i = 0; i < nrOfEdges; ++i) {
     newFrom.push_back(this->getAtomIdByIdx(oldFrom[i]));
     newTo.push_back(this->getAtomIdByIdx(oldTo[i]));
   }
 
-  assert(newFrom.size() == this->getNrOfEdges());
-  assert(newTo.size() == this->getNrOfEdges());
+  assert(newFrom.size() == nrOfEdges);
+  assert(newTo.size() == nrOfEdges);
 
   std::map<std::string, std::vector<long int>> results;
   results.insert_or_assign("bond_from", newFrom);

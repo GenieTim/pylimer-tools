@@ -337,8 +337,10 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     SECTION("Graph copy can be accessed")
     {
       igraph_t graph = universe.getCopyOfGraph();
-      CHECK(igraph_vcount(&graph) == universe.getNrOfAtoms());
-      CHECK(igraph_ecount(&graph) == universe.getNrOfBonds());
+      CHECK(static_cast<size_t>(igraph_vcount(&graph)) ==
+            universe.getNrOfAtoms());
+      CHECK(static_cast<size_t>(igraph_ecount(&graph)) ==
+            universe.getNrOfBonds());
       igraph_integer_t degree;
       igraph_degree_1(&graph, &degree, 0, IGRAPH_ALL, IGRAPH_LOOPS_TWICE);
       CHECK(degree == 2);
@@ -400,7 +402,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       universe.writeGraphToFile("test-graph.gml");
       REQUIRE_THROWS(universe.removeBonds({ {} }, { { 1, 2, 3 } }));
       universe.removeBonds({ { 1, 2, 3 } }, { { 2, 3, 6 } });
-      CHECK(universe.getNrOfBonds() == bondsBefore - 3);
+      CHECK(universe.getNrOfBonds() == static_cast<size_t>(bondsBefore - 3));
     }
 
     SECTION("Get bonds returns")
@@ -549,7 +551,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       auto allBonds = universe.getBonds();
       std::vector<long int> bondsOf1;
       std::vector<long int> bondsOf2;
-      for (int i = 0; i < allBonds["bond_from"].size(); ++i) {
+      for (size_t i = 0; i < allBonds["bond_from"].size(); ++i) {
         if (allBonds["bond_from"][i] == 1) {
           bondsOf1.push_back(allBonds["bond_to"][i]);
         }
@@ -627,7 +629,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       REQUIRE(reducedUniverse.getAtomTypes().size() == 3);
       for (const auto& myPair : loops) {
         for (const std::vector<pe::Atom>& loop : myPair.second) {
-          REQUIRE(loop.size() == myPair.first);
+          REQUIRE(loop.size() == static_cast<size_t>(myPair.first));
         }
       }
       REQUIRE(loops[1][0][0].getId() == 4);
@@ -857,7 +859,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
         std::vector<int> type;
         type.push_back(i);
         // this is slow and could easily be optimized, but whatever
-        for (size_t j = 0; j < nrOfMolecules[i]; ++j) {
+        for (int j = 0; j < nrOfMolecules[i]; ++j) {
           std::vector<long int> atomId;
           atomId.push_back(currentId);
           universe.addAtoms(atomId,
@@ -981,13 +983,14 @@ TEST_CASE("Universe can be decomposed", "[Universe][entity]")
   std::vector<long int> atomIds;
   std::vector<long int> bondFrom, bondTo;
   double offset = 10.0;
-  for (int i = 0; i < nrOfBeads; ++i) {
+  for (int i = 0; i < static_cast<int>(nrOfBeads); ++i) {
     xPositions.push_back(i * 1.0 + offset);
     yPositions.push_back(0.1 * static_cast<double>(i % 4 - i % 3) +
                          offset); // /!\ i needs to be int, not unsigned!
     zPositions.push_back(0.1 * static_cast<double>(i % 5 - i % 7) + offset); //
     atomIds.push_back(i);
-    atomTypes.push_back(i % nrOfBeadsPerChain == 0 ? 2 : 1);
+    atomTypes.push_back(static_cast<size_t>(i) % nrOfBeadsPerChain == 0 ? 2
+                                                                        : 1);
     zeroInts.push_back(0);
     if (i > 0) {
       bondFrom.push_back(i - 1);
@@ -1063,8 +1066,9 @@ TEST_CASE("Coordinates work")
       std::vector<pe::Atom> atoms = molecule.getAtomsLinedUp();
       std::vector<igraph_integer_t> alignedVertices =
         molecule.getVerticesLinedUp(2);
-      CHECK(alignedVertices.size() == molecule.getLength());
-      CHECK(atoms.size() == molecule.getLength());
+      CHECK(alignedVertices.size() ==
+            static_cast<size_t>(molecule.getLength()));
+      CHECK(atoms.size() == static_cast<size_t>(molecule.getLength()));
       for (size_t i = 0; i < 3; ++i) {
         CHECK(molecule.getIdxByAtomId(atoms[i].getId()) == alignedVertices[i]);
       }
@@ -1085,8 +1089,8 @@ TEST_CASE("Coordinates work")
 
     std::vector<igraph_integer_t> alignedVertices =
       molecules[0].getVerticesLinedUp(2);
-    Eigen::VectorXd alignedCoordinates =
-      Eigen::VectorXd::Zero(3 * alignedVertices.size());
+    Eigen::VectorXd alignedCoordinates = Eigen::VectorXd::Zero(
+      3 * static_cast<Eigen::Index>(alignedVertices.size()));
     pe::Box box = universe.getBox();
     Eigen::VectorXd vertexCoordinates =
       molecules[0].getUnwrappedVertexCoordinates(alignedVertices, box);
@@ -1097,13 +1101,14 @@ TEST_CASE("Coordinates work")
     CHECK(alignedCoordinates[0] == 0.);
     CHECK(alignedCoordinates[1] == 0.1);
     for (size_t i = 0; i < 3; ++i) {
-      CHECK(alignedCoordinates[3 * i + 0] == atomsLinedUp[i].getX());
-      CHECK(alignedCoordinates[3 * i + 1] == atomsLinedUp[i].getY());
-      CHECK(alignedCoordinates[3 * i + 2] == atomsLinedUp[i].getZ());
+      const Eigen::Index idx = static_cast<Eigen::Index>(3 * i);
+      CHECK(alignedCoordinates[idx + 0] == atomsLinedUp[i].getX());
+      CHECK(alignedCoordinates[idx + 1] == atomsLinedUp[i].getY());
+      CHECK(alignedCoordinates[idx + 2] == atomsLinedUp[i].getZ());
       //
-      CHECK(alignedCoordinates[3 * i + 0] == vertexCoordinates[3 * i + 0]);
-      CHECK(alignedCoordinates[3 * i + 1] == vertexCoordinates[3 * i + 1]);
-      CHECK(alignedCoordinates[3 * i + 2] == vertexCoordinates[3 * i + 2]);
+      CHECK(alignedCoordinates[idx + 0] == vertexCoordinates[idx + 0]);
+      CHECK(alignedCoordinates[idx + 1] == vertexCoordinates[idx + 1]);
+      CHECK(alignedCoordinates[idx + 2] == vertexCoordinates[idx + 2]);
     }
   }
 
@@ -1132,8 +1137,8 @@ TEST_CASE("Coordinates work")
     Eigen::VectorXd coordinates =
       universe.getUnwrappedVertexCoordinates(indices, box);
     CHECK(coordinates.size() == 9);
-    for (size_t i = 0; i < 3; ++i) {
-      for (size_t dir = 0; dir < 3; ++dir) {
+    for (Eigen::Index i = 0; i < 3; ++i) {
+      for (Eigen::Index dir = 0; dir < 3; ++dir) {
         CHECK(coordinates[i * 3 + dir] == i + 2);
       }
     }
@@ -1183,9 +1188,10 @@ TEST_CASE("Large universe can be used", "[Universe][entity]")
       for (long int atomId : m.getPropertyValues<long int>("id")) {
         igraph_integer_t vertexId = universe.getIdxByAtomId(atomId);
         if (m.getType() == pe::MoleculeType::DANGLING_CHAIN) {
-          CHECK(moleculeTypes[vertexId] == m.getType());
+          CHECK(moleculeTypes[static_cast<size_t>(vertexId)] == m.getType());
         } else if (m.getType() == pe::MoleculeType::PRIMARY_LOOP) {
-          CHECK(moleculeTypes[vertexId] == pe::MoleculeType::UNDEFINED);
+          CHECK(moleculeTypes[static_cast<size_t>(vertexId)] ==
+                pe::MoleculeType::UNDEFINED);
         }
       }
     }
@@ -1293,8 +1299,11 @@ TEST_CASE("Free & Dangling Chains are identified", "[Universe][entity]")
     std::vector<int> degrees = universe.getVertexDegrees();
     CHECK(degrees.size() == universe.getNrOfAtoms());
     for (size_t i = 0; i < degrees.size(); ++i) {
-      CHECK(degrees[i] ==
-            universe.getConnectedAtoms(universe.getAtomByVertexIdx(i)).size());
+      CHECK(static_cast<size_t>(degrees[i]) ==
+            universe
+              .getConnectedAtoms(
+                universe.getAtomByVertexIdx(static_cast<igraph_integer_t>(i)))
+              .size());
     }
   }
 }

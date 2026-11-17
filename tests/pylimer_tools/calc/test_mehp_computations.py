@@ -111,13 +111,11 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
         self.assertEqual(0, compute_cycle_rank(None, 1, 1))
         self.assertEqual(-1, compute_cycle_rank(None, 0, 1))
         universe = Universe(10, 10, 10)
-        universe = self.addAtomBondData(
-            universe, self.testAtoms, self.testBonds)
+        universe = self.addAtomBondData(universe, self.testAtoms, self.testBonds)
         # test basic exception thrown when specifying the wrong arguments
         self.assertRaises(
             ValueError,
-            lambda: compute_cycle_rank(
-                networks=[universe], crosslinker_type=None),
+            lambda: compute_cycle_rank(networks=[universe], crosslinker_type=None),
         )
         self.assertRaises(
             ValueError,
@@ -152,16 +150,14 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
 
     def test_topological_factor_computation(self):
         self.assertEqual(
-            1 + 1.0 /
-            3.0, compute_topological_factor([self.testUniverse], 2, b=1)
+            1 + 1.0 / 3.0, compute_topological_factor([self.testUniverse], 2, b=1)
         )
         bond_lengths = []
         for m in self.testUniverse.get_molecules(2):
             bond_lengths.extend(m.compute_bond_lengths())
         self.assertEqual(1, np.mean(bond_lengths))
         self.assertEqual(
-            0.5485762961986437, compute_topological_factor(
-                [self.testUniverse], 2)
+            0.5485762961986437, compute_topological_factor([self.testUniverse], 2)
         )
         # larger system
         # g = self.saturatedTestUniverse.getUnderlyingGraph()
@@ -177,15 +173,7 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
         universe = Universe(20, 20, 20)
         # Directly bonded crosslinkers: N = 2
         universe.add_atoms(
-            [
-                1, 2], [
-                2, 2], [
-                0.0, 1.0], [
-                0.0, 0.0], [
-                    0.0, 0.0], [
-                        0, 0], [
-                            0, 0], [
-                                0, 0]
+            [1, 2], [2, 2], [0.0, 1.0], [0.0, 0.0], [0.0, 0.0], [0, 0], [0, 0], [0, 0]
         )
         universe.add_bonds([1], [2])
         # Normal polymer strand: crosslinker 3 - monomer 4 - crosslinker 5 (N =
@@ -203,19 +191,16 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
         universe.add_bonds([3, 4], [4, 5])
 
         # R^2 = 4, (N - 2) = 1, b = 1 => contribution = 4.0
-        gamma = compute_topological_factor(
-            [universe], crosslinker_type=2, b=1.0)
+        gamma = compute_topological_factor([universe], crosslinker_type=2, b=1.0)
         self.assertAlmostEqual(4.0, gamma)
 
     def test_shear_modulus_prediction(self):
         self.assertEqual(
-            0.0, predict_shear_modulus(
-                [self.emptyUniverse], crosslinker_type=2)
+            0.0, predict_shear_modulus([self.emptyUniverse], crosslinker_type=2)
         )
         self.assertEqual(
             0.003624521957026753,
-            predict_shear_modulus(
-                [self.saturatedTestUniverse], crosslinker_type=2),
+            predict_shear_modulus([self.saturatedTestUniverse], crosslinker_type=2),
         )
 
 

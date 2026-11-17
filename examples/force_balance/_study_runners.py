@@ -112,8 +112,7 @@ def _simulate_link_vs_spring_single_repeat(
             )
             extra_springs[i] = fb_s.get_nr_of_extra_atoms()
             fb_s.run_force_relaxation()
-            g_springs[i] = (
-                gamma_conv * fb_s.get_gamma_factor(r02) / vol) * 1e6
+            g_springs[i] = (gamma_conv * fb_s.get_gamma_factor(r02) / vol) * 1e6
 
     return r, g_links, g_springs, extra_links, extra_springs
 
@@ -132,16 +131,14 @@ def run_entanglement_link_vs_spring_simulation(
     Averages over independent network realizations and stochastic entanglement samplings
     to provide statistically robust comparisons with Student's t 95% confidence intervals.
     """
-    params = get_parameters_for_polymer(
-        "PDMS", parameter_type=ParameterType.GAUSSIAN)
+    params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
     b = params.get("<b>").to(params.get("distance_units")).magnitude
     bead_density = params.get_bead_density()
     cutoff = params.get_sampling_cutoff()
     nominal_ent_density = params.get_entanglement_density()
     r02 = params.get("R02").to(params.get("distance_units") ** 2).magnitude
     kbt = params.get("T") * params.get("kb")
-    gamma_conv = (
-        (kbt / ((params.get("distance_units")) ** 3)).to("MPa")).magnitude
+    gamma_conv = ((kbt / ((params.get("distance_units")) ** 3)).to("MPa")).magnitude
 
     n_atoms = n_strands * strand_len + int(0.5 * n_strands)
     vol = n_atoms / bead_density
@@ -201,15 +198,12 @@ def run_entanglement_link_vs_spring_simulation(
                 )
     else:
         for task in tasks:
-            r, g_l, g_s, ex_l, ex_s = _simulate_link_vs_spring_single_repeat(
-                *task)
+            r, g_l, g_s, ex_l, ex_s = _simulate_link_vs_spring_single_repeat(*task)
             all_g_links[:, r] = g_l
             all_g_springs[:, r] = g_s
             all_extra_links[:, r] = ex_l
             all_extra_springs[:, r] = ex_s
-            print(
-                f"  [Link vs Spring] Completed repeat {
-                    r + 1}/{n_repeats}...")
+            print(f"  [Link vs Spring] Completed repeat {r + 1}/{n_repeats}...")
 
     # Compute statistical moments and 95% confidence intervals across seeds
     stat_links = compute_ensemble_statistics(all_g_links, axis=1)
@@ -278,9 +272,7 @@ def _simulate_slipping_vs_fixed_single_repeat(
         if n_target == 0:
             # Bare unentangled crosslinker network
             fb = gen.get_force_balance()
-            fb.run_force_relaxation(
-                max_nr_of_steps=5000,
-                disable_slipping=True)
+            fb.run_force_relaxation(max_nr_of_steps=5000, disable_slipping=True)
             g_pa = (gamma_conv * np.sum(fb.get_gamma_factors(r02)) / vol) * 1e6
             it = fb.get_nr_of_iterations()
             g_fixed[i] = g_pa
@@ -301,8 +293,7 @@ def _simulate_slipping_vs_fixed_single_repeat(
 
             # 1. Fixed Entanglement Links (disable_slipping=True)
             fb_fixed = gen.get_force_balance(es)
-            fb_fixed.run_force_relaxation(
-                max_nr_of_steps=5000, disable_slipping=True)
+            fb_fixed.run_force_relaxation(max_nr_of_steps=5000, disable_slipping=True)
             g_fixed[i] = (
                 gamma_conv * np.sum(fb_fixed.get_gamma_factors(r02)) / vol
             ) * 1e6
@@ -310,8 +301,7 @@ def _simulate_slipping_vs_fixed_single_repeat(
 
             # 2. Dynamic Slipping Links (disable_slipping=False)
             fb_slip = gen.get_force_balance(es)
-            fb_slip.run_force_relaxation(
-                max_nr_of_steps=5000, disable_slipping=False)
+            fb_slip.run_force_relaxation(max_nr_of_steps=5000, disable_slipping=False)
             g_slip[i] = (
                 gamma_conv * np.sum(fb_slip.get_gamma_factors(r02)) / vol
             ) * 1e6
@@ -330,16 +320,14 @@ def run_slipping_vs_fixed_simulation(
     max_workers: Optional[int] = None,
 ) -> Dict[str, Any]:
     """Evaluate shear modulus and iteration count comparing slipping vs. fixed links."""
-    params = get_parameters_for_polymer(
-        "PDMS", parameter_type=ParameterType.GAUSSIAN)
+    params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
     b = params.get("<b>").to(params.get("distance_units")).magnitude
     bead_density = params.get_bead_density()
     cutoff = params.get_sampling_cutoff()
     nominal_ent_density = params.get_entanglement_density()
     r02 = params.get("R02").to(params.get("distance_units") ** 2).magnitude
     kbt = params.get("T") * params.get("kb")
-    gamma_conv = (
-        (kbt / ((params.get("distance_units")) ** 3)).to("MPa")).magnitude
+    gamma_conv = ((kbt / ((params.get("distance_units")) ** 3)).to("MPa")).magnitude
 
     n_atoms = n_strands * strand_len + int(0.5 * n_strands)
     vol = n_atoms / bead_density
@@ -382,8 +370,7 @@ def run_slipping_vs_fixed_simulation(
             max_workers=workers, initializer=worker_process_initializer
         ) as executor:
             futures = [
-                executor.submit(
-                    _simulate_slipping_vs_fixed_single_repeat, *task)
+                executor.submit(_simulate_slipping_vs_fixed_single_repeat, *task)
                 for task in tasks
             ]
             for fut in as_completed(futures):
@@ -407,9 +394,7 @@ def run_slipping_vs_fixed_simulation(
             all_g_slip[:, r] = g_slip
             all_iter_fixed[:, r] = iter_fixed
             all_iter_slip[:, r] = iter_slip
-            print(
-                f"  [Slipping vs Fixed] Completed repeat {
-                    r + 1}/{n_repeats}...")
+            print(f"  [Slipping vs Fixed] Completed repeat {r + 1}/{n_repeats}...")
 
     stat_g_fixed = compute_ensemble_statistics(all_g_fixed, axis=1)
     stat_g_slip = compute_ensemble_statistics(all_g_slip, axis=1)
@@ -514,8 +499,7 @@ def _simulate_polydispersity_single_repeat(
 
 
 def run_polydispersity_simulation(
-    pdi_values: Sequence[float] = (
-        1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8),
+    pdi_values: Sequence[float] = (1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8),
     n_strands: int = 10000,
     avg_len: int = 50,
     conversion: float = 0.925,
@@ -524,8 +508,7 @@ def run_polydispersity_simulation(
     max_workers: Optional[int] = None,
 ) -> Dict[str, Any]:
     """Execute multi-seed ensemble simulations of polymer network polydispersity."""
-    params = get_parameters_for_polymer(
-        "PDMS", parameter_type=ParameterType.GAUSSIAN)
+    params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
     b = params.get("<b>").to(params.get("distance_units")).magnitude
     cutoff = params.get_sampling_cutoff()
     ent_density = params.get_entanglement_density()
@@ -593,9 +576,7 @@ def run_polydispersity_simulation(
             all_g_phantom[:, r] = g_ph
             all_w_active[:, r] = w_act
             all_w_dangling[:, r] = w_dang
-            print(
-                f"  [Polydispersity Study] Completed repeat {
-                    r + 1}/{n_repeats}...")
+            print(f"  [Polydispersity Study] Completed repeat {r + 1}/{n_repeats}...")
 
     all_g_ent = all_g_total - all_g_phantom
 
@@ -691,8 +672,7 @@ def _simulate_sampling_cutoff_single_repeat(
         assert fb_l.validate_network()
         res_links[i] = fb_l.get_displacement_residual_norm()
         fb_l.run_force_relaxation()
-        g_links[i] = gamma_conv * \
-            np.sum(fb_l.get_gamma_factors(r02_mag)) / vol_std
+        g_links[i] = gamma_conv * np.sum(fb_l.get_gamma_factors(r02_mag)) / vol_std
         iter_links[i] = fb_l.get_nr_of_iterations()
 
         # Compliant Entanglement Springs
@@ -705,8 +685,7 @@ def _simulate_sampling_cutoff_single_repeat(
         assert fb_s.validate_network()
         res_springs[i] = fb_s.get_displacement_residual_norm()
         fb_s.run_force_relaxation()
-        g_springs[i] = gamma_conv * \
-            np.sum(fb_s.get_gamma_factors(r02_mag)) / vol_std
+        g_springs[i] = gamma_conv * np.sum(fb_s.get_gamma_factors(r02_mag)) / vol_std
         iter_springs[i] = fb_s.get_nr_of_iterations()
 
     # -------------------------------------------------------------
@@ -848,16 +827,12 @@ def run_sampling_cutoff_simulation(
     max_workers: Optional[int] = None,
 ) -> Dict[str, Any]:
     """Execute multi-seed ensemble simulation across sampling cutoffs and system parameters."""
-    params = get_parameters_for_polymer(
-        "PDMS", parameter_type=ParameterType.GAUSSIAN)
+    params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
     b = float(params.get("<b>").to(params.get("distance_units")).magnitude)
     rho = float(params.get_bead_density())
-    r02_mag = float(
-        params.get("R02").to(
-            params.get("distance_units") ** 2).magnitude)
+    r02_mag = float(params.get("R02").to(params.get("distance_units") ** 2).magnitude)
     kbt = params.get("T") * params.get("kb")
-    gamma_conv = float(
-        (kbt / (params.get("distance_units") ** 3)).to("MPa").magnitude)
+    gamma_conv = float((kbt / (params.get("distance_units") ** 3)).to("MPa").magnitude)
     ent_density = float(params.get_entanglement_density())
     default_cutoff = float(params.get_sampling_cutoff())
 
@@ -895,8 +870,7 @@ def run_sampling_cutoff_simulation(
 
     workers = min(resolve_max_workers(max_workers), n_repeats)
     configure_process_threading(workers)
-    print(
-        f"Executing {n_repeats} repeats in parallel across {workers} workers...")
+    print(f"Executing {n_repeats} repeats in parallel across {workers} workers...")
 
     if workers > 1 and n_repeats > 1:
         with ProcessPoolExecutor(
@@ -921,8 +895,7 @@ def run_sampling_cutoff_simulation(
                 all_g_p82[:, r] = res["g_p82"]
                 all_g_r75[:, r] = res["g_r75"]
                 for c_k in ["1.2", "2.0", "3.0"]:
-                    collected_dists[c_k].append(
-                        res["sampled_dists"][f"dists_{c_k}"])
+                    collected_dists[c_k].append(res["sampled_dists"][f"dists_{c_k}"])
                 completed += 1
                 print(
                     f"  [Cutoff Study] Completed repeat {completed}/{
@@ -944,8 +917,7 @@ def run_sampling_cutoff_simulation(
             all_g_p82[:, r] = res["g_p82"]
             all_g_r75[:, r] = res["g_r75"]
             for c_k in ["1.2", "2.0", "3.0"]:
-                collected_dists[c_k].append(
-                    res["sampled_dists"][f"dists_{c_k}"])
+                collected_dists[c_k].append(res["sampled_dists"][f"dists_{c_k}"])
             print(f"  [Cutoff Study] Completed repeat {r + 1}/{n_repeats}...")
 
     # Compute statistical moments across repeats
@@ -1116,8 +1088,7 @@ def _simulate_inactive_removal_single_repeat(
         fb1.run_force_relaxation(
             simplification_mode=pt.StructureSimplificationMode.NO_SIMPLIFICATION
         )
-        g_unf_nosimp[i] = (
-            gamma_conv * np.sum(fb1.get_gamma_factors(r02)) / vol) * 1e6
+        g_unf_nosimp[i] = (gamma_conv * np.sum(fb1.get_gamma_factors(r02)) / vol) * 1e6
         sp_unf_nosimp[i] = fb1.network.nr_of_springs
         links_unf_nosimp[i] = fb1.network.nr_of_links
         iter_unf_nosimp[i] = fb1.get_nr_of_iterations()
@@ -1128,8 +1099,7 @@ def _simulate_inactive_removal_single_repeat(
             simplification_mode=pt.StructureSimplificationMode.INACTIVE_ONLY,
             inactive_removal_cutoff=inactive_cutoff,
         )
-        g_unf_inact[i] = (
-            gamma_conv * np.sum(fb2.get_gamma_factors(r02)) / vol) * 1e6
+        g_unf_inact[i] = (gamma_conv * np.sum(fb2.get_gamma_factors(r02)) / vol) * 1e6
         sp_unf_inact[i] = fb2.network.nr_of_springs
         links_unf_inact[i] = fb2.network.nr_of_links
         iter_unf_inact[i] = fb2.get_nr_of_iterations()
@@ -1140,8 +1110,7 @@ def _simulate_inactive_removal_single_repeat(
             simplification_mode=pt.StructureSimplificationMode.INACTIVE_THEN_X2F,
             inactive_removal_cutoff=inactive_cutoff,
         )
-        g_unf_x2f[i] = (
-            gamma_conv * np.sum(fb3.get_gamma_factors(r02)) / vol) * 1e6
+        g_unf_x2f[i] = (gamma_conv * np.sum(fb3.get_gamma_factors(r02)) / vol) * 1e6
         sp_unf_x2f[i] = fb3.network.nr_of_springs
         links_unf_x2f[i] = fb3.network.nr_of_links
         iter_unf_x2f[i] = fb3.get_nr_of_iterations()
@@ -1151,8 +1120,7 @@ def _simulate_inactive_removal_single_repeat(
         fb4.run_force_relaxation(
             simplification_mode=pt.StructureSimplificationMode.NO_SIMPLIFICATION
         )
-        g_filt_nosimp[i] = (
-            gamma_conv * np.sum(fb4.get_gamma_factors(r02)) / vol) * 1e6
+        g_filt_nosimp[i] = (gamma_conv * np.sum(fb4.get_gamma_factors(r02)) / vol) * 1e6
         sp_filt_nosimp[i] = fb4.network.nr_of_springs
         links_filt_nosimp[i] = fb4.network.nr_of_links
         iter_filt_nosimp[i] = fb4.get_nr_of_iterations()
@@ -1163,8 +1131,7 @@ def _simulate_inactive_removal_single_repeat(
             simplification_mode=pt.StructureSimplificationMode.INACTIVE_THEN_X2F,
             inactive_removal_cutoff=inactive_cutoff,
         )
-        g_filt_x2f[i] = (
-            gamma_conv * np.sum(fb5.get_gamma_factors(r02)) / vol) * 1e6
+        g_filt_x2f[i] = (gamma_conv * np.sum(fb5.get_gamma_factors(r02)) / vol) * 1e6
         sp_filt_x2f[i] = fb5.network.nr_of_springs
         links_filt_x2f[i] = fb5.network.nr_of_links
         iter_filt_x2f[i] = fb5.get_nr_of_iterations()
@@ -1205,8 +1172,7 @@ def run_inactive_removal_and_sampling_simulation(
     max_workers: Optional[int] = None,
 ) -> Dict[str, Any]:
     """Execute multi-seed ensemble simulation comparing inactive strand removal and sampling."""
-    params = get_parameters_for_polymer(
-        "PDMS", parameter_type=ParameterType.GAUSSIAN)
+    params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
     b = params.get("<b>").to(params.get("distance_units")).magnitude
     cutoff = params.get_sampling_cutoff()
     ent_density = params.get_entanglement_density()
@@ -1384,9 +1350,7 @@ def run_inactive_removal_and_sampling_simulation(
             all_iter_unf_x2f[:, r] = it3
             all_iter_filt_nosimp[:, r] = it4
             all_iter_filt_x2f[:, r] = it5
-            print(
-                f"  [Inactive Removal] Completed repeat {
-                    r + 1}/{n_repeats}...")
+            print(f"  [Inactive Removal] Completed repeat {r + 1}/{n_repeats}...")
 
     # Compute ensemble statistics
     stat_g_unf_nosimp = compute_ensemble_statistics(all_g_unf_nosimp, axis=1)
@@ -1398,27 +1362,19 @@ def run_inactive_removal_and_sampling_simulation(
     stat_sp_unf_nosimp = compute_ensemble_statistics(all_sp_unf_nosimp, axis=1)
     stat_sp_unf_inact = compute_ensemble_statistics(all_sp_unf_inact, axis=1)
     stat_sp_unf_x2f = compute_ensemble_statistics(all_sp_unf_x2f, axis=1)
-    stat_sp_filt_nosimp = compute_ensemble_statistics(
-        all_sp_filt_nosimp, axis=1)
+    stat_sp_filt_nosimp = compute_ensemble_statistics(all_sp_filt_nosimp, axis=1)
     stat_sp_filt_x2f = compute_ensemble_statistics(all_sp_filt_x2f, axis=1)
 
-    stat_links_unf_nosimp = compute_ensemble_statistics(
-        all_links_unf_nosimp, axis=1)
-    stat_links_unf_inact = compute_ensemble_statistics(
-        all_links_unf_inact, axis=1)
+    stat_links_unf_nosimp = compute_ensemble_statistics(all_links_unf_nosimp, axis=1)
+    stat_links_unf_inact = compute_ensemble_statistics(all_links_unf_inact, axis=1)
     stat_links_unf_x2f = compute_ensemble_statistics(all_links_unf_x2f, axis=1)
-    stat_links_filt_nosimp = compute_ensemble_statistics(
-        all_links_filt_nosimp, axis=1)
-    stat_links_filt_x2f = compute_ensemble_statistics(
-        all_links_filt_x2f, axis=1)
+    stat_links_filt_nosimp = compute_ensemble_statistics(all_links_filt_nosimp, axis=1)
+    stat_links_filt_x2f = compute_ensemble_statistics(all_links_filt_x2f, axis=1)
 
-    stat_iter_unf_nosimp = compute_ensemble_statistics(
-        all_iter_unf_nosimp, axis=1)
-    stat_iter_unf_inact = compute_ensemble_statistics(
-        all_iter_unf_inact, axis=1)
+    stat_iter_unf_nosimp = compute_ensemble_statistics(all_iter_unf_nosimp, axis=1)
+    stat_iter_unf_inact = compute_ensemble_statistics(all_iter_unf_inact, axis=1)
     stat_iter_unf_x2f = compute_ensemble_statistics(all_iter_unf_x2f, axis=1)
-    stat_iter_filt_nosimp = compute_ensemble_statistics(
-        all_iter_filt_nosimp, axis=1)
+    stat_iter_filt_nosimp = compute_ensemble_statistics(all_iter_filt_nosimp, axis=1)
     stat_iter_filt_x2f = compute_ensemble_statistics(all_iter_filt_x2f, axis=1)
 
     return {
@@ -1553,8 +1509,7 @@ def _run_scaling_grid(
     interquartile-range (25th–75th percentile) statistics capture both timing jitter and
     network realization variance.
     """
-    params = get_parameters_for_polymer(
-        "PDMS", parameter_type=ParameterType.GAUSSIAN)
+    params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
     bead_density = params.get_bead_density()
     cutoff = params.get_sampling_cutoff()
     ent_density = params.get_entanglement_density()
@@ -1585,8 +1540,7 @@ def _run_scaling_grid(
                     str(cutoff),
                     str(ent_density),
                 ]
-                res = subprocess.run(
-                    cmd, capture_output=True, text=True, check=True)
+                res = subprocess.run(cmd, capture_output=True, text=True, check=True)
                 lines = [
                     line
                     for line in res.stdout.strip().split("\n")
@@ -1618,12 +1572,8 @@ def _run_scaling_grid(
                 f"N_atoms={atoms[-1]:7d} | Time={med['time']:6.2f}s "
                 f"[{med['time_q25']:.2f}, {med['time_q75']:.2f}] "
                 f"(univ={med['t_universe']:5.2f}s, "
-                f"sample={
-                    med['t_sample']:5.2f}s, build={
-                    med['t_build']:5.2f}s) | "
-                f"RSS={
-                    med['rss_mb']:6.1f} MB | n_sampled={
-                    med['n_sampled']:.0f}"
+                f"sample={med['t_sample']:5.2f}s, build={med['t_build']:5.2f}s) | "
+                f"RSS={med['rss_mb']:6.1f} MB | n_sampled={med['n_sampled']:.0f}"
             )
 
     def col(mode: str, key: str) -> np.ndarray:
@@ -1683,8 +1633,7 @@ def run_strand_length_benchmark(
     :math:`O(N_{\\text{atoms}})` effects (discrete ``Universe`` construction and RAM).
     """
     print(f"Running Strand-Length Benchmark at ~{target_atoms} atoms...")
-    configs = [(max(10, round(target_atoms / (sl + 0.5))), sl)
-               for sl in strand_lens]
+    configs = [(max(10, round(target_atoms / (sl + 0.5))), sl) for sl in strand_lens]
     return _run_scaling_grid(
         configs,
         seed=seed,
@@ -1708,8 +1657,7 @@ def run_distribution_comparison(
 ) -> Dict[str, np.ndarray]:
     """Sample entanglements and compare contour position alpha and spatial distance distributions."""
     print("Running Conformational Distribution Comparison...")
-    params = get_parameters_for_polymer(
-        "PDMS", parameter_type=ParameterType.GAUSSIAN)
+    params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
     b = params.get("<b>").to(params.get("distance_units")).magnitude
     bead_density = params.get_bead_density()
     cutoff = params.get_sampling_cutoff()
@@ -1739,8 +1687,7 @@ def run_distribution_comparison(
         "od_seed",
         pt.EntanglementFilteringMode.NONE,
     )
-    alpha_od = np.concatenate(
-        [np.array(es_od.alpha_1), np.array(es_od.alpha_2)])
+    alpha_od = np.concatenate([np.array(es_od.alpha_1), np.array(es_od.alpha_2)])
 
     pos1_od = np.array(es_od.position_1).reshape(-1, 3)
     pos2_od = np.array(es_od.position_2).reshape(-1, 3)
@@ -1781,8 +1728,7 @@ def run_distribution_comparison(
         atom2 = u.get_atom(a2)
         dist_disc.append(atom1.distance_to(atom2, box))
 
-    print(
-        f"Sampled {len(dist_od)} on-demand pairs, {len(dist_disc)} discrete pairs.")
+    print(f"Sampled {len(dist_od)} on-demand pairs, {len(dist_disc)} discrete pairs.")
     return {
         "alpha_on_demand": np.array(alpha_od),
         "dist_on_demand": np.array(dist_od),
@@ -1868,8 +1814,7 @@ def _simulate_conversion_sweep_single_repeat(
             upper_sampling_cutoff=cutoff,
             entanglements_as_springs=False,
         )
-        fb_disc.run_force_relaxation(
-            pt.StructureSimplificationMode.INACTIVE_THEN_X2F)
+        fb_disc.run_force_relaxation(pt.StructureSimplificationMode.INACTIVE_THEN_X2F)
         g_d[i] = gamma_conv * np.sum(fb_disc.get_gamma_factors(r02)) / vol
         w_d[i] = fb_disc.get_active_weight_fraction()
         n_d[i] = _count_active_entanglements(fb_disc)
@@ -1906,8 +1851,7 @@ def _simulate_conversion_sweep_single_repeat(
         fb_od_unfilt.run_force_relaxation(
             pt.StructureSimplificationMode.INACTIVE_THEN_X2F
         )
-        g_odu[i] = gamma_conv * \
-            np.sum(fb_od_unfilt.get_gamma_factors(r02)) / vol
+        g_odu[i] = gamma_conv * np.sum(fb_od_unfilt.get_gamma_factors(r02)) / vol
         w_odu[i] = fb_od_unfilt.get_active_weight_fraction()
         n_odu[i] = _count_active_entanglements(fb_od_unfilt)
 
@@ -1935,16 +1879,14 @@ def run_conversion_sweep(
 ) -> Dict[str, Any]:
     """Compare modulus, active fractions, and active entanglement count across conversions."""
     print("Running Conversion Sweep across multi-seed ensembles...")
-    params = get_parameters_for_polymer(
-        "PDMS", parameter_type=ParameterType.GAUSSIAN)
+    params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
     b = params.get("<b>").to(params.get("distance_units")).magnitude
     bead_density = params.get_bead_density()
     cutoff = params.get_sampling_cutoff()
     ent_density = params.get_entanglement_density()
     r02 = params.get("R02").to(params.get("distance_units") ** 2).magnitude
     kbt = params.get("T") * params.get("kb")
-    gamma_conv = (
-        (kbt / ((params.get("distance_units")) ** 3)).to("MPa")).magnitude
+    gamma_conv = ((kbt / ((params.get("distance_units")) ** 3)).to("MPa")).magnitude
 
     n_atoms = n_strands * strand_len + int(0.5 * n_strands)
     vol = n_atoms / bead_density
@@ -1992,8 +1934,7 @@ def run_conversion_sweep(
             max_workers=workers, initializer=worker_process_initializer
         ) as executor:
             futures = [
-                executor.submit(
-                    _simulate_conversion_sweep_single_repeat, *task)
+                executor.submit(_simulate_conversion_sweep_single_repeat, *task)
                 for task in tasks
             ]
             for fut in as_completed(futures):
@@ -2047,9 +1988,7 @@ def run_conversion_sweep(
             g_odu_all[:, r] = g_odu
             w_odu_all[:, r] = w_odu
             n_odu_all[:, r] = n_odu
-            print(
-                f"  [Conversion Sweep] Completed repeat {
-                    r + 1}/{n_repeats}...")
+            print(f"  [Conversion Sweep] Completed repeat {r + 1}/{n_repeats}...")
 
     stat_gd = compute_ensemble_statistics(g_d_all, axis=1)
     stat_wd = compute_ensemble_statistics(w_d_all, axis=1)
@@ -2148,21 +2087,13 @@ def _run_single_pdms_rve_point(
         filtering_mode=EntanglementFilteringMode.OMIT_INACTIVE,
     )
     fb_ent = gen.get_force_balance2(es, entanglements_as_springs=False)
-    fb_ent.run_force_relaxation(
-        pt.StructureSimplificationMode.INACTIVE_THEN_X2F
-    )
-    g_total = float(
-        gamma_conv * fb_ent.get_gamma_factor(r02, nr_of_chains=1) / vol
-    )
+    fb_ent.run_force_relaxation(pt.StructureSimplificationMode.INACTIVE_THEN_X2F)
+    g_total = float(gamma_conv * fb_ent.get_gamma_factor(r02, nr_of_chains=1) / vol)
     w_active = float(fb_ent.get_active_weight_fraction())
 
     fb_ph = gen.get_force_balance2()
-    fb_ph.run_force_relaxation(
-        pt.StructureSimplificationMode.INACTIVE_THEN_X2F
-    )
-    g_phantom = float(
-        gamma_conv * fb_ph.get_gamma_factor(r02, nr_of_chains=1) / vol
-    )
+    fb_ph.run_force_relaxation(pt.StructureSimplificationMode.INACTIVE_THEN_X2F)
+    g_phantom = float(gamma_conv * fb_ph.get_gamma_factor(r02, nr_of_chains=1) / vol)
 
     n_atoms = n_strands * strand_len + n_xlinks
     return g_total, g_phantom, w_active, n_strands, n_atoms
@@ -2253,8 +2184,7 @@ def run_representative_volume_pdms_study(
       3. Stoichiometric imbalance r (at N=100, p = 0.95 * min(1, 1/r))
       4. Sample count precision vs. box size (at N=100, p=0.925, r=1.0, 24 repeats)
     """
-    params = get_parameters_for_polymer(
-        "PDMS", parameter_type=ParameterType.GAUSSIAN)
+    params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
     dist_unit = params.get("distance_units")
     b = params.get("<b>").to(dist_unit).magnitude
     b2 = params.get("<b^2>").to(dist_unit**2).magnitude
@@ -2424,10 +2354,7 @@ def run_representative_volume_pdms_study(
         with ProcessPoolExecutor(
             max_workers=workers, initializer=worker_process_initializer
         ) as executor:
-            futures = [
-                executor.submit(
-                    _simulate_rve_sweep_repeat,
-                    *t) for t in tasks]
+            futures = [executor.submit(_simulate_rve_sweep_repeat, *t) for t in tasks]
             for fut in as_completed(futures):
                 _store_result(fut.result())
                 completed += 1
@@ -2439,8 +2366,7 @@ def run_representative_volume_pdms_study(
         for idx, t in enumerate(tasks, start=1):
             _store_result(_simulate_rve_sweep_repeat(*t))
             if idx % 20 == 0 or idx == total_tasks:
-                print(
-                    f"  [PDMS RVE Study] Completed {idx}/{total_tasks} tasks...")
+                print(f"  [PDMS RVE Study] Completed {idx}/{total_tasks} tasks...")
 
     stat_n_gt = compute_ensemble_statistics(n_g_tot, axis=2)
     stat_n_gp = compute_ensemble_statistics(n_g_ph, axis=2)

@@ -61,10 +61,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 names = ["Melt (single)", "Diamond (imperfect)", "Diamond (fixed)"]
-universes = [
-    one_universe_seq.at_index(0),
-    sequence.at_index(0),
-    sequence.at_index(1)]
+universes = [one_universe_seq.at_index(0), sequence.at_index(0), sequence.at_index(1)]
 atom_counts = [u.get_nr_of_atoms() for u in universes]
 bond_counts = [u.get_nr_of_bonds() for u in universes]
 

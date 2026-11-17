@@ -24,8 +24,7 @@ examples_dir = force_balance_dir.parent
 repo_root = examples_dir.parent
 src_dir = repo_root / "src"
 
-for p in [str(src_dir), str(examples_dir), str(
-        force_balance_dir), str(repo_root)]:
+for p in [str(src_dir), str(examples_dir), str(force_balance_dir), str(repo_root)]:
     if p not in sys.path:
         sys.path.insert(0, p)
 

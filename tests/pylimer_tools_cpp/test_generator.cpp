@@ -375,8 +375,9 @@ TEST_CASE("Universe can crosslink up to w_sol",
   forceBalance.configAssumeBoxLargeEnough(true);
 
   // compare structures before running optimization procedures
-  CHECK(forceBalance.getNrOfSprings() == forceRelaxer2.getNrOfSprings());
-  CHECK(forceBalance.getNrOfSprings() ==
+  CHECK(static_cast<size_t>(forceBalance.getNrOfSprings()) ==
+        forceRelaxer2.getNrOfSprings());
+  CHECK(static_cast<size_t>(forceBalance.getNrOfSprings()) ==
         forceRelaxer.getNrOfSprings() + nFreeStrands);
   Eigen::VectorXd fbVecs = forceBalance.getCurrentPartialSpringDistances();
   Eigen::VectorXd frVecs = forceRelaxer2.getCurrentSpringDistances();
@@ -402,7 +403,7 @@ TEST_CASE("Universe can crosslink up to w_sol",
   forceBalance.runForceRelaxation();
 
   CHECK(forceBalance.validateNetwork());
-  CHECK(forceBalance.getNrOfSprings() ==
+  CHECK(static_cast<size_t>(forceBalance.getNrOfSprings()) ==
         forceRelaxer.getNrOfSprings() + nFreeStrands);
   CHECK_THAT(forceBalance.getGammaFactor(1.),
              Catch::Matchers::WithinRel(forceRelaxer.getGammaFactor(1.), 0.05));
@@ -442,8 +443,8 @@ TEST_CASE("Universe can crosslink up to w_sol",
     Eigen::ArrayXi::Constant(forceBalance2Generator.getNrOfLinks(), -1);
   Eigen::ArrayXi clusterIndicesPerStrand =
     Eigen::ArrayXi::Constant(forceBalance2Generator.getNrOfStrands(), -1);
-  size_t minIndexWithoutCluster = 0;
-  size_t currentClusterIdx = 0;
+  Eigen::Index minIndexWithoutCluster = 0;
+  int currentClusterIdx = 0;
   pylimer_tools::sim::mehp::ForceBalance2Network net2 =
     forceBalance2Generator.getNetwork();
   while ((clusterIndicesPerLink < 0).any()) {
@@ -455,14 +456,18 @@ TEST_CASE("Universe can crosslink up to w_sol",
     bool didChange = true;
     while (didChange) {
       didChange = false;
-      for (Eigen::Index linkIdx = 0; linkIdx < net2.nrOfLinks; ++linkIdx) {
+      for (Eigen::Index linkIdx = 0;
+           linkIdx < static_cast<Eigen::Index>(net2.nrOfLinks);
+           ++linkIdx) {
         if (clusterIndicesPerLink[linkIdx] != currentClusterIdx) {
           continue;
         }
 
-        for (const int strandIdx : net2.strandIndicesOfLink[linkIdx]) {
+        for (const int strandIdx :
+             net2.strandIndicesOfLink[static_cast<size_t>(linkIdx)]) {
           clusterIndicesPerStrand[strandIdx] = currentClusterIdx;
-          for (const int strandsLinkIdx : net2.linkIndicesOfStrand[strandIdx]) {
+          for (const int strandsLinkIdx :
+               net2.linkIndicesOfStrand[static_cast<size_t>(strandIdx)]) {
             if (clusterIndicesPerLink[strandsLinkIdx] < 0) {
               didChange = true;
               clusterIndicesPerLink[strandsLinkIdx] = currentClusterIdx;
@@ -474,7 +479,8 @@ TEST_CASE("Universe can crosslink up to w_sol",
     currentClusterIdx += 1;
   }
 
-  CHECK(clusterIndicesPerLink.maxCoeff() + 1 == universe.getClusters().size());
+  CHECK(static_cast<size_t>(clusterIndicesPerLink.maxCoeff() + 1) ==
+        universe.getClusters().size());
   CHECK(clusterIndicesPerLink.maxCoeff() + 1 == currentClusterIdx);
   // output cluster sizes
   std::map<int, int> clusterSizes;
@@ -484,12 +490,14 @@ TEST_CASE("Universe can crosslink up to w_sol",
     }
     clusterSizes[clusterIdx] += 1;
   }
-  for (int strandIdx = 0; strandIdx < net2.nrOfStrands; ++strandIdx) {
+  for (size_t strandIdx = 0; strandIdx < net2.nrOfStrands; ++strandIdx) {
     double strandNAtoms = 0;
     for (size_t springIdx : net2.springIndicesOfStrand[strandIdx]) {
-      strandNAtoms += net2.springContourLength[springIdx] - 1;
+      strandNAtoms +=
+        net2.springContourLength[static_cast<Eigen::Index>(springIdx)] - 1;
     }
-    clusterSizes[clusterIndicesPerStrand[strandIdx]] += strandNAtoms;
+    clusterSizes[clusterIndicesPerStrand[static_cast<Eigen::Index>(
+      strandIdx)]] += strandNAtoms;
   }
 
   std::cout << "Cluster sizes: ";
@@ -548,7 +556,8 @@ TEST_CASE("Generator can return force balance and relaxation",
     generator.getForceBalance();
   forceBalance.configAssumeBoxLargeEnough(true);
   // compare structures before running optimization procedures
-  CHECK(forceBalance.getNrOfSprings() == forceRelaxer2.getNrOfSprings());
+  CHECK(static_cast<size_t>(forceBalance.getNrOfSprings()) ==
+        forceRelaxer2.getNrOfSprings());
   Eigen::VectorXd fbVecs = forceBalance.getCurrentPartialSpringDistances();
   Eigen::VectorXd fbVecs2 = forceBalance.getCurrentSpringDistances();
   REQUIRE(fbVecs.isApprox(fbVecs2));
@@ -574,7 +583,8 @@ TEST_CASE("Generator can return force balance and relaxation",
   forceBalance.runForceRelaxation();
 
   CHECK(forceBalance.validateNetwork());
-  CHECK(forceBalance.getNrOfSprings() == forceRelaxer2.getNrOfSprings());
+  CHECK(static_cast<size_t>(forceBalance.getNrOfSprings()) ==
+        forceRelaxer2.getNrOfSprings());
   CHECK_THAT(
     forceBalance.getGammaFactor(1.),
     Catch::Matchers::WithinRel(forceRelaxer2.getGammaFactor(1.), 0.025));
@@ -1460,7 +1470,7 @@ TEST_CASE("Linear walk chain can be generated", "[topo][RandomWalker]")
     CHECK(coordinates.segment(3 * (10 + 1), 3) == Eigen::Vector3d(5., 5., 5.));
     Eigen::Vector3d prevDistance =
       coordinates.segment(0, 3) - coordinates.segment(3, 3);
-    for (size_t i = 3; i < coordinates.size(); i += 3) {
+    for (Eigen::Index i = 3; i < coordinates.size(); i += 3) {
       Eigen::Vector3d currentDistance =
         coordinates.segment(i, 3) - coordinates.segment(i - 3, 3);
       CHECK(currentDistance.norm() == Catch::Approx(prevDistance.norm()));
@@ -1474,7 +1484,7 @@ TEST_CASE("Linear walk chain can be generated", "[topo][RandomWalker]")
     CHECK(coordinates.size() == (10) * 3);
     Eigen::Vector3d prevDistance =
       coordinates.segment(0, 3) - coordinates.segment(3, 3);
-    for (size_t i = 3; i < coordinates.size(); i += 3) {
+    for (Eigen::Index i = 3; i < coordinates.size(); i += 3) {
       Eigen::Vector3d currentDistance =
         coordinates.segment(i, 3) - coordinates.segment(i - 3, 3);
       CHECK(currentDistance.norm() == Catch::Approx(prevDistance.norm()));
@@ -1893,8 +1903,8 @@ TEST_CASE(
       generator.getForceBalance(entanglements);
     CHECK(fb.validateNetwork());
     CHECK(fb.getNrOfSprings() == 150 + 15 + 10);
-    CHECK(fb.getNrOfPartialSprings() ==
-          fb.getNrOfSprings() + 2 * entanglements.size());
+    CHECK(static_cast<size_t>(fb.getNrOfPartialSprings()) ==
+          static_cast<size_t>(fb.getNrOfSprings()) + 2 * entanglements.size());
 
     fb.runForceRelaxation(5000, 1e-9);
     CHECK(fb.validateNetwork());
@@ -2380,8 +2390,9 @@ TEST_CASE("On-demand entanglement sampling is spatially uniform across cells",
   for (size_t e = 0; e < ents.size(); ++e) {
     strandInvolved[ents.strandIdx1[e]] = true;
     strandInvolved[ents.strandIdx2[e]] = true;
-    const size_t oct = (ents.x[e] >= 0.0 ? 1 : 0) | (ents.y[e] >= 0.0 ? 2 : 0) |
-                       (ents.z[e] >= 0.0 ? 4 : 0);
+    const size_t oct = (ents.x[static_cast<Eigen::Index>(e)] >= 0.0 ? 1 : 0) |
+                       (ents.y[static_cast<Eigen::Index>(e)] >= 0.0 ? 2 : 0) |
+                       (ents.z[static_cast<Eigen::Index>(e)] >= 0.0 ? 4 : 0);
     octantCounts[oct] += 1;
   }
   const size_t numUniqueStrands = static_cast<size_t>(
