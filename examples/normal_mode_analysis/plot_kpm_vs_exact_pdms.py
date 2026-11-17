@@ -42,7 +42,11 @@ if "__file__" in globals():
         if _p not in sys.path:
             sys.path.insert(0, _p)
 
-from _example_cache import get_example_cache_path, load_or_compute_cache  # noqa: E402
+from _example_cache import (  # noqa: E402
+    format_benchmark_footnote,
+    get_example_cache_path,
+    load_or_compute_cache,
+)
 from _nma_plotting import (  # noqa: E402
     plot_kpm_vs_exact_chain_length,
     plot_kpm_vs_exact_conversion,
@@ -273,3 +277,11 @@ for i, box_l_val in enumerate(data["rve_box_lengths"]):
     )
 
 plot_kpm_vs_exact_rve_and_scaling(data)
+
+# %%
+# Benchmark Hardware
+# ------------------
+# .. note::
+#    The cached runtime scaling benchmarks above were recorded on the
+#    hardware reported below.
+print(format_benchmark_footnote(data))

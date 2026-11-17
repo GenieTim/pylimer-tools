@@ -9,8 +9,11 @@ and CI while enabling large-scale, statistically robust example studies.
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
 import os
 from pathlib import Path
+import platform
+import subprocess
 import sys
 from typing import Any, Callable, Dict, Optional, Union
 
@@ -274,6 +277,147 @@ def should_recompute(recompute_flag: bool = False) -> bool:
     return False
 
 
+def get_system_info() -> Dict[str, Any]:
+    """Collect device, CPU, RAM, and OS metadata for benchmark cache provenance."""
+    sys_name = platform.system()
+    machine = platform.machine()
+
+    cpu_name = ""
+    device_model = ""
+    physical_cores = 0
+    logical_cores = int(os.cpu_count() or 1)
+    ram_gb = 0.0
+
+    if sys_name == "Darwin":
+        for sysctl_key, target in (
+            ("machdep.cpu.brand_string", "cpu"),
+            ("hw.model", "device"),
+            ("hw.physicalcpu", "phys"),
+            ("hw.memsize", "mem"),
+        ):
+            try:
+                out = subprocess.check_output(
+                    ["sysctl", "-n", sysctl_key],
+                    text=True,
+                    stderr=subprocess.DEVNULL,
+                ).strip()
+                if target == "cpu":
+                    cpu_name = out
+                elif target == "device":
+                    device_model = out
+                elif target == "phys":
+                    physical_cores = int(out)
+                elif target == "mem":
+                    ram_gb = float(int(out)) / (1024.0**3)
+            except Exception:
+                pass
+    elif sys_name == "Linux":
+        try:
+            with open("/proc/cpuinfo", "r", encoding="utf-8") as f:
+                for line in f:
+                    if line.startswith("model name") or line.startswith("Model"):
+                        cpu_name = line.split(":", 1)[1].strip()
+                        break
+        except OSError:
+            pass
+        try:
+            with open(
+                "/sys/devices/virtual/dmi/id/product_name", "r", encoding="utf-8"
+            ) as f:
+                device_model = f.read().strip()
+        except OSError:
+            pass
+
+    if not cpu_name:
+        cpu_name = platform.processor() or machine or "Unknown CPU"
+
+    try:
+        import psutil
+
+        if physical_cores <= 0:
+            physical_cores = int(psutil.cpu_count(logical=False) or 0)
+        if ram_gb <= 0.0:
+            ram_gb = float(psutil.virtual_memory().total) / (1024.0**3)
+    except ImportError:
+        if ram_gb <= 0.0 and hasattr(os, "sysconf"):
+            try:
+                ram_gb = float(
+                    os.sysconf("SC_PAGE_SIZE") * os.sysconf("SC_PHYS_PAGES")
+                ) / (1024.0**3)
+            except (ValueError, OSError):
+                pass
+
+    if sys_name == "Darwin":
+        mac_ver = platform.mac_ver()[0]
+        os_desc = (
+            f"macOS {mac_ver} ({machine})"
+            if mac_ver
+            else f"macOS {platform.release()} ({machine})"
+        )
+    else:
+        os_desc = f"{sys_name} {platform.release()} ({machine})"
+
+    return {
+        "meta_cpu": cpu_name,
+        "meta_device": device_model,
+        "meta_cpu_cores_physical": physical_cores,
+        "meta_cpu_cores_logical": logical_cores,
+        "meta_ram_gb": round(ram_gb, 2),
+        "meta_os": os_desc,
+        "meta_python_version": platform.python_version(),
+        "meta_timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+    }
+
+
+def _extract_scalar(data: Dict[str, Any], key: str, default: Any = None) -> Any:
+    """Extract a Python scalar from a dict or 0-d numpy array."""
+    if key not in data:
+        return default
+    val = data[key]
+    if isinstance(val, np.ndarray) and val.ndim == 0:
+        return val.item()
+    return val
+
+
+def format_benchmark_footnote(data: Dict[str, Any]) -> str:
+    """Format cached device, CPU, and RAM metadata as a human-readable footnote."""
+    cpu = _extract_scalar(data, "meta_cpu")
+    if not cpu:
+        return "Benchmark hardware metadata not recorded in cache."
+
+    device = _extract_scalar(data, "meta_device", "")
+    phys = int(_extract_scalar(data, "meta_cpu_cores_physical", 0) or 0)
+    logical = int(_extract_scalar(data, "meta_cpu_cores_logical", 0) or 0)
+    ram_gb = float(_extract_scalar(data, "meta_ram_gb", 0.0) or 0.0)
+    os_desc = _extract_scalar(data, "meta_os", "")
+    py_ver = _extract_scalar(data, "meta_python_version", "")
+    timestamp = _extract_scalar(data, "meta_timestamp", "")
+
+    if phys > 0 and logical > 0 and phys != logical:
+        core_str = f"{phys} physical / {logical} logical cores"
+    elif logical > 0:
+        core_str = f"{logical} cores"
+    else:
+        core_str = ""
+
+    parts = [f"{cpu} ({core_str})" if core_str else str(cpu)]
+    if ram_gb > 0.0:
+        parts.append(
+            f"{ram_gb:.1f} GB RAM" if ram_gb % 1 != 0 else f"{ram_gb:.0f} GB RAM"
+        )
+    if device:
+        parts.append(str(device))
+    if os_desc:
+        parts.append(str(os_desc))
+    if py_ver:
+        parts.append(f"Python {py_ver}")
+
+    summary = ", ".join(parts)
+    if timestamp:
+        return f"Measured on: {summary} (cached {timestamp})."
+    return f"Measured on: {summary}."
+
+
 def load_or_compute_cache(
     cache_path: Union[str, Path],
     compute_fn: Callable[..., Dict[str, Any]],
@@ -318,6 +462,8 @@ def load_or_compute_cache(
         print(f"Computing example data (will save to {path})...")
     configure_process_threading(verbose=verbose)
     data = compute_fn(*args, **kwargs)
+    for k, v in get_system_info().items():
+        data.setdefault(k, v)
 
     path.parent.mkdir(parents=True, exist_ok=True)
     np.savez_compressed(path, **data)
