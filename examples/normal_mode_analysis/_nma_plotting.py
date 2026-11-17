@@ -141,6 +141,10 @@ def plot_kpm_vs_exact_rve_and_scaling(data: Any) -> None:
     t_ex_mean = np.full(len(box_lengths), np.nan)
     t_ex_mean[has_exact] = np.nanmean(rve_t_ex[has_exact], axis=1)
     t_kpm_mean = np.mean(data["rve_t_kpm"], axis=1)
+    t_slq_mean = np.mean(data["rve_t_slq"], axis=1) if "rve_t_slq" in data else None
+    t_hybrid_mean = (
+        np.mean(data["rve_t_hybrid"], axis=1) if "rve_t_hybrid" in data else None
+    )
 
     fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(15.5, 4.6))
 
@@ -223,6 +227,26 @@ def plot_kpm_vs_exact_rve_and_scaling(data: Any) -> None:
         markersize=6,
         label=r"KPM ($\mathcal{O}(N)$)",
     )
+    if t_slq_mean is not None:
+        ax3.loglog(
+            n_atoms_mean,
+            t_slq_mean,
+            "^-",
+            color="#2ca02c",
+            linewidth=2.0,
+            markersize=6,
+            label=r"SLQ ($\mathcal{O}(N)$)",
+        )
+    if t_hybrid_mean is not None:
+        ax3.loglog(
+            n_atoms_mean,
+            t_hybrid_mean,
+            "D-",
+            color="#ff7f0e",
+            linewidth=2.0,
+            markersize=5,
+            label="Hybrid",
+        )
     # Reference O(N^3) and O(N) slopes
     n_ref = np.array([n_atoms_mean[0], n_atoms_mean[-1]])
     ax3.loglog(
@@ -244,7 +268,7 @@ def plot_kpm_vs_exact_rve_and_scaling(data: Any) -> None:
 
     ax3.set_xlabel(r"Number of Beads $N_{\mathrm{atoms}}$")
     ax3.set_ylabel("Wall-Clock Time per Network [s]")
-    ax3.set_title("Computational Scaling: Exact vs. KPM")
+    ax3.set_title("Computational Scaling: Exact vs. Approx.")
     ax3.grid(True, which="both", linestyle="--", alpha=0.45)
     ax3.legend(frameon=True, fontsize=8.0)
 

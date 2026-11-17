@@ -116,22 +116,49 @@ nma.find_all_eigenvalues(
 gp_exact_demo = nma.evaluate_storage_modulus(freqs_demo) * gamma_conv / vol
 t_exact_demo = time.perf_counter() - t0
 
-t0 = time.perf_counter()
-gp_kpm_demo = (
-    nma.evaluate_storage_modulus_kpm(
-        freqs_demo,
-        num_moments=1024,
-        num_random_vectors=20,
-        num_quadrature_points=2048,
-    )
-    * gamma_conv
-    / vol
-)
-t_kpm_demo = time.perf_counter() - t0
+demo_methods = [
+    (
+        "KPM",
+        pt.StochasticSpectralMethod.KPM,
+        {"num_steps": 1024, "num_random_vectors": 20},
+    ),
+    (
+        "SLQ",
+        pt.StochasticSpectralMethod.SLQ,
+        {"num_steps": 200, "num_random_vectors": 20},
+    ),
+    (
+        "Hybrid",
+        pt.StochasticSpectralMethod.HYBRID,
+        {"num_steps": 200, "num_random_vectors": 20, "num_exact_low_modes": 100},
+    ),
+]
 print(
     f"Demo PDMS box (L={box_l:.0f} nm, N_atoms={universe.get_nr_of_atoms()}, "
-    f"N_ent={len(pairs)}): Exact={t_exact_demo:.2f}s, KPM={t_kpm_demo:.2f}s"
+    f"N_ent={len(pairs)}):"
 )
+print(
+    f"{'Method':<8} | {'Time [s]':>8} | {'Speedup':>8} | {"Mean Rel. Err. G' [%]":>21} | {"Max Rel. Err. G' [%]":>20}"
+)
+print("-" * 77)
+print(f"{'Exact':<8} | {t_exact_demo:8.3f} | {'1.0x':>8} | {'0.00':>21} | {'0.00':>20}")
+for name, method, kw in demo_methods:
+    t0 = time.perf_counter()
+    gp_approx_demo = (
+        nma.evaluate_storage_modulus_approx(freqs_demo, method=method, **kw)
+        * gamma_conv
+        / vol
+    )
+    dt_demo = time.perf_counter() - t0
+    rel_err = (
+        np.abs(gp_approx_demo - gp_exact_demo)
+        / np.maximum(gp_exact_demo, 1e-12)
+        * 100.0
+    )
+    print(
+        f"{name:<8} | {dt_demo:8.3f} | {t_exact_demo / dt_demo:7.1f}x | "
+        f"{np.mean(rel_err):21.2f} | {np.max(rel_err):20.2f}"
+    )
 
 cache_path = get_example_cache_path(
     "kpm_vs_exact_pdms_cache.npz", "normal_mode_analysis"
@@ -198,25 +225,51 @@ plot_kpm_vs_exact_stoichiometry(data)
 # reducing the number of realizations :math:`n_{\text{samples}}` required for a
 # target 95% confidence interval.
 
+print(
+    "\nAccuracy comparison across parameter sweeps (mean / max rel. error vs. Exact [%]):"
+)
+print(
+    f"{'Method':<8} | {'Study':<13} | {"Mean Err G' [%]":>15} | {"Max Err G' [%]":>14} | {"Mean Err G'' [%]":>16} | {"Max Err G'' [%]":>15}"
+)
+print("-" * 94)
+for method_key, method_label in (("kpm", "KPM"), ("slq", "SLQ"), ("hybrid", "Hybrid")):
+    for prefix, study_name in (
+        ("n", "Chain Length"),
+        ("p", "Conversion"),
+        ("r", "Stoichiometry"),
+    ):
+        gp_ex = data[f"{prefix}_gp_ex_mean"]
+        gpp_ex = data[f"{prefix}_gpp_ex_mean"]
+        gp_ap = data[f"{prefix}_gp_{method_key}_mean"]
+        gpp_ap = data[f"{prefix}_gpp_{method_key}_mean"]
+        err_gp = np.abs(gp_ap - gp_ex) / np.maximum(gp_ex, 1e-12) * 100.0
+        err_gpp = np.abs(gpp_ap - gpp_ex) / np.maximum(gpp_ex, 1e-12) * 100.0
+        print(
+            f"{method_label:<8} | {study_name:<13} | {np.mean(err_gp):15.2f} | "
+            f"{np.max(err_gp):14.2f} | {np.mean(err_gpp):16.2f} | {np.max(err_gpp):15.2f}"
+        )
+
 print("\nRuntime comparison per network (single-threaded worker, mean over repeats):")
 print(
-    f"{'L [nm]':>7} | {'N_atoms':>8} | {'N_ent':>6} | {'Exact [s]':>10} | {'KPM [s]':>9} | {'Speedup':>8}"
+    f"{'L [nm]':>7} | {'N_atoms':>8} | {'N_ent':>6} | {'Exact [s]':>10} | "
+    f"{'KPM [s]':>9} | {'SLQ [s]':>9} | {'Hybrid [s]':>10}"
 )
-print("-" * 62)
+print("-" * 73)
 for i, box_l_val in enumerate(data["rve_box_lengths"]):
     n_at = float(np.mean(data["rve_n_atoms"][i]))
     n_ent_val = float(np.mean(data["rve_n_ent"][i]))
     t_kpm_val = float(np.mean(data["rve_t_kpm"][i]))
+    t_slq_val = float(np.mean(data["rve_t_slq"][i]))
+    t_hyb_val = float(np.mean(data["rve_t_hybrid"][i]))
     t_ex_arr = data["rve_t_ex"][i]
     if np.any(np.isfinite(t_ex_arr)):
         t_ex_val = float(np.nanmean(t_ex_arr))
         t_ex_str = f"{t_ex_val:9.2f}s"
-        speedup_str = f"{t_ex_val / t_kpm_val:7.1f}x"
     else:
         t_ex_str = "   skipped"
-        speedup_str = "       -"
     print(
-        f"{box_l_val:7.0f} | {n_at:8.0f} | {n_ent_val:6.0f} | {t_ex_str} | {t_kpm_val:8.3f}s | {speedup_str}"
+        f"{box_l_val:7.0f} | {n_at:8.0f} | {n_ent_val:6.0f} | {t_ex_str} | "
+        f"{t_kpm_val:8.3f}s | {t_slq_val:8.3f}s | {t_hyb_val:9.3f}s"
     )
 
 plot_kpm_vs_exact_rve_and_scaling(data)

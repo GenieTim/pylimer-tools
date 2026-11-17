@@ -111,6 +111,8 @@ def _evaluate_single_nma_task(
     num_moments: int,
     num_random_vectors: int,
     num_quadrature_points: int,
+    num_lanczos_steps: int,
+    num_exact_low_modes: int,
     b: float,
     b2: float,
     cutoff: float,
@@ -125,6 +127,12 @@ def _evaluate_single_nma_task(
     np.ndarray,
     np.ndarray,
     np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    float,
+    float,
     float,
     float,
     int,
@@ -166,6 +174,50 @@ def _evaluate_single_nma_task(
     )
     t_kpm = time.perf_counter() - t0_kpm
 
+    t0_slq = time.perf_counter()
+    gp_slq = (
+        nma.evaluate_storage_modulus_approx(
+            freqs,
+            method=pt.StochasticSpectralMethod.SLQ,
+            num_steps=num_lanczos_steps,
+            num_random_vectors=num_random_vectors,
+        )
+        * scale
+    )
+    gpp_slq = (
+        nma.evaluate_loss_modulus_approx(
+            freqs,
+            method=pt.StochasticSpectralMethod.SLQ,
+            num_steps=num_lanczos_steps,
+            num_random_vectors=num_random_vectors,
+        )
+        * scale
+    )
+    t_slq = time.perf_counter() - t0_slq
+
+    t0_hybrid = time.perf_counter()
+    gp_hybrid = (
+        nma.evaluate_storage_modulus_approx(
+            freqs,
+            method=pt.StochasticSpectralMethod.HYBRID,
+            num_steps=num_lanczos_steps,
+            num_random_vectors=num_random_vectors,
+            num_exact_low_modes=num_exact_low_modes,
+        )
+        * scale
+    )
+    gpp_hybrid = (
+        nma.evaluate_loss_modulus_approx(
+            freqs,
+            method=pt.StochasticSpectralMethod.HYBRID,
+            num_steps=num_lanczos_steps,
+            num_random_vectors=num_random_vectors,
+            num_exact_low_modes=num_exact_low_modes,
+        )
+        * scale
+    )
+    t_hybrid = time.perf_counter() - t0_hybrid
+
     if compute_exact:
         t0_ex = time.perf_counter()
         nma.find_all_eigenvalues(
@@ -189,8 +241,14 @@ def _evaluate_single_nma_task(
         gpp_ex,
         gp_kpm,
         gpp_kpm,
+        gp_slq,
+        gpp_slq,
+        gp_hybrid,
+        gpp_hybrid,
         t_ex,
         t_kpm,
+        t_slq,
+        t_hybrid,
         n_atoms,
         n_ent,
     )
@@ -208,17 +266,19 @@ def run_kpm_vs_exact_pdms_study(
     num_moments: int = 1024,
     num_random_vectors: int = 20,
     num_quadrature_points: int = 2048,
+    num_lanczos_steps: int = 200,
+    num_exact_low_modes: int = 100,
     base_seed: int = 4200,
     max_workers: Optional[int] = None,
 ) -> Dict[str, Any]:
-    """Run the KPM vs. Exact normal mode analysis comparison for realistic PDMS networks.
+    """Run the KPM, SLQ, Hybrid vs. Exact normal mode analysis comparison for realistic PDMS networks.
 
     Evaluates:
       1. Chain length N sweep (at p=0.95, r=1.0, L=14 nm)
       2. Cross-link conversion p sweep (at N=100, r=1.0, L=14 nm)
       3. Stoichiometric imbalance r sweep (at N=100, p=0.95*min(1, 1/r), L=14 nm)
       4. Representative volume (L in [10, 36] nm) & sample count (n_rve_repeats=12)
-         with exact eigenvalues computed up to L=20 nm and KPM across all box sizes.
+         with exact eigenvalues computed up to L=20 nm and KPM/SLQ/Hybrid across all box sizes.
     """
     params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
     assert isinstance(params, Parameters)
@@ -239,23 +299,41 @@ def run_kpm_vs_exact_pdms_study(
     n_gpp_ex = np.zeros((len(n_values), n_repeats, n_freqs))
     n_gp_kpm = np.zeros((len(n_values), n_repeats, n_freqs))
     n_gpp_kpm = np.zeros((len(n_values), n_repeats, n_freqs))
+    n_gp_slq = np.zeros((len(n_values), n_repeats, n_freqs))
+    n_gpp_slq = np.zeros((len(n_values), n_repeats, n_freqs))
+    n_gp_hybrid = np.zeros((len(n_values), n_repeats, n_freqs))
+    n_gpp_hybrid = np.zeros((len(n_values), n_repeats, n_freqs))
 
     p_gp_ex = np.zeros((len(p_values), n_repeats, n_freqs))
     p_gpp_ex = np.zeros((len(p_values), n_repeats, n_freqs))
     p_gp_kpm = np.zeros((len(p_values), n_repeats, n_freqs))
     p_gpp_kpm = np.zeros((len(p_values), n_repeats, n_freqs))
+    p_gp_slq = np.zeros((len(p_values), n_repeats, n_freqs))
+    p_gpp_slq = np.zeros((len(p_values), n_repeats, n_freqs))
+    p_gp_hybrid = np.zeros((len(p_values), n_repeats, n_freqs))
+    p_gpp_hybrid = np.zeros((len(p_values), n_repeats, n_freqs))
 
     r_gp_ex = np.zeros((len(r_values), n_repeats, n_freqs))
     r_gpp_ex = np.zeros((len(r_values), n_repeats, n_freqs))
     r_gp_kpm = np.zeros((len(r_values), n_repeats, n_freqs))
     r_gpp_kpm = np.zeros((len(r_values), n_repeats, n_freqs))
+    r_gp_slq = np.zeros((len(r_values), n_repeats, n_freqs))
+    r_gpp_slq = np.zeros((len(r_values), n_repeats, n_freqs))
+    r_gp_hybrid = np.zeros((len(r_values), n_repeats, n_freqs))
+    r_gpp_hybrid = np.zeros((len(r_values), n_repeats, n_freqs))
 
     rve_gp_ex = np.full((len(rve_box_lengths), n_rve_repeats, n_freqs), np.nan)
     rve_gpp_ex = np.full((len(rve_box_lengths), n_rve_repeats, n_freqs), np.nan)
     rve_gp_kpm = np.zeros((len(rve_box_lengths), n_rve_repeats, n_freqs))
     rve_gpp_kpm = np.zeros((len(rve_box_lengths), n_rve_repeats, n_freqs))
+    rve_gp_slq = np.zeros((len(rve_box_lengths), n_rve_repeats, n_freqs))
+    rve_gpp_slq = np.zeros((len(rve_box_lengths), n_rve_repeats, n_freqs))
+    rve_gp_hybrid = np.zeros((len(rve_box_lengths), n_rve_repeats, n_freqs))
+    rve_gpp_hybrid = np.zeros((len(rve_box_lengths), n_rve_repeats, n_freqs))
     rve_t_ex = np.full((len(rve_box_lengths), n_rve_repeats), np.nan)
     rve_t_kpm = np.zeros((len(rve_box_lengths), n_rve_repeats))
+    rve_t_slq = np.zeros((len(rve_box_lengths), n_rve_repeats))
+    rve_t_hybrid = np.zeros((len(rve_box_lengths), n_rve_repeats))
     rve_n_atoms = np.zeros((len(rve_box_lengths), n_rve_repeats), dtype=int)
     rve_n_ent = np.zeros((len(rve_box_lengths), n_rve_repeats), dtype=int)
 
@@ -264,6 +342,8 @@ def run_kpm_vs_exact_pdms_study(
         num_moments,
         num_random_vectors,
         num_quadrature_points,
+        num_lanczos_steps,
+        num_exact_low_modes,
         b,
         b2,
         cutoff,
@@ -362,6 +442,12 @@ def run_kpm_vs_exact_pdms_study(
             np.ndarray,
             np.ndarray,
             np.ndarray,
+            np.ndarray,
+            np.ndarray,
+            np.ndarray,
+            np.ndarray,
+            float,
+            float,
             float,
             float,
             int,
@@ -376,8 +462,14 @@ def run_kpm_vs_exact_pdms_study(
             gpp_ex,
             gp_kpm,
             gpp_kpm,
+            gp_slq,
+            gpp_slq,
+            gp_hybrid,
+            gpp_hybrid,
             t_ex,
             t_kpm,
+            t_slq,
+            t_hybrid,
             n_at,
             n_ent,
         ) = res
@@ -386,23 +478,41 @@ def run_kpm_vs_exact_pdms_study(
             n_gpp_ex[p_idx, rep_idx] = gpp_ex
             n_gp_kpm[p_idx, rep_idx] = gp_kpm
             n_gpp_kpm[p_idx, rep_idx] = gpp_kpm
+            n_gp_slq[p_idx, rep_idx] = gp_slq
+            n_gpp_slq[p_idx, rep_idx] = gpp_slq
+            n_gp_hybrid[p_idx, rep_idx] = gp_hybrid
+            n_gpp_hybrid[p_idx, rep_idx] = gpp_hybrid
         elif kind == _NmaStudyKind.CONVERSION:
             p_gp_ex[p_idx, rep_idx] = gp_ex
             p_gpp_ex[p_idx, rep_idx] = gpp_ex
             p_gp_kpm[p_idx, rep_idx] = gp_kpm
             p_gpp_kpm[p_idx, rep_idx] = gpp_kpm
+            p_gp_slq[p_idx, rep_idx] = gp_slq
+            p_gpp_slq[p_idx, rep_idx] = gpp_slq
+            p_gp_hybrid[p_idx, rep_idx] = gp_hybrid
+            p_gpp_hybrid[p_idx, rep_idx] = gpp_hybrid
         elif kind == _NmaStudyKind.STOICHIOMETRY:
             r_gp_ex[p_idx, rep_idx] = gp_ex
             r_gpp_ex[p_idx, rep_idx] = gpp_ex
             r_gp_kpm[p_idx, rep_idx] = gp_kpm
             r_gpp_kpm[p_idx, rep_idx] = gpp_kpm
+            r_gp_slq[p_idx, rep_idx] = gp_slq
+            r_gpp_slq[p_idx, rep_idx] = gpp_slq
+            r_gp_hybrid[p_idx, rep_idx] = gp_hybrid
+            r_gpp_hybrid[p_idx, rep_idx] = gpp_hybrid
         elif kind == _NmaStudyKind.RVE:
             rve_gp_ex[p_idx, rep_idx] = gp_ex
             rve_gpp_ex[p_idx, rep_idx] = gpp_ex
             rve_gp_kpm[p_idx, rep_idx] = gp_kpm
             rve_gpp_kpm[p_idx, rep_idx] = gpp_kpm
+            rve_gp_slq[p_idx, rep_idx] = gp_slq
+            rve_gpp_slq[p_idx, rep_idx] = gpp_slq
+            rve_gp_hybrid[p_idx, rep_idx] = gp_hybrid
+            rve_gpp_hybrid[p_idx, rep_idx] = gpp_hybrid
             rve_t_ex[p_idx, rep_idx] = t_ex
             rve_t_kpm[p_idx, rep_idx] = t_kpm
+            rve_t_slq[p_idx, rep_idx] = t_slq
+            rve_t_hybrid[p_idx, rep_idx] = t_hybrid
             rve_n_atoms[p_idx, rep_idx] = n_at
             rve_n_ent[p_idx, rep_idx] = n_ent
 
@@ -432,20 +542,36 @@ def run_kpm_vs_exact_pdms_study(
     stat_n_gpp_ex = compute_ensemble_statistics(n_gpp_ex, axis=1)
     stat_n_gp_kpm = compute_ensemble_statistics(n_gp_kpm, axis=1)
     stat_n_gpp_kpm = compute_ensemble_statistics(n_gpp_kpm, axis=1)
+    stat_n_gp_slq = compute_ensemble_statistics(n_gp_slq, axis=1)
+    stat_n_gpp_slq = compute_ensemble_statistics(n_gpp_slq, axis=1)
+    stat_n_gp_hybrid = compute_ensemble_statistics(n_gp_hybrid, axis=1)
+    stat_n_gpp_hybrid = compute_ensemble_statistics(n_gpp_hybrid, axis=1)
 
     stat_p_gp_ex = compute_ensemble_statistics(p_gp_ex, axis=1)
     stat_p_gpp_ex = compute_ensemble_statistics(p_gpp_ex, axis=1)
     stat_p_gp_kpm = compute_ensemble_statistics(p_gp_kpm, axis=1)
     stat_p_gpp_kpm = compute_ensemble_statistics(p_gpp_kpm, axis=1)
+    stat_p_gp_slq = compute_ensemble_statistics(p_gp_slq, axis=1)
+    stat_p_gpp_slq = compute_ensemble_statistics(p_gpp_slq, axis=1)
+    stat_p_gp_hybrid = compute_ensemble_statistics(p_gp_hybrid, axis=1)
+    stat_p_gpp_hybrid = compute_ensemble_statistics(p_gpp_hybrid, axis=1)
 
     stat_r_gp_ex = compute_ensemble_statistics(r_gp_ex, axis=1)
     stat_r_gpp_ex = compute_ensemble_statistics(r_gpp_ex, axis=1)
     stat_r_gp_kpm = compute_ensemble_statistics(r_gp_kpm, axis=1)
     stat_r_gpp_kpm = compute_ensemble_statistics(r_gpp_kpm, axis=1)
+    stat_r_gp_slq = compute_ensemble_statistics(r_gp_slq, axis=1)
+    stat_r_gpp_slq = compute_ensemble_statistics(r_gpp_slq, axis=1)
+    stat_r_gp_hybrid = compute_ensemble_statistics(r_gp_hybrid, axis=1)
+    stat_r_gpp_hybrid = compute_ensemble_statistics(r_gpp_hybrid, axis=1)
 
     stat_rve_gp_ex = compute_ensemble_statistics(rve_gp_ex, axis=1)
     stat_rve_gp_kpm = compute_ensemble_statistics(rve_gp_kpm, axis=1)
     stat_rve_gpp_kpm = compute_ensemble_statistics(rve_gpp_kpm, axis=1)
+    stat_rve_gp_slq = compute_ensemble_statistics(rve_gp_slq, axis=1)
+    stat_rve_gpp_slq = compute_ensemble_statistics(rve_gpp_slq, axis=1)
+    stat_rve_gp_hybrid = compute_ensemble_statistics(rve_gp_hybrid, axis=1)
+    stat_rve_gpp_hybrid = compute_ensemble_statistics(rve_gpp_hybrid, axis=1)
 
     n_r0_nm = np.array([math.sqrt(n_len * b2) for n_len in n_values])
 
@@ -457,6 +583,8 @@ def run_kpm_vs_exact_pdms_study(
         "num_moments": np.array(num_moments),
         "num_random_vectors": np.array(num_random_vectors),
         "num_quadrature_points": np.array(num_quadrature_points),
+        "num_lanczos_steps": np.array(num_lanczos_steps),
+        "num_exact_low_modes": np.array(num_exact_low_modes),
         # Study 1: N
         "n_values": np.array(n_values, dtype=int),
         "n_r0_nm": n_r0_nm,
@@ -466,6 +594,12 @@ def run_kpm_vs_exact_pdms_study(
         "n_gp_kpm_mean": stat_n_gp_kpm["mean"],
         "n_gp_kpm_ci": stat_n_gp_kpm["ci"],
         "n_gpp_kpm_mean": stat_n_gpp_kpm["mean"],
+        "n_gp_slq_mean": stat_n_gp_slq["mean"],
+        "n_gp_slq_ci": stat_n_gp_slq["ci"],
+        "n_gpp_slq_mean": stat_n_gpp_slq["mean"],
+        "n_gp_hybrid_mean": stat_n_gp_hybrid["mean"],
+        "n_gp_hybrid_ci": stat_n_gp_hybrid["ci"],
+        "n_gpp_hybrid_mean": stat_n_gpp_hybrid["mean"],
         # Study 2: p
         "p_values": np.array(p_values, dtype=float),
         "p_gp_ex_mean": stat_p_gp_ex["mean"],
@@ -474,6 +608,12 @@ def run_kpm_vs_exact_pdms_study(
         "p_gp_kpm_mean": stat_p_gp_kpm["mean"],
         "p_gp_kpm_ci": stat_p_gp_kpm["ci"],
         "p_gpp_kpm_mean": stat_p_gpp_kpm["mean"],
+        "p_gp_slq_mean": stat_p_gp_slq["mean"],
+        "p_gp_slq_ci": stat_p_gp_slq["ci"],
+        "p_gpp_slq_mean": stat_p_gpp_slq["mean"],
+        "p_gp_hybrid_mean": stat_p_gp_hybrid["mean"],
+        "p_gp_hybrid_ci": stat_p_gp_hybrid["ci"],
+        "p_gpp_hybrid_mean": stat_p_gpp_hybrid["mean"],
         # Study 3: r
         "r_values": np.array(r_values, dtype=float),
         "r_conversions": np.array(r_conversions, dtype=float),
@@ -483,6 +623,12 @@ def run_kpm_vs_exact_pdms_study(
         "r_gp_kpm_mean": stat_r_gp_kpm["mean"],
         "r_gp_kpm_ci": stat_r_gp_kpm["ci"],
         "r_gpp_kpm_mean": stat_r_gpp_kpm["mean"],
+        "r_gp_slq_mean": stat_r_gp_slq["mean"],
+        "r_gp_slq_ci": stat_r_gp_slq["ci"],
+        "r_gpp_slq_mean": stat_r_gpp_slq["mean"],
+        "r_gp_hybrid_mean": stat_r_gp_hybrid["mean"],
+        "r_gp_hybrid_ci": stat_r_gp_hybrid["ci"],
+        "r_gpp_hybrid_mean": stat_r_gpp_hybrid["mean"],
         # Study 4: RVE, samples & scaling
         "rve_box_lengths": np.array(rve_box_lengths, dtype=float),
         "rve_gp_ex_mean": stat_rve_gp_ex["mean"],
@@ -491,8 +637,16 @@ def run_kpm_vs_exact_pdms_study(
         "rve_gp_kpm_ci": stat_rve_gp_kpm["ci"],
         "rve_gpp_kpm_mean": stat_rve_gpp_kpm["mean"],
         "rve_gp_kpm_all": rve_gp_kpm,
+        "rve_gp_slq_mean": stat_rve_gp_slq["mean"],
+        "rve_gp_slq_ci": stat_rve_gp_slq["ci"],
+        "rve_gpp_slq_mean": stat_rve_gpp_slq["mean"],
+        "rve_gp_hybrid_mean": stat_rve_gp_hybrid["mean"],
+        "rve_gp_hybrid_ci": stat_rve_gp_hybrid["ci"],
+        "rve_gpp_hybrid_mean": stat_rve_gpp_hybrid["mean"],
         "rve_t_ex": rve_t_ex,
         "rve_t_kpm": rve_t_kpm,
+        "rve_t_slq": rve_t_slq,
+        "rve_t_hybrid": rve_t_hybrid,
         "rve_n_atoms": rve_n_atoms,
         "rve_n_ent": rve_n_ent,
     }
