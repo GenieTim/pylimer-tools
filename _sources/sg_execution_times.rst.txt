@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**04:21.895** total execution time for 41 files **from all galleries**:
+**04:40.190** total execution time for 41 files **from all galleries**:
 
 .. container::
 
@@ -38,14 +38,14 @@ Computation times
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_monte_carlo_configuration.py` (``../examples/network_generator/plot_monte_carlo_configuration.py``)
      - 00:27.025
      - 0.0
+   * - :ref:`sphx_glr_auto_examples_normal_mode_analysis_plot_normal_mode_analysis.py` (``../examples/normal_mode_analysis/plot_normal_mode_analysis.py``)
+     - 00:23.612
+     - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_vulcanized_network.py` (``../examples/network_generator/plot_vulcanized_network.py``)
      - 00:16.236
      - 0.0
-   * - :ref:`sphx_glr_auto_examples_normal_mode_analysis_plot_normal_mode_analysis.py` (``../examples/normal_mode_analysis/plot_normal_mode_analysis.py``)
-     - 00:10.377
-     - 0.0
    * - :ref:`sphx_glr_auto_examples_normal_mode_analysis_plot_kpm_vs_exact_pdms.py` (``../examples/normal_mode_analysis/plot_kpm_vs_exact_pdms.py``)
-     - 00:07.909
+     - 00:12.969
      - 0.0
    * - :ref:`sphx_glr_auto_examples_dpd_simulations_plot_dpd_simulation.py` (``../examples/dpd_simulations/plot_dpd_simulation.py``)
      - 00:04.384

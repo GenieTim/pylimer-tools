@@ -4,20 +4,25 @@ Normal Mode Analysis (NMA)
 
 This example demonstrates how to use the NormalModeAnalyzer in pylimer-tools
 to predict the loss and storage modulus of polymer networks using exact eigenvalue
-solvers or the Kernel Polynomial Method (KPM).
+solvers or approximate spectral methods (:class:`~pylimer_tools_cpp.StochasticSpectralMethod`:
+Kernel Polynomial Method ``KPM``, Stochastic Lanczos Quadrature ``SLQ``, and ``HYBRID``).
 
 Reference: :cite:t:`gusev_molecular_2024`
 """
 
-import os
 from pathlib import Path
+import time
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
 from pylimer_tools.io.read_lammps_output_file import read_data_file
-from pylimer_tools_cpp import NormalModeAnalyzer, NormalModeSolver
+from pylimer_tools_cpp import (
+    NormalModeAnalyzer,
+    NormalModeSolver,
+    StochasticSpectralMethod,
+)
 
 
 # Load a LAMMPS data file (replace with your file)
@@ -45,59 +50,117 @@ nma = NormalModeAnalyzer(
 
 # 1. Exact analysis with connected component decomposition and
 # dense/sparse solver
+frequencies = np.logspace(-4, 3, num=int(1e3))
+
+t0 = time.perf_counter()
 nma.find_all_eigenvalues(
     solver=NormalModeSolver.AUTO,
     compute_eigenvectors=False,
     decompose_components=True,
 )
-
-# Get the storage and loss modulus across frequencies
-frequencies = np.logspace(-4, 3, num=int(1e3))
 storage_modulus_exact = nma.evaluate_storage_modulus(omega=frequencies)
 loss_modulus_exact = nma.evaluate_loss_modulus(omega=frequencies)
+t_exact = time.perf_counter() - t0
 
-# 2. Kernel Polynomial Method (KPM) without computing full eigenvalues
-# KPM calculates viscoelastic moduli in O(N) time for large networks.
-storage_modulus_kpm = nma.evaluate_storage_modulus_kpm(
-    omega=frequencies,
-    num_moments=512,
-    num_random_vectors=20,
-    num_quadrature_points=1024,
-)
-loss_modulus_kpm = nma.evaluate_loss_modulus_kpm(
-    omega=frequencies,
-    num_moments=512,
-    num_random_vectors=20,
-    num_quadrature_points=1024,
-)
+# 2. Approximate spectral methods without computing full eigenvalues
+# These methods scale linearly O(N) for large networks.
+approx_configs: list[tuple[str, StochasticSpectralMethod, dict[str, int]]] = [
+    ("KPM", StochasticSpectralMethod.KPM, {"num_steps": 512, "num_random_vectors": 20}),
+    ("SLQ", StochasticSpectralMethod.SLQ, {"num_steps": 200, "num_random_vectors": 20}),
+    (
+        "Hybrid",
+        StochasticSpectralMethod.HYBRID,
+        {"num_steps": 200, "num_random_vectors": 20, "num_exact_low_modes": 100},
+    ),
+]
+
+approx_results: dict[str, tuple[np.ndarray, np.ndarray]] = {}
+summary_rows: list[dict[str, object]] = [
+    {
+        "Method": "Exact",
+        "Time [s]": f"{t_exact:.3f}",
+        "Speedup": "1.0x",
+        "Mean Rel. Err. G' [%]": "0.00",
+        "Max Rel. Err. G' [%]": "0.00",
+        "Mean Rel. Err. G'' [%]": "0.00",
+        "Max Rel. Err. G'' [%]": "0.00",
+    }
+]
+
+for name, method, kwargs in approx_configs:
+    t0 = time.perf_counter()
+    gp_approx = nma.evaluate_storage_modulus_approx(
+        omega=frequencies,
+        method=method,
+        **kwargs,
+    )
+    gpp_approx = nma.evaluate_loss_modulus_approx(
+        omega=frequencies,
+        method=method,
+        **kwargs,
+    )
+    dt = time.perf_counter() - t0
+    approx_results[name] = (gp_approx, gpp_approx)
+
+    rel_err_gp = (
+        np.abs(gp_approx - storage_modulus_exact)
+        / np.maximum(storage_modulus_exact, 1e-12)
+        * 100.0
+    )
+    rel_err_gpp = (
+        np.abs(gpp_approx - loss_modulus_exact)
+        / np.maximum(loss_modulus_exact, 1e-12)
+        * 100.0
+    )
+    summary_rows.append(
+        {
+            "Method": name,
+            "Time [s]": f"{dt:.3f}",
+            "Speedup": f"{t_exact / dt:.1f}x",
+            "Mean Rel. Err. G' [%]": f"{np.mean(rel_err_gp):.2f}",
+            "Max Rel. Err. G' [%]": f"{np.max(rel_err_gp):.2f}",
+            "Mean Rel. Err. G'' [%]": f"{np.mean(rel_err_gpp):.2f}",
+            "Max Rel. Err. G'' [%]": f"{np.max(rel_err_gpp):.2f}",
+        }
+    )
+
+# %%
+# Summary Table
+# -------------
+# Compare runtime, speedup, and relative error against exact diagonalization.
+
+summary_df = pd.DataFrame(summary_rows)
+print(summary_df.to_string(index=False))
 
 # %%
 # .. todo:
 #   Apply conversion factors where necessary
 #
-# Plot and compare the results
-df = pd.DataFrame(
-    {
-        "Frequency": frequencies,
-        "Storage Modulus (Exact)": storage_modulus_exact,
-        "Loss Modulus (Exact)": loss_modulus_exact,
-        "Storage Modulus (KPM)": storage_modulus_kpm,
-        "Loss Modulus (KPM)": loss_modulus_kpm,
-    }
+# Pairwise Comparison Plots (Exact vs. Each Approximate Method)
+# -------------------------------------------------------------
+# Each panel compares Exact against a single approximate method so the curves
+# remain easy to read.
+
+fig, axes = plt.subplots(
+    1,
+    len(approx_configs),
+    figsize=(15.0, 4.6),
+    sharex=True,
+    sharey=True,
 )
-df.set_index("Frequency", inplace=True)
-ax = df.plot(
-    title="Normal Mode Analysis: Exact vs KPM Moduli",
-    loglog=True,
-    style={
-        "Storage Modulus (Exact)": "b-",
-        "Loss Modulus (Exact)": "r-",
-        "Storage Modulus (KPM)": "b--",
-        "Loss Modulus (KPM)": "r--",
-    },
-    grid=True,
-)
-ax.set_xlabel("Frequency [rad/s]")
-ax.set_ylabel("Modulus [a.u.]")
+
+for ax, (name, _, _) in zip(axes, approx_configs):
+    gp_approx, gpp_approx = approx_results[name]
+    ax.loglog(frequencies, storage_modulus_exact, "b-", label="G' (Exact)")
+    ax.loglog(frequencies, loss_modulus_exact, "r-", label="G'' (Exact)")
+    ax.loglog(frequencies, gp_approx, "b--", label=f"G' ({name})")
+    ax.loglog(frequencies, gpp_approx, "r--", label=f"G'' ({name})")
+    ax.set_title(f"Exact vs. {name}")
+    ax.set_xlabel("Frequency [rad/s]")
+    ax.grid(True, which="both", linestyle="--", alpha=0.45)
+    ax.legend(frameon=True, fontsize=8.5, loc="lower right")
+
+axes[0].set_ylabel("Modulus [a.u.]")
+fig.suptitle("Normal Mode Analysis: Exact vs. Approximate Spectral Methods")
 plt.tight_layout()
 plt.show()

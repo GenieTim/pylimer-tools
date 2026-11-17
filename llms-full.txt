@@ -11121,7 +11121,7 @@ against full eigenvalue decomposition on realistic PDMS networks generated via M
 on-demand entanglement sampling.
 
 <div id='sg-tag-list' class='sphx-glr-tag-list'></div><div class="sphx-glr-thumbnails">
-<!-- thumbnail-parent-div-open --><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the NormalModeAnalyzer in pylimer-tools to predict the loss and storage modulus of polymer networks using exact eigenvalue solvers or the Kernel Polynomial Method (KPM).">![](auto_examples/normal_mode_analysis/images/thumb/sphx_glr_plot_normal_mode_analysis_thumb.png)
+<!-- thumbnail-parent-div-open --><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the NormalModeAnalyzer in pylimer-tools to predict the loss and storage modulus of polymer networks using exact eigenvalue solvers or approximate spectral methods (~pylimer_tools_cpp.StochasticSpectralMethod: Kernel Polynomial Method KPM, Stochastic Lanczos Quadrature SLQ, and HYBRID).">![](auto_examples/normal_mode_analysis/images/thumb/sphx_glr_plot_normal_mode_analysis_thumb.png)
 
 [Normal Mode Analysis (NMA)](auto_examples/normal_mode_analysis/plot_normal_mode_analysis.html.md)
 
@@ -12804,7 +12804,7 @@ against full eigenvalue decomposition on realistic PDMS networks generated via M
 on-demand entanglement sampling.
 
 <div id='sg-tag-list' class='sphx-glr-tag-list'></div><div class="sphx-glr-thumbnails">
-<!-- thumbnail-parent-div-open --><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the NormalModeAnalyzer in pylimer-tools to predict the loss and storage modulus of polymer networks using exact eigenvalue solvers or the Kernel Polynomial Method (KPM).">![](auto_examples/normal_mode_analysis/images/thumb/sphx_glr_plot_normal_mode_analysis_thumb.png)
+<!-- thumbnail-parent-div-open --><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the NormalModeAnalyzer in pylimer-tools to predict the loss and storage modulus of polymer networks using exact eigenvalue solvers or approximate spectral methods (~pylimer_tools_cpp.StochasticSpectralMethod: Kernel Polynomial Method KPM, Stochastic Lanczos Quadrature SLQ, and HYBRID).">![](auto_examples/normal_mode_analysis/images/thumb/sphx_glr_plot_normal_mode_analysis_thumb.png)
 
 [Normal Mode Analysis (NMA)](auto_examples/normal_mode_analysis/plot_normal_mode_analysis.html.md)
 
@@ -12900,7 +12900,7 @@ network, sample entanglements on demand, add the entanglement springs as bonds
 in the generated [`Universe`](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe), and compare exact vs.
 KPM moduli.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 68-141 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 68-168 -->
 ```Python
 params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
 assert isinstance(params, Parameters)
@@ -12952,22 +12952,49 @@ nma.find_all_eigenvalues(
 gp_exact_demo = nma.evaluate_storage_modulus(freqs_demo) * gamma_conv / vol
 t_exact_demo = time.perf_counter() - t0
 
-t0 = time.perf_counter()
-gp_kpm_demo = (
-    nma.evaluate_storage_modulus_kpm(
-        freqs_demo,
-        num_moments=1024,
-        num_random_vectors=20,
-        num_quadrature_points=2048,
-    )
-    * gamma_conv
-    / vol
-)
-t_kpm_demo = time.perf_counter() - t0
+demo_methods = [
+    (
+        "KPM",
+        pt.StochasticSpectralMethod.KPM,
+        {"num_steps": 1024, "num_random_vectors": 20},
+    ),
+    (
+        "SLQ",
+        pt.StochasticSpectralMethod.SLQ,
+        {"num_steps": 200, "num_random_vectors": 20},
+    ),
+    (
+        "Hybrid",
+        pt.StochasticSpectralMethod.HYBRID,
+        {"num_steps": 200, "num_random_vectors": 20, "num_exact_low_modes": 100},
+    ),
+]
 print(
     f"Demo PDMS box (L={box_l:.0f} nm, N_atoms={universe.get_nr_of_atoms()}, "
-    f"N_ent={len(pairs)}): Exact={t_exact_demo:.2f}s, KPM={t_kpm_demo:.2f}s"
+    f"N_ent={len(pairs)}):"
 )
+print(
+    f"{'Method':<8} | {'Time [s]':>8} | {'Speedup':>8} | {"Mean Rel. Err. G' [%]":>21} | {"Max Rel. Err. G' [%]":>20}"
+)
+print("-" * 77)
+print(f"{'Exact':<8} | {t_exact_demo:8.3f} | {'1.0x':>8} | {'0.00':>21} | {'0.00':>20}")
+for name, method, kw in demo_methods:
+    t0 = time.perf_counter()
+    gp_approx_demo = (
+        nma.evaluate_storage_modulus_approx(freqs_demo, method=method, **kw)
+        * gamma_conv
+        / vol
+    )
+    dt_demo = time.perf_counter() - t0
+    rel_err = (
+        np.abs(gp_approx_demo - gp_exact_demo)
+        / np.maximum(gp_exact_demo, 1e-12)
+        * 100.0
+    )
+    print(
+        f"{name:<8} | {dt_demo:8.3f} | {t_exact_demo / dt_demo:7.1f}x | "
+        f"{np.mean(rel_err):21.2f} | {np.max(rel_err):20.2f}"
+    )
 
 cache_path = get_example_cache_path(
     "kpm_vs_exact_pdms_cache.npz", "normal_mode_analysis"
@@ -12976,11 +13003,17 @@ data = load_or_compute_cache(cache_path, run_kpm_vs_exact_pdms_study)
 ```
 
 ```none
-Demo PDMS box (L=12 nm, N_atoms=3819, N_ent=84): Exact=5.85s, KPM=0.10s
+Demo PDMS box (L=12 nm, N_atoms=3819, N_ent=84):
+Method   | Time [s] |  Speedup | Mean Rel. Err. G' [%] | Max Rel. Err. G' [%]
+-----------------------------------------------------------------------------
+Exact    |    9.857 |     1.0x |                  0.00 |                 0.00
+KPM      |    0.115 |    85.4x |                  2.69 |                 9.99
+SLQ      |    0.039 |   252.6x |                  0.68 |                 4.79
+Hybrid   |    0.177 |    55.6x |                  0.64 |                 1.80
 Loading cached example data from kpm_vs_exact_pdms_cache.npz...
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 142-153 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 169-180 -->
 
 ## Effect of Chain Length ($N$)
 
@@ -12994,12 +13027,12 @@ and $G''(\omega)$ accurately across the transition and Rouse regimes
 deviations only in the lowest-frequency tail where very few eigenvalues
 reside.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 153-156 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 180-183 -->
 ```Python
 plot_kpm_vs_exact_chain_length(data)
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 157-167 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 184-194 -->
 
 ## Effect of Cross-link Conversion ($p$)
 
@@ -13012,12 +13045,12 @@ frequencies while leaving the high-frequency segmental Rouse response
 ($\omega\tau_0 \gtrsim 0.1$) largely unchanged. KPM captures this
 conversion-dependent softening faithfully without computing any eigenvalues.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 167-170 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 194-197 -->
 ```Python
 plot_kpm_vs_exact_conversion(data)
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 171-182 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 198-209 -->
 
 ## Effect of Stoichiometric Imbalance ($r$)
 
@@ -13031,12 +13064,12 @@ regime, whereas excess cross-linker ($r = 1.25$) maintains a higher
 strand conversion and modulus closer to the stoichiometric reference
 ($r = 1.00$). Across all $r$, KPM tracks the exact spectra closely.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 182-185 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 209-212 -->
 ```Python
 plot_kpm_vs_exact_stoichiometry(data)
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 186-200 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 213-227 -->
 
 ## Representative Volume, Sample Count, and Computational Scaling
 
@@ -13053,46 +13086,85 @@ in $\sim 9.8\,\text{s}$. Larger boxes also suppress finite-size scatter,
 reducing the number of realizations $n_{\text{samples}}$ required for a
 target 95% confidence interval.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 200-223 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 227-276 -->
 ```Python
+print(
+    "\nAccuracy comparison across parameter sweeps (mean / max rel. error vs. Exact [%]):"
+)
+print(
+    f"{'Method':<8} | {'Study':<13} | {"Mean Err G' [%]":>15} | {"Max Err G' [%]":>14} | {"Mean Err G'' [%]":>16} | {"Max Err G'' [%]":>15}"
+)
+print("-" * 94)
+for method_key, method_label in (("kpm", "KPM"), ("slq", "SLQ"), ("hybrid", "Hybrid")):
+    for prefix, study_name in (
+        ("n", "Chain Length"),
+        ("p", "Conversion"),
+        ("r", "Stoichiometry"),
+    ):
+        gp_ex = data[f"{prefix}_gp_ex_mean"]
+        gpp_ex = data[f"{prefix}_gpp_ex_mean"]
+        gp_ap = data[f"{prefix}_gp_{method_key}_mean"]
+        gpp_ap = data[f"{prefix}_gpp_{method_key}_mean"]
+        err_gp = np.abs(gp_ap - gp_ex) / np.maximum(gp_ex, 1e-12) * 100.0
+        err_gpp = np.abs(gpp_ap - gpp_ex) / np.maximum(gpp_ex, 1e-12) * 100.0
+        print(
+            f"{method_label:<8} | {study_name:<13} | {np.mean(err_gp):15.2f} | "
+            f"{np.max(err_gp):14.2f} | {np.mean(err_gpp):16.2f} | {np.max(err_gpp):15.2f}"
+        )
+
 print("\nRuntime comparison per network (single-threaded worker, mean over repeats):")
 print(
-    f"{'L [nm]':>7} | {'N_atoms':>8} | {'N_ent':>6} | {'Exact [s]':>10} | {'KPM [s]':>9} | {'Speedup':>8}"
+    f"{'L [nm]':>7} | {'N_atoms':>8} | {'N_ent':>6} | {'Exact [s]':>10} | "
+    f"{'KPM [s]':>9} | {'SLQ [s]':>9} | {'Hybrid [s]':>10}"
 )
-print("-" * 62)
+print("-" * 73)
 for i, box_l_val in enumerate(data["rve_box_lengths"]):
     n_at = float(np.mean(data["rve_n_atoms"][i]))
     n_ent_val = float(np.mean(data["rve_n_ent"][i]))
     t_kpm_val = float(np.mean(data["rve_t_kpm"][i]))
+    t_slq_val = float(np.mean(data["rve_t_slq"][i]))
+    t_hyb_val = float(np.mean(data["rve_t_hybrid"][i]))
     t_ex_arr = data["rve_t_ex"][i]
     if np.any(np.isfinite(t_ex_arr)):
         t_ex_val = float(np.nanmean(t_ex_arr))
         t_ex_str = f"{t_ex_val:9.2f}s"
-        speedup_str = f"{t_ex_val / t_kpm_val:7.1f}x"
     else:
         t_ex_str = "   skipped"
-        speedup_str = "       -"
     print(
-        f"{box_l_val:7.0f} | {n_at:8.0f} | {n_ent_val:6.0f} | {t_ex_str} | {t_kpm_val:8.3f}s | {speedup_str}"
+        f"{box_l_val:7.0f} | {n_at:8.0f} | {n_ent_val:6.0f} | {t_ex_str} | "
+        f"{t_kpm_val:8.3f}s | {t_slq_val:8.3f}s | {t_hyb_val:9.3f}s"
     )
 
 plot_kpm_vs_exact_rve_and_scaling(data)
 ```
 
 ```none
+Accuracy comparison across parameter sweeps (mean / max rel. error vs. Exact [%]):
+Method   | Study         | Mean Err G' [%] | Max Err G' [%] | Mean Err G'' [%] | Max Err G'' [%]
+----------------------------------------------------------------------------------------------
+KPM      | Chain Length  |           21.84 |         410.09 |             2.91 |           26.84
+KPM      | Conversion    |           10.95 |          81.63 |             3.97 |           39.65
+KPM      | Stoichiometry |           10.51 |          81.34 |             4.14 |           39.08
+SLQ      | Chain Length  |            1.91 |          47.50 |             0.51 |            5.12
+SLQ      | Conversion    |            2.16 |          41.91 |             0.54 |            3.81
+SLQ      | Stoichiometry |            1.93 |          38.16 |             0.61 |           10.84
+Hybrid   | Chain Length  |            0.15 |           0.68 |             0.19 |            0.74
+Hybrid   | Conversion    |            0.21 |           0.73 |             0.26 |            0.64
+Hybrid   | Stoichiometry |            0.16 |           0.66 |             0.21 |            0.67
+
 Runtime comparison per network (single-threaded worker, mean over repeats):
- L [nm] |  N_atoms |  N_ent |  Exact [s] |   KPM [s] |  Speedup
---------------------------------------------------------------
-     10 |     2211 |     51 |      2.04s |    0.119s |    17.1x
-     12 |     3819 |     86 |     14.61s |    0.117s |   124.7x
-     14 |     6130 |    128 |     12.78s |    0.121s |   105.3x
-     16 |     9146 |    213 |     43.16s |    0.144s |   300.6x
-     20 |    17788 |    386 |    225.34s |    0.151s |  1496.8x
-     28 |    48843 |   1093 |    skipped |    2.643s |        -
-     36 |   103816 |   2321 |    skipped |    9.783s |        -
+ L [nm] |  N_atoms |  N_ent |  Exact [s] |   KPM [s] |   SLQ [s] | Hybrid [s]
+-------------------------------------------------------------------------
+     10 |     2211 |     50 |     12.86s |    0.483s |    1.000s |     2.008s
+     12 |     3819 |     86 |     59.83s |    0.552s |    1.216s |     4.014s
+     14 |     6130 |    130 |    117.04s |    0.518s |    1.212s |     5.986s
+     16 |     9146 |    213 |    231.42s |    0.522s |    1.239s |     6.433s
+     20 |    17788 |    383 |   1046.24s |    0.632s |    1.772s |    13.060s
+     28 |    48843 |   1095 |    skipped |    1.301s |    9.916s |    52.878s
+     36 |   103816 |   2324 |    skipped |    3.526s |   29.958s |   120.455s
 ```
 
-**Total running time of the script:** (0 minutes 7.909 seconds)
+**Total running time of the script:** (0 minutes 12.969 seconds)
 
 <a id="sphx-glr-download-auto-examples-normal-mode-analysis-plot-kpm-vs-exact-pdms-py"></a>
 
@@ -13123,21 +13195,26 @@ to download the full example code.
 
 This example demonstrates how to use the NormalModeAnalyzer in pylimer-tools
 to predict the loss and storage modulus of polymer networks using exact eigenvalue
-solvers or the Kernel Polynomial Method (KPM).
+solvers or approximate spectral methods ([`StochasticSpectralMethod`](api/pylimer_tools_cpp.StochasticSpectralMethod.html.md#pylimer_tools_cpp.StochasticSpectralMethod):
+Kernel Polynomial Method `KPM`, Stochastic Lanczos Quadrature `SLQ`, and `HYBRID`).
 
 Reference: Gusev and Bernhard [[GB24](acknowledgements.html.md#id7)]
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 11-74 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 12-127 -->
 ```Python
-import os
 from pathlib import Path
+import time
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
 from pylimer_tools.io.read_lammps_output_file import read_data_file
-from pylimer_tools_cpp import NormalModeAnalyzer, NormalModeSolver
+from pylimer_tools_cpp import (
+    NormalModeAnalyzer,
+    NormalModeSolver,
+    StochasticSpectralMethod,
+)
 
 
 # Load a LAMMPS data file (replace with your file)
@@ -13165,75 +13242,138 @@ nma = NormalModeAnalyzer(
 
 # 1. Exact analysis with connected component decomposition and
 # dense/sparse solver
+frequencies = np.logspace(-4, 3, num=int(1e3))
+
+t0 = time.perf_counter()
 nma.find_all_eigenvalues(
     solver=NormalModeSolver.AUTO,
     compute_eigenvectors=False,
     decompose_components=True,
 )
-
-# Get the storage and loss modulus across frequencies
-frequencies = np.logspace(-4, 3, num=int(1e3))
 storage_modulus_exact = nma.evaluate_storage_modulus(omega=frequencies)
 loss_modulus_exact = nma.evaluate_loss_modulus(omega=frequencies)
+t_exact = time.perf_counter() - t0
 
-# 2. Kernel Polynomial Method (KPM) without computing full eigenvalues
-# KPM calculates viscoelastic moduli in O(N) time for large networks.
-storage_modulus_kpm = nma.evaluate_storage_modulus_kpm(
-    omega=frequencies,
-    num_moments=512,
-    num_random_vectors=20,
-    num_quadrature_points=1024,
-)
-loss_modulus_kpm = nma.evaluate_loss_modulus_kpm(
-    omega=frequencies,
-    num_moments=512,
-    num_random_vectors=20,
-    num_quadrature_points=1024,
-)
+# 2. Approximate spectral methods without computing full eigenvalues
+# These methods scale linearly O(N) for large networks.
+approx_configs: list[tuple[str, StochasticSpectralMethod, dict[str, int]]] = [
+    ("KPM", StochasticSpectralMethod.KPM, {"num_steps": 512, "num_random_vectors": 20}),
+    ("SLQ", StochasticSpectralMethod.SLQ, {"num_steps": 200, "num_random_vectors": 20}),
+    (
+        "Hybrid",
+        StochasticSpectralMethod.HYBRID,
+        {"num_steps": 200, "num_random_vectors": 20, "num_exact_low_modes": 100},
+    ),
+]
+
+approx_results: dict[str, tuple[np.ndarray, np.ndarray]] = {}
+summary_rows: list[dict[str, object]] = [
+    {
+        "Method": "Exact",
+        "Time [s]": f"{t_exact:.3f}",
+        "Speedup": "1.0x",
+        "Mean Rel. Err. G' [%]": "0.00",
+        "Max Rel. Err. G' [%]": "0.00",
+        "Mean Rel. Err. G'' [%]": "0.00",
+        "Max Rel. Err. G'' [%]": "0.00",
+    }
+]
+
+for name, method, kwargs in approx_configs:
+    t0 = time.perf_counter()
+    gp_approx = nma.evaluate_storage_modulus_approx(
+        omega=frequencies,
+        method=method,
+        **kwargs,
+    )
+    gpp_approx = nma.evaluate_loss_modulus_approx(
+        omega=frequencies,
+        method=method,
+        **kwargs,
+    )
+    dt = time.perf_counter() - t0
+    approx_results[name] = (gp_approx, gpp_approx)
+
+    rel_err_gp = (
+        np.abs(gp_approx - storage_modulus_exact)
+        / np.maximum(storage_modulus_exact, 1e-12)
+        * 100.0
+    )
+    rel_err_gpp = (
+        np.abs(gpp_approx - loss_modulus_exact)
+        / np.maximum(loss_modulus_exact, 1e-12)
+        * 100.0
+    )
+    summary_rows.append(
+        {
+            "Method": name,
+            "Time [s]": f"{dt:.3f}",
+            "Speedup": f"{t_exact / dt:.1f}x",
+            "Mean Rel. Err. G' [%]": f"{np.mean(rel_err_gp):.2f}",
+            "Max Rel. Err. G' [%]": f"{np.max(rel_err_gp):.2f}",
+            "Mean Rel. Err. G'' [%]": f"{np.mean(rel_err_gpp):.2f}",
+            "Max Rel. Err. G'' [%]": f"{np.max(rel_err_gpp):.2f}",
+        }
+    )
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 75-79 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 128-131 -->
+
+## Summary Table
+
+Compare runtime, speedup, and relative error against exact diagonalization.
+
+<!-- GENERATED FROM PYTHON SOURCE LINES 131-135 -->
+```Python
+summary_df = pd.DataFrame(summary_rows)
+print(summary_df.to_string(index=False))
+```
+
+```none
+Method Time [s] Speedup Mean Rel. Err. G' [%] Max Rel. Err. G' [%] Mean Rel. Err. G'' [%] Max Rel. Err. G'' [%]
+ Exact   22.535    1.0x                  0.00                 0.00                   0.00                  0.00
+   KPM    0.058  389.7x                 22.84                97.14                   8.78                 66.62
+   SLQ    0.051  441.0x                  2.06                41.07                   1.03                  6.64
+Hybrid    0.359   62.8x                  0.44                 1.38                   0.49                  1.41
+```
+
+<!-- GENERATED FROM PYTHON SOURCE LINES 136-143 -->
 <!-- todo:
 Apply conversion factors where necessary -->
 
-Plot and compare the results
+## Pairwise Comparison Plots (Exact vs. Each Approximate Method)
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 79-104 -->
+Each panel compares Exact against a single approximate method so the curves
+remain easy to read.
+
+<!-- GENERATED FROM PYTHON SOURCE LINES 143-167 -->
 ```Python
-df = pd.DataFrame(
-    {
-        "Frequency": frequencies,
-        "Storage Modulus (Exact)": storage_modulus_exact,
-        "Loss Modulus (Exact)": loss_modulus_exact,
-        "Storage Modulus (KPM)": storage_modulus_kpm,
-        "Loss Modulus (KPM)": loss_modulus_kpm,
-    }
+fig, axes = plt.subplots(
+    1,
+    len(approx_configs),
+    figsize=(15.0, 4.6),
+    sharex=True,
+    sharey=True,
 )
-df.set_index("Frequency", inplace=True)
-ax = df.plot(
-    title="Normal Mode Analysis: Exact vs KPM Moduli",
-    loglog=True,
-    style={
-        "Storage Modulus (Exact)": "b-",
-        "Loss Modulus (Exact)": "r-",
-        "Storage Modulus (KPM)": "b--",
-        "Loss Modulus (KPM)": "r--",
-    },
-    grid=True,
-)
-ax.set_xlabel("Frequency [rad/s]")
-ax.set_ylabel("Modulus [a.u.]")
+
+for ax, (name, _, _) in zip(axes, approx_configs):
+    gp_approx, gpp_approx = approx_results[name]
+    ax.loglog(frequencies, storage_modulus_exact, "b-", label="G' (Exact)")
+    ax.loglog(frequencies, loss_modulus_exact, "r-", label="G'' (Exact)")
+    ax.loglog(frequencies, gp_approx, "b--", label=f"G' ({name})")
+    ax.loglog(frequencies, gpp_approx, "r--", label=f"G'' ({name})")
+    ax.set_title(f"Exact vs. {name}")
+    ax.set_xlabel("Frequency [rad/s]")
+    ax.grid(True, which="both", linestyle="--", alpha=0.45)
+    ax.legend(frameon=True, fontsize=8.5, loc="lower right")
+
+axes[0].set_ylabel("Modulus [a.u.]")
+fig.suptitle("Normal Mode Analysis: Exact vs. Approximate Spectral Methods")
 plt.tight_layout()
 plt.show()
 ```
 
-```none
-/home/runner/work/pylimer-tools/pylimer-tools/examples/normal_mode_analysis/plot_normal_mode_analysis.py:88: Pandas4Warning: The inplace keyword in DataFrame.set_index is deprecated and will be removed in a future version (PDEP-8).
-See https://pandas.pydata.org/docs/dev/whatsnew/v3.1.0.html#deprecation-inplace for more details.
-  df.set_index("Frequency", inplace=True)
-```
-
-**Total running time of the script:** (0 minutes 10.377 seconds)
+**Total running time of the script:** (0 minutes 23.612 seconds)
 
 <a id="sphx-glr-download-auto-examples-normal-mode-analysis-plot-normal-mode-analysis-py"></a>
 
@@ -13252,7 +13392,7 @@ See https://pandas.pydata.org/docs/dev/whatsnew/v3.1.0.html#deprecation-inplace 
 
 # Computation times
 
-**00:18.286** total execution time for 2 files **from auto_examples/normal_mode_analysis**:
+**00:36.581** total execution time for 2 files **from auto_examples/normal_mode_analysis**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -13269,8 +13409,8 @@ $(document).ready( function () {
 
 | Example                                                                                                                                                                                                           | Time      |   Mem (MB) |
 |-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [Normal Mode Analysis (NMA)](auto_examples/normal_mode_analysis/plot_normal_mode_analysis.html.md#sphx-glr-auto-examples-normal-mode-analysis-plot-normal-mode-analysis-py) (`plot_normal_mode_analysis.py`)                               | 00:10.377 |          0 |
-| [KPM vs. Full Eigenvalue Normal Mode Analysis for PDMS Networks](auto_examples/normal_mode_analysis/plot_kpm_vs_exact_pdms.html.md#sphx-glr-auto-examples-normal-mode-analysis-plot-kpm-vs-exact-pdms-py) (`plot_kpm_vs_exact_pdms.py`) | 00:07.909 |          0 |
+| [Normal Mode Analysis (NMA)](auto_examples/normal_mode_analysis/plot_normal_mode_analysis.html.md#sphx-glr-auto-examples-normal-mode-analysis-plot-normal-mode-analysis-py) (`plot_normal_mode_analysis.py`)                               | 00:23.612 |          0 |
+| [KPM vs. Full Eigenvalue Normal Mode Analysis for PDMS Networks](auto_examples/normal_mode_analysis/plot_kpm_vs_exact_pdms.html.md#sphx-glr-auto-examples-normal-mode-analysis-plot-kpm-vs-exact-pdms-py) (`plot_kpm_vs_exact_pdms.py`) | 00:12.969 |          0 |
 
 
 # auto_examples/readers_writers/index.html.md
@@ -22922,7 +23062,7 @@ pylimer-generate-network [OPTIONS]
 Name of the polymer to generate the network for
 
 * **Options:**
-  pib | apmma | pom | peo | app348 | pdms | app463 | pe | apma | apva | pbd20 | aphma | apea | pi7 | cispbd | aps | pi34 | ptfe | apams | pi20 | ipp | cispi | p6n | pet | pi50 | apoa | pbd98 | sbr | pi75 | app | app413 | pe413 | pc | ips | spp | pib413
+  pi50 | app413 | peo | pi7 | pi34 | pc | pe | app | apma | aphma | apoa | ipp | apva | pib413 | p6n | cispi | pet | pbd98 | pe413 | pbd20 | pi75 | pi20 | apea | spp | aps | app463 | pib | apmma | pdms | pom | sbr | cispbd | ips | app348 | apams | ptfe
 
 ### --parameter-type <parameter_type>
 
@@ -23033,7 +23173,7 @@ pylimer-analyse-networks [OPTIONS] [FILES]...
 Name of the polymer to use for parameter retrieval.
 
 * **Options:**
-  pib | apmma | pom | peo | app348 | pdms | app463 | pe | apma | apva | pbd20 | aphma | apea | pi7 | cispbd | aps | pi34 | ptfe | apams | pi20 | ipp | cispi | p6n | pet | pi50 | apoa | pbd98 | sbr | pi75 | app | app413 | pe413 | pc | ips | spp | pib413
+  pi50 | app413 | peo | pi7 | pi34 | pc | pe | app | apma | aphma | apoa | ipp | apva | pib413 | p6n | cispi | pet | pbd98 | pe413 | pbd20 | pi75 | pi20 | apea | spp | aps | app463 | pib | apmma | pdms | pom | sbr | cispbd | ips | app348 | apams | ptfe
 
 ### Arguments
 
