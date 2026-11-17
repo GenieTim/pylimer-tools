@@ -336,20 +336,19 @@ randomlyFindEntanglements(const pylimer_tools::entities::Universe& universe,
       }
       vertexIsEligible[atomIdx1] = 0;
 
-      const size_t nNeighbours =
-        static_cast<size_t>(neighbourList.getIndicesCloseToCoordinates(
+      const Eigen::Index nNeighbours =
+        static_cast<Eigen::Index>(neighbourList.getIndicesCloseToCoordinates(
           neighbourIndices,
           coordinates.segment<3>(3 * atomVertexIdx1),
           upperCutoff));
       long int atomVertexIdx2 = -1;
       bool hasBfsForSource = false;
 
-      for (Eigen::Index idxInNeighbours = 0;
-           idxInNeighbours < static_cast<Eigen::Index>(nNeighbours);
+      for (Eigen::Index idxInNeighbours = 0; idxInNeighbours < nNeighbours;
            ++idxInNeighbours) {
         const Eigen::Index randNeighbourIdx =
-          std::uniform_int_distribution<Eigen::Index>(
-            idxInNeighbours, static_cast<Eigen::Index>(nNeighbours) - 1)(rng);
+          std::uniform_int_distribution<Eigen::Index>(idxInNeighbours,
+                                                      nNeighbours - 1)(rng);
         std::swap(neighbourIndices[idxInNeighbours],
                   neighbourIndices[randNeighbourIdx]);
         const long int candidateVertex = neighbourIndices[idxInNeighbours];

@@ -1058,9 +1058,8 @@ MEHPForceBalance::randomlyAddSliplinks(const size_t nrOfSliplinksToSample,
   atomToStrand.reserve(this->universe.getNrOfAtoms());
   std::unordered_map<size_t, size_t> atomIdxInStrand;
   atomIdxInStrand.reserve(this->universe.getNrOfAtoms());
-  size_t springId = 0;
   for (size_t i = 0; i < crossLinkerChains.size(); ++i) {
-    pylimer_tools::entities::Molecule chain = crossLinkerChains[i];
+    const pylimer_tools::entities::Molecule& chain = crossLinkerChains[i];
     RUNTIME_EXP_IFN(chain.getType() !=
                       pylimer_tools::entities::MoleculeType::UNDEFINED,
                     "Couldn't determine molecule type.");
@@ -1071,24 +1070,19 @@ MEHPForceBalance::randomlyAddSliplinks(const size_t nrOfSliplinksToSample,
         (chain.getType() ==
            pylimer_tools::entities::MoleculeType::DANGLING_CHAIN &&
          danglingChainsAreKept)) {
-      assert(i == this->initialConfig.springToMoleculeIds[springId]);
       std::vector<pylimer_tools::entities::Atom> atoms =
-        crossLinkerChains[i].getAtomsLinedUp(this->crossLinkerType);
+        chain.getAtomsLinedUp(this->crossLinkerType);
       for (size_t atomIdx = 0; atomIdx < atoms.size(); ++atomIdx) {
         const pylimer_tools::entities::Atom& atom = atoms[atomIdx];
         if (atom.getType() != this->crossLinkerType) {
-          atomToStrand.emplace(atom.getId(), springId);
-          atomIdxInStrand.emplace(atom.getId(), atomIdx);
-          RUNTIME_EXP_IFN(this->initialConfig.oldAtomIdToSpringIndex.at(
-                            static_cast<size_t>(atom.getId())) == springId,
-                          "The spring numbering seems incorrect. Placing "
-                          "slip-links will lead to inappropriate placement.");
+          const auto springIt = this->initialConfig.oldAtomIdToSpringIndex.find(
+            static_cast<size_t>(atom.getId()));
+          if (springIt != this->initialConfig.oldAtomIdToSpringIndex.end()) {
+            atomToStrand.emplace(atom.getId(), springIt->second);
+            atomIdxInStrand.emplace(atom.getId(), atomIdx);
+          }
         }
       }
-      RUNTIME_EXP_IFN(this->initialConfig.springToMoleculeIds[springId] == i,
-                      "The spring numbering seems incorrect. Placing "
-                      "slip-links will lead to inappropriate placement.");
-      springId += 1;
     }
   }
 
@@ -5102,12 +5096,12 @@ MEHPForceBalance::getCrosslinkerVerse() const
  * @param clampAlpha
  */
 void
-MEHPForceBalance::addSlipLinks(
+MEHPForceBalance::addSlipLinksImpl(
   const std::vector<size_t>& strandIdx1,
   const std::vector<size_t>& strandIdx2,
-  const std::vector<double>& x,
-  const std::vector<double>& y,
-  const std::vector<double>& z,
+  const Eigen::Ref<const Eigen::VectorXd>& x,
+  const Eigen::Ref<const Eigen::VectorXd>& y,
+  const Eigen::Ref<const Eigen::VectorXd>& z,
   const std::vector<double>& alpha1,
   const std::vector<double>& alpha2,
   std::vector<std::vector<size_t>> loops,
@@ -5134,8 +5128,9 @@ MEHPForceBalance::addSlipLinks(
   const size_t currentNrOfLinks = this->initialConfig.nrOfLinks;
   const size_t currentNrOfPartialSprings =
     this->initialConfig.nrOfPartialSprings;
-  if (additionalLen != x.size() || additionalLen != y.size() ||
-      additionalLen != z.size()) {
+  const Eigen::Index additionalLenE = static_cast<Eigen::Index>(additionalLen);
+  if (additionalLenE != x.size() || additionalLenE != y.size() ||
+      additionalLenE != z.size()) {
     throw std::invalid_argument("x, y and z must have the same dimensions");
   }
   if (additionalLen != strandIdx2.size() || additionalLen != alpha1.size() ||
@@ -5219,9 +5214,10 @@ MEHPForceBalance::addSlipLinks(
     // add the info that is straight-forward to add
     const Eigen::Index newLinkIdxE =
       static_cast<Eigen::Index>(currentNrOfLinks + i);
-    this->initialConfig.coordinates[3 * newLinkIdxE] = x[i];
-    this->initialConfig.coordinates[3 * newLinkIdxE + 1] = y[i];
-    this->initialConfig.coordinates[3 * newLinkIdxE + 2] = z[i];
+    const Eigen::Index iE = static_cast<Eigen::Index>(i);
+    this->initialConfig.coordinates[3 * newLinkIdxE] = x[iE];
+    this->initialConfig.coordinates[3 * newLinkIdxE + 1] = y[iE];
+    this->initialConfig.coordinates[3 * newLinkIdxE + 2] = z[iE];
     this->initialConfig.linkIsSliplink[newLinkIdxE] = true;
     this->initialConfig.nrOfCrosslinkSwapsEndured
       [newLinkIdxE - static_cast<Eigen::Index>(this->initialConfig.nrOfNodes)] =
@@ -6066,86 +6062,350 @@ MEHPForceBalance::getWeightedPartialSpringLength(
 bool
 MEHPForceBalance::ConvertNetwork(ForceBalanceNetwork& net,
                                  const int xlinkType,
-                                 bool remove2functionalCrosslinkers,
-                                 bool removeDanglingChains)
+                                 const bool remove2functionalCrosslinkers,
+                                 const bool removeDanglingChains)
 {
+  const size_t nrOfAtoms = this->universe.getNrOfAtoms();
+  const size_t nrOfBonds = this->universe.getNrOfBonds();
+
+  const std::vector<int> vertexDegrees = this->universe.getVertexDegrees();
+  std::vector<int> vertexTypes = this->universe.getPropertyValues<int>("type");
+  const std::vector<long int> vertexAtomIds =
+    this->universe.getPropertyValues<long int>("id");
+
   if (remove2functionalCrosslinkers) {
-    for (pylimer_tools::entities::Atom xlinker :
-         this->universe.getAtomsOfType(xlinkType)) {
+    for (size_t vIdx = 0; vIdx < nrOfAtoms; ++vIdx) {
       // change type of crosslinkers with a degree <= 2 to "normal",
       // non-crosslink beads
-      igraph_int_t vertexId = this->universe.getIdxByAtomId(xlinker.getId());
-      if (this->universe.computeFunctionalityForVertex(vertexId) <= 2) {
-        this->universe.setPropertyValue(vertexId, "type", xlinkType - 1);
+      if (vertexTypes[vIdx] == xlinkType && vertexDegrees[vIdx] <= 2) {
+        vertexTypes[vIdx] = xlinkType - 1;
+        this->universe.setPropertyValue(
+          static_cast<igraph_int_t>(vIdx), "type", xlinkType - 1);
       }
     }
   }
 
-  std::vector<pylimer_tools::entities::Molecule> crossLinkerChains =
-    this->universe.getChainsWithCrosslinker(xlinkType);
+  const igraph_t& graph = this->universe.getGraph();
+  std::vector<long int> edgeTypes(nrOfBonds, -1);
+  if (nrOfBonds > 0 &&
+      igraph_cattribute_has_attr(&graph, IGRAPH_ATTRIBUTE_EDGE, "type")) {
+    igraph_vector_t typesVec;
+    REQUIRE_IGRAPH_SUCCESS(igraph_vector_init(&typesVec, 0));
+    if (igraph_cattribute_EANV(
+          &graph, "type", igraph_ess_all(IGRAPH_EDGEORDER_ID), &typesVec)) {
+      igraph_vector_destroy(&typesVec);
+      throw std::runtime_error("Failed to fetch edge type attribute");
+    }
+    assert(static_cast<size_t>(igraph_vector_size(&typesVec)) == nrOfBonds);
+    for (size_t eIdx = 0; eIdx < nrOfBonds; ++eIdx) {
+      edgeTypes[eIdx] = static_cast<long int>(std::llround(
+        igraph_vector_get(&typesVec, static_cast<igraph_int_t>(eIdx))));
+    }
+    igraph_vector_destroy(&typesVec);
+  }
 
-  // need to include all but dangling and free chains in order to
-  // model entanglement
-  size_t nrOfSprings = 0;
-  std::vector<bool> useChain = pylimer_tools::utils::initializeWithValue<bool>(
-    crossLinkerChains.size(), false);
-  std::vector<long int> vertexIdToLinkIdx =
-    pylimer_tools::utils::initializeWithValue<long int>(
-      this->universe.getNrOfAtoms(), -1);
+  const Eigen::VectorXd vertexCoordinates =
+    nrOfAtoms > 0 ? this->universe.getUnwrappedVertexCoordinates(this->box)
+                  : Eigen::VectorXd::Zero(0);
+
+  std::vector<bool> vertexIsJunction(nrOfAtoms, false);
+  for (size_t vIdx = 0; vIdx < nrOfAtoms; ++vIdx) {
+    if (vertexDegrees[vIdx] > 2 || vertexTypes[vIdx] == xlinkType) {
+      vertexIsJunction[vIdx] = true;
+    }
+  }
+
+  std::vector<bool> vertexVisited(nrOfAtoms, false);
+  std::vector<bool> edgeVisited(nrOfBonds, false);
+  std::vector<long int> vertexIdToLinkIdx(nrOfAtoms, -1);
   size_t currentLinkIdx = 0;
-  for (size_t i = 0; i < crossLinkerChains.size(); ++i) {
-    RUNTIME_EXP_IFN(crossLinkerChains[i].getType() !=
-                      pylimer_tools::entities::MoleculeType::UNDEFINED,
-                    "Crosslinker chain's chain type could not be "
-                    "detected. Cannot work like that.");
-    if (crossLinkerChains[i].getType() ==
-        pylimer_tools::entities::MoleculeType::NETWORK_STRAND) {
-      assert(crossLinkerChains[i].getChainEnds(xlinkType, true).size() == 2);
-      useChain[i] = true;
-      nrOfSprings += 1;
-    } else if (crossLinkerChains[i].getType() ==
-               pylimer_tools::entities::MoleculeType::PRIMARY_LOOP) {
-      // when omitting f=2 crosslinks, it's possible that we end up with
-      // "free" primary loops – let's not use those
-      if (crossLinkerChains[i].getAtomsOfType(xlinkType).size() > 0) {
-        useChain[i] = true;
-        nrOfSprings += 1;
-      }
-    } else if (!removeDanglingChains &&
-               crossLinkerChains[i].getType() ==
-                 pylimer_tools::entities::MoleculeType::DANGLING_CHAIN) {
-      std::vector<pylimer_tools::entities::Atom> endAtoms =
-        crossLinkerChains[i].getAtomsOfDegree(1);
-      RUNTIME_EXP_IFN(endAtoms.size() == 2,
-                      "Expected a dangling chain to have two ends, got " +
-                        std::to_string(endAtoms.size()) + ".");
-      // cannot assert this without entanglement types being set
-      // assert(XOR((endAtoms[0].getType() == crossLinkerType),
-      //            endAtoms[1].getType() == crossLinkerType));
 
-      useChain[i] = true;
-      nrOfSprings += 1;
+  struct DiscoveredStrand
+  {
+    size_t fromV;
+    size_t toV;
+    double contourLength;
+    int springType;
+    Eigen::Vector3d expectedDistance;
+    std::vector<size_t> atomVertices;
+  };
+  std::vector<DiscoveredStrand> discoveredStrands;
+  discoveredStrands.reserve(nrOfBonds / 2 + 1);
+
+  igraph_adjlist_t adjacencyList;
+  REQUIRE_IGRAPH_SUCCESS(igraph_adjlist_init(
+    &graph, &adjacencyList, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
+  igraph_inclist_t incidenceList;
+  if (igraph_inclist_init(
+        &graph, &incidenceList, IGRAPH_ALL, IGRAPH_LOOPS_TWICE)) {
+    igraph_adjlist_destroy(&adjacencyList);
+    throw std::runtime_error("Failed to initialize incidence list.");
+  }
+
+  auto addDiscoveredStrand = [&](const size_t endA,
+                                 const size_t endB,
+                                 const size_t nBonds,
+                                 const long int bondTypeSum,
+                                 Eigen::Vector3d expectedDistance,
+                                 std::vector<size_t> atomVertices) {
+    size_t fromV = endA;
+    size_t toV = endB;
+    if (vertexAtomIds[fromV] > vertexAtomIds[toV]) {
+      std::swap(fromV, toV);
+      expectedDistance = -expectedDistance;
     }
 
-    if (useChain[i]) {
-      std::vector<pylimer_tools::entities::Atom> endAtoms =
-        crossLinkerChains[i].getChainEnds(xlinkType);
-      for (const pylimer_tools::entities::Atom& endAtom : endAtoms) {
-        size_t atomVertexIdx =
-          static_cast<size_t>(this->universe.getIdxByAtomId(endAtom.getId()));
-        if (vertexIdToLinkIdx[atomVertexIdx] == -1) {
-          vertexIdToLinkIdx[atomVertexIdx] =
-            static_cast<long int>(currentLinkIdx);
-          currentLinkIdx += 1;
+    if (vertexIdToLinkIdx[fromV] == -1) {
+      vertexIdToLinkIdx[fromV] = static_cast<long int>(currentLinkIdx);
+      currentLinkIdx += 1;
+    }
+    if (vertexIdToLinkIdx[toV] == -1) {
+      vertexIdToLinkIdx[toV] = static_cast<long int>(currentLinkIdx);
+      currentLinkIdx += 1;
+    }
+
+    discoveredStrands.push_back(
+      DiscoveredStrand{ fromV,
+                        toV,
+                        static_cast<double>(nBonds),
+                        static_cast<int>(static_cast<double>(bondTypeSum) /
+                                         static_cast<double>(nBonds)),
+                        expectedDistance,
+                        std::move(atomVertices) });
+  };
+
+  // Helper to walk from a non-junction vertex along one incident edge until
+  // reaching a junction, a degree-1 end, or returning to startBeadV.
+  auto walkFromNonJunction = [&](const size_t startBeadV,
+                                 const igraph_int_t dirIdx,
+                                 size_t& outEndV,
+                                 size_t& outNBonds,
+                                 long int& outBondTypeSum,
+                                 Eigen::Vector3d& outVec,
+                                 std::vector<size_t>& outVertices) -> bool {
+    const igraph_vector_int_t* startNeighbors =
+      igraph_adjlist_get(&adjacencyList, static_cast<igraph_int_t>(startBeadV));
+    const igraph_vector_int_t* startIncidentEdges =
+      igraph_inclist_get(&incidenceList, static_cast<igraph_int_t>(startBeadV));
+    const size_t firstEdge =
+      static_cast<size_t>(igraph_vector_int_get(startIncidentEdges, dirIdx));
+    if (edgeVisited[firstEdge]) {
+      return false;
+    }
+    edgeVisited[firstEdge] = true;
+
+    size_t currV =
+      static_cast<size_t>(igraph_vector_int_get(startNeighbors, dirIdx));
+    outNBonds = 1;
+    outBondTypeSum = edgeTypes[firstEdge];
+    outVec =
+      vertexCoordinates.segment<3>(3 * static_cast<Eigen::Index>(currV)) -
+      vertexCoordinates.segment<3>(3 * static_cast<Eigen::Index>(startBeadV));
+    this->box.handlePBC(outVec);
+    outVertices.push_back(currV);
+
+    if (currV == startBeadV) {
+      outEndV = currV;
+      return true;
+    }
+
+    while (!vertexIsJunction[currV] && vertexDegrees[currV] == 2) {
+      vertexVisited[currV] = true;
+      const igraph_vector_int_t* neighbors =
+        igraph_adjlist_get(&adjacencyList, static_cast<igraph_int_t>(currV));
+      const igraph_vector_int_t* incidentEdges =
+        igraph_inclist_get(&incidenceList, static_cast<igraph_int_t>(currV));
+      assert(igraph_vector_int_size(neighbors) == 2);
+      assert(igraph_vector_int_size(incidentEdges) == 2);
+
+      const size_t e0 =
+        static_cast<size_t>(igraph_vector_int_get(incidentEdges, 0));
+      const igraph_int_t nextChoice = edgeVisited[e0] ? 1 : 0;
+      const size_t nextEdge =
+        static_cast<size_t>(igraph_vector_int_get(incidentEdges, nextChoice));
+      assert(!edgeVisited[nextEdge]);
+      edgeVisited[nextEdge] = true;
+
+      const size_t nextV =
+        static_cast<size_t>(igraph_vector_int_get(neighbors, nextChoice));
+      Eigen::Vector3d stepVec =
+        vertexCoordinates.segment<3>(3 * static_cast<Eigen::Index>(nextV)) -
+        vertexCoordinates.segment<3>(3 * static_cast<Eigen::Index>(currV));
+      this->box.handlePBC(stepVec);
+      outVec += stepVec;
+      outNBonds += 1;
+      outBondTypeSum += edgeTypes[nextEdge];
+      currV = nextV;
+      outVertices.push_back(currV);
+
+      if (currV == startBeadV) {
+        break;
+      }
+    }
+
+    if (!vertexIsJunction[currV]) {
+      vertexVisited[currV] = true;
+    }
+    outEndV = currV;
+    return true;
+  };
+
+  // Pass 1: Discover all strands containing >= 1 non-junction bead in order
+  // of their minimum non-junction vertex index (matching igraph_decompose).
+  for (size_t vIdx = 0; vIdx < nrOfAtoms; ++vIdx) {
+    if (vertexIsJunction[vIdx] || vertexVisited[vIdx]) {
+      continue;
+    }
+    vertexVisited[vIdx] = true;
+    if (vertexDegrees[vIdx] == 0) {
+      continue;
+    }
+
+    std::vector<size_t> atomVertices;
+    atomVertices.push_back(vIdx);
+
+    if (vertexDegrees[vIdx] == 1) {
+      size_t endV = vIdx;
+      size_t nBonds = 0;
+      long int bondTypeSum = 0;
+      Eigen::Vector3d vec = Eigen::Vector3d::Zero();
+      const bool walked = walkFromNonJunction(
+        vIdx, 0, endV, nBonds, bondTypeSum, vec, atomVertices);
+      assert(walked);
+      (void)walked;
+      if (vertexIsJunction[endV] && !removeDanglingChains) {
+        addDiscoveredStrand(
+          vIdx, endV, nBonds, bondTypeSum, vec, std::move(atomVertices));
+      }
+      continue;
+    }
+
+    assert(vertexDegrees[vIdx] == 2);
+    size_t end0 = vIdx;
+    size_t nBonds0 = 0;
+    long int bondTypeSum0 = 0;
+    Eigen::Vector3d vec0 = Eigen::Vector3d::Zero();
+    const bool walked0 = walkFromNonJunction(
+      vIdx, 0, end0, nBonds0, bondTypeSum0, vec0, atomVertices);
+    if (!walked0 || end0 == vIdx) {
+      // Free primary loop of non-junction beads: skip
+      continue;
+    }
+
+    size_t end1 = vIdx;
+    size_t nBonds1 = 0;
+    long int bondTypeSum1 = 0;
+    Eigen::Vector3d vec1 = Eigen::Vector3d::Zero();
+    const bool walked1 = walkFromNonJunction(
+      vIdx, 1, end1, nBonds1, bondTypeSum1, vec1, atomVertices);
+    assert(walked1);
+    (void)walked1;
+
+    const size_t totalBonds = nBonds0 + nBonds1;
+    const long int totalBondTypeSum = bondTypeSum0 + bondTypeSum1;
+    const Eigen::Vector3d expectedDistance = vec1 - vec0;
+
+    bool useStrand = false;
+    if (vertexIsJunction[end0] && vertexIsJunction[end1]) {
+      if (end0 == end1) {
+        // Primary loop: only use if the junction is of xlinkType
+        if (vertexTypes[end0] == xlinkType) {
+          useStrand = true;
         }
+        // Avoid duplicate entry for the single junction in atomVertices
+        atomVertices.pop_back();
+      } else {
+        // NETWORK_STRAND
+        useStrand = true;
+      }
+    } else if ((vertexIsJunction[end0] || vertexIsJunction[end1]) &&
+               !removeDanglingChains) {
+      // DANGLING_CHAIN
+      useStrand = true;
+    }
+
+    if (useStrand) {
+      addDiscoveredStrand(end0,
+                          end1,
+                          totalBonds,
+                          totalBondTypeSum,
+                          expectedDistance,
+                          std::move(atomVertices));
+    }
+  }
+
+  // Pass 2: Direct bonds between two junctions and self-loops on junctions.
+  for (size_t startV = 0; startV < nrOfAtoms; ++startV) {
+    if (!vertexIsJunction[startV]) {
+      continue;
+    }
+    const igraph_vector_int_t* startNeighbors =
+      igraph_adjlist_get(&adjacencyList, static_cast<igraph_int_t>(startV));
+    const igraph_vector_int_t* startIncidentEdges =
+      igraph_inclist_get(&incidenceList, static_cast<igraph_int_t>(startV));
+    const igraph_int_t startDeg = igraph_vector_int_size(startNeighbors);
+    assert(startDeg == igraph_vector_int_size(startIncidentEdges));
+
+    std::vector<size_t> selfLoopEdges;
+    for (igraph_int_t i = 0; i < startDeg; ++i) {
+      const size_t edgeIdx =
+        static_cast<size_t>(igraph_vector_int_get(startIncidentEdges, i));
+      if (edgeVisited[edgeIdx]) {
+        continue;
+      }
+      edgeVisited[edgeIdx] = true;
+
+      const size_t endV =
+        static_cast<size_t>(igraph_vector_int_get(startNeighbors, i));
+      assert(vertexIsJunction[endV]);
+      if (endV == startV) {
+        selfLoopEdges.push_back(edgeIdx);
+        continue;
+      }
+
+      bool useStrand = false;
+      if (vertexDegrees[startV] > 1 && vertexDegrees[endV] > 1) {
+        useStrand = true;
+      } else if (!removeDanglingChains &&
+                 (vertexDegrees[startV] > 1 || vertexDegrees[endV] > 1)) {
+        useStrand = true;
+      }
+      if (!useStrand) {
+        continue;
+      }
+
+      Eigen::Vector3d expectedDistance =
+        vertexCoordinates.segment<3>(3 * static_cast<Eigen::Index>(endV)) -
+        vertexCoordinates.segment<3>(3 * static_cast<Eigen::Index>(startV));
+      this->box.handlePBC(expectedDistance);
+      addDiscoveredStrand(startV,
+                          endV,
+                          1,
+                          edgeTypes[edgeIdx],
+                          expectedDistance,
+                          std::vector<size_t>{ startV, endV });
+    }
+
+    for (const size_t edgeIdx : selfLoopEdges) {
+      if (vertexTypes[startV] == xlinkType) {
+        addDiscoveredStrand(startV,
+                            startV,
+                            1,
+                            edgeTypes[edgeIdx],
+                            Eigen::Vector3d::Zero(),
+                            std::vector<size_t>{ startV });
       }
     }
   }
 
-  size_t nrOfXlinks = currentLinkIdx;
+  igraph_adjlist_destroy(&adjacencyList);
+  igraph_inclist_destroy(&incidenceList);
+
+  const size_t nrOfSprings = discoveredStrands.size();
+  const size_t nrOfXlinks = currentLinkIdx;
 
   // crossLinkerUniverse.simplify();
-  pylimer_tools::entities::Box universeBox = this->box;
+  const pylimer_tools::entities::Box universeBox = this->box;
   net.L[0] = universeBox.getLx();
   net.L[1] = universeBox.getLy();
   net.L[2] = universeBox.getLz();
@@ -6184,22 +6444,19 @@ MEHPForceBalance::ConvertNetwork(ForceBalanceNetwork& net,
   net.springIsActive = Eigen::ArrayXb::Constant(nrOfSpringsE, false);
   net.springsContourLength = Eigen::VectorXd::Zero(nrOfSpringsE);
   net.springsType = Eigen::ArrayXi::Zero(nrOfSpringsE);
-  net.oldAtomIdToSpringIndex.reserve(this->universe.getNrOfAtoms());
+  net.oldAtomIdToSpringIndex.reserve(nrOfAtoms);
   net.springToMoleculeIds.reserve(nrOfSprings);
   net.partialSpringIsPartial = Eigen::ArrayXb::Constant(nrOfSpringsE, false);
 
   // convert (crosslinker-)beads
-  std::map<int, int> atomIdToNode;
   for (size_t i = 0; i < vertexIdToLinkIdx.size(); ++i) {
     if (vertexIdToLinkIdx[i] != -1) {
-      size_t linkIdx = static_cast<size_t>(vertexIdToLinkIdx[i]);
+      const size_t linkIdx = static_cast<size_t>(vertexIdToLinkIdx[i]);
       const Eigen::Index linkIdxE = static_cast<Eigen::Index>(linkIdx);
-      pylimer_tools::entities::Atom atom =
-        this->universe.getAtomByVertexIdx(static_cast<igraph_int_t>(i));
-      atomIdToNode[atom.getId()] = static_cast<int>(linkIdx);
-      net.oldAtomIds[linkIdxE] = atom.getId();
-      net.oldAtomTypes[linkIdxE] = atom.getType();
-      Eigen::Vector3d coords = atom.getCoordinates();
+      net.oldAtomIds[linkIdxE] = static_cast<int>(vertexAtomIds[i]);
+      net.oldAtomTypes[linkIdxE] = vertexTypes[i];
+      Eigen::Vector3d coords =
+        vertexCoordinates.segment<3>(3 * static_cast<Eigen::Index>(i));
       this->box.handlePBC(coords);
       net.coordinates.segment(3 * linkIdxE, 3) = coords;
     }
@@ -6207,107 +6464,57 @@ MEHPForceBalance::ConvertNetwork(ForceBalanceNetwork& net,
 
   // convert springs
   size_t spring_idx = 0;
-  Eigen::Vector3d expectedDistance = Eigen::Vector3d::Zero();
-  // net.connectivityToSpringIndex.reserve(nrOfSprings);
-  for (size_t i = 0; i < crossLinkerChains.size(); ++i) {
-    if (!useChain[i]) {
-      continue;
-    }
-    std::vector<pylimer_tools::entities::Atom> xlinkersOfChain =
-      crossLinkerChains[i].getAtomsOfType(xlinkType);
-    std::vector<pylimer_tools::entities::Atom> chainEnds =
-      crossLinkerChains[i].getChainEnds(xlinkType, true);
-    RUNTIME_EXP_IFN(chainEnds.size() == 2,
-                    "Expected two chain ends when converting structure. Got " +
-                      std::to_string(chainEnds.size()) + ".");
-    long int atomIdFrom = chainEnds[0].getId();
-    long int atomIdTo = chainEnds[1].getId();
-    bool addChain = false;
+  for (size_t i = 0; i < nrOfSprings; ++i) {
+    const DiscoveredStrand& strand = discoveredStrands[i];
     const Eigen::Index springIdxE = static_cast<Eigen::Index>(spring_idx);
-    if (crossLinkerChains[i].getType() ==
-        pylimer_tools::entities::MoleculeType::NETWORK_STRAND) {
-      addChain = true;
 
-      // spring contour length = nr of bonds between two crosslinkers
-      net.springsContourLength[springIdxE] =
-        static_cast<double>(crossLinkerChains[i].getNrOfAtoms() - 1);
-    } else if (crossLinkerChains[i].getType() ==
-               pylimer_tools::entities::MoleculeType::PRIMARY_LOOP) {
-      addChain = true;
+    net.springsContourLength[springIdxE] = strand.contourLength;
+    net.springsType[springIdxE] = strand.springType;
 
-      net.springsContourLength[springIdxE] =
-        static_cast<double>(crossLinkerChains[i].getNrOfAtoms());
-      if (xlinkersOfChain.size() == 2) {
-        net.springsContourLength[springIdxE] =
-          static_cast<double>(crossLinkerChains[i].getNrOfAtoms() - 1);
-      }
-    } else if (crossLinkerChains[i].getType() ==
-                 pylimer_tools::entities::MoleculeType::DANGLING_CHAIN &&
-               !removeDanglingChains) {
-      net.springsContourLength[springIdxE] =
-        static_cast<double>(crossLinkerChains[i].getNrOfAtoms() - 1);
-      addChain = true;
+    const long int nodeIdxFrom = vertexIdToLinkIdx[strand.fromV];
+    const long int nodeIdxTo = vertexIdToLinkIdx[strand.toV];
+    assert(nodeIdxFrom >= 0 && nodeIdxTo >= 0);
+
+    net.springToMoleculeIds.push_back(spring_idx);
+    for (const size_t vIdx : strand.atomVertices) {
+      net.oldAtomIdToSpringIndex[static_cast<size_t>(vertexAtomIds[vIdx])] =
+        spring_idx;
     }
-    auto bondTypes = crossLinkerChains[i].getBonds()["bond_type"];
-    net.springsType[springIdxE] = MEAN(bondTypes);
-    assert(addChain);
 
-    if (addChain) {
-      long int nodeIdxFrom = atomIdToNode.at(atomIdFrom);
-      long int nodeIdxTo = atomIdToNode.at(atomIdTo);
-      // if (nodeIdxFrom > nodeIdxTo) {
-      //   std::swap(nodeIdxFrom, nodeIdxTo);
-      //   std::swap(atomIdFrom, atomIdTo);
-      // }
-
-      net.springToMoleculeIds.push_back(i);
-      std::vector<pylimer_tools::entities::Atom> allChainAtoms =
-        crossLinkerChains[i].getAtoms();
-      for (const pylimer_tools::entities::Atom& a : allChainAtoms) {
-        net.oldAtomIdToSpringIndex[static_cast<size_t>(a.getId())] = spring_idx;
-      }
-
+    pylimer_tools::utils::addIfNotContained(
+      net.springIndicesOfLinks[static_cast<size_t>(nodeIdxFrom)], spring_idx);
+    if (nodeIdxFrom != nodeIdxTo) {
       pylimer_tools::utils::addIfNotContained(
-        net.springIndicesOfLinks[static_cast<size_t>(nodeIdxFrom)], spring_idx);
-      if (nodeIdxFrom != nodeIdxTo) {
-        pylimer_tools::utils::addIfNotContained(
-          net.springIndicesOfLinks[static_cast<size_t>(nodeIdxTo)], spring_idx);
-      }
-
-      net.linkIndicesOfSprings[spring_idx].push_back(
-        static_cast<size_t>(nodeIdxFrom));
-      net.linkIndicesOfSprings[spring_idx].push_back(
-        static_cast<size_t>(nodeIdxTo));
-
-      net.springIndexA[springIdxE] = static_cast<int>(nodeIdxFrom);
-      net.springIndexB[springIdxE] = static_cast<int>(nodeIdxTo);
-      for (Eigen::Index j = 0; j < 3; j++) {
-        net.springCoordinateIndexA[3 * springIdxE + j] =
-          static_cast<int>(nodeIdxFrom * 3 + j);
-        net.springCoordinateIndexB[3 * springIdxE + j] =
-          static_cast<int>(nodeIdxTo * 3 + j);
-      }
-
-      std::vector<size_t> zeroMap;
-      zeroMap.push_back(spring_idx);
-      net.localToGlobalSpringIndex.push_back(zeroMap);
-      net.partialToFullSpringIndex[static_cast<Eigen::Index>(spring_idx)] =
-        static_cast<int>(spring_idx);
-
-      expectedDistance = crossLinkerChains[i].getOverallBondSumFromTo(
-        static_cast<size_t>(atomIdFrom),
-        static_cast<size_t>(atomIdTo),
-        xlinkType,
-        true);
-      Eigen::Vector3d actualDistance =
-        net.coordinates.segment(3 * nodeIdxTo, 3) -
-        net.coordinates.segment(3 * nodeIdxFrom, 3);
-      net.springPartBoxOffset.segment(3 * static_cast<Eigen::Index>(spring_idx),
-                                      3) = expectedDistance - actualDistance;
-      assert(this->box.isValidOffset(expectedDistance - actualDistance));
-
-      spring_idx += 1;
+        net.springIndicesOfLinks[static_cast<size_t>(nodeIdxTo)], spring_idx);
     }
+
+    net.linkIndicesOfSprings[spring_idx].push_back(
+      static_cast<size_t>(nodeIdxFrom));
+    net.linkIndicesOfSprings[spring_idx].push_back(
+      static_cast<size_t>(nodeIdxTo));
+
+    net.springIndexA[springIdxE] = static_cast<int>(nodeIdxFrom);
+    net.springIndexB[springIdxE] = static_cast<int>(nodeIdxTo);
+    for (Eigen::Index j = 0; j < 3; j++) {
+      net.springCoordinateIndexA[3 * springIdxE + j] =
+        static_cast<int>(nodeIdxFrom * 3 + j);
+      net.springCoordinateIndexB[3 * springIdxE + j] =
+        static_cast<int>(nodeIdxTo * 3 + j);
+    }
+
+    std::vector<size_t> zeroMap;
+    zeroMap.push_back(spring_idx);
+    net.localToGlobalSpringIndex.push_back(zeroMap);
+    net.partialToFullSpringIndex[springIdxE] = static_cast<int>(spring_idx);
+
+    const Eigen::Vector3d actualDistance =
+      net.coordinates.segment(3 * static_cast<Eigen::Index>(nodeIdxTo), 3) -
+      net.coordinates.segment(3 * static_cast<Eigen::Index>(nodeIdxFrom), 3);
+    net.springPartBoxOffset.segment(3 * springIdxE, 3) =
+      strand.expectedDistance - actualDistance;
+    assert(this->box.isValidOffset(strand.expectedDistance - actualDistance));
+
+    spring_idx += 1;
   }
 
   net.springPartCoordinateIndexA = net.springCoordinateIndexA;

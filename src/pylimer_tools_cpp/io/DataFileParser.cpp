@@ -50,20 +50,22 @@ DataFileParser::read(const std::string& filePath,
 
   // reserve space
   // for atom data
-  this->atomIds.reserve(static_cast<size_t>(this->nAtoms));
-  this->atomTypes.reserve(static_cast<size_t>(this->nAtoms));
-  this->moleculeIds.reserve(static_cast<size_t>(this->nAtoms));
-  this->atomX.reserve(static_cast<size_t>(this->nAtoms));
-  this->atomY.reserve(static_cast<size_t>(this->nAtoms));
-  this->atomZ.reserve(static_cast<size_t>(this->nAtoms));
-  this->atomNx.reserve(static_cast<size_t>(this->nAtoms));
-  this->atomNy.reserve(static_cast<size_t>(this->nAtoms));
-  this->atomNz.reserve(static_cast<size_t>(this->nAtoms));
+  const size_t nAtomsSz = static_cast<size_t>(this->nAtoms);
+  this->atomIds.reserve(nAtomsSz);
+  this->atomTypes.reserve(nAtomsSz);
+  this->moleculeIds.reserve(nAtomsSz);
+  this->atomX.reserve(nAtomsSz);
+  this->atomY.reserve(nAtomsSz);
+  this->atomZ.reserve(nAtomsSz);
+  this->atomNx.reserve(nAtomsSz);
+  this->atomNy.reserve(nAtomsSz);
+  this->atomNz.reserve(nAtomsSz);
   // and bond data
-  this->bondIds.reserve(static_cast<size_t>(this->nBonds));
-  this->bondTypes.reserve(static_cast<size_t>(this->nBonds));
-  this->bondFrom.reserve(static_cast<size_t>(this->nBonds));
-  this->bondTo.reserve(static_cast<size_t>(this->nBonds));
+  const size_t nBondsSz = static_cast<size_t>(this->nBonds);
+  this->bondIds.reserve(nBondsSz);
+  this->bondTypes.reserve(nBondsSz);
+  this->bondFrom.reserve(nBondsSz);
+  this->bondTo.reserve(nBondsSz);
 
   // skip empty lines plus the line with "Masses"
   while (getline(file, line)) {
@@ -713,7 +715,11 @@ DataFileParser::readAtomGeneric(const std::string& line,
       using FT = AtomFieldDescriptor::FieldType;
       switch (descriptor.fields[argIdx]) {
         case FT::ATOM_ID:
-          this->atomIds.push_back(static_cast<long int>(arg));
+          if constexpr (std::is_same_v<std::decay_t<decltype(arg)>, long int>) {
+            this->atomIds.push_back(arg);
+          } else {
+            this->atomIds.push_back(static_cast<long int>(arg));
+          }
           break;
         case FT::MOLECULE_ID:
           this->moleculeIds.push_back(static_cast<int>(arg));
@@ -899,7 +905,7 @@ void
 DataFileParser::readAtom(const std::string& line)
 {
   auto descriptor = getAtomStyleDescriptor(AtomStyle::MOLECULAR);
-  size_t atomId;
+  long int atomId;
   long int nx, ny, nz;
   int atomType, moleculeId;
   double x, y, z;
@@ -912,7 +918,7 @@ void
 DataFileParser::readAtomFull(const std::string& line)
 {
   auto descriptor = getAtomStyleDescriptor(AtomStyle::FULL);
-  size_t atomId;
+  long int atomId;
   long int nx, ny, nz;
   int atomType, moleculeId;
   double charge, x, y, z;
@@ -935,7 +941,7 @@ void
 DataFileParser::readAtomCharge(const std::string& line)
 {
   auto descriptor = getAtomStyleDescriptor(AtomStyle::CHARGE);
-  size_t atomId;
+  long int atomId;
   long int nx, ny, nz;
   int atomType;
   double charge, x, y, z;
@@ -948,7 +954,7 @@ void
 DataFileParser::readAtomDipole(const std::string& line)
 {
   auto descriptor = getAtomStyleDescriptor(AtomStyle::DIPOLE);
-  size_t atomId;
+  long int atomId;
   long int nx, ny, nz;
   int atomType;
   double charge, x, y, z, dipoleX, dipoleY, dipoleZ;
@@ -973,7 +979,7 @@ void
 DataFileParser::readAtomDpd(const std::string& line)
 {
   auto descriptor = getAtomStyleDescriptor(AtomStyle::DPD);
-  size_t atomId;
+  long int atomId;
   long int nx, ny, nz;
   int atomType;
   double x, y, z, theta;
@@ -986,7 +992,7 @@ void
 DataFileParser::readAtomMdpd(const std::string& line)
 {
   auto descriptor = getAtomStyleDescriptor(AtomStyle::MDPD);
-  size_t atomId;
+  long int atomId;
   long int nx, ny, nz;
   int atomType;
   double x, y, z, rho;
@@ -998,7 +1004,7 @@ void
 DataFileParser::readAtomSphere(const std::string& line)
 {
   auto descriptor = getAtomStyleDescriptor(AtomStyle::SPHERE);
-  size_t atomId;
+  long int atomId;
   long int nx, ny, nz;
   int atomType;
   double x, y, z, diameter, density;
@@ -1011,7 +1017,7 @@ void
 DataFileParser::readAtomAtomic(const std::string& line)
 {
   auto descriptor = getAtomStyleDescriptor(AtomStyle::ATOMIC);
-  size_t atomId;
+  long int atomId;
   long int nx, ny, nz;
   int atomType;
   double x, y, z;
@@ -1023,7 +1029,7 @@ void
 DataFileParser::readAtomBody(const std::string& line)
 {
   auto descriptor = getAtomStyleDescriptor(AtomStyle::BODY);
-  size_t atomId;
+  long int atomId;
   long int nx, ny, nz;
   int atomType, bodyflag;
   double mass, x, y, z;
@@ -1036,7 +1042,7 @@ void
 DataFileParser::readAtomBpmSphere(const std::string& line)
 {
   auto descriptor = getAtomStyleDescriptor(AtomStyle::BPM_SPHERE);
-  size_t atomId;
+  long int atomId;
   long int nx, ny, nz;
   int atomType, moleculeId;
   double diameter, density, x, y, z;
@@ -1060,7 +1066,7 @@ void
 DataFileParser::readAtomDielectric(const std::string& line)
 {
   auto descriptor = getAtomStyleDescriptor(AtomStyle::DIELECTRIC);
-  size_t atomId;
+  long int atomId;
   long int nx, ny, nz;
   int atomType;
   double charge, x, y, z, mux, muy, muz, area, ed, em, epsilon, curvature;
@@ -1090,7 +1096,7 @@ void
 DataFileParser::readAtomEdpd(const std::string& line)
 {
   auto descriptor = getAtomStyleDescriptor(AtomStyle::EDPD);
-  size_t atomId;
+  long int atomId;
   long int nx, ny, nz;
   int atomType;
   double edpd_temp, edpd_cv, x, y, z;
@@ -1113,7 +1119,7 @@ void
 DataFileParser::readAtomElectron(const std::string& line)
 {
   auto descriptor = getAtomStyleDescriptor(AtomStyle::ELECTRON);
-  size_t atomId;
+  long int atomId;
   long int nx, ny, nz;
   int atomType;
   double charge, espin, eradius, x, y, z;
@@ -1137,7 +1143,7 @@ void
 DataFileParser::readAtomEllipsoid(const std::string& line)
 {
   auto descriptor = getAtomStyleDescriptor(AtomStyle::ELLIPSOID);
-  size_t atomId;
+  long int atomId;
   long int nx, ny, nz;
   int atomType, ellipsoidflag;
   double density, x, y, z;
@@ -1160,7 +1166,7 @@ void
 DataFileParser::readAtomLine(const std::string& line)
 {
   auto descriptor = getAtomStyleDescriptor(AtomStyle::LINE);
-  size_t atomId;
+  long int atomId;
   long int nx, ny, nz;
   int atomType, moleculeId, lineflag;
   double density, x, y, z;
@@ -1184,7 +1190,7 @@ void
 DataFileParser::readAtomPeri(const std::string& line)
 {
   auto descriptor = getAtomStyleDescriptor(AtomStyle::PERI);
-  size_t atomId;
+  long int atomId;
   long int nx, ny, nz;
   int atomType;
   double volume, density, x, y, z;
@@ -1197,7 +1203,7 @@ void
 DataFileParser::readAtomRheo(const std::string& line)
 {
   auto descriptor = getAtomStyleDescriptor(AtomStyle::RHEO);
-  size_t atomId;
+  long int atomId;
   long int nx, ny, nz;
   int atomType, status;
   double rho, x, y, z;
@@ -1210,7 +1216,7 @@ void
 DataFileParser::readAtomRheoThermal(const std::string& line)
 {
   auto descriptor = getAtomStyleDescriptor(AtomStyle::RHEO_THERMAL);
-  size_t atomId;
+  long int atomId;
   long int nx, ny, nz;
   int atomType, status;
   double rho, energy, x, y, z;
@@ -1234,7 +1240,7 @@ void
 DataFileParser::readAtomSmd(const std::string& line)
 {
   auto descriptor = getAtomStyleDescriptor(AtomStyle::SMD);
-  size_t atomId;
+  long int atomId;
   long int nx, ny, nz;
   int atomType, moleculeId;
   double volume, mass, kradius, cradius, x0, y0, z0, x, y, z;
@@ -1263,7 +1269,7 @@ void
 DataFileParser::readAtomSph(const std::string& line)
 {
   auto descriptor = getAtomStyleDescriptor(AtomStyle::SPH);
-  size_t atomId;
+  long int atomId;
   long int nx, ny, nz;
   int atomType;
   double rho, esph, cv, x, y, z;
@@ -1276,7 +1282,7 @@ void
 DataFileParser::readAtomSpin(const std::string& line)
 {
   auto descriptor = getAtomStyleDescriptor(AtomStyle::SPIN);
-  size_t atomId;
+  long int atomId;
   long int nx, ny, nz;
   int atomType;
   double x, y, z, spx, spy, spz, sp;
@@ -1289,7 +1295,7 @@ void
 DataFileParser::readAtomTemplate(const std::string& line)
 {
   auto descriptor = getAtomStyleDescriptor(AtomStyle::TEMPLATE);
-  size_t atomId;
+  long int atomId;
   long int nx, ny, nz;
   int atomType, moleculeId, templateIndex, templateAtom;
   double x, y, z;
@@ -1313,7 +1319,7 @@ void
 DataFileParser::readAtomTri(const std::string& line)
 {
   auto descriptor = getAtomStyleDescriptor(AtomStyle::TRI);
-  size_t atomId;
+  long int atomId;
   long int nx, ny, nz;
   int atomType, moleculeId, triangleflag;
   double density, x, y, z;
@@ -1337,7 +1343,7 @@ void
 DataFileParser::readAtomWavepacket(const std::string& line)
 {
   auto descriptor = getAtomStyleDescriptor(AtomStyle::WAVEPACKET);
-  size_t atomId;
+  long int atomId;
   long int nx, ny, nz;
   int atomType, etag;
   double charge, espin, eradius, cs_re, cs_im, x, y, z;
@@ -1370,13 +1376,13 @@ DataFileParser::readAtomHybrid(const std::string& line,
     throw std::runtime_error(
       "This combination is not implemented for hybrid atom style");
   }
-  size_t atomId;
+  long int atomId;
   long int nx, ny, nz;
   int atomType, moleculeId;
   double x, y, z;
   double edpdTemp, edpd;
   int resFound = sscanf(line.c_str(),
-                        "%zu %d %le %le %le %d %le %le %ld %ld %ld",
+                        "%ld %d %le %le %le %d %le %le %ld %ld %ld",
                         &atomId,
                         &atomType,
                         &x,
@@ -1393,7 +1399,7 @@ DataFileParser::readAtomHybrid(const std::string& line,
                   "Did not find enough data in line '" + line + "': only " +
                     std::to_string(resFound) + ".");
 
-  this->atomIds.push_back(static_cast<long>(atomId));
+  this->atomIds.push_back(atomId);
   this->moleculeIds.push_back(moleculeId);
   this->atomTypes.push_back(atomType);
   this->atomX.push_back(x);
@@ -1435,17 +1441,18 @@ DataFileParser::readBonds(std::ifstream& file, std::string& line)
 void
 DataFileParser::readBond(const std::string& line)
 {
-  size_t bondId, bondType, newBondFrom, newBondTo;
+  long int bondId, newBondFrom, newBondTo;
+  int bondType;
   sscanf(line.c_str(),
-         "%zu %zu %zu %zu",
+         "%ld %d %ld %ld",
          &bondId,
          &bondType,
          &newBondFrom,
          &newBondTo);
-  this->bondIds.push_back(static_cast<long>(bondId));
-  this->bondTypes.push_back(static_cast<int>(bondType));
-  this->bondFrom.push_back(static_cast<long>(newBondFrom));
-  this->bondTo.push_back(static_cast<long>(newBondTo));
+  this->bondIds.push_back(bondId);
+  this->bondTypes.push_back(bondType);
+  this->bondFrom.push_back(newBondFrom);
+  this->bondTo.push_back(newBondTo);
 }
 
 void
@@ -1474,20 +1481,21 @@ DataFileParser::readAngles(std::ifstream& file, std::string& line)
 void
 DataFileParser::readAngle(const std::string& line)
 {
-  size_t newAngleId, newAngleType, newAngleFrom, newAngleVia, newAngleTo;
+  long int newAngleId, newAngleFrom, newAngleVia, newAngleTo;
+  int newAngleType;
   sscanf(line.c_str(),
-         "%zu %zu %zu %zu %zu",
+         "%ld %d %ld %ld %ld",
          &newAngleId,
          &newAngleType,
          &newAngleFrom,
          &newAngleVia,
          &newAngleTo);
 
-  this->angleIds.push_back(static_cast<long>(newAngleId));
-  this->angleTypes.push_back(static_cast<int>(newAngleType));
-  this->angleFrom.push_back(static_cast<long>(newAngleFrom));
-  this->angleVia.push_back(static_cast<long>(newAngleVia));
-  this->angleTo.push_back(static_cast<long>(newAngleTo));
+  this->angleIds.push_back(newAngleId);
+  this->angleTypes.push_back(newAngleType);
+  this->angleFrom.push_back(newAngleFrom);
+  this->angleVia.push_back(newAngleVia);
+  this->angleTo.push_back(newAngleTo);
 }
 
 void
@@ -1517,10 +1525,10 @@ DataFileParser::readDihedralAngles(std::ifstream& file, std::string& line)
 void
 DataFileParser::readDihedralAngle(const std::string& line)
 {
-  size_t newAngleId, newAngleType, newAngleFrom, newAngleVia1, newAngleVia2,
-    newAngleTo;
+  long int newAngleId, newAngleFrom, newAngleVia1, newAngleVia2, newAngleTo;
+  int newAngleType;
   sscanf(line.c_str(),
-         "%zu %zu %zu %zu %zu %zu",
+         "%ld %d %ld %ld %ld %ld",
          &newAngleId,
          &newAngleType,
          &newAngleFrom,
@@ -1528,12 +1536,12 @@ DataFileParser::readDihedralAngle(const std::string& line)
          &newAngleVia2,
          &newAngleTo);
 
-  this->dihedralAngleIds.push_back(static_cast<long>(newAngleId));
-  this->dihedralAngleTypes.push_back(static_cast<int>(newAngleType));
-  this->dihedralAngleFrom.push_back(static_cast<long>(newAngleFrom));
-  this->dihedralAngleVia1.push_back(static_cast<long>(newAngleVia1));
-  this->dihedralAngleVia2.push_back(static_cast<long>(newAngleVia2));
-  this->dihedralAngleTo.push_back(static_cast<long>(newAngleTo));
+  this->dihedralAngleIds.push_back(newAngleId);
+  this->dihedralAngleTypes.push_back(newAngleType);
+  this->dihedralAngleFrom.push_back(newAngleFrom);
+  this->dihedralAngleVia1.push_back(newAngleVia1);
+  this->dihedralAngleVia2.push_back(newAngleVia2);
+  this->dihedralAngleTo.push_back(newAngleTo);
 }
 
 void
@@ -1546,22 +1554,23 @@ DataFileParser::readVelocities(std::ifstream& file, std::string& line)
   }
   // then, skip empty lines
   this->skipEmptyLines(line, file);
-  std::unordered_map<size_t, size_t> atomIdToIdx;
+  const size_t nAtomsSz = static_cast<size_t>(this->nAtoms);
+  std::unordered_map<long int, size_t> atomIdToIdx;
   std::vector<double> unorderedVx, unorderedVy, unorderedVz;
-  unorderedVx.reserve(static_cast<size_t>(this->nAtoms));
-  unorderedVy.reserve(static_cast<size_t>(this->nAtoms));
-  unorderedVz.reserve(static_cast<size_t>(this->nAtoms));
+  unorderedVx.reserve(nAtomsSz);
+  unorderedVy.reserve(nAtomsSz);
+  unorderedVz.reserve(nAtomsSz);
   // start reading, assuming as many as atoms
-  for (size_t i = 0; i < static_cast<size_t>(this->nAtoms); ++i) {
-    size_t atomId;
+  for (size_t i = 0; i < nAtomsSz; ++i) {
+    long int atomId;
     double vx, vy, vz;
-    sscanf(line.c_str(), "%zu %le %le %le", &atomId, &vx, &vy, &vz);
+    sscanf(line.c_str(), "%ld %le %le %le", &atomId, &vx, &vy, &vz);
     unorderedVx.push_back(vx);
     unorderedVy.push_back(vy);
     unorderedVz.push_back(vz);
     atomIdToIdx[atomId] = i;
 
-    if (!getline(file, line) && i + 1 < static_cast<size_t>(this->nAtoms)) {
+    if (!getline(file, line) && i + 1 < nAtomsSz) {
       throw std::runtime_error("Data file ended too early. Not enough "
                                "velocities read. Read " +
                                std::to_string(i + 1) + " of " +
@@ -1569,16 +1578,16 @@ DataFileParser::readVelocities(std::ifstream& file, std::string& line)
                                " expected velocities.");
     }
   }
-  assert(unorderedVx.size() == static_cast<size_t>(this->nAtoms));
+  assert(unorderedVx.size() == nAtomsSz);
 
   // re-order for the other stuff
   std::vector<double> orderedVx, orderedVy, orderedVz;
-  orderedVx.reserve(static_cast<size_t>(this->nAtoms));
-  orderedVy.reserve(static_cast<size_t>(this->nAtoms));
-  orderedVz.reserve(static_cast<size_t>(this->nAtoms));
+  orderedVx.reserve(nAtomsSz);
+  orderedVy.reserve(nAtomsSz);
+  orderedVz.reserve(nAtomsSz);
 
-  for (size_t i = 0; i < static_cast<size_t>(this->nAtoms); ++i) {
-    size_t realIdx = atomIdToIdx.at(static_cast<size_t>(this->atomIds[i]));
+  for (size_t i = 0; i < nAtomsSz; ++i) {
+    const size_t realIdx = atomIdToIdx.at(this->atomIds[i]);
     orderedVx.push_back(unorderedVx[realIdx]);
     orderedVy.push_back(unorderedVy[realIdx]);
     orderedVz.push_back(unorderedVz[realIdx]);

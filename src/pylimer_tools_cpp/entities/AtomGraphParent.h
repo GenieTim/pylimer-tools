@@ -423,19 +423,17 @@ public:
     igraph_vector_t allValues;
     igraph_vector_init(&allValues,
                        static_cast<igraph_integer_t>(vertices.size()));
-    igraph_vector_int_t vertexIdxs;
-    igraph_vector_int_init(&vertexIdxs,
-                           static_cast<igraph_integer_t>(vertices.size()));
-    pylimer_tools::utils::StdVectorToIgraphVectorT(vertices, &vertexIdxs);
+    const igraph_vector_int_t vertexIdxs = igraph_vector_int_view(
+      vertices.data(), static_cast<igraph_integer_t>(vertices.size()));
     if (igraph_cattribute_VANV(&this->graph,
                                propertyName,
                                igraph_vss_vector(&vertexIdxs),
                                &allValues)) {
+      igraph_vector_destroy(&allValues);
       throw std::runtime_error("Failed to query properties of graph.");
     }
     pylimer_tools::utils::igraphVectorTToStdVector(&allValues, results);
     igraph_vector_destroy(&allValues);
-    igraph_vector_int_destroy(&vertexIdxs);
     return results;
   }
 

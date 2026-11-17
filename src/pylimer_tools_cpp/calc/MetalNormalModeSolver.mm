@@ -685,8 +685,8 @@ computeChebyshevMomentsKPMMetal(const Eigen::SparseMatrix<double>& mat,
       [device newBufferWithLength:sizeof(float) * numMoments * num_tgs
                           options:MTLResourceStorageModeShared];
 
-    Eigen::VectorXd avgMoments =
-      Eigen::VectorXd::Zero(static_cast<Eigen::Index>(numMoments));
+    const Eigen::Index numMomentsIdx = static_cast<Eigen::Index>(numMoments);
+    Eigen::VectorXd avgMoments = Eigen::VectorXd::Zero(numMomentsIdx);
 
     std::mt19937_64 rng(42);
     std::uniform_int_distribution<int> coin(0, 1);
@@ -750,7 +750,7 @@ computeChebyshevMomentsKPMMetal(const Eigen::SparseMatrix<double>& mat,
           int curr_idx = 1;
           int next_idx = 2;
 
-          for (size_t m = 1; m < numMoments - 1; ++m) {
+          for (Eigen::Index m = 1; m < numMomentsIdx - 1; ++m) {
             [enc setComputePipelineState:pStepRecB8];
             [enc setBuffer:bufRowPtr offset:0 atIndex:0];
             [enc setBuffer:bufColIdx offset:0 atIndex:1];
@@ -768,7 +768,8 @@ computeChebyshevMomentsKPMMetal(const Eigen::SparseMatrix<double>& mat,
             [enc setBuffer:bufVB8 offset:0 atIndex:0];
             [enc setBuffer:bufUB8[next_idx] offset:0 atIndex:1];
             [enc setBuffer:bufPartialsB8
-                    offset:(m + 1) * num_tgs * sizeof(float) * 8
+                    offset:static_cast<NSUInteger>(m + 1) * num_tgs *
+                           sizeof(float) * 8
                    atIndex:2];
             [enc setBytes:&nVal length:sizeof(uint32_t) atIndex:3];
             [enc setThreadgroupMemoryLength:sizeof(float) * 4 * tg_size atIndex:0];
@@ -788,14 +789,14 @@ computeChebyshevMomentsKPMMetal(const Eigen::SparseMatrix<double>& mat,
         [cmd waitUntilCompleted];
 
         float* parts = static_cast<float*>([bufPartialsB8 contents]);
-        for (size_t m = 0; m < numMoments; ++m) {
+        for (Eigen::Index m = 0; m < numMomentsIdx; ++m) {
           float sum = 0.0f;
           for (uint32_t tg = 0; tg < num_tgs; ++tg) {
-            for (size_t b = 0; b < 8; ++b) {
+            for (Eigen::Index b = 0; b < 8; ++b) {
               sum += parts[(m * num_tgs + tg) * 8 + b];
             }
           }
-          avgMoments[static_cast<Eigen::Index>(m)] += static_cast<double>(sum);
+          avgMoments[m] += static_cast<double>(sum);
         }
         vectorsProcessed += 8;
 
@@ -851,7 +852,7 @@ computeChebyshevMomentsKPMMetal(const Eigen::SparseMatrix<double>& mat,
           int curr_idx = 1;
           int next_idx = 2;
 
-          for (size_t m = 1; m < numMoments - 1; ++m) {
+          for (Eigen::Index m = 1; m < numMomentsIdx - 1; ++m) {
             [enc setComputePipelineState:pStepRecB4];
             [enc setBuffer:bufRowPtr offset:0 atIndex:0];
             [enc setBuffer:bufColIdx offset:0 atIndex:1];
@@ -869,7 +870,8 @@ computeChebyshevMomentsKPMMetal(const Eigen::SparseMatrix<double>& mat,
             [enc setBuffer:bufVB4 offset:0 atIndex:0];
             [enc setBuffer:bufUB4[next_idx] offset:0 atIndex:1];
             [enc setBuffer:bufPartialsB4
-                    offset:(m + 1) * num_tgs * sizeof(float) * 4
+                    offset:static_cast<NSUInteger>(m + 1) * num_tgs *
+                           sizeof(float) * 4
                    atIndex:2];
             [enc setBytes:&nVal length:sizeof(uint32_t) atIndex:3];
             [enc setThreadgroupMemoryLength:sizeof(float) * 4 * tg_size atIndex:0];
@@ -888,14 +890,14 @@ computeChebyshevMomentsKPMMetal(const Eigen::SparseMatrix<double>& mat,
         [cmd waitUntilCompleted];
 
         float* parts = static_cast<float*>([bufPartialsB4 contents]);
-        for (size_t m = 0; m < numMoments; ++m) {
+        for (Eigen::Index m = 0; m < numMomentsIdx; ++m) {
           float sum = 0.0f;
           for (uint32_t tg = 0; tg < num_tgs; ++tg) {
-            for (size_t b = 0; b < 4; ++b) {
+            for (Eigen::Index b = 0; b < 4; ++b) {
               sum += parts[(m * num_tgs + tg) * 4 + b];
             }
           }
-          avgMoments[static_cast<Eigen::Index>(m)] += static_cast<double>(sum);
+          avgMoments[m] += static_cast<double>(sum);
         }
         vectorsProcessed += 4;
 
@@ -950,7 +952,7 @@ computeChebyshevMomentsKPMMetal(const Eigen::SparseMatrix<double>& mat,
           int curr_idx = 1;
           int next_idx = 2;
 
-          for (size_t m = 1; m < numMoments - 1; ++m) {
+          for (Eigen::Index m = 1; m < numMomentsIdx - 1; ++m) {
             [enc setComputePipelineState:pStepRec];
             [enc setBuffer:bufRowPtr offset:0 atIndex:0];
             [enc setBuffer:bufColIdx offset:0 atIndex:1];
@@ -968,7 +970,8 @@ computeChebyshevMomentsKPMMetal(const Eigen::SparseMatrix<double>& mat,
             [enc setBuffer:bufV offset:0 atIndex:0];
             [enc setBuffer:bufU[next_idx] offset:0 atIndex:1];
             [enc setBuffer:bufPartials
-                    offset:(m + 1) * num_tgs * sizeof(float)
+                    offset:static_cast<NSUInteger>(m + 1) * num_tgs *
+                           sizeof(float)
                    atIndex:2];
             [enc setBytes:&nVal length:sizeof(uint32_t) atIndex:3];
             [enc setThreadgroupMemoryLength:sizeof(float) * tg_size atIndex:0];
@@ -987,12 +990,12 @@ computeChebyshevMomentsKPMMetal(const Eigen::SparseMatrix<double>& mat,
         [cmd waitUntilCompleted];
 
         float* parts = static_cast<float*>([bufPartials contents]);
-        for (size_t m = 0; m < numMoments; ++m) {
+        for (Eigen::Index m = 0; m < numMomentsIdx; ++m) {
           float sum = 0.0f;
           for (uint32_t tg = 0; tg < num_tgs; ++tg) {
             sum += parts[m * num_tgs + tg];
           }
-          avgMoments[static_cast<Eigen::Index>(m)] += static_cast<double>(sum);
+          avgMoments[m] += static_cast<double>(sum);
         }
         vectorsProcessed += 1;
       }

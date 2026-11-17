@@ -328,26 +328,22 @@ ResistanceDistanceAnalysis::solveIdentityChunked(size_t chunkSize) const
     return Eigen::MatrixXd(0, 0);
   }
 
-  Eigen::Index N = static_cast<Eigen::Index>(numNodes_);
+  const Eigen::Index N = static_cast<Eigen::Index>(numNodes_);
   Eigen::MatrixXd X(N, N);
-  if (chunkSize == 0) {
-    chunkSize = 128;
-  }
+  const Eigen::Index chunkSizeIdx =
+    chunkSize == 0 ? 128 : static_cast<Eigen::Index>(chunkSize);
 
   // Level-3 BLAS chunked forward/back-substitutions:
   // Solving in chunks of B columns converts triangular solves from memory-bound
   // dtrsv (Level-2 BLAS) into compute-bound dtrsm (Level-3 BLAS), exploiting
   // AMX/Accelerate
-  for (size_t colStart = 0; colStart < numNodes_; colStart += chunkSize) {
-    size_t curChunk = std::min(chunkSize, numNodes_ - colStart);
-    Eigen::MatrixXd I_chunk =
-      Eigen::MatrixXd::Zero(N, static_cast<Eigen::Index>(curChunk));
-    for (size_t c = 0; c < curChunk; ++c) {
-      I_chunk(static_cast<Eigen::Index>(colStart + c),
-              static_cast<Eigen::Index>(c)) = 1.0;
+  for (Eigen::Index colStart = 0; colStart < N; colStart += chunkSizeIdx) {
+    const Eigen::Index curChunk = std::min(chunkSizeIdx, N - colStart);
+    Eigen::MatrixXd I_chunk = Eigen::MatrixXd::Zero(N, curChunk);
+    for (Eigen::Index c = 0; c < curChunk; ++c) {
+      I_chunk(colStart + c, c) = 1.0;
     }
-    X.middleCols(static_cast<Eigen::Index>(colStart),
-                 static_cast<Eigen::Index>(curChunk)) = solver_.solve(I_chunk);
+    X.middleCols(colStart, curChunk) = solver_.solve(I_chunk);
   }
 
   return X;
@@ -365,25 +361,21 @@ ResistanceDistanceAnalysis::computeAllPairsEffectiveResistance(
     X.col(static_cast<Eigen::Index>(r)).setZero();
   }
 
-  Eigen::Index N = static_cast<Eigen::Index>(numNodes_);
+  const Eigen::Index N = static_cast<Eigen::Index>(numNodes_);
   Eigen::MatrixXd R(N, N);
 #ifdef OPENMP_FOUND
-#pragma omp parallel for schedule(static) if (numNodes_ > 128)
+#pragma omp parallel for schedule(static) if (N > 128)
 #endif
-  for (size_t i = 0; i < numNodes_; ++i) {
-    for (size_t j = 0; j < numNodes_; ++j) {
+  for (Eigen::Index i = 0; i < N; ++i) {
+    const size_t compI = nodeComponentId_[static_cast<size_t>(i)];
+    for (Eigen::Index j = 0; j < N; ++j) {
       if (i == j) {
-        R(static_cast<Eigen::Index>(i), static_cast<Eigen::Index>(j)) = 0.0;
-      } else if (nodeComponentId_[i] != nodeComponentId_[j]) {
-        R(static_cast<Eigen::Index>(i), static_cast<Eigen::Index>(j)) =
-          std::numeric_limits<double>::infinity();
+        R(i, j) = 0.0;
+      } else if (compI != nodeComponentId_[static_cast<size_t>(j)]) {
+        R(i, j) = std::numeric_limits<double>::infinity();
       } else {
-        double res =
-          X(static_cast<Eigen::Index>(i), static_cast<Eigen::Index>(i)) +
-          X(static_cast<Eigen::Index>(j), static_cast<Eigen::Index>(j)) -
-          2.0 * X(static_cast<Eigen::Index>(i), static_cast<Eigen::Index>(j));
-        R(static_cast<Eigen::Index>(i), static_cast<Eigen::Index>(j)) =
-          std::max(0.0, res);
+        const double res = X(i, i) + X(j, j) - 2.0 * X(i, j);
+        R(i, j) = std::max(0.0, res);
       }
     }
   }
@@ -401,14 +393,15 @@ ResistanceDistanceAnalysis::computeKirchhoffIndex() const
     return 0.0;
   }
 
-  Eigen::MatrixXd R = computeAllPairsEffectiveResistance();
+  const Eigen::MatrixXd R = computeAllPairsEffectiveResistance();
+  const Eigen::Index N = R.rows();
   double K = 0.0;
 #ifdef OPENMP_FOUND
-#pragma omp parallel for reduction(+ : K) schedule(static) if (numNodes_ > 128)
+#pragma omp parallel for reduction(+ : K) schedule(static) if (N > 128)
 #endif
-  for (size_t i = 0; i < numNodes_; ++i) {
-    for (size_t j = i + 1; j < numNodes_; ++j) {
-      K += R(static_cast<Eigen::Index>(i), static_cast<Eigen::Index>(j));
+  for (Eigen::Index i = 0; i < N; ++i) {
+    for (Eigen::Index j = i + 1; j < N; ++j) {
+      K += R(i, j);
     }
   }
   return K;
@@ -501,13 +494,14 @@ ResistanceDistanceAnalysis::computeCommuteTime(size_t i, size_t j) const
 Eigen::MatrixXd
 ResistanceDistanceAnalysis::computeAllPairsCommuteTime() const
 {
-  Eigen::MatrixXd R = computeAllPairsEffectiveResistance();
-  double twoM = 2.0 * totalWeight_;
-  Eigen::MatrixXd C(numNodes_, numNodes_);
-  for (size_t i = 0; i < numNodes_; ++i) {
-    for (size_t j = 0; j < numNodes_; ++j) {
-      double r = R(static_cast<Eigen::Index>(i), static_cast<Eigen::Index>(j));
-      C(static_cast<Eigen::Index>(i), static_cast<Eigen::Index>(j)) =
+  const Eigen::MatrixXd R = computeAllPairsEffectiveResistance();
+  const Eigen::Index N = R.rows();
+  const double twoM = 2.0 * totalWeight_;
+  Eigen::MatrixXd C(N, N);
+  for (Eigen::Index i = 0; i < N; ++i) {
+    for (Eigen::Index j = 0; j < N; ++j) {
+      const double r = R(i, j);
+      C(i, j) =
         std::isinf(r) ? std::numeric_limits<double>::infinity() : twoM * r;
     }
   }
@@ -517,17 +511,17 @@ ResistanceDistanceAnalysis::computeAllPairsCommuteTime() const
 Eigen::VectorXd
 ResistanceDistanceAnalysis::computeTotalResistancePerNode() const
 {
-  Eigen::MatrixXd R = computeAllPairsEffectiveResistance();
-  Eigen::VectorXd tot =
-    Eigen::VectorXd::Zero(static_cast<Eigen::Index>(numNodes_));
-  for (size_t i = 0; i < numNodes_; ++i) {
+  const Eigen::MatrixXd R = computeAllPairsEffectiveResistance();
+  const Eigen::Index N = R.rows();
+  Eigen::VectorXd tot = Eigen::VectorXd::Zero(N);
+  for (Eigen::Index i = 0; i < N; ++i) {
     double s = 0.0;
-    for (size_t j = 0; j < numNodes_; ++j) {
+    for (Eigen::Index j = 0; j < N; ++j) {
       if (i != j) {
-        s += R(static_cast<Eigen::Index>(i), static_cast<Eigen::Index>(j));
+        s += R(i, j);
       }
     }
-    tot(static_cast<Eigen::Index>(i)) = s;
+    tot(i) = s;
   }
   return tot;
 }
@@ -535,15 +529,15 @@ ResistanceDistanceAnalysis::computeTotalResistancePerNode() const
 Eigen::VectorXd
 ResistanceDistanceAnalysis::computeResistanceCentrality() const
 {
-  Eigen::VectorXd tot = computeTotalResistancePerNode();
-  Eigen::VectorXd centrality =
-    Eigen::VectorXd::Zero(static_cast<Eigen::Index>(numNodes_));
-  double nMinusOne = static_cast<double>(numNodes_ > 1 ? numNodes_ - 1 : 1);
+  const Eigen::VectorXd tot = computeTotalResistancePerNode();
+  const Eigen::Index N = tot.size();
+  Eigen::VectorXd centrality = Eigen::VectorXd::Zero(N);
+  const double nMinusOne = static_cast<double>(N > 1 ? N - 1 : 1);
 
-  for (size_t i = 0; i < numNodes_; ++i) {
-    double s = tot(static_cast<Eigen::Index>(i));
+  for (Eigen::Index i = 0; i < N; ++i) {
+    const double s = tot(i);
     if (s > 0.0 && !std::isinf(s)) {
-      centrality(static_cast<Eigen::Index>(i)) = nMinusOne / s;
+      centrality(i) = nMinusOne / s;
     }
   }
   return centrality;

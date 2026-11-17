@@ -641,9 +641,9 @@ NormalModeAnalyzer::computeAllEigenvalues(const NormalModeSolver solver,
     if (includeEigenvectors) {
       for (Eigen::Index j = 0; j < subEvals.size(); ++j) {
         Eigen::VectorXd fullV = Eigen::VectorXd::Zero(nRows);
-        for (size_t k = 0; k < M; ++k) {
-          fullV[static_cast<Eigen::Index>(comp[k])] =
-            subEvecs(static_cast<Eigen::Index>(k), j);
+        for (Eigen::Index k = 0; k < subEvecs.rows(); ++k) {
+          fullV[static_cast<Eigen::Index>(comp[static_cast<size_t>(k)])] =
+            subEvecs(k, j);
         }
         evalEvecPairs.emplace_back(subEvals[j], std::move(fullV));
       }
@@ -660,9 +660,13 @@ NormalModeAnalyzer::computeAllEigenvalues(const NormalModeSolver solver,
               [](const auto& a, const auto& b) { return a.first < b.first; });
     Eigen::VectorXd finalEvals(nRows);
     Eigen::MatrixXd finalEvecs(nRows, nRows);
-    for (size_t i = 0; i < evalEvecPairs.size(); ++i) {
-      finalEvals[static_cast<Eigen::Index>(i)] = evalEvecPairs[i].first;
-      finalEvecs.col(static_cast<Eigen::Index>(i)) = evalEvecPairs[i].second;
+    const Eigen::Index numPairs =
+      static_cast<Eigen::Index>(evalEvecPairs.size());
+    for (Eigen::Index i = 0; i < numPairs; ++i) {
+      const std::pair<double, Eigen::VectorXd>& pair =
+        evalEvecPairs[static_cast<size_t>(i)];
+      finalEvals[i] = pair.first;
+      finalEvecs.col(i) = pair.second;
     }
     this->setEigenvalues(finalEvals);
     this->setEigenvectors(finalEvecs);
@@ -985,15 +989,15 @@ NormalModeAnalyzer::getSpectralScalingParameters(double eps) const
 Eigen::VectorXd
 computeJacksonKernel(size_t numMoments)
 {
-  Eigen::VectorXd kernel(static_cast<Eigen::Index>(numMoments));
+  const Eigen::Index numMomentsIdx = static_cast<Eigen::Index>(numMoments);
+  Eigen::VectorXd kernel(numMomentsIdx);
   double M_d = static_cast<double>(numMoments);
   double denom = std::tan(M_PI / (M_d + 1.0));
-  for (size_t m = 0; m < numMoments; ++m) {
+  for (Eigen::Index m = 0; m < numMomentsIdx; ++m) {
     double m_d = static_cast<double>(m);
-    kernel[static_cast<Eigen::Index>(m)] =
-      ((M_d - m_d + 1.0) * std::cos(M_PI * m_d / (M_d + 1.0)) +
-       std::sin(M_PI * m_d / (M_d + 1.0)) / denom) /
-      (M_d + 1.0);
+    kernel[m] = ((M_d - m_d + 1.0) * std::cos(M_PI * m_d / (M_d + 1.0)) +
+                 std::sin(M_PI * m_d / (M_d + 1.0)) / denom) /
+                (M_d + 1.0);
   }
   return kernel;
 }
@@ -1049,10 +1053,11 @@ NormalModeAnalyzer::computeChebyshevMomentsKPM(size_t numMoments,
       Eigen::VectorXd u_prev = u0;
       Eigen::VectorXd u_curr = u1;
       Eigen::VectorXd u_next(n);
-      for (size_t m = 1; m < numMoments - 1; ++m) {
+      const Eigen::Index numMomentsIdx = static_cast<Eigen::Index>(numMoments);
+      for (Eigen::Index m = 1; m < numMomentsIdx - 1; ++m) {
         y.noalias() = this->assembledConnectivityMatrix * u_curr;
         u_next = (2.0 / w) * (y - c * u_curr) - u_prev;
-        avgMoments[static_cast<Eigen::Index>(m + 1)] += v.dot(u_next);
+        avgMoments[m + 1] += v.dot(u_next);
         u_prev = std::move(u_curr);
         u_curr = std::move(u_next);
       }
@@ -1118,9 +1123,9 @@ NormalModeAnalyzer::computeEffectiveSpectrumKPM(
       continue;
 
     double sum = mu[0];
-    for (size_t m = 1; m < numMoments; ++m) {
-      sum += 2.0 * mu[static_cast<Eigen::Index>(m)] *
-             std::cos(static_cast<double>(m) * theta_k);
+    const Eigen::Index numMomentsIdx = static_cast<Eigen::Index>(numMoments);
+    for (Eigen::Index m = 1; m < numMomentsIdx; ++m) {
+      sum += 2.0 * mu[m] * std::cos(static_cast<double>(m) * theta_k);
     }
     double dn =
       (static_cast<double>(n) / static_cast<double>(Q)) * std::max(0.0, sum);
@@ -1156,9 +1161,10 @@ NormalModeAnalyzer::computeDensityOfStatesKPM(const Eigen::ArrayXd& lambdaGrid,
     double sum = mu[0];
     if (numMoments > 1) {
       sum += 2.0 * mu[1] * t_curr;
-      for (size_t m = 1; m < numMoments - 1; ++m) {
+      const Eigen::Index numMomentsIdx = static_cast<Eigen::Index>(numMoments);
+      for (Eigen::Index m = 1; m < numMomentsIdx - 1; ++m) {
         double t_next = 2.0 * x * t_curr - t_prev;
-        sum += 2.0 * mu[static_cast<Eigen::Index>(m + 1)] * t_next;
+        sum += 2.0 * mu[m + 1] * t_next;
         t_prev = t_curr;
         t_curr = t_next;
       }

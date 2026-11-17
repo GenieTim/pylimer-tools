@@ -1531,7 +1531,7 @@ protected:
   double evaluatePressure(const ForceBalance2Network& net,
                           const Eigen::VectorXd& u) const
   {
-    const auto stressTensor = this->evaluateStressTensor(net, u);
+    const Eigen::Matrix3d stressTensor = this->evaluateStressTensor(net, u);
     return this->evaluatePressure(stressTensor);
   }
 
@@ -1541,10 +1541,9 @@ protected:
    * @param stressTensor
    * @return double
    */
-  static double evaluatePressure(
-    const std::array<std::array<double, 3>, 3>& stressTensor)
+  static double evaluatePressure(const Eigen::Matrix3d& stressTensor)
   {
-    return (stressTensor[0][0] + stressTensor[1][1] + stressTensor[2][2]) / 3.0;
+    return stressTensor.trace() / 3.0;
   }
 
   /**
@@ -1553,9 +1552,9 @@ protected:
    * @param net
    * @param u
    * @param crosslinksOnly whether to only consider crosslinks
-   * @return std::array<std::array<double, 3>, 3>
+   * @return Eigen::Matrix3d
    */
-  std::array<std::array<double, 3>, 3> evaluateStressTensorLinkBased(
+  Eigen::Matrix3d evaluateStressTensorLinkBased(
     const ForceBalance2Network& net,
     const Eigen::VectorXd& u,
     const bool crosslinksOnly = false) const;
@@ -1566,7 +1565,7 @@ protected:
    * @param linkIndices the indices of the links to respect
    * @param net
    * @param u
-   * @return std::array<std::array<double, 3>, 3>
+   * @return Eigen::Matrix3d
    */
   Eigen::Matrix3d evaluateStressTensorForLinks(
     const std::vector<size_t>& linkIndices,
@@ -1578,11 +1577,10 @@ protected:
    *
    * @param net
    * @param u
-   * @return std::array<std::array<double, 3>, 3>
+   * @return Eigen::Matrix3d
    */
-  std::array<std::array<double, 3>, 3> evaluateStressTensor(
-    const ForceBalance2Network& net,
-    const Eigen::VectorXd& u) const;
+  Eigen::Matrix3d evaluateStressTensor(const ForceBalance2Network& net,
+                                       const Eigen::VectorXd& u) const;
 
   /**
    * @brief Compute the force acting on a slip- or crosslink

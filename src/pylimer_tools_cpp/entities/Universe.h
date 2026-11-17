@@ -354,7 +354,8 @@ protected:
 
   // internal functions
   igraph_vs_t getVerticesOfType(int type) const;
-  igraph_vs_t getVerticesByIndices(std::vector<igraph_integer_t> indices) const;
+  igraph_vs_t getVerticesByIndices(
+    const std::vector<igraph_integer_t>& indices) const;
   std::vector<double> computeDs(const std::vector<long int>& bondFrom,
                                 const std::vector<long int>& bondTo,
                                 const std::string& direction,

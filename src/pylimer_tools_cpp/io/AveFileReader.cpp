@@ -128,15 +128,13 @@ AveFileReader::getNrOfColumns()
 }
 
 /**
- * @brief Actually read the file's data
- *
- * @return std::vector<std::vector<double>>
+ * @brief Read and cache the file's data if not already loaded
  */
-std::vector<std::vector<double>>
-AveFileReader::getData()
+void
+AveFileReader::readData()
 {
-  if (this->data.size() > 0) {
-    return this->data;
+  if (this->dataIsRead) {
+    return;
   }
 
   const size_t nRows = static_cast<size_t>(std::max(0, this->getNrOfRows()));
@@ -182,14 +180,29 @@ AveFileReader::getData()
     }
   }
 
-  this->data = results;
-  return results;
+  this->data = std::move(results);
+  this->dataIsRead = true;
+}
+
+/**
+ * @brief Actually read the file's data
+ *
+ * @return std::vector<std::vector<double>>
+ */
+std::vector<std::vector<double>>
+AveFileReader::getData()
+{
+  if (!this->dataIsRead) {
+    this->readData();
+  }
+  return this->data;
 }
 
 namespace {
-  std::vector<double> autocorrelateArray(const Eigen::ArrayXd& colData,
-                                         const int nRows,
-                                         const std::vector<size_t>& dts)
+  std::vector<double> autocorrelateArray(
+    const Eigen::Ref<const Eigen::ArrayXd>& colData,
+    const Eigen::Index nRows,
+    const std::vector<size_t>& dts)
   {
     for (size_t i = 0; i < dts.size(); ++i) {
       if (i > 0) {
@@ -229,10 +242,12 @@ AveFileReader::autocorrelateColumn(const int column,
   INVALIDINDEX_EXP_IFN(column >= 0 && column < this->getNrOfColumns(),
                        "Invalid column");
 
-  const int nRows = this->getNrOfRows();
-  this->getData();
+  const Eigen::Index nRows = static_cast<Eigen::Index>(this->getNrOfRows());
+  if (!this->dataIsRead) {
+    this->readData();
+  }
   const size_t colIdx = static_cast<size_t>(column);
-  const Eigen::ArrayXd colData = Eigen::Map<Eigen::ArrayXd, Eigen::Unaligned>(
+  const Eigen::Map<const Eigen::ArrayXd, Eigen::Unaligned> colData(
     this->data[colIdx].data(),
     static_cast<Eigen::Index>(this->data[colIdx].size()));
 
@@ -258,16 +273,19 @@ AveFileReader::autocorrelateColumnDifference(const int column1,
   INVALIDINDEX_EXP_IFN(column2 >= 0 && column2 < this->getNrOfColumns(),
                        "Invalid column");
 
-  const int nRows = this->getNrOfRows();
+  const Eigen::Index nRows = static_cast<Eigen::Index>(this->getNrOfRows());
+  if (!this->dataIsRead) {
+    this->readData();
+  }
   const size_t col1Idx = static_cast<size_t>(column1);
   const size_t col2Idx = static_cast<size_t>(column2);
   const Eigen::ArrayXd colData =
-    Eigen::Map<Eigen::ArrayXd, Eigen::Unaligned>(
-      this->getData()[col1Idx].data(),
-      static_cast<Eigen::Index>(this->getData()[col1Idx].size())) -
-    Eigen::Map<Eigen::ArrayXd, Eigen::Unaligned>(
-      this->getData()[col2Idx].data(),
-      static_cast<Eigen::Index>(this->getData()[col2Idx].size()));
+    Eigen::Map<const Eigen::ArrayXd, Eigen::Unaligned>(
+      this->data[col1Idx].data(),
+      static_cast<Eigen::Index>(this->data[col1Idx].size())) -
+    Eigen::Map<const Eigen::ArrayXd, Eigen::Unaligned>(
+      this->data[col2Idx].data(),
+      static_cast<Eigen::Index>(this->data[col2Idx].size()));
 
   return autocorrelateArray(colData, nRows, dts);
 }

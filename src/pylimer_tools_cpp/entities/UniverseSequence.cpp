@@ -6,6 +6,7 @@
 #include "Universe.h"
 #include <Eigen/Dense>
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -14,6 +15,18 @@
 #endif
 
 namespace pylimer_tools::entities {
+
+namespace {
+  size_t computeStepSize(const size_t nFrames, const int nrOfOrigins)
+  {
+    if (nrOfOrigins <= 0) {
+      return 1;
+    }
+    const double rawStepSize = std::floor(static_cast<double>(nFrames) /
+                                          static_cast<double>(nrOfOrigins));
+    return std::max<size_t>(1, static_cast<size_t>(std::max(0.0, rawStepSize)));
+  }
+} // namespace
 // TODO: connectivity (& graphs) could be stored only once if they stay the
 // same over a sequence.
 void
@@ -585,11 +598,8 @@ UniverseSequence::computeDistanceAutocorrelationFromToAtoms(
   // this is a highly inefficient algorithm, but no idea how to do better
   // (except for omitting some data, skipping the graph, or other minor
   // optimizations)
-  const size_t stepSize = static_cast<size_t>(
-    std::max(1,
-             static_cast<int>(std::floor(
-               static_cast<double>(this->getLength() - startingIndex) /
-               static_cast<double>(nrOfOrigins)))));
+  const size_t stepSize =
+    computeStepSize(this->getLength() - startingIndex, nrOfOrigins);
   for (size_t parent_universe_idx = startingIndex;
        parent_universe_idx < this->getLength();
        parent_universe_idx += stepSize) {
@@ -774,11 +784,8 @@ UniverseSequence::computeMsdForAtomProperties(
   // this is a highly inefficient algorithm, but no idea how to do better
   // (except for omitting some data, skipping the graph, or other minor
   // optimizations)
-  const size_t stepSize = static_cast<size_t>(
-    std::max(1,
-             static_cast<int>(std::floor(
-               static_cast<double>(this->getLength() - startingIndex) /
-               static_cast<double>(nrOfOrigins)))));
+  const size_t stepSize =
+    computeStepSize(this->getLength() - startingIndex, nrOfOrigins);
   Eigen::VectorXd distance =
     Eigen::VectorXd::Zero(static_cast<Eigen::Index>(3 * atomIds.size()));
   for (size_t parent_universe_idx = startingIndex;
@@ -922,11 +929,8 @@ UniverseSequence::computeMsdForAtomsFromDumpFile(
   // this is a highly inefficient algorithm, but no idea how to do better
   // (except for omitting some data, skipping the graph, or other minor
   // optimizations)
-  const size_t stepSize = static_cast<size_t>(
-    std::max(1,
-             static_cast<int>(std::floor(
-               static_cast<double>(this->getLength() - startingIndex) /
-               static_cast<double>(nrOfOrigins)))));
+  const size_t stepSize =
+    computeStepSize(this->getLength() - startingIndex, nrOfOrigins);
   Eigen::VectorXd distance =
     Eigen::VectorXd::Zero(static_cast<Eigen::Index>(3 * atomIds.size()));
   for (size_t parent_universe_idx = startingIndex;
@@ -1041,10 +1045,7 @@ UniverseSequence::computeMsdForAtomsFromDataFiles(
   // this is a highly inefficient algorithm, but no idea how to do better
   // (except for omitting some data, skipping the graph, or other minor
   // optimizations)
-  const size_t stepSize = static_cast<size_t>(std::max(
-    1,
-    static_cast<int>(std::floor(static_cast<double>(this->getLength()) /
-                                static_cast<double>(nrOfOrigins)))));
+  const size_t stepSize = computeStepSize(this->getLength(), nrOfOrigins);
   Eigen::VectorXd distance =
     Eigen::VectorXd::Zero(static_cast<Eigen::Index>(3 * atomIds.size()));
   for (size_t parent_universe_idx = 0; parent_universe_idx < this->getLength();

@@ -44,10 +44,9 @@ graphHasVertexWithProperty(igraph_t* graph,
     igraph_vector_destroy(&results);
     throw std::runtime_error("Failed to query property " + propertyName);
   };
-  std::vector<IN> resultsV;
-  igraphVectorTToStdVector<IN>(&results, resultsV);
-  for (IN result : resultsV) {
-    if (result == propertyValue) {
+  const igraph_integer_t n = igraph_vector_size(&results);
+  for (igraph_integer_t i = 0; i < n; ++i) {
+    if (static_cast<IN>(igraph_vector_get(&results, i)) == propertyValue) {
       igraph_vector_destroy(&results);
       return true;
     }

@@ -3273,9 +3273,9 @@ MEHPForceBalance2::evaluateStressTensorForLinks(
  *
  * @param net
  * @param u
- * @return std::array<std::array<double, 3>, 3>
+ * @return Eigen::Matrix3d
  */
-std::array<std::array<double, 3>, 3>
+Eigen::Matrix3d
 MEHPForceBalance2::evaluateStressTensorLinkBased(
   const ForceBalance2Network& net,
   const Eigen::VectorXd& u,
@@ -3293,7 +3293,7 @@ MEHPForceBalance2::evaluateStressTensorLinkBased(
         net.linkIsEntanglement[static_cast<Eigen::Index>(linkIdx)]) {
       continue;
     }
-    Eigen::Matrix3d stressOnLink =
+    const Eigen::Matrix3d stressOnLink =
       this->evaluateStressOnLink(linkIdx, net, u, debugNrSpringsVisited);
     /* spring contribution to the overall stress tensor */
     RUNTIME_EXP_IFN(std::isfinite(stressOnLink.squaredNorm()),
@@ -3301,14 +3301,6 @@ MEHPForceBalance2::evaluateStressTensorLinkBased(
                       std::to_string(stressOnLink.squaredNorm()) + " at link " +
                       std::to_string(linkIdx) + "!");
     stress += stressOnLink;
-  }
-
-  std::array<std::array<double, 3>, 3> stressA;
-  for (Eigen::Index i = 0; i < 3; ++i) {
-    for (Eigen::Index j = 0; j < 3; ++j) {
-      stressA[static_cast<size_t>(i)][static_cast<size_t>(j)] =
-        halfOverVolume * stress(i, j);
-    }
   }
 
   if (!crosslinksOnly) {
@@ -3326,7 +3318,7 @@ MEHPForceBalance2::evaluateStressTensorLinkBased(
                       std::to_string(debugNrSpringsVisited.maxCoeff()) + ".");
   }
 
-  return stressA;
+  return halfOverVolume * stress;
 }
 
 /**
@@ -3334,22 +3326,17 @@ MEHPForceBalance2::evaluateStressTensorLinkBased(
  *
  * @param net
  * @param u
- * @return std::array<std::array<double, 3>, 3>
+ * @return Eigen::Matrix3d
  */
-std::array<std::array<double, 3>, 3>
+Eigen::Matrix3d
 MEHPForceBalance2::evaluateStressTensor(const ForceBalance2Network& net,
                                         const Eigen::VectorXd& u) const
 {
-  std::array<std::array<double, 3>, 3> stress;
-  for (size_t i = 0; i < 3; ++i) {
-    for (size_t j = 0; j < 3; ++j) {
-      stress[i][j] = 0.0;
-    }
-  }
+  Eigen::Matrix3d stress = Eigen::Matrix3d::Zero();
 
   const double oneOverVolume = 1. / (net.L[0] * net.L[1] * net.L[2]);
 
-  Eigen::VectorXd displacedCoords = net.coordinates + u;
+  const Eigen::VectorXd displacedCoords = net.coordinates + u;
   Eigen::VectorXd relevantPartialDistancesA =
     (displacedCoords(net.springCoordinateIndexB) -
      displacedCoords(net.springCoordinateIndexA)) +
@@ -3361,10 +3348,10 @@ MEHPForceBalance2::evaluateStressTensor(const ForceBalance2Network& net,
     }
   }
 
-  for (size_t partialSpringIdx = 0; partialSpringIdx < net.nrOfSprings;
-       ++partialSpringIdx) {
-    const Eigen::Index sIdx = static_cast<Eigen::Index>(partialSpringIdx);
-    Eigen::Vector3d distance = relevantPartialDistancesA.segment(3 * sIdx, 3);
+  for (Eigen::Index sIdx = 0; sIdx < static_cast<Eigen::Index>(net.nrOfSprings);
+       ++sIdx) {
+    const Eigen::Vector3d distance =
+      relevantPartialDistancesA.segment<3>(3 * sIdx);
     const double oneOverContourLengthFraction =
       1. / net.springContourLength[sIdx];
 
@@ -3373,29 +3360,26 @@ MEHPForceBalance2::evaluateStressTensor(const ForceBalance2Network& net,
       for (Eigen::Index k = 0; k < 3; k++) {
         const double contribution = distance[j] * distance[k] * this->kappa *
                                     oneOverContourLengthFraction;
-        RUNTIME_EXP_IFN(
-          std::isfinite(contribution),
-          "Got non-finite contribution to stress tensor: " +
-            std::to_string(contribution) + " at coordinates " +
-            std::to_string(k) + ", " + std::to_string(j) +
-            " for partial spring " + std::to_string(partialSpringIdx) +
-            " from distances " + std::to_string(distance[j]) + ", " +
-            std::to_string(distance[k]) + " and denominator " +
-            std::to_string(oneOverContourLengthFraction) + ".");
-        // if (std::isfinite(denominator) && std::isfinite(contribution))
-        // {
-        stress[static_cast<size_t>(j)][static_cast<size_t>(k)] += contribution;
-        // }
+        RUNTIME_EXP_IFN(std::isfinite(contribution),
+                        "Got non-finite contribution to stress tensor: " +
+                          std::to_string(contribution) + " at coordinates " +
+                          std::to_string(k) + ", " + std::to_string(j) +
+                          " for partial spring " + std::to_string(sIdx) +
+                          " from distances " + std::to_string(distance[j]) +
+                          ", " + std::to_string(distance[k]) +
+                          " and denominator " +
+                          std::to_string(oneOverContourLengthFraction) + ".");
+        stress(j, k) += contribution;
       }
     }
   }
 
-  for (size_t i = 0; i < 3; ++i) {
-    for (size_t j = 0; j < 3; ++j) {
-      stress[i][j] *= oneOverVolume;
-      RUNTIME_EXP_IFN(std::isfinite(stress[i][j]),
+  stress *= oneOverVolume;
+  for (Eigen::Index i = 0; i < 3; ++i) {
+    for (Eigen::Index j = 0; j < 3; ++j) {
+      RUNTIME_EXP_IFN(std::isfinite(stress(i, j)),
                       "Got non-finite stress tensor component: " +
-                        std::to_string(stress[i][j]) + " at coordinates " +
+                        std::to_string(stress(i, j)) + " at coordinates " +
                         std::to_string(i) + ", " + std::to_string(j) +
                         " from denominator " + std::to_string(oneOverVolume) +
                         ".");
@@ -3408,31 +3392,15 @@ MEHPForceBalance2::evaluateStressTensor(const ForceBalance2Network& net,
 Eigen::Matrix3d
 MEHPForceBalance2::getStressTensor()
 {
-  std::array<std::array<double, 3>, 3> res =
-    this->evaluateStressTensor(this->initialConfig, this->currentDisplacements);
-
-  // convert the array to an Eigen matrix
-  Eigen::Matrix3d convertedRes = Eigen::Matrix3d::Zero();
-  for (Eigen::Index i = 0; i < 3; ++i) {
-    convertedRes.row(i) =
-      Eigen::Vector3d::Map(res[static_cast<size_t>(i)].data(), 3);
-  }
-  return convertedRes;
+  return this->evaluateStressTensor(this->initialConfig,
+                                    this->currentDisplacements);
 }
 
 Eigen::Matrix3d
 MEHPForceBalance2::getStressTensorLinkBased(const bool crosslinksOnly) const
 {
-  const std::array<std::array<double, 3>, 3> res =
-    this->evaluateStressTensorLinkBased(
-      this->initialConfig, this->currentDisplacements, crosslinksOnly);
-  Eigen::Matrix3d convertedRes = Eigen::Matrix3d::Zero();
-  for (Eigen::Index i = 0; i < 3; ++i) {
-    for (Eigen::Index j = 0; j < 3; ++j) {
-      convertedRes(i, j) = res[static_cast<size_t>(i)][static_cast<size_t>(j)];
-    }
-  }
-  return convertedRes;
+  return this->evaluateStressTensorLinkBased(
+    this->initialConfig, this->currentDisplacements, crosslinksOnly);
 }
 
 /**

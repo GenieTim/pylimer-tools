@@ -1546,20 +1546,18 @@ public:
     if (entanglements.size() == 0) {
       return;
     }
-    const std::vector<double> xs(
-      entanglements.x.data(), entanglements.x.data() + entanglements.x.size());
-    const std::vector<double> ys(
-      entanglements.y.data(), entanglements.y.data() + entanglements.y.size());
-    const std::vector<double> zs(
-      entanglements.z.data(), entanglements.z.data() + entanglements.z.size());
-    this->addSlipLinks(entanglements.strandIdx1,
-                       entanglements.strandIdx2,
-                       xs,
-                       ys,
-                       zs,
-                       entanglements.alpha1,
-                       entanglements.alpha2,
-                       false);
+    const std::vector<std::vector<size_t>> loops;
+    const std::vector<std::vector<size_t>> loopsOfSliplinks;
+    this->addSlipLinksImpl(entanglements.strandIdx1,
+                           entanglements.strandIdx2,
+                           entanglements.x,
+                           entanglements.y,
+                           entanglements.z,
+                           entanglements.alpha1,
+                           entanglements.alpha2,
+                           loops,
+                           loopsOfSliplinks,
+                           false);
   }
 
   void addSlipLinks(const std::vector<size_t>& strandIdx1,
@@ -1608,7 +1606,25 @@ public:
                     const std::vector<double>& alpha2,
                     std::vector<std::vector<size_t>> loops,
                     std::vector<std::vector<size_t>> loopsOfSliplinks,
-                    bool clampAlpha = false);
+                    bool clampAlpha = false)
+  {
+    const Eigen::Map<const Eigen::VectorXd> xMap(
+      x.data(), static_cast<Eigen::Index>(x.size()));
+    const Eigen::Map<const Eigen::VectorXd> yMap(
+      y.data(), static_cast<Eigen::Index>(y.size()));
+    const Eigen::Map<const Eigen::VectorXd> zMap(
+      z.data(), static_cast<Eigen::Index>(z.size()));
+    this->addSlipLinksImpl(strandIdx1,
+                           strandIdx2,
+                           xMap,
+                           yMap,
+                           zMap,
+                           alpha1,
+                           alpha2,
+                           std::move(loops),
+                           std::move(loopsOfSliplinks),
+                           clampAlpha);
+  }
 
   /**
    * @brief Compute the spring vectors
@@ -2494,6 +2510,17 @@ protected:
                       const int xlinkType,
                       bool remove2functionalCrosslinkers = false,
                       bool removeDanglingChains = false);
+
+  void addSlipLinksImpl(const std::vector<size_t>& strandIdx1,
+                        const std::vector<size_t>& strandIdx2,
+                        const Eigen::Ref<const Eigen::VectorXd>& x,
+                        const Eigen::Ref<const Eigen::VectorXd>& y,
+                        const Eigen::Ref<const Eigen::VectorXd>& z,
+                        const std::vector<double>& alpha1,
+                        const std::vector<double>& alpha2,
+                        std::vector<std::vector<size_t>> loops,
+                        std::vector<std::vector<size_t>> loopsOfSliplinks,
+                        bool clampAlpha = false);
 
   /**
    * @brief Evaluate the pressure of the network at specific displacements

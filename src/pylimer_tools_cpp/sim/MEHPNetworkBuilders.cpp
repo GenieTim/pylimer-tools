@@ -66,26 +66,29 @@ namespace {
                                    const StrandEndpointSummary& summary,
                                    Eigen::VectorXd& coordinates)
   {
-    const size_t nCrosslinks = summary.nCrosslinks;
-    for (size_t xl = 0; xl < nCrosslinks; ++xl) {
-      const Eigen::Index base = static_cast<Eigen::Index>(3 * xl);
-      coordinates(base + 0) = cu.xlinkX[xl];
-      coordinates(base + 1) = cu.xlinkY[xl];
-      coordinates(base + 2) = cu.xlinkZ[xl];
+    const Eigen::Index nCrosslinks =
+      static_cast<Eigen::Index>(summary.nCrosslinks);
+    for (Eigen::Index xl = 0; xl < nCrosslinks; ++xl) {
+      const size_t xlIdx = static_cast<size_t>(xl);
+      const Eigen::Index base = 3 * xl;
+      coordinates(base + 0) = cu.xlinkX[xlIdx];
+      coordinates(base + 1) = cu.xlinkY[xlIdx];
+      coordinates(base + 2) = cu.xlinkZ[xlIdx];
     }
-    for (size_t d = 0; d < summary.nDanglingEnds; ++d) {
-      const Eigen::Index base =
-        static_cast<Eigen::Index>(3 * (nCrosslinks + d));
-      const size_t partner = summary.danglingEndPartners[d];
+    const Eigen::Index nDanglingEnds =
+      static_cast<Eigen::Index>(summary.nDanglingEnds);
+    for (Eigen::Index d = 0; d < nDanglingEnds; ++d) {
+      const Eigen::Index base = 3 * (nCrosslinks + d);
+      const size_t partner =
+        summary.danglingEndPartners[static_cast<size_t>(d)];
       coordinates(base + 0) = cu.xlinkX[partner];
       coordinates(base + 1) = cu.xlinkY[partner];
       coordinates(base + 2) = cu.xlinkZ[partner];
     }
     if (summary.nFreeEnds > 0) {
       coordinates
-        .segment(
-          static_cast<Eigen::Index>(3 * (nCrosslinks + summary.nDanglingEnds)),
-          static_cast<Eigen::Index>(3 * summary.nFreeEnds))
+        .segment(3 * (nCrosslinks + nDanglingEnds),
+                 static_cast<Eigen::Index>(3 * summary.nFreeEnds))
         .setZero();
     }
   }
@@ -155,33 +158,36 @@ buildForceRelaxationNetwork(const pylimer_tools::entities::Box& box,
   for (size_t springIdx = 0; springIdx < nSprings; ++springIdx) {
     const Eigen::Index springEigenIdx = static_cast<Eigen::Index>(springIdx);
     const size_t s = summary.includedStrandIndices[springIdx];
-    long int from = cu.strandFrom[s];
-    long int to = cu.strandTo[s];
+    const long int rawFrom = cu.strandFrom[s];
+    const long int rawTo = cu.strandTo[s];
     const int nBeads = cu.beadsInStrand[s];
 
-    if (from >= 0 && to >= 0) {
+    size_t nodeFrom = 0;
+    size_t nodeTo = 0;
+
+    if (rawFrom >= 0 && rawTo >= 0) {
+      nodeFrom = static_cast<size_t>(rawFrom);
+      nodeTo = static_cast<size_t>(rawTo);
       net.springsContourLength(springEigenIdx) =
         static_cast<double>(nBeads + 1);
-    } else if (from >= 0 || to >= 0) {
-      const long int partner = (from >= 0) ? from : to;
-      from = partner;
-      to = static_cast<long int>(nCrosslinks + handledDanglingIdx);
+    } else if (rawFrom >= 0 || rawTo >= 0) {
+      nodeFrom = static_cast<size_t>(rawFrom >= 0 ? rawFrom : rawTo);
+      nodeTo = nCrosslinks + handledDanglingIdx;
       handledDanglingIdx += 1;
       net.springsContourLength(springEigenIdx) = static_cast<double>(nBeads);
     } else {
-      from =
-        static_cast<long int>(nCrosslinks + nDanglingEnds + handledFreeIdx);
-      to = from + 1;
+      nodeFrom = nCrosslinks + nDanglingEnds + handledFreeIdx;
+      nodeTo = nodeFrom + 1;
       handledFreeIdx += 2;
       net.springsContourLength(springEigenIdx) =
         static_cast<double>(nBeads - 1);
     }
 
-    net.springIndexA(springEigenIdx) = static_cast<int>(from);
-    net.springIndexB(springEigenIdx) = static_cast<int>(to);
-    net.springIndicesOfLinks[static_cast<size_t>(from)].push_back(springIdx);
-    if (to != from) {
-      net.springIndicesOfLinks[static_cast<size_t>(to)].push_back(springIdx);
+    net.springIndexA(springEigenIdx) = static_cast<int>(nodeFrom);
+    net.springIndexB(springEigenIdx) = static_cast<int>(nodeTo);
+    net.springIndicesOfLinks[nodeFrom].push_back(springIdx);
+    if (nodeTo != nodeFrom) {
+      net.springIndicesOfLinks[nodeTo].push_back(springIdx);
     }
   }
 
@@ -246,8 +252,8 @@ buildForceBalanceNetwork(const pylimer_tools::entities::Box& box,
   net.nrOfCrosslinkSwapsEndured = Eigen::ArrayXi::Zero(0);
   net.oldAtomTypes =
     Eigen::ArrayXi::Zero(static_cast<Eigen::Index>(net.nrOfNodes));
-  for (size_t xl = 0; xl < nCrosslinks; ++xl) {
-    net.oldAtomTypes(static_cast<Eigen::Index>(xl)) = cu.xlinkTypes[xl];
+  for (Eigen::Index xl = 0; xl < static_cast<Eigen::Index>(nCrosslinks); ++xl) {
+    net.oldAtomTypes(xl) = cu.xlinkTypes[static_cast<size_t>(xl)];
   }
   net.springIndicesOfLinks.assign(net.nrOfNodes, std::vector<size_t>());
 
@@ -261,35 +267,36 @@ buildForceBalanceNetwork(const pylimer_tools::entities::Box& box,
   size_t handledFreeIdx = 0;
 
   for (Eigen::Index springIdx = 0; springIdx < nSprings; ++springIdx) {
-    const size_t s =
-      summary.includedStrandIndices[static_cast<size_t>(springIdx)];
-    long int from = cu.strandFrom[s];
-    long int to = cu.strandTo[s];
+    const size_t springSizeIdx = static_cast<size_t>(springIdx);
+    const size_t s = summary.includedStrandIndices[springSizeIdx];
+    const long int rawFrom = cu.strandFrom[s];
+    const long int rawTo = cu.strandTo[s];
     const int nBeads = cu.beadsInStrand[s];
 
-    if (from >= 0 && to >= 0) {
+    size_t nodeFrom = 0;
+    size_t nodeTo = 0;
+
+    if (rawFrom >= 0 && rawTo >= 0) {
+      nodeFrom = static_cast<size_t>(rawFrom);
+      nodeTo = static_cast<size_t>(rawTo);
       net.springsContourLength(springIdx) = static_cast<double>(nBeads + 1);
-    } else if (from >= 0 || to >= 0) {
-      const long int partner = (from >= 0) ? from : to;
-      from = partner;
-      to = static_cast<long int>(nCrosslinks + handledDanglingIdx);
+    } else if (rawFrom >= 0 || rawTo >= 0) {
+      nodeFrom = static_cast<size_t>(rawFrom >= 0 ? rawFrom : rawTo);
+      nodeTo = nCrosslinks + handledDanglingIdx;
       handledDanglingIdx += 1;
       net.springsContourLength(springIdx) = static_cast<double>(nBeads);
     } else {
-      from =
-        static_cast<long int>(nCrosslinks + nDanglingEnds + handledFreeIdx);
-      to = from + 1;
+      nodeFrom = nCrosslinks + nDanglingEnds + handledFreeIdx;
+      nodeTo = nodeFrom + 1;
       handledFreeIdx += 2;
       net.springsContourLength(springIdx) = static_cast<double>(nBeads - 1);
     }
 
-    net.springIndexA(springIdx) = static_cast<int>(from);
-    net.springIndexB(springIdx) = static_cast<int>(to);
-    net.springIndicesOfLinks[static_cast<size_t>(from)].push_back(
-      static_cast<size_t>(springIdx));
-    if (from != to) {
-      net.springIndicesOfLinks[static_cast<size_t>(to)].push_back(
-        static_cast<size_t>(springIdx));
+    net.springIndexA(springIdx) = static_cast<int>(nodeFrom);
+    net.springIndexB(springIdx) = static_cast<int>(nodeTo);
+    net.springIndicesOfLinks[nodeFrom].push_back(springSizeIdx);
+    if (nodeFrom != nodeTo) {
+      net.springIndicesOfLinks[nodeTo].push_back(springSizeIdx);
     }
   }
   assert(handledDanglingIdx == nDanglingEnds);
@@ -403,28 +410,31 @@ buildForceBalance2Network(
                                  : Eigen::ArrayXi(Eigen::ArrayXi::Zero(0));
   net.oldAtomTypes = Eigen::ArrayXi::Ones(static_cast<Eigen::Index>(nrOfLinks));
 
-  for (size_t xl = 0; xl < nCrosslinks; ++xl) {
-    Eigen::Vector3d pos(cu.xlinkX[xl], cu.xlinkY[xl], cu.xlinkZ[xl]);
+  for (Eigen::Index xl = 0; xl < static_cast<Eigen::Index>(nCrosslinks); ++xl) {
+    const size_t xlIdx = static_cast<size_t>(xl);
+    Eigen::Vector3d pos(cu.xlinkX[xlIdx], cu.xlinkY[xlIdx], cu.xlinkZ[xlIdx]);
     box.handlePBC(pos);
-    net.coordinates.segment<3>(static_cast<Eigen::Index>(3 * xl)) = pos;
-    net.oldAtomTypes(static_cast<Eigen::Index>(xl)) = cu.xlinkTypes[xl];
+    net.coordinates.segment<3>(3 * xl) = pos;
+    net.oldAtomTypes(xl) = cu.xlinkTypes[xlIdx];
   }
 
-  for (size_t dIdx = 0; dIdx < nDanglingEnds; ++dIdx) {
-    const size_t nodeIdx = nCrosslinks + dIdx;
-    const size_t partnerXl = summary.danglingEndPartners[dIdx];
-    net.coordinates.segment<3>(static_cast<Eigen::Index>(3 * nodeIdx)) =
-      net.coordinates.segment<3>(static_cast<Eigen::Index>(3 * partnerXl));
-    net.oldAtomTypes(static_cast<Eigen::Index>(nodeIdx)) =
-      summary.danglingEndTypes[dIdx];
+  for (Eigen::Index dIdx = 0; dIdx < static_cast<Eigen::Index>(nDanglingEnds);
+       ++dIdx) {
+    const size_t dSizeIdx = static_cast<size_t>(dIdx);
+    const Eigen::Index nodeIdx = static_cast<Eigen::Index>(nCrosslinks) + dIdx;
+    const Eigen::Index partnerXl =
+      static_cast<Eigen::Index>(summary.danglingEndPartners[dSizeIdx]);
+    net.coordinates.segment<3>(3 * nodeIdx) =
+      net.coordinates.segment<3>(3 * partnerXl);
+    net.oldAtomTypes(nodeIdx) = summary.danglingEndTypes[dSizeIdx];
   }
 
-  for (size_t fIdx = 0; fIdx < nFreeEnds; ++fIdx) {
-    const size_t nodeIdx = nCrosslinks + nDanglingEnds + fIdx;
-    net.coordinates.segment<3>(static_cast<Eigen::Index>(3 * nodeIdx))
-      .setZero();
-    net.oldAtomTypes(static_cast<Eigen::Index>(nodeIdx)) =
-      summary.freeEndTypes[fIdx];
+  for (Eigen::Index fIdx = 0; fIdx < static_cast<Eigen::Index>(nFreeEnds);
+       ++fIdx) {
+    const Eigen::Index nodeIdx =
+      static_cast<Eigen::Index>(nCrosslinks + nDanglingEnds) + fIdx;
+    net.coordinates.segment<3>(3 * nodeIdx).setZero();
+    net.oldAtomTypes(nodeIdx) = summary.freeEndTypes[static_cast<size_t>(fIdx)];
   }
 
   struct StrandEntanglementPlacement
@@ -644,13 +654,11 @@ buildForceBalance2Network(
       net.strandIndexOfSpring(spEigenIdx) = static_cast<int>(s);
       net.springIndexA(spEigenIdx) = static_cast<int>(linkA);
       net.springIndexB(spEigenIdx) = static_cast<int>(linkB);
-      for (size_t dir = 0; dir < 3; ++dir) {
-        net.springCoordinateIndexA(3 * spEigenIdx +
-                                   static_cast<Eigen::Index>(dir)) =
-          static_cast<int>(3 * linkA + dir);
-        net.springCoordinateIndexB(3 * spEigenIdx +
-                                   static_cast<Eigen::Index>(dir)) =
-          static_cast<int>(3 * linkB + dir);
+      for (Eigen::Index dir = 0; dir < 3; ++dir) {
+        net.springCoordinateIndexA(3 * spEigenIdx + dir) =
+          static_cast<int>(3 * linkA) + static_cast<int>(dir);
+        net.springCoordinateIndexB(3 * spEigenIdx + dir) =
+          static_cast<int>(3 * linkB) + static_cast<int>(dir);
       }
       net.springContourLength(spEigenIdx) = subContourLengths[m];
 
@@ -684,13 +692,11 @@ buildForceBalance2Network(
       net.springContourLength(spEigenIdx) = 1.0;
       net.springIndexA(spEigenIdx) = static_cast<int>(link1);
       net.springIndexB(spEigenIdx) = static_cast<int>(link2);
-      for (size_t dir = 0; dir < 3; ++dir) {
-        net.springCoordinateIndexA(3 * spEigenIdx +
-                                   static_cast<Eigen::Index>(dir)) =
-          static_cast<int>(3 * link1 + dir);
-        net.springCoordinateIndexB(3 * spEigenIdx +
-                                   static_cast<Eigen::Index>(dir)) =
-          static_cast<int>(3 * link2 + dir);
+      for (Eigen::Index dir = 0; dir < 3; ++dir) {
+        net.springCoordinateIndexA(3 * spEigenIdx + dir) =
+          static_cast<int>(3 * link1) + static_cast<int>(dir);
+        net.springCoordinateIndexB(3 * spEigenIdx + dir) =
+          static_cast<int>(3 * link2) + static_cast<int>(dir);
       }
       net.springBoxOffset.segment<3>(3 * spEigenIdx) = box.getOffset(
         net.coordinates.segment<3>(static_cast<Eigen::Index>(3 * link2)) -

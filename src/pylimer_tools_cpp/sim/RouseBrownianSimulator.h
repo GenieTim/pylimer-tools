@@ -92,7 +92,7 @@ public:
                                            double dt = 0.01);
 
   // Parameter getters
-  size_t getNrOfNodes() const { return numNodes_; }
+  size_t getNrOfNodes() const { return static_cast<size_t>(numNodes_); }
   double getGamma() const { return gamma_; }
   double getK() const { return k_; }
   double getTemperature() const { return T_; }
@@ -169,7 +169,7 @@ public:
     bool timeAveraged = false);
 
 private:
-  size_t numNodes_{ 0 };
+  Eigen::Index numNodes_{ 0 };
   double gamma_{ 1.0 };
   double k_{ 1.0 };
   double T_{ 1.0 };

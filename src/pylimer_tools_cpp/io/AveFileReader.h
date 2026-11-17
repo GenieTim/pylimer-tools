@@ -33,8 +33,10 @@ private:
   int numHeaderRows = -1;
   std::vector<std::string> columnNames;
   std::vector<std::vector<double>> data;
+  bool dataIsRead = false;
 
   int getNrOfHeaderRows();
+  void readData();
 };
 
 }

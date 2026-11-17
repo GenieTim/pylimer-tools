@@ -539,12 +539,10 @@ AtomGraphParent::getUnwrappedVertexCoordinates(
   const std::vector<igraph_integer_t>& vertices,
   const pylimer_tools::entities::Box& box) const
 {
-  igraph_vector_int_t vertices_v;
-  igraph_vector_int_init(&vertices_v,
-                         static_cast<igraph_int_t>(vertices.size()));
-  pylimer_tools::utils::StdVectorToIgraphVectorT(vertices, &vertices_v);
-  Eigen::VectorXd result = this->getUnwrappedVertexCoordinates(vertices_v, box);
-  igraph_vector_int_destroy(&vertices_v);
+  const igraph_vector_int_t vertices_v = igraph_vector_int_view(
+    vertices.data(), static_cast<igraph_int_t>(vertices.size()));
+  const Eigen::VectorXd result =
+    this->getUnwrappedVertexCoordinates(vertices_v, box);
   assert(static_cast<size_t>(result.size()) == vertices.size() * 3);
   return result;
 }
@@ -569,16 +567,13 @@ AtomGraphParent::getVertexCoordinates(const igraph_vs_t selector) const
     throw std::runtime_error("Failed to query property z of graph.");
   }
 
-  const size_t size = static_cast<size_t>(igraph_vector_size(&xvalues));
-  Eigen::VectorXd results(size * 3);
-  for (size_t i = 0; i < size; ++i) {
-    const igraph_integer_t idx = static_cast<igraph_integer_t>(i);
-    results[static_cast<Eigen::Index>(3 * i)] =
-      igraph_vector_get(&xvalues, idx);
-    results[static_cast<Eigen::Index>(3 * i + 1)] =
-      igraph_vector_get(&yvalues, idx);
-    results[static_cast<Eigen::Index>(3 * i + 2)] =
-      igraph_vector_get(&zvalues, idx);
+  const igraph_integer_t size = igraph_vector_size(&xvalues);
+  Eigen::VectorXd results(static_cast<Eigen::Index>(size) * 3);
+  for (igraph_integer_t i = 0; i < size; ++i) {
+    const Eigen::Index eIdx = static_cast<Eigen::Index>(i);
+    results[3 * eIdx] = igraph_vector_get(&xvalues, i);
+    results[3 * eIdx + 1] = igraph_vector_get(&yvalues, i);
+    results[3 * eIdx + 2] = igraph_vector_get(&zvalues, i);
   }
 
   igraph_vector_destroy(&xvalues);
@@ -604,12 +599,9 @@ Eigen::VectorXd
 AtomGraphParent::getVertexCoordinates(
   const std::vector<igraph_integer_t>& vertices) const
 {
-  igraph_vector_int_t vertices_v;
-  igraph_vector_int_init(&vertices_v,
-                         static_cast<igraph_integer_t>(vertices.size()));
-  pylimer_tools::utils::StdVectorToIgraphVectorT(vertices, &vertices_v);
-  Eigen::VectorXd result = this->getVertexCoordinates(vertices_v);
-  igraph_vector_int_destroy(&vertices_v);
+  const igraph_vector_int_t vertices_v = igraph_vector_int_view(
+    vertices.data(), static_cast<igraph_integer_t>(vertices.size()));
+  const Eigen::VectorXd result = this->getVertexCoordinates(vertices_v);
   assert(static_cast<size_t>(result.size()) == vertices.size() * 3);
   return result;
 }
@@ -661,27 +653,15 @@ AtomGraphParent::getVertexAndEdgePropertyNames() const
 std::vector<Atom>
 AtomGraphParent::getAtomsOfDegree(const int degree) const
 {
-  std::vector<long int> endNodeIndices = this->getVerticesWithDegree(degree);
-  igraph_vector_int_t endNodeSelectorVector;
-  igraph_vector_int_init(&endNodeSelectorVector,
-                         static_cast<igraph_int_t>(endNodeIndices.size()));
-  pylimer_tools::utils::StdVectorToIgraphVectorT(endNodeIndices,
-                                                 &endNodeSelectorVector);
-  igraph_vit_t vit;
-  igraph_vit_create(
-    &this->graph, igraph_vss_vector(&endNodeSelectorVector), &vit);
+  const std::vector<long int> endNodeIndices =
+    this->getVerticesWithDegree(degree);
 
   std::vector<Atom> results;
-  results.reserve(static_cast<size_t>(IGRAPH_VIT_SIZE(vit)));
-  while (!IGRAPH_VIT_END(vit)) {
-    long int vertexId1 = static_cast<long int>(IGRAPH_VIT_GET(vit));
-    Atom atom = this->getAtomByVertexIdx(vertexId1);
-    results.push_back(atom);
-    IGRAPH_VIT_NEXT(vit);
+  results.reserve(endNodeIndices.size());
+  for (const long int vertexId1 : endNodeIndices) {
+    results.push_back(this->getAtomByVertexIdx(vertexId1));
   }
 
-  igraph_vector_int_destroy(&endNodeSelectorVector);
-  igraph_vit_destroy(&vit);
   return results;
 }
 
