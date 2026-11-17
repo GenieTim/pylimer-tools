@@ -25,7 +25,7 @@ for p in (str(src_dir), str(examples_dir), str(nma_dir), str(repo_root)):
         sys.path.insert(0, p)
 
 from _example_cache import get_example_cache_path, load_or_compute_cache  # noqa: E402
-from _study_runners import run_kpm_vs_exact_pdms_study  # noqa: E402
+from _nma_study_runners import run_kpm_vs_exact_pdms_study  # noqa: E402
 
 
 def recompute_kpm_vs_exact_pdms(max_workers: Optional[int] = None) -> None:
@@ -33,8 +33,7 @@ def recompute_kpm_vs_exact_pdms(max_workers: Optional[int] = None) -> None:
     cache_path = get_example_cache_path(
         "kpm_vs_exact_pdms_cache.npz", "normal_mode_analysis"
     )
-    print(
-        f"\n--- Recomputing KPM vs. Exact PDMS cache ({cache_path.name}) ---")
+    print(f"\n--- Recomputing KPM vs. Exact PDMS cache ({cache_path.name}) ---")
     load_or_compute_cache(
         cache_path,
         run_kpm_vs_exact_pdms_study,

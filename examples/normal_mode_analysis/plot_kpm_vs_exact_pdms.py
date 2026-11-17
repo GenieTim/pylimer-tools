@@ -43,13 +43,13 @@ if "__file__" in globals():
             sys.path.insert(0, _p)
 
 from _example_cache import get_example_cache_path, load_or_compute_cache  # noqa: E402
-from _plotting import (  # noqa: E402
+from _nma_plotting import (  # noqa: E402
     plot_kpm_vs_exact_chain_length,
     plot_kpm_vs_exact_conversion,
     plot_kpm_vs_exact_rve_and_scaling,
     plot_kpm_vs_exact_stoichiometry,
 )
-from _study_runners import run_kpm_vs_exact_pdms_study  # noqa: E402
+from _nma_study_runners import run_kpm_vs_exact_pdms_study  # noqa: E402
 from pylimer_tools.io.bead_spring_parameter_provider import (  # noqa: E402
     ParameterType,
     Parameters,

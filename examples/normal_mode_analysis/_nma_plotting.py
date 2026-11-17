@@ -9,14 +9,7 @@ from typing import Any, Sequence
 import matplotlib.pyplot as plt
 import numpy as np
 
-_COLORS = (
-    "#1f77b4",
-    "#ff7f0e",
-    "#2ca02c",
-    "#d62728",
-    "#9467bd",
-    "#8c564b",
-    "#e377c2")
+_COLORS = ("#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2")
 
 
 def _plot_kpm_vs_exact_moduli_pair(
@@ -29,8 +22,7 @@ def _plot_kpm_vs_exact_moduli_pair(
     title_prefix: str,
 ) -> None:
     """Shared two-panel log-log comparison of G'(omega) and G''(omega) for Exact vs. KPM."""
-    fig, (ax1, ax2) = plt.subplots(
-        1, 2, figsize=(12.2, 4.8), sharex=True, sharey=True)
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12.2, 4.8), sharex=True, sharey=True)
 
     for idx, label in enumerate(labels):
         c = _COLORS[idx % len(_COLORS)]
@@ -66,9 +58,7 @@ def _plot_kpm_vs_exact_moduli_pair(
             r"Storage Modulus $G'(\omega)$ [MPa]",
             f"{title_prefix}: Storage Modulus",
         ),
-        (ax2,
-         r"Loss Modulus $G''(\omega)$ [MPa]",
-         f"{title_prefix}: Loss Modulus"),
+        (ax2, r"Loss Modulus $G''(\omega)$ [MPa]", f"{title_prefix}: Loss Modulus"),
     ):
         ax.set_xlabel(r"Reduced Frequency $\omega\tau_0$ [-]")
         ax.set_ylabel(ylabel)
@@ -167,13 +157,7 @@ def plot_kpm_vs_exact_rve_and_scaling(data: Any) -> None:
             label=rf"$L={box_l:.0f}\,\mathrm{{nm}}$ ($\sim{n_at:,}$ beads)",
         )
         if np.all(np.isfinite(gp_ex_mean[idx])):
-            ax1.loglog(
-                freqs,
-                gp_ex_mean[idx],
-                "-",
-                color=c,
-                linewidth=1.2,
-                alpha=0.55)
+            ax1.loglog(freqs, gp_ex_mean[idx], "-", color=c, linewidth=1.2, alpha=0.55)
 
     ax1.set_xlabel(r"Reduced Frequency $\omega\tau_0$ [-]")
     ax1.set_ylabel(r"Storage Modulus $G'(\omega)$ [MPa]")
@@ -187,7 +171,9 @@ def plot_kpm_vs_exact_rve_and_scaling(data: Any) -> None:
     freq_idx = int(np.argmin(np.abs(freqs - 1e-2)))
     n_rve_repeats = gp_kpm_all.shape[1]
     sample_counts = np.arange(2, n_rve_repeats + 1)
-    selected_boxes = sorted({0, 2, 4, len(box_lengths) - 1} & set(range(len(box_lengths))))
+    selected_boxes = sorted(
+        {0, 2, 4, len(box_lengths) - 1} & set(range(len(box_lengths)))
+    )
     for box_idx in selected_boxes:
         c = _COLORS[box_idx % len(_COLORS)]
         box_l = box_lengths[box_idx]
