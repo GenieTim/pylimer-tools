@@ -38,12 +38,20 @@ ResistanceDistanceAnalysis::ResistanceDistanceAnalysis(
   INVALIDARG_EXP_IFN(L.rows() == L.cols(), "Laplacian matrix L must be square");
   INVALIDARG_EXP_IFN(L.rows() > 0, "Laplacian matrix L cannot be empty");
 
+  const Eigen::SparseMatrix<double> diff =
+    L_ - Eigen::SparseMatrix<double>(L_.transpose());
+  INVALIDARG_EXP_IFN(diff.norm() <= 1e-10 * std::max(1.0, L_.norm()),
+                     "Laplacian matrix L must be symmetric");
+
   // Compute totalWeight_ = 0.5 * Tr(L) and count off-diagonal edges
   double diagSum = 0.0;
   size_t offDiagCount = 0;
   for (int k = 0; k < L_.outerSize(); ++k) {
     for (Eigen::SparseMatrix<double>::InnerIterator it(L_, k); it; ++it) {
       if (it.row() == it.col()) {
+        INVALIDARG_EXP_IFN(
+          it.value() >= 0.0,
+          "Laplacian matrix L must have non-negative diagonal entries");
         diagSum += it.value();
       } else if (it.row() < it.col()) {
         ++offDiagCount;
@@ -71,7 +79,7 @@ ResistanceDistanceAnalysis::initializeFromEdges(
     weights.empty() || weights.size() == springFrom.size(),
     "weights must be empty or have the same size as springFrom");
 
-  numEdges_ = springFrom.size();
+  numEdges_ = 0;
 
   if (numNodes == 0) {
     size_t maxIdx = 0;
@@ -94,12 +102,12 @@ ResistanceDistanceAnalysis::initializeFromEdges(
   totalWeight_ = 0.0;
 
   for (size_t e = 0; e < springFrom.size(); ++e) {
-    size_t u = springFrom[e];
-    size_t v = springTo[e];
+    const size_t u = springFrom[e];
+    const size_t v = springTo[e];
     if (u == v) {
       continue; // Skip self loops in Laplacian assembly
     }
-    double w = weights.empty() ? 1.0 : weights[e];
+    const double w = weights.empty() ? 1.0 : weights[e];
     INVALIDARG_EXP_IFN(w > 0.0, "Edge weight/spring constant must be positive");
 
     triplets.emplace_back(static_cast<int>(u), static_cast<int>(v), -w);
@@ -107,6 +115,7 @@ ResistanceDistanceAnalysis::initializeFromEdges(
     diag(static_cast<Eigen::Index>(u)) += w;
     diag(static_cast<Eigen::Index>(v)) += w;
     totalWeight_ += w;
+    ++numEdges_;
   }
 
   for (size_t i = 0; i < numNodes_; ++i) {
@@ -393,18 +402,7 @@ ResistanceDistanceAnalysis::computeKirchhoffIndex() const
     return 0.0;
   }
 
-  const Eigen::MatrixXd R = computeAllPairsEffectiveResistance();
-  const Eigen::Index N = R.rows();
-  double K = 0.0;
-#ifdef OPENMP_FOUND
-#pragma omp parallel for reduction(+ : K) schedule(static) if (N > 128)
-#endif
-  for (Eigen::Index i = 0; i < N; ++i) {
-    for (Eigen::Index j = i + 1; j < N; ++j) {
-      K += R(i, j);
-    }
-  }
-  return K;
+  return 0.5 * computeTotalResistancePerNode().sum();
 }
 
 double
@@ -417,12 +415,12 @@ ResistanceDistanceAnalysis::computeKirchhoffIndexSpectral() const
     return 0.0;
   }
 
-  Eigen::MatrixXd denseL = Eigen::MatrixXd(L_);
-  Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> es(denseL);
+  const Eigen::MatrixXd denseL = Eigen::MatrixXd(L_);
+  const Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> es(denseL);
   RUNTIME_EXP_IFN(es.info() == Eigen::Success,
                   "Spectral decomposition of L failed");
 
-  Eigen::VectorXd eigenvalues = es.eigenvalues();
+  const Eigen::VectorXd eigenvalues = es.eigenvalues();
   double sumReciprocal = 0.0;
   for (int i = 0; i < eigenvalues.size(); ++i) {
     if (eigenvalues(i) > 1e-10) {
@@ -447,8 +445,8 @@ ResistanceDistanceAnalysis::computeMoorePenrosePseudoInverse(
   Eigen::MatrixXd Lplus = Eigen::MatrixXd::Zero(
     static_cast<Eigen::Index>(numNodes_), static_cast<Eigen::Index>(numNodes_));
 
-  for (const auto& comp : connectedComponents_) {
-    size_t nComp = comp.size();
+  for (const std::vector<size_t>& comp : connectedComponents_) {
+    const size_t nComp = comp.size();
     if (nComp <= 1) {
       continue;
     }
@@ -463,11 +461,12 @@ ResistanceDistanceAnalysis::computeMoorePenrosePseudoInverse(
     }
 
     const Eigen::Index nCompIdx = static_cast<Eigen::Index>(nComp);
-    Eigen::MatrixXd Pc = Eigen::MatrixXd::Identity(nCompIdx, nCompIdx) -
-                         (1.0 / static_cast<double>(nComp)) *
-                           Eigen::MatrixXd::Constant(nCompIdx, nCompIdx, 1.0);
+    const Eigen::MatrixXd Pc =
+      Eigen::MatrixXd::Identity(nCompIdx, nCompIdx) -
+      (1.0 / static_cast<double>(nComp)) *
+        Eigen::MatrixXd::Constant(nCompIdx, nCompIdx, 1.0);
 
-    Eigen::MatrixXd Lplus_c = Pc * Xc * Pc;
+    const Eigen::MatrixXd Lplus_c = Pc * Xc * Pc;
 
     for (size_t a = 0; a < nComp; ++a) {
       for (size_t b = 0; b < nComp; ++b) {
@@ -484,7 +483,7 @@ ResistanceDistanceAnalysis::computeMoorePenrosePseudoInverse(
 double
 ResistanceDistanceAnalysis::computeCommuteTime(size_t i, size_t j) const
 {
-  double R = computeEffectiveResistance(i, j);
+  const double R = computeEffectiveResistance(i, j);
   if (std::isinf(R)) {
     return std::numeric_limits<double>::infinity();
   }
@@ -511,17 +510,51 @@ ResistanceDistanceAnalysis::computeAllPairsCommuteTime() const
 Eigen::VectorXd
 ResistanceDistanceAnalysis::computeTotalResistancePerNode() const
 {
-  const Eigen::MatrixXd R = computeAllPairsEffectiveResistance();
-  const Eigen::Index N = R.rows();
+  if (numNodes_ <= 1) {
+    return Eigen::VectorXd::Zero(static_cast<Eigen::Index>(numNodes_));
+  }
+  if (!isConnected()) {
+    return Eigen::VectorXd::Constant(static_cast<Eigen::Index>(numNodes_),
+                                     std::numeric_limits<double>::infinity());
+  }
+
+  ensureFactorized();
+
+  const Eigen::Index N = static_cast<Eigen::Index>(numNodes_);
+  const size_t chunkSize = 128;
+  const size_t r = referenceNodePerComponent_[0];
+
+  Eigen::VectorXd diagX = Eigen::VectorXd::Zero(N);
+  Eigen::VectorXd rowSumsX = Eigen::VectorXd::Zero(N);
+
+  for (size_t colStart = 0; colStart < numNodes_; colStart += chunkSize) {
+    const size_t curChunk = std::min(chunkSize, numNodes_ - colStart);
+    Eigen::MatrixXd I_chunk =
+      Eigen::MatrixXd::Zero(N, static_cast<Eigen::Index>(curChunk));
+    for (size_t c = 0; c < curChunk; ++c) {
+      I_chunk(static_cast<Eigen::Index>(colStart + c),
+              static_cast<Eigen::Index>(c)) = 1.0;
+    }
+
+    Eigen::MatrixXd X_chunk = solver_.solve(I_chunk);
+    X_chunk.row(static_cast<Eigen::Index>(r)).setZero();
+    if (r >= colStart && r < colStart + curChunk) {
+      X_chunk.col(static_cast<Eigen::Index>(r - colStart)).setZero();
+    }
+
+    for (size_t c = 0; c < curChunk; ++c) {
+      const Eigen::Index globalCol = static_cast<Eigen::Index>(colStart + c);
+      diagX(globalCol) = X_chunk(globalCol, static_cast<Eigen::Index>(c));
+    }
+    rowSumsX += X_chunk.rowwise().sum();
+  }
+
+  const double traceX = diagX.sum();
   Eigen::VectorXd tot = Eigen::VectorXd::Zero(N);
   for (Eigen::Index i = 0; i < N; ++i) {
-    double s = 0.0;
-    for (Eigen::Index j = 0; j < N; ++j) {
-      if (i != j) {
-        s += R(i, j);
-      }
-    }
-    tot(i) = s;
+    tot(i) = std::max(
+      0.0,
+      static_cast<double>(numNodes_) * diagX(i) + traceX - 2.0 * rowSumsX(i));
   }
   return tot;
 }

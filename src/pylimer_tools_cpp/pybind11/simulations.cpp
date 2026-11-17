@@ -2717,24 +2717,51 @@ A strand is a chain of connected links between two crosslinks.
           Checks internal data structure consistency and throws exceptions if issues are found.
          )pbdoc");
 
-  py::native_enum<RouseSolverType>(m, "RouseSolverType", "enum.IntEnum")
-    .value("DIRECT_LDLT", RouseSolverType::DIRECT_LDLT)
-    .value("DIRECT_LLT", RouseSolverType::DIRECT_LLT)
-    .value("CONJUGATE_GRADIENT", RouseSolverType::CONJUGATE_GRADIENT)
-    .export_values()
+  py::native_enum<RouseSolverType>(
+    m,
+    "RouseSolverType",
+    "enum.IntEnum",
+    "Linear solver algorithm for implicit Rouse/Brownian time-stepping.")
+    .value("DIRECT_LDLT",
+           RouseSolverType::DIRECT_LDLT,
+           "Direct sparse SimplicialLDLT solver")
+    .value("DIRECT_LLT",
+           RouseSolverType::DIRECT_LLT,
+           "Direct sparse SimplicialLLT solver")
+    .value("CONJUGATE_GRADIENT",
+           RouseSolverType::CONJUGATE_GRADIENT,
+           "Iterative Conjugate Gradient solver")
     .finalize();
 
-  py::class_<RouseSimulationResult, py::smart_holder>(m,
-                                                      "RouseSimulationResult")
-    .def_readonly("times", &RouseSimulationResult::times)
-    .def_readonly("msd", &RouseSimulationResult::msd)
-    .def_readonly("msd_center_of_mass", &RouseSimulationResult::msdCenterOfMass)
+  py::class_<RouseSimulationResult, py::smart_holder>(
+    m,
+    "RouseSimulationResult",
+    R"pbdoc(
+      Output container for Rouse dynamics simulation runs.
+    )pbdoc")
+    .def_readonly("times",
+                  &RouseSimulationResult::times,
+                  "Sampled simulation times.")
+    .def_readonly("msd",
+                  &RouseSimulationResult::msd,
+                  "Bead mean-squared displacement at sampled times.")
+    .def_readonly("msd_center_of_mass",
+                  &RouseSimulationResult::msdCenterOfMass,
+                  "Center-of-mass mean-squared displacement at sampled times.")
     .def_readonly("end_to_end_correlation",
-                  &RouseSimulationResult::endToEndCorrelation)
-    .def_readonly("trajectory", &RouseSimulationResult::trajectory);
+                  &RouseSimulationResult::endToEndCorrelation,
+                  "Normalized end-to-end vector autocorrelation at sampled times.")
+    .def_readonly("trajectory",
+                  &RouseSimulationResult::trajectory,
+                  "List of (N, 3) position matrices if save_trajectory was enabled.");
 
-  py::class_<RouseBrownianSimulator, py::smart_holder>(m,
-                                                       "RouseBrownianSimulator")
+  py::class_<RouseBrownianSimulator, py::smart_holder>(
+    m,
+    "RouseBrownianSimulator",
+    R"pbdoc(
+      Implicit time-stepping Rouse and Brownian dynamics simulator for polymer chains
+      and general spring networks.
+    )pbdoc")
     .def(py::init<const std::vector<size_t>&,
                   const std::vector<size_t>&,
                   double,
@@ -2742,6 +2769,18 @@ A strand is a chain of connected links between two crosslinks.
                   double,
                   double,
                   size_t>(),
+         R"pbdoc(
+           Construct from edge lists (spring_from, spring_to), friction gamma,
+           spring constant k, temperature T, time step dt, and optional num_nodes.
+
+           :param spring_from: Source node indices of springs
+           :param spring_to: Target node indices of springs
+           :param gamma: Bead friction coefficient
+           :param k: Hookean spring constant
+           :param T: Temperature
+           :param dt: Integration time step
+           :param num_nodes: Total number of nodes (deduced if 0)
+         )pbdoc",
          py::arg("spring_from"),
          py::arg("spring_to"),
          py::arg("gamma") = 1.0,
@@ -2754,6 +2793,15 @@ A strand is a chain of connected links between two crosslinks.
                   double,
                   double,
                   double>(),
+         R"pbdoc(
+           Construct from a pre-assembled sparse scalar graph Laplacian matrix L.
+
+           :param L: Symmetric positive semidefinite graph Laplacian matrix
+           :param gamma: Bead friction coefficient
+           :param k: Hookean spring constant
+           :param T: Temperature
+           :param dt: Integration time step
+         )pbdoc",
          py::arg("L"),
          py::arg("gamma") = 1.0,
          py::arg("k") = 1.0,
@@ -2766,6 +2814,9 @@ A strand is a chain of connected links between two crosslinks.
           new RouseBrownianSimulator(RouseBrownianSimulator::createLinearChain(
             num_nodes, gamma, k, T, dt)));
       },
+      R"pbdoc(
+        Create a RouseBrownianSimulator for a linear chain of num_nodes beads.
+      )pbdoc",
       py::arg("num_nodes"),
       py::arg("gamma") = 1.0,
       py::arg("k") = 1.0,
@@ -2778,6 +2829,9 @@ A strand is a chain of connected links between two crosslinks.
           new RouseBrownianSimulator(
             RouseBrownianSimulator::createRing(num_nodes, gamma, k, T, dt)));
       },
+      R"pbdoc(
+        Create a RouseBrownianSimulator for a ring polymer of num_nodes beads.
+      )pbdoc",
       py::arg("num_nodes"),
       py::arg("gamma") = 1.0,
       py::arg("k") = 1.0,
@@ -2795,72 +2849,202 @@ A strand is a chain of connected links between two crosslinks.
           new RouseBrownianSimulator(RouseBrownianSimulator::createStar(
             num_arms, arm_length, gamma, k, T, dt)));
       },
+      R"pbdoc(
+        Create a RouseBrownianSimulator for a star polymer with num_arms arms of arm_length bonds each.
+      )pbdoc",
       py::arg("num_arms"),
       py::arg("arm_length") = 1,
       py::arg("gamma") = 1.0,
       py::arg("k") = 1.0,
       py::arg("T") = 1.0,
       py::arg("dt") = 0.01)
-    .def("get_nr_of_nodes", &RouseBrownianSimulator::getNrOfNodes)
-    .def("get_gamma", &RouseBrownianSimulator::getGamma)
-    .def("get_k", &RouseBrownianSimulator::getK)
-    .def("get_temperature", &RouseBrownianSimulator::getTemperature)
-    .def("get_dt", &RouseBrownianSimulator::getDt)
+    .def("get_nr_of_nodes",
+         &RouseBrownianSimulator::getNrOfNodes,
+         "Get the number of nodes (beads) in the simulator.")
+    .def("get_gamma",
+         &RouseBrownianSimulator::getGamma,
+         "Get the friction coefficient gamma.")
+    .def("get_k",
+         &RouseBrownianSimulator::getK,
+         "Get the Hookean spring constant k.")
+    .def("get_temperature",
+         &RouseBrownianSimulator::getTemperature,
+         "Get the temperature T.")
+    .def("get_dt",
+         &RouseBrownianSimulator::getDt,
+         "Get the integration time step dt.")
+    .def("get_kb",
+         &RouseBrownianSimulator::getKB,
+         "Get the Boltzmann constant kB.")
     .def("get_diffusion_coefficient",
-         &RouseBrownianSimulator::getDiffusionCoefficient)
-    .def("set_parameters", &RouseBrownianSimulator::setParameters)
-    .def("set_gamma", &RouseBrownianSimulator::setGamma)
-    .def("set_k", &RouseBrownianSimulator::setK)
-    .def("set_temperature", &RouseBrownianSimulator::setTemperature)
-    .def("set_dt", &RouseBrownianSimulator::setDt)
-    .def("set_solver_type", &RouseBrownianSimulator::setSolverType)
-    .def("set_seed", &RouseBrownianSimulator::setSeed)
-    .def("set_positions", &RouseBrownianSimulator::setPositions)
-    .def("get_positions", &RouseBrownianSimulator::getPositions)
+         &RouseBrownianSimulator::getDiffusionCoefficient,
+         "Get the bead diffusion coefficient D = kB * T / gamma.")
+    .def("get_solver_type",
+         &RouseBrownianSimulator::getSolverType,
+         "Get the active linear solver type.")
+    .def("set_parameters",
+         &RouseBrownianSimulator::setParameters,
+         "Set gamma, k, T, and dt simultaneously.",
+         py::arg("gamma"),
+         py::arg("k"),
+         py::arg("T"),
+         py::arg("dt"))
+    .def("set_gamma",
+         &RouseBrownianSimulator::setGamma,
+         "Set the friction coefficient gamma.",
+         py::arg("gamma"))
+    .def("set_k",
+         &RouseBrownianSimulator::setK,
+         "Set the Hookean spring constant k.",
+         py::arg("k"))
+    .def("set_temperature",
+         &RouseBrownianSimulator::setTemperature,
+         "Set the temperature T.",
+         py::arg("T"))
+    .def("set_dt",
+         &RouseBrownianSimulator::setDt,
+         "Set the integration time step dt.",
+         py::arg("dt"))
+    .def("set_kb",
+         &RouseBrownianSimulator::setKB,
+         "Set the Boltzmann constant kB.",
+         py::arg("kb"))
+    .def("set_solver_type",
+         &RouseBrownianSimulator::setSolverType,
+         "Set the linear solver algorithm used for implicit time-stepping.",
+         py::arg("solver_type"))
+    .def("set_seed",
+         &RouseBrownianSimulator::setSeed,
+         "Set the random number generator seed for thermal noise.",
+         py::arg("seed"))
+    .def("set_positions",
+         &RouseBrownianSimulator::setPositions,
+         "Set the (N, 3) bead positions matrix.",
+         py::arg("positions"))
+    .def("set_positions_flattened",
+         &RouseBrownianSimulator::setPositionsFlattened,
+         "Set bead positions from a flattened 3N vector.",
+         py::arg("positions"),
+         py::arg("interleaved") = true)
+    .def("get_positions",
+         &RouseBrownianSimulator::getPositions,
+         "Get the (N, 3) bead positions matrix.")
+    .def("get_positions_flattened",
+         &RouseBrownianSimulator::getPositionsFlattened,
+         "Get bead positions as a flattened 3N vector.",
+         py::arg("interleaved") = true)
     .def("initialize_linear_positions",
          &RouseBrownianSimulator::initializeLinearPositions,
+         "Initialize bead positions spaced along a coordinate axis.",
          py::arg("bond_length") = 1.0,
          py::arg("axis") = 0)
     .def("initialize_random_walk",
          &RouseBrownianSimulator::initializeRandomWalk,
+         "Initialize bead positions as a 3D random walk.",
          py::arg("bond_length") = 1.0,
          py::arg("seed") = 42)
-    .def("get_laplacian", &RouseBrownianSimulator::getLaplacian)
-    .def("get_shifted_matrix", &RouseBrownianSimulator::getShiftedMatrix)
-    .def("step", &RouseBrownianSimulator::step, py::arg("num_steps") = 1)
+    .def("get_laplacian",
+         &RouseBrownianSimulator::getLaplacian,
+         "Get the sparse graph Laplacian matrix L.")
+    .def("get_shifted_matrix",
+         &RouseBrownianSimulator::getShiftedMatrix,
+         "Get the shifted implicit stepping matrix A = I + dt * (k / gamma) * L.")
+    .def("step",
+         &RouseBrownianSimulator::step,
+         "Advance the simulation by num_steps implicit Brownian steps.",
+         py::arg("num_steps") = 1)
     .def("step_with_external_forces",
          &RouseBrownianSimulator::stepWithExternalForces,
+         "Advance the simulation by num_steps under external forces and thermal noise.",
          py::arg("forces"),
          py::arg("num_steps") = 1)
     .def("step_deterministic",
          &RouseBrownianSimulator::stepDeterministic,
+         "Advance the simulation by num_steps deterministic relaxation steps (without thermal noise).",
          py::arg("num_steps") = 1)
-    .def("get_center_of_mass", &RouseBrownianSimulator::getCenterOfMass)
-    .def("get_end_to_end_vector",
-         &RouseBrownianSimulator::getEndToEndVector,
-         py::arg("node_a") = 0,
-         py::arg("node_b") = static_cast<size_t>(-1))
-    .def("get_end_to_end_distance",
-         &RouseBrownianSimulator::getEndToEndDistance,
-         py::arg("node_a") = 0,
-         py::arg("node_b") = static_cast<size_t>(-1))
-    .def("get_radius_of_gyration", &RouseBrownianSimulator::getRadiusOfGyration)
-    .def("get_potential_energy", &RouseBrownianSimulator::getPotentialEnergy)
-    .def("run",
-         &RouseBrownianSimulator::run,
-         py::arg("total_steps"),
-         py::arg("sample_interval") = 1,
-         py::arg("save_trajectory") = false,
-         py::arg("end_to_end_node_a") = 0,
-         py::arg("end_to_end_node_b") = static_cast<size_t>(-1))
+    .def("step_deterministic_with_external_forces",
+         &RouseBrownianSimulator::stepDeterministicWithExternalForces,
+         "Advance the simulation by num_steps deterministic steps under external forces.",
+         py::arg("forces"),
+         py::arg("num_steps") = 1)
+    .def("get_center_of_mass",
+         &RouseBrownianSimulator::getCenterOfMass,
+         "Compute the 3D center of mass of all nodes.")
+    .def(
+      "get_end_to_end_vector",
+      [](const RouseBrownianSimulator& self, size_t node_a, long node_b) {
+        const size_t actual_b =
+          (node_b < 0) ? static_cast<size_t>(-1) : static_cast<size_t>(node_b);
+        return self.getEndToEndVector(node_a, actual_b);
+      },
+      "Compute the 3D vector from node_a to node_b (defaults to last node if node_b < 0).",
+      py::arg("node_a") = 0,
+      py::arg("node_b") = -1)
+    .def(
+      "get_end_to_end_distance",
+      [](const RouseBrownianSimulator& self, size_t node_a, long node_b) {
+        const size_t actual_b =
+          (node_b < 0) ? static_cast<size_t>(-1) : static_cast<size_t>(node_b);
+        return self.getEndToEndDistance(node_a, actual_b);
+      },
+      "Compute the Euclidean distance between node_a and node_b (defaults to last node if node_b < 0).",
+      py::arg("node_a") = 0,
+      py::arg("node_b") = -1)
+    .def("get_radius_of_gyration",
+         &RouseBrownianSimulator::getRadiusOfGyration,
+         "Compute the radius of gyration of the current bead configuration.")
+    .def("get_potential_energy",
+         &RouseBrownianSimulator::getPotentialEnergy,
+         "Compute the harmonic spring potential energy of the current configuration.")
+    .def(
+      "run",
+      [](RouseBrownianSimulator& self,
+         size_t total_steps,
+         size_t sample_interval,
+         bool save_trajectory,
+         size_t end_to_end_node_a,
+         long end_to_end_node_b) {
+        const size_t actual_b = (end_to_end_node_b < 0)
+                                  ? static_cast<size_t>(-1)
+                                  : static_cast<size_t>(end_to_end_node_b);
+        return self.run(total_steps,
+                        sample_interval,
+                        save_trajectory,
+                        end_to_end_node_a,
+                        actual_b);
+      },
+      "Run the simulation for total_steps and record dynamical observables every sample_interval steps.",
+      py::arg("total_steps"),
+      py::arg("sample_interval") = 1,
+      py::arg("save_trajectory") = false,
+      py::arg("end_to_end_node_a") = 0,
+      py::arg("end_to_end_node_b") = -1)
     .def_static("compute_msd",
                 &RouseBrownianSimulator::computeMSD,
+                "Compute bead mean-squared displacement from a trajectory of (N, 3) position matrices.",
                 py::arg("trajectory"),
                 py::arg("time_averaged") = false)
     .def_static("compute_center_of_mass_msd",
                 &RouseBrownianSimulator::computeCenterOfMassMSD,
+                "Compute center-of-mass mean-squared displacement from a trajectory of (N, 3) position matrices.",
                 py::arg("trajectory"),
-                py::arg("time_averaged") = false);
+                py::arg("time_averaged") = false)
+    .def_static(
+      "compute_end_to_end_autocorrelation",
+      [](const std::vector<Eigen::MatrixXd>& trajectory,
+         size_t node_a,
+         long node_b,
+         bool time_averaged) {
+        const size_t actual_b =
+          (node_b < 0) ? static_cast<size_t>(-1) : static_cast<size_t>(node_b);
+        return RouseBrownianSimulator::computeEndToEndAutocorrelation(
+          trajectory, node_a, actual_b, time_averaged);
+      },
+      "Compute normalized end-to-end vector autocorrelation from a trajectory of (N, 3) position matrices.",
+      py::arg("trajectory"),
+      py::arg("node_a") = 0,
+      py::arg("node_b") = -1,
+      py::arg("time_averaged") = false);
 }
 
 #endif /* PYBIND_CALC_H */

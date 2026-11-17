@@ -168,6 +168,52 @@ TEST_CASE("NormalModeAnalyzer can compute some eigenvalues",
   CHECK(eigenvalues.size() == 1);
 
   CHECK_THAT(eigenvalues[0], Catch::Matchers::WithinAbs(0., 1e-10));
+
+  // Verify multiple sparse eigenvalues and eigenvectors are sorted ascending
+  pc::NormalModeAnalyzer chainNma(
+    { 0, 1, 2, 3, 4, 5, 6, 7 }, { 1, 2, 3, 4, 5, 6, 7, 8 });
+  chainNma.findSparseEigenvalues(4, true);
+  const Eigen::VectorXd& sparseEvals = chainNma.getEigenvalues();
+  const Eigen::MatrixXd& sparseEvecs = chainNma.getEigenvectors();
+  REQUIRE(sparseEvals.size() == 4);
+  REQUIRE(sparseEvecs.rows() == 9);
+  REQUIRE(sparseEvecs.cols() == 4);
+  for (Eigen::Index i = 0; i + 1 < sparseEvals.size(); ++i) {
+    CHECK(sparseEvals[i] <= sparseEvals[i + 1]);
+  }
+  const Eigen::MatrixXd A = chainNma.getAssembledConnectivityMatrix();
+  for (Eigen::Index i = 0; i < sparseEvals.size(); ++i) {
+    CHECK((A * sparseEvecs.col(i) - sparseEvals[i] * sparseEvecs.col(i)).norm() <
+          1e-8);
+  }
+}
+
+TEST_CASE("NormalModeAnalyzer ignores self-loops cleanly",
+          "[analysis][NormalModeAnalyzer]")
+{
+  // Linear chain 0-1-2-3 with self-loops on 0 and 2
+  pc::NormalModeAnalyzer cleanChain({ 0, 1, 2 }, { 1, 2, 3 });
+  pc::NormalModeAnalyzer loopChain({ 0, 0, 1, 2, 2 }, { 0, 1, 2, 2, 3 });
+
+  CHECK(loopChain.getAssembledConnectivityMatrix().nonZeros() ==
+        cleanChain.getAssembledConnectivityMatrix().nonZeros());
+
+  cleanChain.computeAllEigenvalues(pc::NormalModeSolver::DENSE_EIGEN, false, false);
+  const Eigen::VectorXd expectedEvals = cleanChain.getEigenvalues();
+
+  loopChain.computeAllEigenvalues(pc::NormalModeSolver::DENSE_EIGEN, false, false);
+  CHECK(loopChain.getEigenvalues().isApprox(expectedEvals, 1e-9));
+
+  loopChain.computeAllEigenvalues(pc::NormalModeSolver::DENSE_EIGEN, false, true);
+  CHECK(loopChain.getEigenvalues().isApprox(expectedEvals, 1e-9));
+
+  // Validate setter dimension checks
+  REQUIRE_THROWS_AS(loopChain.setEigenvalues(Eigen::VectorXd::Zero(10)),
+                    std::invalid_argument);
+  REQUIRE_THROWS_AS(loopChain.setEigenvectors(Eigen::MatrixXd::Zero(3, 3)),
+                    std::invalid_argument);
+  REQUIRE_THROWS_AS(loopChain.setEigenvectors(Eigen::MatrixXd::Zero(4, 5)),
+                    std::invalid_argument);
 }
 
 TEST_CASE("NormalModeAnalyzer solvers give consistent eigenvalues",

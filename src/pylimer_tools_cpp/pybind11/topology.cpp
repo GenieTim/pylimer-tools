@@ -334,16 +334,36 @@ init_pylimer_bound_topo(py::module_& m)
               EntanglementFilteringMode::NONE,
               "EntanglementFilteringMode.NONE"));
   py::class_<pylimer_tools::topo::ResistanceDistanceAnalysis, py::smart_holder>(
-    m, "ResistanceDistanceAnalysis")
+    m,
+    "ResistanceDistanceAnalysis",
+    R"pbdoc(
+      Analysis of topological resistance distances, Kirchhoff index,
+      and random-walk commute times on graph Laplacians.
+    )pbdoc")
     .def(py::init<const std::vector<size_t>&,
                   const std::vector<size_t>&,
                   const std::vector<double>&,
                   size_t>(),
+         R"pbdoc(
+           Construct from edge lists (spring_from, spring_to), optional edge weights,
+           and optional number of nodes.
+
+           :param spring_from: Source node indices of edges
+           :param spring_to: Target node indices of edges
+           :param weights: Optional weights (spring constants) of edges (defaults to 1.0)
+           :param num_nodes: Optional total number of nodes (deduced if 0)
+         )pbdoc",
          py::arg("spring_from"),
          py::arg("spring_to"),
          py::arg("weights") = std::vector<double>{},
          py::arg("num_nodes") = 0)
-    .def(py::init<const Eigen::SparseMatrix<double>&>(), py::arg("L"))
+    .def(py::init<const Eigen::SparseMatrix<double>&>(),
+         R"pbdoc(
+           Construct from a pre-assembled sparse scalar graph Laplacian matrix L.
+
+           :param L: Symmetric positive semidefinite graph Laplacian matrix
+         )pbdoc",
+         py::arg("L"))
     .def_static(
       "create_linear_chain",
       [](size_t num_nodes) {
@@ -352,6 +372,12 @@ init_pylimer_bound_topo(py::module_& m)
             pylimer_tools::topo::ResistanceDistanceAnalysis::createLinearChain(
               num_nodes)));
       },
+      R"pbdoc(
+        Create a ResistanceDistanceAnalysis instance for a linear chain of num_nodes nodes.
+
+        :param num_nodes: Number of nodes in the linear chain
+        :return: ResistanceDistanceAnalysis instance
+      )pbdoc",
       py::arg("num_nodes"))
     .def_static(
       "create_ring",
@@ -361,6 +387,12 @@ init_pylimer_bound_topo(py::module_& m)
             pylimer_tools::topo::ResistanceDistanceAnalysis::createRing(
               num_nodes)));
       },
+      R"pbdoc(
+        Create a ResistanceDistanceAnalysis instance for a ring graph of num_nodes nodes.
+
+        :param num_nodes: Number of nodes in the ring (at least 3)
+        :return: ResistanceDistanceAnalysis instance
+      )pbdoc",
       py::arg("num_nodes"))
     .def_static(
       "create_complete",
@@ -370,6 +402,12 @@ init_pylimer_bound_topo(py::module_& m)
             pylimer_tools::topo::ResistanceDistanceAnalysis::createComplete(
               num_nodes)));
       },
+      R"pbdoc(
+        Create a ResistanceDistanceAnalysis instance for a complete graph K_N.
+
+        :param num_nodes: Number of nodes in the complete graph (at least 2)
+        :return: ResistanceDistanceAnalysis instance
+      )pbdoc",
       py::arg("num_nodes"))
     .def_static(
       "create_star",
@@ -379,63 +417,175 @@ init_pylimer_bound_topo(py::module_& m)
             pylimer_tools::topo::ResistanceDistanceAnalysis::createStar(
               num_arms, arm_length)));
       },
+      R"pbdoc(
+        Create a ResistanceDistanceAnalysis instance for a star graph.
+
+        :param num_arms: Number of arms (at least 2)
+        :param arm_length: Number of edges per arm (defaults to 1)
+        :return: ResistanceDistanceAnalysis instance
+      )pbdoc",
       py::arg("num_arms"),
       py::arg("arm_length") = 1)
     .def("get_nr_of_nodes",
-         &pylimer_tools::topo::ResistanceDistanceAnalysis::getNrOfNodes)
+         &pylimer_tools::topo::ResistanceDistanceAnalysis::getNrOfNodes,
+         R"pbdoc(
+           Get the number of nodes in the graph.
+
+           :return: Number of nodes
+         )pbdoc")
     .def("get_nr_of_edges",
-         &pylimer_tools::topo::ResistanceDistanceAnalysis::getNrOfEdges)
+         &pylimer_tools::topo::ResistanceDistanceAnalysis::getNrOfEdges,
+         R"pbdoc(
+           Get the number of non-self-loop edges in the graph.
+
+           :return: Number of edges
+         )pbdoc")
     .def("get_total_edge_weight",
-         &pylimer_tools::topo::ResistanceDistanceAnalysis::getTotalEdgeWeight)
+         &pylimer_tools::topo::ResistanceDistanceAnalysis::getTotalEdgeWeight,
+         R"pbdoc(
+           Get the total weight of all edges in the graph.
+
+           :return: Total edge weight
+         )pbdoc")
     .def("is_connected",
-         &pylimer_tools::topo::ResistanceDistanceAnalysis::isConnected)
+         &pylimer_tools::topo::ResistanceDistanceAnalysis::isConnected,
+         R"pbdoc(
+           Check whether the graph consists of a single connected component.
+
+           :return: True if connected, False otherwise
+         )pbdoc")
     .def("get_nr_of_connected_components",
          &pylimer_tools::topo::ResistanceDistanceAnalysis::
-           getNrOfConnectedComponents)
+           getNrOfConnectedComponents,
+         R"pbdoc(
+           Get the number of connected components in the graph.
+
+           :return: Number of connected components
+         )pbdoc")
     .def(
       "get_connected_components",
-      &pylimer_tools::topo::ResistanceDistanceAnalysis::getConnectedComponents)
+      &pylimer_tools::topo::ResistanceDistanceAnalysis::getConnectedComponents,
+      R"pbdoc(
+        Get the list of node indices for each connected component.
+
+        :return: List of node index lists per connected component
+      )pbdoc")
     .def("get_laplacian",
-         &pylimer_tools::topo::ResistanceDistanceAnalysis::getLaplacian)
+         &pylimer_tools::topo::ResistanceDistanceAnalysis::getLaplacian,
+         R"pbdoc(
+           Get the sparse graph Laplacian matrix L.
+
+           :return: Sparse Laplacian matrix
+         )pbdoc")
+    .def("get_pinned_laplacian",
+         &pylimer_tools::topo::ResistanceDistanceAnalysis::getPinnedLaplacian,
+         R"pbdoc(
+           Get the sparse pinned Laplacian matrix with reference nodes pinned to 1 on the diagonal.
+
+           :return: Sparse pinned Laplacian matrix
+         )pbdoc")
     .def("compute_effective_resistance",
          &pylimer_tools::topo::ResistanceDistanceAnalysis::
            computeEffectiveResistance,
+         R"pbdoc(
+           Compute the effective resistance between nodes i and j.
+
+           :param i: First node index
+           :param j: Second node index
+           :return: Effective resistance R_ij (or inf if in different components)
+         )pbdoc",
          py::arg("i"),
          py::arg("j"))
     .def("compute_effective_resistance_batched",
          &pylimer_tools::topo::ResistanceDistanceAnalysis::
            computeEffectiveResistanceBatched,
+         R"pbdoc(
+           Compute the effective resistance for a batch of node pairs using a single multi-RHS solve.
+
+           :param pairs: List of (i, j) node index pairs
+           :return: Vector of effective resistances for each pair
+         )pbdoc",
          py::arg("pairs"))
     .def("compute_all_pairs_effective_resistance",
          &pylimer_tools::topo::ResistanceDistanceAnalysis::
            computeAllPairsEffectiveResistance,
+         R"pbdoc(
+           Compute the N x N symmetric matrix of all-pairs effective resistances.
+
+           :param chunk_size: Number of columns per solve chunk (defaults to 128)
+           :return: N x N matrix of effective resistances
+         )pbdoc",
          py::arg("chunk_size") = 128)
     .def("compute_moore_penrose_pseudo_inverse",
          &pylimer_tools::topo::ResistanceDistanceAnalysis::
            computeMoorePenrosePseudoInverse,
+         R"pbdoc(
+           Compute the Moore-Penrose pseudo-inverse L^+ of the graph Laplacian.
+
+           :param chunk_size: Number of columns per solve chunk (defaults to 128)
+           :return: N x N Moore-Penrose pseudo-inverse matrix
+         )pbdoc",
          py::arg("chunk_size") = 128)
     .def("solve_identity_chunked",
          &pylimer_tools::topo::ResistanceDistanceAnalysis::solveIdentityChunked,
+         R"pbdoc(
+           Solve L_pinned * X = I in multi-column chunks.
+
+           :param chunk_size: Number of columns per solve chunk (defaults to 128)
+           :return: N x N solution matrix X
+         )pbdoc",
          py::arg("chunk_size") = 128)
     .def(
       "compute_kirchhoff_index",
-      &pylimer_tools::topo::ResistanceDistanceAnalysis::computeKirchhoffIndex)
+      &pylimer_tools::topo::ResistanceDistanceAnalysis::computeKirchhoffIndex,
+      R"pbdoc(
+        Compute the Kirchhoff index K(G) = sum_{i < j} R_ij without allocating the full N x N matrix.
+
+        :return: Kirchhoff index (or inf if disconnected)
+      )pbdoc")
     .def("compute_kirchhoff_index_spectral",
          &pylimer_tools::topo::ResistanceDistanceAnalysis::
-           computeKirchhoffIndexSpectral)
+           computeKirchhoffIndexSpectral,
+         R"pbdoc(
+           Compute the Kirchhoff index from the non-zero eigenvalues of the Laplacian.
+
+           :return: Kirchhoff index (or inf if disconnected)
+         )pbdoc")
     .def("compute_total_resistance_per_node",
          &pylimer_tools::topo::ResistanceDistanceAnalysis::
-           computeTotalResistancePerNode)
+           computeTotalResistancePerNode,
+         R"pbdoc(
+           Compute the sum of effective resistances from each node to all other nodes.
+
+           :return: Vector of total resistance per node
+         )pbdoc")
     .def("compute_resistance_centrality",
          &pylimer_tools::topo::ResistanceDistanceAnalysis::
-           computeResistanceCentrality)
+           computeResistanceCentrality,
+         R"pbdoc(
+           Compute the resistance centrality (N - 1) / sum_{j != i} R_ij for each node.
+
+           :return: Vector of resistance centralities
+         )pbdoc")
     .def("compute_commute_time",
          &pylimer_tools::topo::ResistanceDistanceAnalysis::computeCommuteTime,
+         R"pbdoc(
+           Compute the random-walk commute time C_ij = 2 * M * R_ij between nodes i and j.
+
+           :param i: First node index
+           :param j: Second node index
+           :return: Commute time C_ij
+         )pbdoc",
          py::arg("i"),
          py::arg("j"))
     .def("compute_all_pairs_commute_time",
          &pylimer_tools::topo::ResistanceDistanceAnalysis::
-           computeAllPairsCommuteTime);
+           computeAllPairsCommuteTime,
+         R"pbdoc(
+           Compute the N x N matrix of all-pairs random-walk commute times.
+
+           :return: N x N matrix of commute times
+         )pbdoc");
 };
 // }
 

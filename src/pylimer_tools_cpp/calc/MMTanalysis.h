@@ -2,6 +2,10 @@
 #define MMT_ANALYSIS_H
 
 #include "../entities/Universe.h"
+#include "../utils/utilityMacros.h"
+#include <cmath>
+#include <map>
+#include <vector>
 
 namespace pylimer_tools::calc::mmt {
 
@@ -29,33 +33,41 @@ type.
 Returns:
   - r (float): The stoichiometric inbalance
 */
-double
-computeStoichiometricInbalance(pylimer_tools::entities::Universe network,
-                               const int crossLinkerType,
-                               const int strandLength,
-                               std::map<int, int> functionalityPerType)
+inline double
+computeStoichiometricInbalance(
+  const pylimer_tools::entities::Universe& network,
+  const int crossLinkerType,
+  const int strandLength,
+  const std::map<int, int>& functionalityPerType)
 {
+  INVALIDARG_EXP_IFN(strandLength > 0, "strandLength must be greater than 0");
 
   if (network.getNrOfAtoms() == 0) {
-    return 0;
+    return 0.0;
   }
 
-  std::vector<int> allTypes = network.getPropertyValues<int>("type");
+  const std::vector<int> allTypes = network.getPropertyValues<int>("type");
 
   int crossLinkerFormableBonds = 0;
   int otherFormableBonds = 0;
 
   // count how often every type occurs
-  for (int type : allTypes) {
+  for (const int type : allTypes) {
     if (type == crossLinkerType) {
-      crossLinkerFormableBonds += functionalityPerType[crossLinkerType];
+      crossLinkerFormableBonds += functionalityPerType.at(crossLinkerType);
     } else {
-      otherFormableBonds += functionalityPerType[type];
+      otherFormableBonds += functionalityPerType.at(type);
     }
   }
 
+  if (otherFormableBonds == 0) {
+    return 0.0;
+  }
+
   // division by 2 is implicit
-  return crossLinkerFormableBonds / (otherFormableBonds / strandLength);
+  return static_cast<double>(crossLinkerFormableBonds) /
+         (static_cast<double>(otherFormableBonds) /
+          static_cast<double>(strandLength));
 }
 
 /**
@@ -73,28 +85,33 @@ type.
 Returns:
   - p (float): The extent of reaction
 */
-double
-computeExtentOfReaction(pylimer_tools::entities::Universe network,
-                        std::map<int, int> functionalityPerType)
+inline double
+computeExtentOfReaction(const pylimer_tools::entities::Universe& network,
+                        const std::map<int, int>& functionalityPerType)
 {
   if (network.getNrOfAtoms() == 0) {
-    return 1;
+    return 1.0;
   }
 
-  std::vector<int> allTypes = network.getPropertyValues<int>("type");
+  const std::vector<int> allTypes = network.getPropertyValues<int>("type");
 
   int maxFormableBonds = 0;
 
   // count how often every type occurs
-  for (int type : allTypes) {
-    maxFormableBonds += functionalityPerType[type];
+  for (const int type : allTypes) {
+    maxFormableBonds += functionalityPerType.at(type);
   }
 
-  return network.getNrOfBonds() * 2.0 / static_cast<double>(maxFormableBonds);
+  if (maxFormableBonds == 0) {
+    return 0.0;
+  }
+
+  return static_cast<double>(network.getNrOfBonds()) * 2.0 /
+         static_cast<double>(maxFormableBonds);
 }
 
-double
-computeExtentOfReaction(pylimer_tools::entities::Universe network)
+inline double
+computeExtentOfReaction(const pylimer_tools::entities::Universe& network)
 {
   return computeExtentOfReaction(network,
                                  network.determineFunctionalityPerType());
@@ -116,10 +133,11 @@ Arguments:
 Returns:
   - p_gel: critical extent of reaction for gelation
 */
-double
+inline double
 predictGelationPoint(const double r, const int f, const int g = 2)
 {
-  return 1 / (r * (static_cast<double>(f) - 1) * (static_cast<double>(g) - 1));
+  return std::sqrt(
+    1.0 / (r * (static_cast<double>(f) - 1.0) * (static_cast<double>(g) - 1.0)));
 }
 }
 

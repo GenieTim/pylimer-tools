@@ -72,13 +72,13 @@ public:
 
   void computeAllEigenvaluesGPU(const bool includeEigenvectors = false);
 
-  Eigen::VectorXd getEigenvalues() const;
-  void setEigenvalues(Eigen::VectorXd e);
+  const Eigen::VectorXd& getEigenvalues() const;
+  void setEigenvalues(const Eigen::VectorXd& e);
 
-  Eigen::MatrixXd getEigenvectors() const;
-  void setEigenvectors(Eigen::MatrixXd e);
+  const Eigen::MatrixXd& getEigenvectors() const;
+  void setEigenvectors(const Eigen::MatrixXd& e);
 
-  Eigen::SparseMatrix<double> getAssembledConnectivityMatrix() const;
+  const Eigen::SparseMatrix<double>& getAssembledConnectivityMatrix() const;
 
   Eigen::ArrayXd evaluateStressAutocorrelation(const Eigen::ArrayXd& t) const;
 
@@ -207,6 +207,9 @@ private:
   size_t clusterCount = 0;
   Eigen::VectorXd eigenvalues;
   Eigen::MatrixXd eigenvectors;
+  mutable size_t cachedKPMMoments_{ 0 };
+  mutable size_t cachedKPMVectors_{ 0 };
+  mutable Eigen::VectorXd cachedMu_{};
 
   void solveMatrix(const Eigen::SparseMatrix<double>& mat,
                    NormalModeSolver solver,

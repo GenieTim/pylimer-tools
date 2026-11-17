@@ -84,7 +84,6 @@ init_pylimer_bound_calc(py::module_& m)
          
          :param nr_of_eigenvalues: Number of smallest eigenvalues to find
          :param compute_eigenvectors: Whether to also compute eigenvectors (default: False)
-         :return: True if computation was successful
          )pbdoc",
          py::arg("nr_of_eigenvalues"),
          py::arg("compute_eigenvectors") = false)
@@ -110,7 +109,6 @@ init_pylimer_bound_calc(py::module_& m)
          Find all eigenvalues using a GPU solver (cuSOLVER on CUDA or Metal on Apple Silicon).
          
          :param compute_eigenvectors: Whether to also compute eigenvectors (default: False)
-         :return: True if computation was successful
          )pbdoc",
          py::arg("compute_eigenvectors") = false)
 #endif

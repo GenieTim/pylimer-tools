@@ -286,6 +286,63 @@ TEST_CASE("ResistanceDistanceAnalysis disconnected graph handling",
     CHECK_THAT(res(2), Catch::Matchers::WithinAbs(1.0, 1e-9));
     CHECK(std::isinf(res(3)));
   }
+
+  SECTION("Total resistance per node is infinite and centrality is zero")
+  {
+    Eigen::VectorXd tot = rda.computeTotalResistancePerNode();
+    Eigen::VectorXd centrality = rda.computeResistanceCentrality();
+    for (Eigen::Index i = 0; i < tot.size(); ++i) {
+      CHECK(std::isinf(tot(i)));
+      CHECK_THAT(centrality(i), Catch::Matchers::WithinAbs(0.0, 1e-12));
+    }
+  }
+}
+
+TEST_CASE("ResistanceDistanceAnalysis and RouseBrownianSimulator edge cases "
+          "and input validation",
+          "[topo][sim][ResistanceDistanceAnalysis][RouseBrownianSimulator]")
+{
+  SECTION("Self-loops are ignored in edge count and Laplacian assembly")
+  {
+    std::vector<size_t> from = { 0, 1, 1, 2 };
+    std::vector<size_t> to = { 1, 1, 2, 2 };
+    pt::ResistanceDistanceAnalysis rda(from, to, {}, 3);
+    CHECK(rda.getNrOfNodes() == 3);
+    CHECK(rda.getNrOfEdges() == 2);
+    CHECK_THAT(rda.computeEffectiveResistance(0, 2),
+               Catch::Matchers::WithinAbs(2.0, 1e-9));
+  }
+
+  SECTION("Empty graph is rejected in both classes")
+  {
+    CHECK_THROWS_AS(pt::ResistanceDistanceAnalysis({}, {}, {}, 0),
+                    std::invalid_argument);
+    CHECK_THROWS_AS(ps::RouseBrownianSimulator({}, {}, 1.0, 1.0, 1.0, 0.01, 0),
+                    std::invalid_argument);
+  }
+
+  SECTION("Asymmetric and negative-diagonal Laplacians are rejected")
+  {
+    Eigen::SparseMatrix<double> asymL(2, 2);
+    asymL.insert(0, 0) = 1.0;
+    asymL.insert(0, 1) = -1.0;
+    asymL.insert(1, 1) = 1.0;
+    asymL.makeCompressed();
+
+    CHECK_THROWS_AS(pt::ResistanceDistanceAnalysis(asymL),
+                    std::invalid_argument);
+    CHECK_THROWS_AS(ps::RouseBrownianSimulator(asymL), std::invalid_argument);
+
+    Eigen::SparseMatrix<double> negDiagL(2, 2);
+    negDiagL.insert(0, 0) = -1.0;
+    negDiagL.insert(1, 1) = 1.0;
+    negDiagL.makeCompressed();
+
+    CHECK_THROWS_AS(pt::ResistanceDistanceAnalysis(negDiagL),
+                    std::invalid_argument);
+    CHECK_THROWS_AS(ps::RouseBrownianSimulator(negDiagL),
+                    std::invalid_argument);
+  }
 }
 
 TEST_CASE("ResistanceDistanceAnalysis Moore-Penrose pseudo-inverse properties",

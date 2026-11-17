@@ -28,7 +28,9 @@ RouseBrownianSimulator::RouseBrownianSimulator(
   INVALIDARG_EXP_IFN(dt_ > 0.0, "Time step dt must be positive");
 
   initializeFromEdges(springFrom, springTo, numNodes);
-  positions_ = Eigen::MatrixXd::Zero(numNodes_, 3);
+  positions_ = Eigen::MatrixXd::Zero(static_cast<Eigen::Index>(numNodes_), 3);
+  rhsBuffer_.resize(static_cast<Eigen::Index>(numNodes_), 3);
+  cgSolutionBuffer_.resize(static_cast<Eigen::Index>(numNodes_), 3);
   updateShiftedMatrixAndFactorization();
 }
 
@@ -52,7 +54,23 @@ RouseBrownianSimulator::RouseBrownianSimulator(
   INVALIDARG_EXP_IFN(T_ >= 0.0, "Temperature T must be non-negative");
   INVALIDARG_EXP_IFN(dt_ > 0.0, "Time step dt must be positive");
 
-  positions_ = Eigen::MatrixXd::Zero(numNodes_, 3);
+  const Eigen::SparseMatrix<double> diff =
+    L_ - Eigen::SparseMatrix<double>(L_.transpose());
+  INVALIDARG_EXP_IFN(diff.norm() <= 1e-10 * std::max(1.0, L_.norm()),
+                     "Laplacian matrix L must be symmetric");
+  for (int col = 0; col < L_.outerSize(); ++col) {
+    for (Eigen::SparseMatrix<double>::InnerIterator it(L_, col); it; ++it) {
+      if (it.row() == it.col()) {
+        INVALIDARG_EXP_IFN(
+          it.value() >= 0.0,
+          "Laplacian matrix L must have non-negative diagonal entries");
+      }
+    }
+  }
+
+  positions_ = Eigen::MatrixXd::Zero(static_cast<Eigen::Index>(numNodes_), 3);
+  rhsBuffer_.resize(static_cast<Eigen::Index>(numNodes_), 3);
+  cgSolutionBuffer_.resize(static_cast<Eigen::Index>(numNodes_), 3);
   updateShiftedMatrixAndFactorization();
 }
 
@@ -64,6 +82,8 @@ RouseBrownianSimulator::initializeFromEdges(
 {
   INVALIDARG_EXP_IFN(springFrom.size() == springTo.size(),
                      "springFrom and springTo must have the same size");
+  INVALIDARG_EXP_IFN(springFrom.size() > 0 || numNodes > 0,
+                     "Graph cannot be completely empty");
 
   if (numNodes == 0) {
     size_t maxIdx = 0;
@@ -169,12 +189,12 @@ RouseBrownianSimulator::solveShiftedRHS(const Eigen::MatrixXd& rhs,
       result = lltSolver_.solve(rhs);
       break;
     case RouseSolverType::CONJUGATE_GRADIENT: {
-      Eigen::MatrixXd nextPos(numNodes_, 3);
+      cgSolutionBuffer_.resize(static_cast<Eigen::Index>(numNodes_), 3);
       for (int c = 0; c < 3; ++c) {
-        nextPos.col(c) =
+        cgSolutionBuffer_.col(c) =
           cgSolver_.solveWithGuess(rhs.col(c), positions_.col(c));
       }
-      result = nextPos;
+      result.noalias() = cgSolutionBuffer_;
       break;
     }
     default:
@@ -324,21 +344,21 @@ RouseBrownianSimulator::initializeRandomWalk(double bondLength, uint64_t seed)
 void
 RouseBrownianSimulator::step(size_t numSteps)
 {
-  double D = getDiffusionCoefficient();
-  double sigma = (T_ > 0.0) ? std::sqrt(2.0 * D * dt_) : 0.0;
-  Eigen::MatrixXd rhs(numNodes_, 3);
+  const double D = getDiffusionCoefficient();
+  const double sigma = (T_ > 0.0) ? std::sqrt(2.0 * D * dt_) : 0.0;
+  rhsBuffer_.resize(static_cast<Eigen::Index>(numNodes_), 3);
 
   for (size_t s = 0; s < numSteps; ++s) {
     if (sigma > 0.0) {
-      for (Eigen::Index i = 0; i < numNodes_; ++i) {
-        rhs(i, 0) = positions_(i, 0) + sigma * normalDist_(rng_);
-        rhs(i, 1) = positions_(i, 1) + sigma * normalDist_(rng_);
-        rhs(i, 2) = positions_(i, 2) + sigma * normalDist_(rng_);
+      for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(numNodes_); ++i) {
+        rhsBuffer_(i, 0) = positions_(i, 0) + sigma * normalDist_(rng_);
+        rhsBuffer_(i, 1) = positions_(i, 1) + sigma * normalDist_(rng_);
+        rhsBuffer_(i, 2) = positions_(i, 2) + sigma * normalDist_(rng_);
       }
     } else {
-      rhs = positions_;
+      rhsBuffer_.noalias() = positions_;
     }
-    solveShiftedRHS(rhs, positions_);
+    solveShiftedRHS(rhsBuffer_, positions_);
   }
 }
 
@@ -350,35 +370,35 @@ RouseBrownianSimulator::stepWithExternalForces(const Eigen::MatrixXd& forces,
     forces.rows() == numNodes_ && forces.cols() == 3,
     "External forces matrix must have dimensions (numNodes, 3)");
 
-  double D = getDiffusionCoefficient();
-  double sigma = (T_ > 0.0) ? std::sqrt(2.0 * D * dt_) : 0.0;
-  double forceCoeff = dt_ / gamma_;
-  Eigen::MatrixXd rhs(numNodes_, 3);
+  const double D = getDiffusionCoefficient();
+  const double sigma = (T_ > 0.0) ? std::sqrt(2.0 * D * dt_) : 0.0;
+  const double forceCoeff = dt_ / gamma_;
+  rhsBuffer_.resize(static_cast<Eigen::Index>(numNodes_), 3);
 
   for (size_t s = 0; s < numSteps; ++s) {
     if (sigma > 0.0) {
-      for (Eigen::Index i = 0; i < numNodes_; ++i) {
-        rhs(i, 0) = positions_(i, 0) + forceCoeff * forces(i, 0) +
-                    sigma * normalDist_(rng_);
-        rhs(i, 1) = positions_(i, 1) + forceCoeff * forces(i, 1) +
-                    sigma * normalDist_(rng_);
-        rhs(i, 2) = positions_(i, 2) + forceCoeff * forces(i, 2) +
-                    sigma * normalDist_(rng_);
+      for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(numNodes_); ++i) {
+        rhsBuffer_(i, 0) = positions_(i, 0) + forceCoeff * forces(i, 0) +
+                           sigma * normalDist_(rng_);
+        rhsBuffer_(i, 1) = positions_(i, 1) + forceCoeff * forces(i, 1) +
+                           sigma * normalDist_(rng_);
+        rhsBuffer_(i, 2) = positions_(i, 2) + forceCoeff * forces(i, 2) +
+                           sigma * normalDist_(rng_);
       }
     } else {
-      rhs = positions_ + forceCoeff * forces;
+      rhsBuffer_.noalias() = positions_ + forceCoeff * forces;
     }
-    solveShiftedRHS(rhs, positions_);
+    solveShiftedRHS(rhsBuffer_, positions_);
   }
 }
 
 void
 RouseBrownianSimulator::stepDeterministic(size_t numSteps)
 {
-  Eigen::MatrixXd rhs(numNodes_, 3);
+  rhsBuffer_.resize(static_cast<Eigen::Index>(numNodes_), 3);
   for (size_t s = 0; s < numSteps; ++s) {
-    rhs = positions_;
-    solveShiftedRHS(rhs, positions_);
+    rhsBuffer_.noalias() = positions_;
+    solveShiftedRHS(rhsBuffer_, positions_);
   }
 }
 
@@ -391,11 +411,11 @@ RouseBrownianSimulator::stepDeterministicWithExternalForces(
     forces.rows() == numNodes_ && forces.cols() == 3,
     "External forces matrix must have dimensions (numNodes, 3)");
 
-  double forceCoeff = dt_ / gamma_;
-  Eigen::MatrixXd rhs(numNodes_, 3);
+  const double forceCoeff = dt_ / gamma_;
+  rhsBuffer_.resize(static_cast<Eigen::Index>(numNodes_), 3);
   for (size_t s = 0; s < numSteps; ++s) {
-    rhs = positions_ + forceCoeff * forces;
-    solveShiftedRHS(rhs, positions_);
+    rhsBuffer_.noalias() = positions_ + forceCoeff * forces;
+    solveShiftedRHS(rhsBuffer_, positions_);
   }
 }
 
@@ -430,7 +450,7 @@ RouseBrownianSimulator::getRadiusOfGyration() const
   if (numNodes_ <= 1) {
     return 0.0;
   }
-  Eigen::Vector3d cm = getCenterOfMass();
+  const Eigen::Vector3d cm = getCenterOfMass();
   double rgSq = 0.0;
   for (Eigen::Index i = 0; i < numNodes_; ++i) {
     rgSq += (positions_.row(i).transpose() - cm).squaredNorm();
@@ -443,7 +463,7 @@ RouseBrownianSimulator::getPotentialEnergy() const
 {
   double u = 0.0;
   for (int c = 0; c < 3; ++c) {
-    Eigen::VectorXd Lr = L_ * positions_.col(c);
+    const Eigen::VectorXd Lr = L_ * positions_.col(c);
     u += positions_.col(c).dot(Lr);
   }
   return 0.5 * k_ * u;
@@ -461,7 +481,7 @@ RouseBrownianSimulator::run(size_t totalSteps,
     endToEndNodeB = static_cast<size_t>(numNodes_ - 1);
   }
 
-  size_t numSamples = totalSteps / sampleInterval + 1;
+  const size_t numSamples = totalSteps / sampleInterval + 1;
   RouseSimulationResult result;
   result.times = Eigen::VectorXd::Zero(static_cast<Eigen::Index>(numSamples));
   result.msd = Eigen::VectorXd::Zero(static_cast<Eigen::Index>(numSamples));
@@ -474,10 +494,11 @@ RouseBrownianSimulator::run(size_t totalSteps,
     result.trajectory.reserve(numSamples);
   }
 
-  Eigen::MatrixXd initialPos = positions_;
-  Eigen::Vector3d initialCM = getCenterOfMass();
-  Eigen::Vector3d initialR_ee = getEndToEndVector(endToEndNodeA, endToEndNodeB);
-  double initialR_eeSq = initialR_ee.squaredNorm();
+  const Eigen::MatrixXd initialPos = positions_;
+  const Eigen::Vector3d initialCM = getCenterOfMass();
+  const Eigen::Vector3d initialR_ee =
+    getEndToEndVector(endToEndNodeA, endToEndNodeB);
+  const double initialR_eeSq = initialR_ee.squaredNorm();
 
   // Record t = 0
   result.times(0) = 0.0;
@@ -488,13 +509,17 @@ RouseBrownianSimulator::run(size_t totalSteps,
     result.trajectory.push_back(positions_);
   }
 
+  size_t currentStep = 0;
   const Eigen::Index numSamplesIdx = static_cast<Eigen::Index>(numSamples);
   Eigen::Index sampleIdx = 1;
-  for (size_t stepIdx = 1; stepIdx <= totalSteps; ++stepIdx) {
-    step(1);
+  while (currentStep < totalSteps) {
+    const size_t stepsToTake =
+      std::min(sampleInterval, totalSteps - currentStep);
+    step(stepsToTake);
+    currentStep += stepsToTake;
 
-    if (stepIdx % sampleInterval == 0 && sampleIdx < numSamplesIdx) {
-      double t = static_cast<double>(stepIdx) * dt_;
+    if (currentStep % sampleInterval == 0 && sampleIdx < numSamplesIdx) {
+      const double t = static_cast<double>(currentStep) * dt_;
       result.times(sampleIdx) = t;
 
       // Bead MSD: (1/N) * sum_i |r_i(t) - r_i(0)|^2
@@ -505,11 +530,12 @@ RouseBrownianSimulator::run(size_t totalSteps,
       result.msd(sampleIdx) = msdVal / static_cast<double>(numNodes_);
 
       // Center of mass MSD: |r_cm(t) - r_cm(0)|^2
-      Eigen::Vector3d curCM = getCenterOfMass();
+      const Eigen::Vector3d curCM = getCenterOfMass();
       result.msdCenterOfMass(sampleIdx) = (curCM - initialCM).squaredNorm();
 
       // End-to-end vector autocorrelation: <R_ee(t) . R_ee(0)> / |R_ee(0)|^2
-      Eigen::Vector3d curR_ee = getEndToEndVector(endToEndNodeA, endToEndNodeB);
+      const Eigen::Vector3d curR_ee =
+        getEndToEndVector(endToEndNodeA, endToEndNodeB);
       if (initialR_eeSq > 1e-12) {
         result.endToEndCorrelation(sampleIdx) =
           curR_ee.dot(initialR_ee) / initialR_eeSq;

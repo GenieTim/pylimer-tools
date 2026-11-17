@@ -74,6 +74,9 @@ NormalModeAnalyzer::NormalModeAnalyzer(const std::vector<size_t>& springFrom,
     // some sanity checks
     assert(springFrom[i] < nRows);
     assert(springTo[i] < nRows);
+    if (springFrom[i] == springTo[i]) {
+      continue;
+    }
     // triplets will be summed up -> we can use the same indices multiple
     // times
     triplets.push_back(Eigen::Triplet<double>(
@@ -104,9 +107,32 @@ NormalModeAnalyzer::findSparseEigenvalues(const size_t nrOfEigenvalues,
 {
   INVALIDARG_EXP_IFN(nrOfEigenvalues > 0,
                      "nrOfEigenvalues must be greater than 0");
-  size_t n = static_cast<size_t>(this->assembledConnectivityMatrix.rows());
+  const size_t n = static_cast<size_t>(this->assembledConnectivityMatrix.rows());
   INVALIDARG_EXP_IFN(nrOfEigenvalues < n,
                      "nrOfEigenvalues must be less than matrix size");
+
+  auto storeSortedResults = [&](const Eigen::VectorXd& rawEvals,
+                                const Eigen::MatrixXd& rawEvecs) {
+    std::vector<Eigen::Index> order(static_cast<size_t>(rawEvals.size()));
+    std::iota(order.begin(), order.end(), 0);
+    std::sort(order.begin(),
+              order.end(),
+              [&rawEvals](const Eigen::Index a, const Eigen::Index b) {
+                return rawEvals[a] < rawEvals[b];
+              });
+    Eigen::VectorXd sortedEvals(rawEvals.size());
+    for (size_t i = 0; i < order.size(); ++i) {
+      sortedEvals[static_cast<Eigen::Index>(i)] = rawEvals[order[i]];
+    }
+    this->setEigenvalues(sortedEvals);
+    if (includeEigenvectors) {
+      Eigen::MatrixXd sortedEvecs(rawEvecs.rows(), rawEvecs.cols());
+      for (size_t i = 0; i < order.size(); ++i) {
+        sortedEvecs.col(static_cast<Eigen::Index>(i)) = rawEvecs.col(order[i]);
+      }
+      this->setEigenvectors(sortedEvecs);
+    }
+  };
 
   try {
     Spectra::SparseSymShiftSolve<double> op(this->assembledConnectivityMatrix);
@@ -122,10 +148,9 @@ NormalModeAnalyzer::findSparseEigenvalues(const size_t nrOfEigenvalues,
     eigs.init();
     eigs.compute(Spectra::SortRule::LargestMagn);
     if (eigs.info() == Spectra::CompInfo::Successful) {
-      this->setEigenvalues(eigs.eigenvalues());
-      if (includeEigenvectors) {
-        this->setEigenvectors(eigs.eigenvectors());
-      }
+      storeSortedResults(
+        eigs.eigenvalues(),
+        includeEigenvectors ? eigs.eigenvectors() : Eigen::MatrixXd());
       return;
     }
   } catch (...) {
@@ -148,10 +173,9 @@ NormalModeAnalyzer::findSparseEigenvalues(const size_t nrOfEigenvalues,
 
   RUNTIME_EXP_IFN(eigs.info() == Spectra::CompInfo::Successful,
                   "Spectra failed to compute sparse eigenvalues");
-  this->setEigenvalues(eigs.eigenvalues());
-  if (includeEigenvectors) {
-    this->setEigenvectors(eigs.eigenvectors());
-  }
+  storeSortedResults(
+    eigs.eigenvalues(),
+    includeEigenvectors ? eigs.eigenvectors() : Eigen::MatrixXd());
 };
 
 void
@@ -657,7 +681,10 @@ NormalModeAnalyzer::computeAllEigenvalues(const NormalModeSolver solver,
   if (includeEigenvectors) {
     std::sort(evalEvecPairs.begin(),
               evalEvecPairs.end(),
-              [](const auto& a, const auto& b) { return a.first < b.first; });
+              [](const std::pair<double, Eigen::VectorXd>& a,
+                 const std::pair<double, Eigen::VectorXd>& b) {
+                return a.first < b.first;
+              });
     Eigen::VectorXd finalEvals(nRows);
     Eigen::MatrixXd finalEvecs(nRows, nRows);
     const Eigen::Index numPairs =
@@ -833,7 +860,7 @@ NormalModeAnalyzer::requireEigenvaluesComputation() const
                   "Eigenvalues have not been computed yet");
 }
 
-Eigen::VectorXd
+const Eigen::VectorXd&
 NormalModeAnalyzer::getEigenvalues() const
 {
   this->requireEigenvaluesComputation();
@@ -841,8 +868,13 @@ NormalModeAnalyzer::getEigenvalues() const
 }
 
 void
-NormalModeAnalyzer::setEigenvalues(const Eigen::VectorXd newEigenvalues)
+NormalModeAnalyzer::setEigenvalues(const Eigen::VectorXd& newEigenvalues)
 {
+  if (this->assembledConnectivityMatrix.rows() > 0) {
+    INVALIDARG_EXP_IFN(
+      newEigenvalues.size() <= this->assembledConnectivityMatrix.rows(),
+      "Number of eigenvalues cannot exceed connectivity matrix size.");
+  }
   this->eigenvalues = newEigenvalues;
   for (Eigen::Index i = 0; i < this->eigenvalues.size(); ++i) {
     if (std::abs(this->eigenvalues[i]) < NORMAL_MODE_ZERO_TOLERANCE) {
@@ -851,8 +883,6 @@ NormalModeAnalyzer::setEigenvalues(const Eigen::VectorXd newEigenvalues)
   }
   this->isEigenvaluesComputed = true;
   this->clusterCount = this->countSolubleClusters();
-
-  // TODO: possibly validate vector dimensions
 }
 
 void
@@ -862,7 +892,7 @@ NormalModeAnalyzer::requireEigenvectorsComputation() const
                   "Eigenvectors have not been computed yet");
 }
 
-Eigen::MatrixXd
+const Eigen::MatrixXd&
 NormalModeAnalyzer::getEigenvectors() const
 {
   this->requireEigenvectorsComputation();
@@ -870,11 +900,19 @@ NormalModeAnalyzer::getEigenvectors() const
 }
 
 void
-NormalModeAnalyzer::setEigenvectors(const Eigen::MatrixXd newEigenvectors)
+NormalModeAnalyzer::setEigenvectors(const Eigen::MatrixXd& newEigenvectors)
 {
+  if (newEigenvectors.size() > 0 &&
+      this->assembledConnectivityMatrix.rows() > 0) {
+    INVALIDARG_EXP_IFN(
+      newEigenvectors.rows() == this->assembledConnectivityMatrix.rows(),
+      "Eigenvector matrix row count must match connectivity matrix size.");
+    INVALIDARG_EXP_IFN(
+      newEigenvectors.cols() <= newEigenvectors.rows(),
+      "Eigenvector matrix column count cannot exceed row count.");
+  }
   this->eigenvectors = newEigenvectors;
   this->isEigenvectorsComputed = true;
-  // TODO: possibly validate matrix dimensions
 }
 
 size_t
@@ -891,7 +929,7 @@ NormalModeAnalyzer::getNrOfSolubleClusters() const
   return this->clusterCount;
 }
 
-Eigen::SparseMatrix<double>
+const Eigen::SparseMatrix<double>&
 NormalModeAnalyzer::getAssembledConnectivityMatrix() const
 {
   return this->assembledConnectivityMatrix;
@@ -1066,6 +1104,9 @@ NormalModeAnalyzer::computeChebyshevMomentsKPM(size_t numMoments,
 
   avgMoments /= static_cast<double>(numRandomVectors);
   avgMoments.array() *= computeJacksonKernel(numMoments).array();
+  this->cachedKPMMoments_ = numMoments;
+  this->cachedKPMVectors_ = numRandomVectors;
+  this->cachedMu_ = avgMoments;
   return avgMoments;
 }
 
@@ -1079,13 +1120,18 @@ NormalModeAnalyzer::computeChebyshevMomentsKPMMetal(size_t numMoments,
     std::pair<double, double> scaling = getSpectralScalingParameters(0.01);
     const double c = scaling.first;
     const double w = scaling.second;
-    return pylimer_tools::calc::computeChebyshevMomentsKPMMetal(
-      this->assembledConnectivityMatrix,
-      numMoments,
-      numRandomVectors,
-      c,
-      w,
-      batchSize);
+    Eigen::VectorXd moments =
+      pylimer_tools::calc::computeChebyshevMomentsKPMMetal(
+        this->assembledConnectivityMatrix,
+        numMoments,
+        numRandomVectors,
+        c,
+        w,
+        batchSize);
+    this->cachedKPMMoments_ = numMoments;
+    this->cachedKPMVectors_ = numRandomVectors;
+    this->cachedMu_ = moments;
+    return moments;
   }
 #endif
   (void)batchSize;
@@ -1100,25 +1146,32 @@ NormalModeAnalyzer::computeEffectiveSpectrumKPM(
   std::vector<double>& lambdaNodes,
   std::vector<double>& deltaN) const
 {
-  Eigen::Index n = this->assembledConnectivityMatrix.rows();
+  const Eigen::Index n = this->assembledConnectivityMatrix.rows();
   if (n == 0 || numMoments == 0 || numQuadraturePoints == 0)
     return;
 
-  std::pair<double, double> scaling = getSpectralScalingParameters(0.01);
+  const std::pair<double, double> scaling = getSpectralScalingParameters(0.01);
   const double c = scaling.first;
   const double w = scaling.second;
-  Eigen::VectorXd mu =
-    computeChebyshevMomentsKPMMetal(numMoments, numRandomVectors);
+  if (this->cachedKPMMoments_ != numMoments ||
+      this->cachedKPMVectors_ != numRandomVectors ||
+      this->cachedMu_.size() != static_cast<Eigen::Index>(numMoments)) {
+    this->cachedMu_ =
+      computeChebyshevMomentsKPMMetal(numMoments, numRandomVectors);
+    this->cachedKPMMoments_ = numMoments;
+    this->cachedKPMVectors_ = numRandomVectors;
+  }
+  const Eigen::VectorXd& mu = this->cachedMu_;
 
-  size_t Q = numQuadraturePoints;
+  const size_t Q = numQuadraturePoints;
   lambdaNodes.reserve(Q);
   deltaN.reserve(Q);
 
   for (size_t k = 1; k <= Q; ++k) {
-    double theta_k =
+    const double theta_k =
       (static_cast<double>(k) - 0.5) * M_PI / static_cast<double>(Q);
-    double x_k = std::cos(theta_k);
-    double lam_k = c + w * x_k;
+    const double x_k = std::cos(theta_k);
+    const double lam_k = c + w * x_k;
     if (lam_k <= 1e-4)
       continue;
 
@@ -1127,7 +1180,7 @@ NormalModeAnalyzer::computeEffectiveSpectrumKPM(
     for (Eigen::Index m = 1; m < numMomentsIdx; ++m) {
       sum += 2.0 * mu[m] * std::cos(static_cast<double>(m) * theta_k);
     }
-    double dn =
+    const double dn =
       (static_cast<double>(n) / static_cast<double>(Q)) * std::max(0.0, sum);
     lambdaNodes.push_back(lam_k);
     deltaN.push_back(dn);
@@ -1139,15 +1192,22 @@ NormalModeAnalyzer::computeDensityOfStatesKPM(const Eigen::ArrayXd& lambdaGrid,
                                               size_t numMoments,
                                               size_t numRandomVectors) const
 {
-  Eigen::Index n = this->assembledConnectivityMatrix.rows();
+  const Eigen::Index n = this->assembledConnectivityMatrix.rows();
   if (n == 0)
     return Eigen::ArrayXd::Zero(lambdaGrid.size());
 
-  std::pair<double, double> scaling = getSpectralScalingParameters(0.01);
+  const std::pair<double, double> scaling = getSpectralScalingParameters(0.01);
   const double c = scaling.first;
   const double w = scaling.second;
-  Eigen::VectorXd mu =
-    computeChebyshevMomentsKPMMetal(numMoments, numRandomVectors);
+  if (this->cachedKPMMoments_ != numMoments ||
+      this->cachedKPMVectors_ != numRandomVectors ||
+      this->cachedMu_.size() != static_cast<Eigen::Index>(numMoments)) {
+    this->cachedMu_ =
+      computeChebyshevMomentsKPMMetal(numMoments, numRandomVectors);
+    this->cachedKPMMoments_ = numMoments;
+    this->cachedKPMVectors_ = numRandomVectors;
+  }
+  const Eigen::VectorXd& mu = this->cachedMu_;
 
   Eigen::ArrayXd dos = Eigen::ArrayXd::Zero(lambdaGrid.size());
   for (Eigen::Index i = 0; i < lambdaGrid.size(); ++i) {

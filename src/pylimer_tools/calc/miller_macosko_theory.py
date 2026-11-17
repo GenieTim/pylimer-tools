@@ -329,9 +329,6 @@ def compute_weight_fraction_of_soluble_material(
     :param b2: The mole fraction of reactive sites in B2 among all reactive sites
         in a mixture of B1 and B2
     :return: :math:`W_{sol}` (float): The weight fraction of soluble material according to MMT.
-    :return: weight_fractions (dict): a dictionary with key: type, and value: weight fraction of type
-    :return: :math:`\\alpha` (float): Macosko & Miller's :math:`P(F_A)`
-    :return: :math:`\\beta` (float): Macosko & Miller's :math:`P(F_B)`
     """
     if network is not None and network.get_nr_of_bonds() == 0:
         return 1.0
@@ -370,7 +367,7 @@ def compute_weight_fraction_of_soluble_material(
 
 def compute_weight_fraction_of_soluble_material_from_weight_fractions(
     r: float, p: float, f: int, w_f: float, w_g: float, g: int = 2
-):
+) -> float:
     """
     Use MMT to compute the weight fraction of soluble material using
 
@@ -388,7 +385,9 @@ def compute_weight_fraction_of_soluble_material_from_weight_fractions(
     return w_f * (alpha**f) + w_g * ((r * p * (alpha ** (f - 1)) + 1 - r * p) ** g)
 
 
-def compute_miller_macosko_probabilities(r: float, p: float, f: int, b2: float = 1.0):
+def compute_miller_macosko_probabilities(
+    r: float, p: float, f: int, b2: float = 1.0
+) -> Tuple[float, float]:
     """
     Compute Macosko and Miller's probabilities :math:`P(F_A)` and :math:`P(F_B)`
     i.e., the probability that a randomly chosen A (crosslink) or B (strand-end),
@@ -890,7 +889,7 @@ def predict_p_from_w_sol(
     weight_fractions: Union[dict, None] = None,
     r: Union[float, None] = None,
     b2: Union[float, None] = None,
-):
+) -> float:
     """
     Compute the extent of reaction based on the weight fraction of soluble material.
 
@@ -957,7 +956,7 @@ def predict_p_from_w_sol(
     return res.x
 
 
-def _validate_r_and_p(r: float, p: float, f: int):
+def _validate_r_and_p(r: float, p: float, f: int) -> None:
     """
     Validate the parameters used in Miller-Macosko theory calculations.
 
@@ -1134,8 +1133,10 @@ def _compute_validate_parameters(
     def _can_be_computed(param: _ParamValidatorAssembler) -> bool:
         return all(_param_is_ready(dep) for dep in param.dependencies)
 
-    def _validate(param_name: str):
-        if not _validator_per_name[param_name].param_validator(given_parameters[p]):
+    def _validate(param_name: str) -> None:
+        if not _validator_per_name[param_name].param_validator(
+            given_parameters[param_name]
+        ):
             raise ValueError(
                 "Invalid value for parameter '{}' (got {}).".format(
                     param_name, given_parameters[param_name]

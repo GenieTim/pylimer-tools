@@ -8,9 +8,11 @@ import numpy as np
 from pint import UnitRegistry
 
 from pylimer_tools.calc.miller_macosko_theory import (
+    _compute_validate_parameters,
     compute_miller_macosko_probabilities,
     compute_modulus_decomposition,
     compute_weight_fraction_of_soluble_material,
+    compute_weight_fraction_of_soluble_material_from_weight_fractions,
     predict_gelation_point,
     predict_number_density_of_junction_points,
     predict_p_from_w_sol,
@@ -330,6 +332,30 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
             1.0,
             3,
         )
+        # Verify compute_weight_fraction_of_soluble_material_from_weight_fractions
+        w_sol_dict = compute_weight_fraction_of_soluble_material(
+            network=None,
+            crosslinker_type=2,
+            functionality_per_type={1: 2, 2: 4},
+            weight_fractions={1: 0.85, 2: 0.15},
+            r=1.0,
+            p=0.95,
+            b2=1.0,
+        )
+        w_sol_direct = (
+            compute_weight_fraction_of_soluble_material_from_weight_fractions(
+                r=1.0, p=0.95, f=4, w_f=0.15, w_g=0.85, g=2
+            )
+        )
+        self.assertAlmostEqual(w_sol_dict, w_sol_direct, places=10)
+
+        # Verify parameter validation error handling in _compute_validate_parameters
+        with self.assertRaises(ValueError):
+            _compute_validate_parameters({"r": -0.5, "p": 0.9}, ["r", "p"])
+        with self.assertRaises(ValueError):
+            _compute_validate_parameters({"r": 1.0, "p": 1.5}, ["r", "p"])
+        with self.assertRaises(ValueError):
+            _compute_validate_parameters({}, ["r", "p"])
 
     # def testProbabilityCalculations(self):
     #     self.assertRaises(

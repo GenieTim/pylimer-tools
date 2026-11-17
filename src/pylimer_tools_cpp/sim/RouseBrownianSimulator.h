@@ -180,6 +180,8 @@ private:
   Eigen::SparseMatrix<double> L_{};
   Eigen::SparseMatrix<double> A_{};
   Eigen::MatrixXd positions_{};
+  Eigen::MatrixXd rhsBuffer_{};
+  Eigen::MatrixXd cgSolutionBuffer_{};
 
   mutable Eigen::SimplicialLDLT<Eigen::SparseMatrix<double>> ldltSolver_{};
   mutable Eigen::SimplicialLLT<Eigen::SparseMatrix<double>> lltSolver_{};
