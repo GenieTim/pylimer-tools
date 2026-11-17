@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**06:02.295** total execution time for 40 files **from all galleries**:
+**06:16.983** total execution time for 41 files **from all galleries**:
 
 .. container::
 
@@ -42,7 +42,10 @@ Computation times
      - 00:22.267
      - 0.0
    * - :ref:`sphx_glr_auto_examples_normal_mode_analysis_plot_normal_mode_analysis.py` (``../examples/normal_mode_analysis/plot_normal_mode_analysis.py``)
-     - 00:15.722
+     - 00:17.656
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_normal_mode_analysis_plot_kpm_vs_exact_pdms.py` (``../examples/normal_mode_analysis/plot_kpm_vs_exact_pdms.py``)
+     - 00:12.754
      - 0.0
    * - :ref:`sphx_glr_auto_examples_dpd_simulations_plot_dpd_simulation.py` (``../examples/dpd_simulations/plot_dpd_simulation.py``)
      - 00:04.992

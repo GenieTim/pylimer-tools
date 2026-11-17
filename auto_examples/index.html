@@ -261,6 +261,7 @@
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="normal_mode_analysis/index.html">Normal Mode Analysis</a><input aria-label="Toggle navigation of Normal Mode Analysis" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="normal_mode_analysis/plot_normal_mode_analysis.html">Normal Mode Analysis (NMA)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="normal_mode_analysis/plot_kpm_vs_exact_pdms.html">KPM vs. Full Eigenvalue Normal Mode Analysis for PDMS Networks</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="readers_writers/index.html">File I/O: Readers &amp; Writers</a><input aria-label="Toggle navigation of File I/O: Readers &amp; Writers" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
@@ -562,9 +563,15 @@ the current implementation is more powerful, as needed for <span class="bibtex-c
 as published in <span class="bibtex-citation" id="id8">Gusev and Bernhard [<a class="reference internal" href="../acknowledgements.html#id7" title="Andrei A. Gusev and Tim Bernhard. Molecular Model for Linear Viscoelastic Properties of Entangled Polymer Networks. Macromolecules, 57(21):10152–10163, November 2024. doi:10.1021/acs.macromol.4c01429.">GB24</a>]</span>.
 This is useful for understanding the viscoelastic properties of the network.
 The corresponding class is <a class="reference internal" href="../api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer" title="pylimer_tools_cpp.NormalModeAnalyzer"><code class="xref py py-class docutils literal notranslate"><span class="pre">NormalModeAnalyzer</span></code></a>.</p>
+<p>See <span class="xref std std-doc">plot_kpm_vs_exact_pdms</span> for a large-scale comparison of the Kernel Polynomial Method (KPM)
+against full eigenvalue decomposition on realistic PDMS networks generated via Monte Carlo with
+on-demand entanglement sampling.</p>
 <div id='sg-tag-list' class='sphx-glr-tag-list'></div><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the NormalModeAnalyzer in pylimer-tools to predict the loss and storage modulus of polymer networks using exact eigenvalue solvers or the Kernel Polynomial Method (KPM)."><img alt="" src="../_images/sphx_glr_plot_normal_mode_analysis_thumb.png" />
 <p><a class="reference internal" href="normal_mode_analysis/plot_normal_mode_analysis.html"><span class="doc">Normal Mode Analysis (NMA)</span></a></p>
   <div class="sphx-glr-thumbnail-title">Normal Mode Analysis (NMA)</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Normal Mode Analysis (NMA) in NormalModeAnalyzer predicts the linear viscoelastic storage modulus G&#x27;(\omega) and loss modulus G&#x27;&#x27;(\omega) of entangled polymer networks from their bead-spring connectivity graph (gusev_molecular_2024). Computing the full eigenvalue spectrum scales as \mathcal{O}(N_{\text{atoms}}^3), which quickly becomes prohibitive for realistic representative volume elements (RVEs). The Kernel Polynomial Method (KPM) approximates the spectral density using Chebyshev moments and stochastic trace estimation in \mathcal{O}(N_{\text{atoms}}) time."><img alt="" src="../_images/sphx_glr_plot_kpm_vs_exact_pdms_thumb.png" />
+<p><a class="reference internal" href="normal_mode_analysis/plot_kpm_vs_exact_pdms.html"><span class="doc">KPM vs. Full Eigenvalue Normal Mode Analysis for PDMS Networks</span></a></p>
+  <div class="sphx-glr-thumbnail-title">KPM vs. Full Eigenvalue Normal Mode Analysis for PDMS Networks</div>
 </div></div></section>
 <section id="file-i-o-readers-writers">
 <h2>File I/O: Readers &amp; Writers<a class="headerlink" href="#file-i-o-readers-writers" title="Link to this heading">¶</a></h2>

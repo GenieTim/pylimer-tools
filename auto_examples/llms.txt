@@ -34,6 +34,7 @@
 - [NOTE](network_generator/plot_tetra_peg_network.html.md): Go to the end
 - [Normal Mode Analysis](normal_mode_analysis/index.html.md): pylimer-tools provides a normal mode analysis (NMA) implementation to predict the loss and storage m...
 - [NOTE](normal_mode_analysis/plot_normal_mode_analysis.html.md): Go to the end
+- [NOTE](normal_mode_analysis/plot_kpm_vs_exact_pdms.html.md): Go to the end
 - [File I/O: Readers &amp; Writers](readers_writers/index.html.md): pylimer-tools provides comprehensive support for reading and writing various LAMMPS file formats, en...
 - [NOTE](readers_writers/plot_pylimer_tools_output_reader.html.md): Go to the end
 - [NOTE](readers_writers/plot_histogram_reader.html.md): Go to the end
@@ -58,7 +59,7 @@
 - [Computation times](dpd_simulations/sg_execution_times.html.md): &#42;&#42;00:04.992&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/dpd_simulations&#42;&#42;:
 - [Computation times](force_balance/sg_execution_times.html.md): &#42;&#42;00:13.124&#42;&#42; total execution time for 11 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
 - [Computation times](network_generator/sg_execution_times.html.md): &#42;&#42;01:02.370&#42;&#42; total execution time for 9 files &#42;&#42;from auto_examples/network_generator&#42;&#42;:
-- [Computation times](normal_mode_analysis/sg_execution_times.html.md): &#42;&#42;00:15.722&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/normal_mode_analysis&#42;&#42;:
+- [Computation times](normal_mode_analysis/sg_execution_times.html.md): &#42;&#42;00:30.411&#42;&#42; total execution time for 2 files &#42;&#42;from auto_examples/normal_mode_analysis&#42;&#42;:
 - [Computation times](readers_writers/sg_execution_times.html.md): &#42;&#42;00:05.625&#42;&#42; total execution time for 13 files &#42;&#42;from auto_examples/readers_writers&#42;&#42;:
 - [Computation times](sg_execution_times.html.md): &#42;&#42;00:00.000&#42;&#42; total execution time for 0 files &#42;&#42;from auto_examples&#42;&#42;:
 - [Computation times](structure_analysis/sg_execution_times.html.md): &#42;&#42;00:00.369&#42;&#42; total execution time for 4 files &#42;&#42;from auto_examples/structure_analysis&#42;&#42;:
