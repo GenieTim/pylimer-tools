@@ -34,7 +34,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx_paramlinks.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx_paramlinks.css?v=dd72e65a" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=bafda8c6" />
     
@@ -240,6 +240,7 @@
 <li class="toctree-l3"><a class="reference internal" href="force_balance/plot_sampling_cutoff_effect.html">Sampling Cut-Off Effect</a></li>
 <li class="toctree-l3"><a class="reference internal" href="force_balance/plot_inactive_removal_and_sampling.html">Inactive Removal &amp; Sampling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="force_balance/plot_entanglement_sampling_comparison.html">Entanglement Sampling Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="force_balance/plot_representative_volume_pdms.html">Representative Volume Study for PDMS Networks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="force_balance/plot_fb_deformation_exp.html">Deformation Experiment</a></li>
 <li class="toctree-l3"><a class="reference internal" href="force_balance/plot_force_balance.html">Force Balance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="force_balance/plot_force_balance_2.html">Force Balance 2</a></li>
@@ -470,8 +471,9 @@ This is useful for predicting the (phantom) equilibrium shear modulus of the net
 <li><p><span class="xref std std-doc">plot_entanglement_link_vs_spring</span> for the difference between modeling entanglements as rigid merged links versus compliant Hookean springs in Force Balance 2,</p></li>
 <li><p><span class="xref std std-doc">plot_slipping_vs_fixed_links</span> for a comparison of dynamic contour slipping versus fixed entanglement links in Force Balance 1, and</p></li>
 <li><p><span class="xref std std-doc">plot_inactive_removal_and_sampling</span> for the removal of inactive strands/entanglements in Force Balance 2 and the impact of pre-filtering dangling chains during entanglement sampling,</p></li>
-<li><p><span class="xref std std-doc">plot_polydispersity_study</span> for the effect of precursor strand length polydispersity on equilibrium shear modulus and defect fractions, and</p></li>
-<li><p><span class="xref std std-doc">plot_sampling_cutoff_effect</span> for the effect of the slip-link sampling cut-off distance on the equilibrium shear modulus in Force Balance 2, investigating pre-strain distortions, link vs. spring representations, and interactions with strand length <span class="math notranslate nohighlight">\(N\)</span>, conversion <span class="math notranslate nohighlight">\(p\)</span>, and stoichiometric imbalance <span class="math notranslate nohighlight">\(r\)</span>.</p></li>
+<li><p><span class="xref std std-doc">plot_polydispersity_study</span> for the effect of precursor strand length polydispersity on equilibrium shear modulus and defect fractions,</p></li>
+<li><p><span class="xref std std-doc">plot_sampling_cutoff_effect</span> for the effect of the slip-link sampling cut-off distance on the equilibrium shear modulus in Force Balance 2, investigating pre-strain distortions, link vs. spring representations, and interactions with strand length <span class="math notranslate nohighlight">\(N\)</span>, conversion <span class="math notranslate nohighlight">\(p\)</span>, and stoichiometric imbalance <span class="math notranslate nohighlight">\(r\)</span>, and</p></li>
+<li><p><span class="xref std std-doc">plot_representative_volume_pdms</span> for a representative volume element (RVE) study of realistic PDMS networks across chain length <span class="math notranslate nohighlight">\(N\)</span>, conversion <span class="math notranslate nohighlight">\(p\)</span>, stoichiometric imbalance <span class="math notranslate nohighlight">\(r\)</span>, and ensemble sample count.</p></li>
 </ul>
 <div id='sg-tag-list' class='sphx-glr-tag-list'></div><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="In MEHPForceBalance (gusev_numerical_2019, bernhard_phantom_2025), entanglement links can either remain frozen at their initial contour positions (``disable_slipping=True``) or slide dynamically along the polymer strands to balance contour tension (``disable_slipping=False``)."><img alt="" src="../_images/sphx_glr_plot_slipping_vs_fixed_links_thumb.png" />
 <p><a class="reference internal" href="force_balance/plot_slipping_vs_fixed_links.html"><span class="doc">Slipping vs. Fixed Entanglement Links</span></a></p>
@@ -491,6 +493,9 @@ This is useful for predicting the (phantom) equilibrium shear modulus of the net
 </div><div class="sphx-glr-thumbcontainer" tooltip="In polymer network elasticity simulations using the Maximum Entropy Homogenization Procedure (MEHP) and Force Balance (gusev_numerical_2019, bernhard_phantom_2025), entanglements are represented as localized topological constraints (entanglement links or springs)."><img alt="" src="../_images/sphx_glr_plot_entanglement_sampling_comparison_thumb.png" />
 <p><a class="reference internal" href="force_balance/plot_entanglement_sampling_comparison.html"><span class="doc">Entanglement Sampling Methods</span></a></p>
   <div class="sphx-glr-thumbnail-title">Entanglement Sampling Methods</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="When predicting the equilibrium shear modulus G of polymer networks via Monte Carlo network generation (~pylimer_tools_cpp.MCUniverseGenerator), on-demand entanglement sampling (~pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements), and MEHPForceBalance2, the simulation box must be large enough to act as a Representative Volume Element (RVE)—avoiding both finite-size bias (e.g. periodic self-looping or insufficient topological sampling) and excessive sample-to-sample variance."><img alt="" src="../_images/sphx_glr_plot_representative_volume_pdms_thumb.png" />
+<p><a class="reference internal" href="force_balance/plot_representative_volume_pdms.html"><span class="doc">Representative Volume Study for PDMS Networks</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Representative Volume Study for PDMS Networks</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="This example shows how to use the MEHPForceBalance2 class in a deformation experiment."><img alt="" src="../_images/sphx_glr_plot_fb_deformation_exp_thumb.png" />
 <p><a class="reference internal" href="force_balance/plot_fb_deformation_exp.html"><span class="doc">Deformation Experiment</span></a></p>
   <div class="sphx-glr-thumbnail-title">Deformation Experiment</div>

@@ -2,7 +2,7 @@
 
 # Computation times
 
-**00:00.275** total execution time for 4 files **from auto_examples/structure_analysis**:
+**00:00.206** total execution time for 4 files **from auto_examples/structure_analysis**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -19,7 +19,7 @@ $(document).ready( function () {
 
 | Example                                                                                                                                                                              | Time      |   Mem (MB) |
 |--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [End-to-End Distribution](plot_end_to_end_distribution.md#sphx-glr-auto-examples-structure-analysis-plot-end-to-end-distribution-py) (`plot_end_to_end_distribution.py`) | 00:00.086 |          0 |
-| [Loop Finding and Analysis](plot_loop_analysis.md#sphx-glr-auto-examples-structure-analysis-plot-loop-analysis-py) (`plot_loop_analysis.py`)                   | 00:00.085 |          0 |
-| [Extract Synthesis Parameters](plot_structure_analysis.md#sphx-glr-auto-examples-structure-analysis-plot-structure-analysis-py) (`plot_structure_analysis.py`)      | 00:00.054 |          0 |
-| [Decompose/Split Structure](plot_decompose_structure.md#sphx-glr-auto-examples-structure-analysis-plot-decompose-structure-py) (`plot_decompose_structure.py`)       | 00:00.050 |          0 |
+| [Loop Finding and Analysis](plot_loop_analysis.md#sphx-glr-auto-examples-structure-analysis-plot-loop-analysis-py) (`plot_loop_analysis.py`)                   | 00:00.071 |          0 |
+| [End-to-End Distribution](plot_end_to_end_distribution.md#sphx-glr-auto-examples-structure-analysis-plot-end-to-end-distribution-py) (`plot_end_to_end_distribution.py`) | 00:00.059 |          0 |
+| [Extract Synthesis Parameters](plot_structure_analysis.md#sphx-glr-auto-examples-structure-analysis-plot-structure-analysis-py) (`plot_structure_analysis.py`)      | 00:00.038 |          0 |
+| [Decompose/Split Structure](plot_decompose_structure.md#sphx-glr-auto-examples-structure-analysis-plot-decompose-structure-py) (`plot_decompose_structure.py`)       | 00:00.038 |          0 |

@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:04.133** total execution time for 13 files **from auto_examples/readers_writers**:
+**00:03.005** total execution time for 13 files **from auto_examples/readers_writers**:
 
 .. container::
 
@@ -33,41 +33,41 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_readers_writers_plot_memory_efficient_dump_file_reading.py` (``plot_memory_efficient_dump_file_reading.py``)
-     - 00:02.604
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_readers_writers_plot_data_file_reader.py` (``plot_data_file_reader.py``)
-     - 00:00.359
+     - 00:01.932
      - 0.0
    * - :ref:`sphx_glr_auto_examples_readers_writers_plot_unit_conversion.py` (``plot_unit_conversion.py``)
-     - 00:00.326
+     - 00:00.232
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_readers_writers_plot_data_file_reader.py` (``plot_data_file_reader.py``)
+     - 00:00.217
      - 0.0
    * - :ref:`sphx_glr_auto_examples_readers_writers_plot_convert_trajectory_to_frame.py` (``plot_convert_trajectory_to_frame.py``)
-     - 00:00.181
+     - 00:00.127
      - 0.0
    * - :ref:`sphx_glr_auto_examples_readers_writers_plot_convert_for_bond_swapping.py` (``plot_convert_for_bond_swapping.py``)
-     - 00:00.111
+     - 00:00.086
      - 0.0
    * - :ref:`sphx_glr_auto_examples_readers_writers_plot_data_file_writer.py` (``plot_data_file_writer.py``)
-     - 00:00.111
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_readers_writers_plot_correlated_averages_reader.py` (``plot_correlated_averages_reader.py``)
-     - 00:00.085
+     - 00:00.081
      - 0.0
    * - :ref:`sphx_glr_auto_examples_readers_writers_plot_time_averaged_data_reader.py` (``plot_time_averaged_data_reader.py``)
-     - 00:00.083
+     - 00:00.061
      - 0.0
    * - :ref:`sphx_glr_auto_examples_readers_writers_plot_log_thermo_file_reader.py` (``plot_log_thermo_file_reader.py``)
-     - 00:00.082
+     - 00:00.061
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_readers_writers_plot_correlated_averages_reader.py` (``plot_correlated_averages_reader.py``)
+     - 00:00.060
      - 0.0
    * - :ref:`sphx_glr_auto_examples_readers_writers_plot_dump_file_reader.py` (``plot_dump_file_reader.py``)
-     - 00:00.069
+     - 00:00.050
      - 0.0
    * - :ref:`sphx_glr_auto_examples_readers_writers_plot_histogram_reader.py` (``plot_histogram_reader.py``)
-     - 00:00.052
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_readers_writers_plot_pylimer_tools_output_reader.py` (``plot_pylimer_tools_output_reader.py``)
      - 00:00.040
      - 0.0
+   * - :ref:`sphx_glr_auto_examples_readers_writers_plot_pylimer_tools_output_reader.py` (``plot_pylimer_tools_output_reader.py``)
+     - 00:00.032
+     - 0.0
    * - :ref:`sphx_glr_auto_examples_readers_writers_plot_performance_caching.py` (``plot_performance_caching.py``)
-     - 00:00.031
+     - 00:00.026
      - 0.0

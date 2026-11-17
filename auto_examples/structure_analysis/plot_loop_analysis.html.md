@@ -17,7 +17,7 @@ This example demonstrates how to find and analyze loops in polymer networks usin
 <!-- GENERATED FROM PYTHON SOURCE LINES 7-59 -->
 ```none
 Number of loops found (max length 2*(46+1)): 2
-Loop length counts: {322: 1, 92: 1, 46: 2, 138: 1}
+Loop length counts: {46: 2, 138: 1, 322: 1, 92: 1}
 Shortest loop involving atom 1: []
 ```
 
@@ -76,7 +76,7 @@ shortest_loop = universe.find_minimal_order_loop_from(
 print(f"Shortest loop involving atom 1: {shortest_loop}")
 ```
 
-**Total running time of the script:** (0 minutes 0.085 seconds)
+**Total running time of the script:** (0 minutes 0.071 seconds)
 
 <a id="sphx-glr-download-auto-examples-structure-analysis-plot-loop-analysis-py"></a>
 

@@ -200,11 +200,12 @@
 - [NOTE](plot_sampling_cutoff_effect.html.md): Go to the end
 - [NOTE](plot_inactive_removal_and_sampling.html.md): Go to the end
 - [NOTE](plot_entanglement_sampling_comparison.html.md): Go to the end
+- [NOTE](plot_representative_volume_pdms.html.md): Go to the end
 - [NOTE](plot_fb_deformation_exp.html.md): Go to the end
 - [NOTE](plot_force_balance.html.md): Go to the end
 - [NOTE](plot_force_balance_2.html.md): Go to the end
 - [NOTE](plot_force_relaxation.html.md): Go to the end
-- [Computation times](sg_execution_times.html.md): &#42;&#42;00:07.830&#42;&#42; total execution time for 10 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
+- [Computation times](sg_execution_times.html.md): &#42;&#42;00:06.787&#42;&#42; total execution time for 11 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
 
 ## Optional
 
