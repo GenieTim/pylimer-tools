@@ -227,7 +227,7 @@ class CMakeBuild(build_ext):
         # auxiliary "native" libs
 
         debug = int(os.environ.get("DEBUG", 0)) if self.debug is None else self.debug
-        cfg = "Debug" if debug else "RelWithDebInfo"  # "Release"
+        cfg = "Debug" if debug else os.environ.get("CMAKE_BUILD_TYPE", "RelWithDebInfo")
 
         # The CMake build process is done in a temporary directory,
         # so we have to create it here.

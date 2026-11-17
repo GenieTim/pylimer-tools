@@ -2841,6 +2841,8 @@ TEST_CASE("All MEHPForceBalance2 solvers solve simple network systems",
       pcm::StructureSimplificationMode::NO_SIMPLIFICATION, 1e-6, solver));
     CHECK(forceBalancer.getNrOfSprings() == nrOfChains + 9);
     CHECK(forceBalancer.getNrOfActiveSprings() > 0);
+    CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
+    CHECK(forceBalancer.getResidual() < 1e-5);
   }
 }
 

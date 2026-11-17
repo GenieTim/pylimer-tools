@@ -92,17 +92,17 @@ endif ()
 # Project version and metadata
 add_compile_definitions(OVERALL_PROJECT_VERSION="${CMAKE_PROJECT_VERSION}")
 
-# Include build configuration and dependencies
-include(${CMAKE_CURRENT_LIST_DIR}/vendor/myConfigureFile.cmake)
-include(${CMAKE_CURRENT_LIST_DIR}/vendor/CMakeLists.txt)
+# Default to hidden symbol visibility so static libraries and bindings do not
+# export internal symbols or route intra-module calls through GOT/stubs in
+# shared/SIDE_MODULE builds (e.g. Emscripten/Pyodide).
+set(CMAKE_C_VISIBILITY_PRESET hidden)
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
 
-# ==============================================================================
-# Python bindings configuration
-# ==============================================================================
-
-# Detect if building with Pyodide
-if (CMAKE_SYSTEM_NAME STREQUAL "Emscripten" OR 
-    CMAKE_C_COMPILER MATCHES "pyodide" OR 
+# Detect if building with Pyodide BEFORE including vendor/ so vendor CMake
+# modules (myCompilerDefaultFlags, vendorForwardArgs, igraph) see BUILDING_WITH_PYODIDE.
+if (CMAKE_SYSTEM_NAME STREQUAL "Emscripten" OR
+    CMAKE_C_COMPILER MATCHES "pyodide" OR
     CMAKE_CXX_COMPILER MATCHES "pyodide" OR
     DEFINED ENV{PYODIDE} OR
     DEFINED ENV{PYODIDE_BUILD} OR
@@ -110,7 +110,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Emscripten" OR
     PYODIDE_BUILD)
     set(BUILDING_WITH_PYODIDE ON)
     message(STATUS "Detected Pyodide build environment")
-    
+
     # NOTE: Using pybind11's FindPython (PYBIND11_FINDPYTHON=ON) triggers a
     # call to CMake's FindPython with the Development.Module component.
     # In the Pyodide cross-compilation environment this currently fails
@@ -126,7 +126,10 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Emscripten" OR
     # disable CMake's C++20 module/dependency scanning to prevent fatal
     # 'stdlib.h' / 'iostream' not found errors during scanning.
     set(CMAKE_CXX_SCAN_FOR_MODULES OFF CACHE BOOL "Disable module scanning for Pyodide" FORCE)
-    
+    # Prevent pybind11 from injecting -fexceptions (JS-based invoke_* EH)
+    # after our -fwasm-exceptions flag.
+    set(_pybind11_no_exceptions ON)
+
     # Get Python include directory from pyodide config
     execute_process(
         COMMAND pyodide config get python_include_dir
@@ -134,15 +137,15 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Emscripten" OR
         OUTPUT_STRIP_TRAILING_WHITESPACE
         ERROR_QUIET
     )
-    
+
     if (PYODIDE_PYTHON_INCLUDE_DIR)
         set(Python_INCLUDE_DIRS ${PYODIDE_PYTHON_INCLUDE_DIR} CACHE PATH "Python include directory from pyodide config" FORCE)
         set(Python3_INCLUDE_DIRS ${PYODIDE_PYTHON_INCLUDE_DIR} CACHE PATH "Python 3 include directory from pyodide config" FORCE)
         message(STATUS "Set Python_INCLUDE_DIRS to: ${Python_INCLUDE_DIRS}")
-        
+
         set(PYTHON_INCLUDE_DIRS ${PYODIDE_PYTHON_INCLUDE_DIR} CACHE PATH "Python include directory for pybind11" FORCE)
         set(pybind11_INCLUDE_DIRS ${PYODIDE_PYTHON_INCLUDE_DIR} CACHE PATH "Python include directory for pybind11" FORCE)
-        
+
     else()
         message(WARNING "Could not get python_include_dir from pyodide config, falling back to default behavior")
     endif()
@@ -150,6 +153,14 @@ else()
     set(BUILDING_WITH_PYODIDE OFF)
     message(STATUS "Not building with Pyodide, using standard configuration")
 endif()
+
+# Include build configuration and dependencies
+include(${CMAKE_CURRENT_LIST_DIR}/vendor/myConfigureFile.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/vendor/CMakeLists.txt)
+
+# ==============================================================================
+# Python bindings configuration
+# ==============================================================================
 
 # Prepare pybind11 for Python bindings
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/vendor/pybind11)

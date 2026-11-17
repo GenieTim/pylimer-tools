@@ -166,13 +166,25 @@ gradientDescentBarzilaiBorwein(
  * Heavy Ball momentum acceleration. The momentum term helps accelerate
  * convergence by incorporating information from previous iterations.
  *
- * Update formula: x_{k+1} = x_k - alpha_k * g_k + beta * (x_k - x_{k-1})
- * where beta is the momentum coefficient (typically 0.5-0.9).
+ * Update formula (with momentum active):
+ *   x_{k+1} = x_k - (1 - beta) * alpha_k * g_k + beta * (x_k - x_{k-1}),
+ * where g_k = A x_k - b and beta is the momentum coefficient (typically
+ * 0.5-0.9). The (1 - beta) scaling keeps the steady-state effective step equal
+ * to alpha_k. Robustness features:
+ *  - alpha_k follows the adaptive (selective long/short) Barzilai-Borwein rule
+ *    and keeps the sign of the curvature s^T y, so both positive- and
+ *    negative-definite A are supported (the sign is detected after the first
+ *    step, which is then discarded from the momentum);
+ *  - adaptive restart: momentum is dropped whenever it opposes -alpha_k g_k;
+ *  - backtracking with momentum reset if the residual blows up (non-finite or
+ *    more than 100x the best residual so far). Each backtracking trial counts
+ *    as one iteration.
  *
  * @tparam MatrixType The type of matrix A
- * @param A The coefficient matrix
+ * @param A The coefficient matrix (symmetric definite, either sign)
  * @param b The right-hand side vector
- * @param learningRate Initial learning rate (good default is 0.01-0.1)
+ * @param learningRate Initial (and fallback) step size magnitude (good default
+ * is 0.01-0.1)
  * @param tolerance Convergence tolerance based on relative residual norm
  * @param maxIterations Maximum iterations allowed
  * @param iteration Reference to counter storing iterations performed
@@ -208,52 +220,108 @@ gradientDescentHeavyBallBarzilaiBorwein(
   const double beta =
     std::max(0.0, std::min(momentumCoeff, 0.99)); // Clamp momentum
 
+  double gradientNorm = gradient.norm();
   const double initialNorm =
-    initialResidual > 0.0 ? initialResidual : gradient.norm();
+    initialResidual > 0.0 ? initialResidual : gradientNorm;
+  if (initialNorm <= 0.0) {
+    return x;
+  }
 
-  Eigen::VectorXd Ax = A * x; // Cache A*x
+  double bestGradientNorm = gradientNorm;
 
-  while ((gradient.norm() / initialNorm) > tolerance &&
+  while ((gradientNorm / initialNorm) > tolerance &&
          iteration < maxIterations) {
-    // Heavy Ball update: step = -alpha*g + beta*momentum
-    Eigen::VectorXd step = -alpha * gradient + beta * momentum;
-    x = x + step;
+    // Adaptive gradient restart: reset momentum if it opposes -alpha * gradient
+    // (works for both positive-definite alpha > 0 and negative-definite alpha <
+    // 0)
+    const bool hasMomentum = beta > 0.0 && momentum.squaredNorm() > 0.0 &&
+                             (-alpha * gradient.dot(momentum) >= 0.0);
+    if (!hasMomentum) {
+      momentum.setZero();
+    }
 
-    // Efficient gradient computation
-    Eigen::VectorXd Astep = A * step;
-    Eigen::VectorXd nextAx = Ax + Astep;
-    Eigen::VectorXd nextGradient = nextAx - b;
+    // Heavy Ball update: step = -(1 - beta)*alpha*g + beta*momentum.
+    // Scaling the gradient term by (1 - beta) when momentum is active makes the
+    // steady-state effective step size match alpha.
+    Eigen::VectorXd step;
+    if (hasMomentum) {
+      step = -(1.0 - beta) * alpha * gradient + beta * momentum;
+    } else {
+      step = -alpha * gradient;
+    }
+
+    Eigen::VectorXd nextX = x + step;
+    Eigen::VectorXd nextGradient = A * nextX - b;
+    double nextGradientNorm = nextGradient.norm();
+    const double currentGradientNorm = gradientNorm;
+
+    // If the step caused a catastrophic blowup or non-finite residual (and not
+    // the initial probing step where alpha sign might flip), reset momentum and
+    // backtrack
+    if (iteration > 0 && (!std::isfinite(nextGradientNorm) ||
+                          nextGradientNorm > 100.0 * bestGradientNorm)) {
+      momentum.setZero();
+      double safeAlpha = hasMomentum ? alpha : 0.5 * alpha;
+      for (int bt = 0; bt < 30 && iteration < maxIterations; ++bt) {
+        if (bt > 0) {
+          safeAlpha *= 0.5;
+        }
+        step = -safeAlpha * gradient;
+        nextX = x + step;
+        nextGradient = A * nextX - b;
+        nextGradientNorm = nextGradient.norm();
+        iteration++;
+        if (std::isfinite(nextGradientNorm) &&
+            nextGradientNorm <= currentGradientNorm) {
+          break;
+        }
+      }
+      alpha = safeAlpha;
+    }
 
     Eigen::VectorXd deltaGradient = nextGradient - gradient;
 
-    // Barzilai-Borwein step size (using BB2 which often works better with
-    // momentum)
-    double sTy = step.dot(deltaGradient);
-    double sTs = step.squaredNorm();
+    // Barzilai-Borwein step size (scale-invariant curvature check, preserving
+    // sign of sTy for both positive- and negative-definite systems)
+    const double sTy = step.dot(deltaGradient);
+    const double sTs = step.squaredNorm();
+    const double yTy = deltaGradient.squaredNorm();
 
-    if (std::abs(sTy) > 1e-14 && std::isfinite(sTs / sTy)) {
-      alpha = sTs / sTy;
-      // Clamp to reasonable bounds
-      alpha = std::max(1e-8, std::min(alpha, 1e6));
-    } else {
-      alpha = learningRate;
-    }
-
-    // Update for next iteration
-    momentum = step;
-    Ax = nextAx;
-    gradient = nextGradient;
-    iteration++;
-
-    // Periodically recompute to prevent floating point drift
-    if (iteration % 50 == 0) {
-      Ax = A * x;
-      gradient = Ax - b;
-      // Optionally reset momentum on recomputation to avoid accumulated errors
-      if (iteration % 200 == 0) {
-        momentum.setZero();
+    double nextAlpha = (sTy < 0.0) ? -learningRate : learningRate;
+    if (sTs > 0.0 && yTy > 0.0 &&
+        std::abs(sTy) > 1e-12 * std::sqrt(sTs * yTy)) {
+      const double alphaLong = sTs / sTy;
+      const double alphaShort = sTy / yTy;
+      if (std::isfinite(alphaLong) && std::isfinite(alphaShort)) {
+        // Selective ABB rule: ratio alphaShort / alphaLong is always in (0, 1]
+        nextAlpha = (alphaShort / alphaLong < 0.5) ? alphaShort : alphaLong;
+        const double clampedMag =
+          std::max(1e-10, std::min(std::abs(nextAlpha), 1e6));
+        nextAlpha = std::copysign(clampedMag, nextAlpha);
       }
+      // If alpha flipped sign (e.g., on iteration 0 for negative-definite A),
+      // reset momentum so the wrong-sign initial step is discarded
+      if (nextAlpha * alpha < 0.0) {
+        momentum.setZero();
+      } else {
+        momentum = step;
+      }
+    } else {
+      // Degenerate curvature or zero step: reset momentum
+      momentum.setZero();
     }
+
+    if (std::isfinite(nextGradientNorm) &&
+        nextGradientNorm < bestGradientNorm) {
+      bestGradientNorm = nextGradientNorm;
+    }
+
+    // swap instead of copy-assign: next* are loop-local and not reused
+    x.swap(nextX);
+    gradient.swap(nextGradient);
+    gradientNorm = nextGradientNorm;
+    alpha = nextAlpha;
+    iteration++;
 
     // Call iteration callback if provided
     if (iterationCallback && iterationCallback(iteration, x)) {

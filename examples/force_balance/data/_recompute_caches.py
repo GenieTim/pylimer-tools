@@ -271,14 +271,11 @@ def main() -> None:
             initializer=worker_process_initializer,
         ) as pool:
             futures = [
-                pool.submit(_run_cache_task, t, workers_per_cache)
-                for t in tasks_to_run
+                pool.submit(_run_cache_task, t, workers_per_cache) for t in tasks_to_run
             ]
             for fut in as_completed(futures):
                 completed_task = fut.result()
-                print(
-                    f"Task '{completed_task.value}' completed successfully."
-                )
+                print(f"Task '{completed_task.value}' completed successfully.")
     else:
         for t in tasks_to_run:
             _run_cache_task(t, total_workers)

@@ -154,6 +154,24 @@ TEST_CASE("Gradient Descent Solvers - Correctness Tests",
     REQUIRE(error.norm() / xTrue.norm() < 0.01);
   }
 
+  SECTION("Heavy Ball + Barzilai-Borwein - Negative-definite system")
+  {
+    Eigen::MatrixXd A = -createSPDMatrix(n, 100.0);
+    Eigen::VectorXd xTrue = Eigen::VectorXd::Random(n);
+    Eigen::VectorXd b = A * xTrue;
+
+    int iterations = 0;
+    Eigen::VectorXd xSolved = Eigen::gradientDescentHeavyBallBarzilaiBorwein(
+      A, b, 0.01, tolerance, maxIterations, iterations);
+
+    double relResidual = computeRelativeResidual(A, xSolved, b);
+    REQUIRE(relResidual < 1e-5);
+    REQUIRE(iterations < maxIterations);
+
+    Eigen::VectorXd error = xSolved - xTrue;
+    REQUIRE(error.norm() / xTrue.norm() < 0.01);
+  }
+
   SECTION("Compare methods on well-conditioned SPD system")
   {
     Eigen::MatrixXd A = createSPDMatrix(n, 10.0); // well-conditioned

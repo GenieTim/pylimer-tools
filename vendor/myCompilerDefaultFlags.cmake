@@ -1,3 +1,5 @@
+include_guard(GLOBAL)
+
 # ==============================================================================
 # Compiler Optimization and Warning Configuration
 # ==============================================================================
@@ -93,13 +95,28 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Emscripten" OR
     # Emscripten/WebAssembly/Pyodide-specific optimizations
     message(STATUS "Configuring Emscripten/WebAssembly optimizations")
 
-    # Pyodide ABI: WebAssembly exception handling
-    add_compile_options(-fwasm-exceptions)
-    add_link_options(-fwasm-exceptions)
+    # Core WebAssembly flags, shared with externally built vendor projects via
+    # vendorForwardArgs.cmake (which must be included after this file):
+    # - Pyodide ABI: WebAssembly exception handling
+    # - Hidden visibility in SIDE_MODULE builds so intra-module calls resolve
+    #   directly instead of going through GOT.func / JS stubs[prop] trampolines
+    #   (the CMAKE_*_VISIBILITY_PRESET variables are set in the top-level
+    #   CMakeLists.txt; the explicit flag also covers targets ignoring them)
+    # - WebAssembly SIMD instructions for vector operations
+    set(PYLIMER_WASM_COMPILE_FLAGS
+        -fwasm-exceptions -fvisibility=hidden -msimd128 -mrelaxed-simd)
+    set(PYLIMER_WASM_LINK_FLAGS -fwasm-exceptions)
+    if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+        # Maximum optimization, link-time optimization, and no assertions
+        list(APPEND PYLIMER_WASM_COMPILE_FLAGS -O3 -flto -DNDEBUG)
+        list(APPEND PYLIMER_WASM_LINK_FLAGS -flto)
+    endif ()
 
-    # Enable WebAssembly SIMD instructions for vector operations
-    add_compile_options(-msimd128)
-    add_compile_options(-mrelaxed-simd)
+    add_compile_options(
+        ${PYLIMER_WASM_COMPILE_FLAGS}
+        $<$<COMPILE_LANGUAGE:CXX>:-fvisibility-inlines-hidden>
+    )
+    add_link_options(${PYLIMER_WASM_LINK_FLAGS})
 
     # Conditionally disable RTTI to reduce binary size, but only if Cereal is disabled
     # since Cereal's polymorphic serialization requires RTTI (uses typeid())
@@ -116,16 +133,9 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Emscripten" OR
     endif ()
 
     if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-        # Maximum optimization for release builds
-        add_compile_options(-O3)
-
-        # Link-time optimization
-        add_compile_options(-flto)
-        add_link_options(-flto)
-
-        # Disable assertions and other runtime checks for maximum performance
-        add_compile_options(-DNDEBUG)
-        add_link_options(-s ASSERTIONS=0)
+        # -O3 -flto -DNDEBUG are part of PYLIMER_WASM_COMPILE_FLAGS above;
+        # additionally disable Emscripten runtime assertions
+        add_link_options("SHELL:-s ASSERTIONS=0")
 
         message(STATUS "Emscripten Release: Enabled maximum optimizations with SIMD")
     else ()
