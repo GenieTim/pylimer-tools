@@ -1,6 +1,6 @@
 # Changelog
 
-## main
+## v0.6.0
 
 ### Unified Entanglement Sampling, Performance & Robustness Improvements
 - **Unified On-Demand Entanglement Sampling (`EntanglementDetector`, `MCUniverseGenerator`)**:
@@ -14,8 +14,11 @@
   - Eliminate transient `Eigen::VectorXd` heap allocations in `Universe::computeDanglingAtoms`.
   - Replace raw `new[]` / `delete[]` buffer management with RAII `std::vector<double>` in `MEHPForceRelaxation::getResiduals`.
   - Guard against zero variance (`std <= 0`) in `doRandomWalkChain` to avoid constructing invalid `std::normal_distribution<double>(0.0, 0.0)`.
-- **Force Balance Examples Modularization (`examples/force_balance/`)**:
+- **Force Balance Examples Modularization & PDMS RVE Example (`examples/force_balance/`)**:
   - Extract reusable study runners (`examples/force_balance/_study_runners.py`) and plotting utilities (`examples/force_balance/_plotting.py`) shared across `plot_entanglement_sampling_comparison.py`, `plot_polydispersity_study.py`, and `plot_sampling_cutoff_effect.py`.
+  - Add PDMS representative volume element (RVE) example (`examples/force_balance/plot_representative_volume_pdms.py`) with precomputed cache (`representative_volume_pdms_cache.npz`).
+- **Code Quality & Warning Fixes**:
+  - Fix compiler warnings and review findings across C++ entities, I/O parsers, simulators, and utilities.
 
 ### Deterministic Per-Strand Seeds, Streaming Statistics & Unified Network Builders
 - **Deterministic Per-Strand Bead Realization (`CrosslinkerUniverse`, `EntanglementDetector`, `MCUniverseGenerator`)**:
