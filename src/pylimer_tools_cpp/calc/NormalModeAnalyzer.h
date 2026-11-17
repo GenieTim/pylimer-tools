@@ -41,6 +41,35 @@ inline const NormalModeSolver allNormalModeSolvers[] = {
 #undef X
 };
 
+#define STOCHASTIC_SPECTRAL_METHODS                                            \
+  X(AUTO, "Auto")                                                              \
+  X(SLQ, "SLQ")                                                                \
+  X(HYBRID, "Hybrid")                                                          \
+  X(KPM, "KPM")
+
+/**
+ * @brief Available stochastic / approximate spectral methods for normal mode
+ *        analysis on large networks.
+ */
+enum class StochasticSpectralMethod
+{
+#define X(e, s) e,
+  STOCHASTIC_SPECTRAL_METHODS
+#undef X
+};
+
+inline const std::string StochasticSpectralMethodNames[] = {
+#define X(e, s) s,
+  STOCHASTIC_SPECTRAL_METHODS
+#undef X
+};
+
+inline const StochasticSpectralMethod allStochasticSpectralMethods[] = {
+#define X(e, s) StochasticSpectralMethod::e,
+  STOCHASTIC_SPECTRAL_METHODS
+#undef X
+};
+
 class NormalModeAnalyzer
 {
 public:
@@ -180,6 +209,65 @@ public:
     size_t numRandomVectors = 20,
     size_t numQuadraturePoints = 2048) const;
 
+  // MARK: Approximate / Stochastic Spectral Methods (SLQ, Hybrid, KPM)
+
+  /**
+   * @brief Evaluate stress autocorrelation G(t) using an approximate spectral
+   *        method (SLQ, Hybrid exact-low + SLQ, or KPM).
+   *
+   * @param t Time points at which to evaluate stress autocorrelation
+   * @param method Spectral approximation method (AUTO, SLQ, HYBRID, or KPM)
+   * @param numSteps Lanczos steps (SLQ/HYBRID) or Chebyshev moments (KPM)
+   * @param numRandomVectors Number of Rademacher random vectors (default: 20)
+   * @param numExactLowModes Number of exact lowest nonzero modes for HYBRID
+   * (default: 100)
+   * @return Stress autocorrelation values
+   */
+  Eigen::ArrayXd evaluateStressAutocorrelationApprox(
+    const Eigen::ArrayXd& t,
+    StochasticSpectralMethod method = StochasticSpectralMethod::AUTO,
+    size_t numSteps = 200,
+    size_t numRandomVectors = 20,
+    size_t numExactLowModes = 100) const;
+
+  /**
+   * @brief Evaluate storage modulus G'(omega) using an approximate spectral
+   *        method (SLQ, Hybrid exact-low + SLQ, or KPM).
+   *
+   * @param omega Angular frequencies to evaluate
+   * @param method Spectral approximation method (AUTO, SLQ, HYBRID, or KPM)
+   * @param numSteps Lanczos steps (SLQ/HYBRID) or Chebyshev moments (KPM)
+   * @param numRandomVectors Number of Rademacher random vectors (default: 20)
+   * @param numExactLowModes Number of exact lowest nonzero modes for HYBRID
+   * (default: 100)
+   * @return Storage modulus values
+   */
+  Eigen::ArrayXd evaluateStorageModulusApprox(
+    const Eigen::ArrayXd& omega,
+    StochasticSpectralMethod method = StochasticSpectralMethod::AUTO,
+    size_t numSteps = 200,
+    size_t numRandomVectors = 20,
+    size_t numExactLowModes = 100) const;
+
+  /**
+   * @brief Evaluate loss modulus G''(omega) using an approximate spectral
+   *        method (SLQ, Hybrid exact-low + SLQ, or KPM).
+   *
+   * @param omega Angular frequencies to evaluate
+   * @param method Spectral approximation method (AUTO, SLQ, HYBRID, or KPM)
+   * @param numSteps Lanczos steps (SLQ/HYBRID) or Chebyshev moments (KPM)
+   * @param numRandomVectors Number of Rademacher random vectors (default: 20)
+   * @param numExactLowModes Number of exact lowest nonzero modes for HYBRID
+   * (default: 100)
+   * @return Loss modulus values
+   */
+  Eigen::ArrayXd evaluateLossModulusApprox(
+    const Eigen::ArrayXd& omega,
+    StochasticSpectralMethod method = StochasticSpectralMethod::AUTO,
+    size_t numSteps = 200,
+    size_t numRandomVectors = 20,
+    size_t numExactLowModes = 100) const;
+
 #ifdef CEREALIZABLE
   static NormalModeAnalyzer fromString(std::string in)
   {
@@ -211,6 +299,16 @@ private:
   mutable size_t cachedKPMVectors_{ 0 };
   mutable Eigen::VectorXd cachedMu_{};
 
+  mutable bool hasCachedApproxSpectrum_{ false };
+  mutable StochasticSpectralMethod cachedApproxMethod_{
+    StochasticSpectralMethod::AUTO
+  };
+  mutable size_t cachedApproxSteps_{ 0 };
+  mutable size_t cachedApproxVectors_{ 0 };
+  mutable size_t cachedApproxLowModes_{ 0 };
+  mutable std::vector<double> cachedApproxLambdaNodes_{};
+  mutable std::vector<double> cachedApproxDeltaN_{};
+
   void solveMatrix(const Eigen::SparseMatrix<double>& mat,
                    NormalModeSolver solver,
                    bool includeEigenvectors,
@@ -237,6 +335,45 @@ private:
                                    size_t numQuadraturePoints,
                                    std::vector<double>& lambdaNodes,
                                    std::vector<double>& deltaN) const;
+
+  void computeConnectedComponents(size_t& numComponents,
+                                  std::vector<size_t>& labels,
+                                  std::vector<size_t>& counts) const;
+
+  void runDeflatedSLQ(size_t numSteps,
+                      size_t numRandomVectors,
+                      size_t numComponents,
+                      const std::vector<size_t>& labels,
+                      const std::vector<size_t>& counts,
+                      const Eigen::MatrixXd* deflationBasis,
+                      std::vector<double>& lambdaNodes,
+                      std::vector<double>& deltaN) const;
+
+  void computeEffectiveSpectrumHybrid(size_t numSteps,
+                                      size_t numRandomVectors,
+                                      size_t numExactLowModes,
+                                      std::vector<double>& lambdaNodes,
+                                      std::vector<double>& deltaN) const;
+
+  void ensureApproxSpectrumCached(StochasticSpectralMethod method,
+                                  size_t numSteps,
+                                  size_t numRandomVectors,
+                                  size_t numExactLowModes) const;
+
+  static Eigen::ArrayXd evaluateStressAutocorrelationFromSpectrum(
+    const Eigen::ArrayXd& t,
+    const std::vector<double>& lambdaNodes,
+    const std::vector<double>& deltaN);
+
+  static Eigen::ArrayXd evaluateStorageModulusFromSpectrum(
+    const Eigen::ArrayXd& omega,
+    const std::vector<double>& lambdaNodes,
+    const std::vector<double>& deltaN);
+
+  static Eigen::ArrayXd evaluateLossModulusFromSpectrum(
+    const Eigen::ArrayXd& omega,
+    const std::vector<double>& lambdaNodes,
+    const std::vector<double>& deltaN);
 
   static Eigen::VectorXd computeJacksonKernel(size_t numMoments);
 

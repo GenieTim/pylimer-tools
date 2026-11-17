@@ -1236,18 +1236,12 @@ NormalModeAnalyzer::computeDensityOfStatesKPM(const Eigen::ArrayXd& lambdaGrid,
 }
 
 Eigen::ArrayXd
-NormalModeAnalyzer::evaluateStressAutocorrelationKPM(
+NormalModeAnalyzer::evaluateStressAutocorrelationFromSpectrum(
   const Eigen::ArrayXd& t,
-  size_t numMoments,
-  size_t numRandomVectors,
-  size_t numQuadraturePoints) const
+  const std::vector<double>& lambdaNodes,
+  const std::vector<double>& deltaN)
 {
   Eigen::ArrayXd result = Eigen::ArrayXd::Zero(t.size());
-  std::vector<double> lambdaNodes;
-  std::vector<double> deltaN;
-  computeEffectiveSpectrumKPM(
-    numMoments, numRandomVectors, numQuadraturePoints, lambdaNodes, deltaN);
-
   for (size_t k = 0; k < lambdaNodes.size(); ++k) {
     result += deltaN[k] * (-2.0 * lambdaNodes[k] * t).exp();
   }
@@ -1255,17 +1249,12 @@ NormalModeAnalyzer::evaluateStressAutocorrelationKPM(
 }
 
 Eigen::ArrayXd
-NormalModeAnalyzer::evaluateStorageModulusKPM(const Eigen::ArrayXd& omega,
-                                              size_t numMoments,
-                                              size_t numRandomVectors,
-                                              size_t numQuadraturePoints) const
+NormalModeAnalyzer::evaluateStorageModulusFromSpectrum(
+  const Eigen::ArrayXd& omega,
+  const std::vector<double>& lambdaNodes,
+  const std::vector<double>& deltaN)
 {
   Eigen::ArrayXd result = Eigen::ArrayXd::Zero(omega.size());
-  std::vector<double> lambdaNodes;
-  std::vector<double> deltaN;
-  computeEffectiveSpectrumKPM(
-    numMoments, numRandomVectors, numQuadraturePoints, lambdaNodes, deltaN);
-
   for (size_t k = 0; k < lambdaNodes.size(); ++k) {
     Eigen::ArrayXd term = (omega / (2.0 * lambdaNodes[k])).square();
     result += deltaN[k] * (term / (1.0 + term));
@@ -1274,21 +1263,476 @@ NormalModeAnalyzer::evaluateStorageModulusKPM(const Eigen::ArrayXd& omega,
 }
 
 Eigen::ArrayXd
+NormalModeAnalyzer::evaluateLossModulusFromSpectrum(
+  const Eigen::ArrayXd& omega,
+  const std::vector<double>& lambdaNodes,
+  const std::vector<double>& deltaN)
+{
+  Eigen::ArrayXd result = Eigen::ArrayXd::Zero(omega.size());
+  for (size_t k = 0; k < lambdaNodes.size(); ++k) {
+    Eigen::ArrayXd term = omega / (2.0 * lambdaNodes[k]);
+    result += deltaN[k] * (term / (1.0 + term.square()));
+  }
+  return result;
+}
+
+Eigen::ArrayXd
+NormalModeAnalyzer::evaluateStressAutocorrelationKPM(
+  const Eigen::ArrayXd& t,
+  size_t numMoments,
+  size_t numRandomVectors,
+  size_t numQuadraturePoints) const
+{
+  std::vector<double> lambdaNodes;
+  std::vector<double> deltaN;
+  computeEffectiveSpectrumKPM(
+    numMoments, numRandomVectors, numQuadraturePoints, lambdaNodes, deltaN);
+  return evaluateStressAutocorrelationFromSpectrum(t, lambdaNodes, deltaN);
+}
+
+Eigen::ArrayXd
+NormalModeAnalyzer::evaluateStorageModulusKPM(const Eigen::ArrayXd& omega,
+                                              size_t numMoments,
+                                              size_t numRandomVectors,
+                                              size_t numQuadraturePoints) const
+{
+  std::vector<double> lambdaNodes;
+  std::vector<double> deltaN;
+  computeEffectiveSpectrumKPM(
+    numMoments, numRandomVectors, numQuadraturePoints, lambdaNodes, deltaN);
+  return evaluateStorageModulusFromSpectrum(omega, lambdaNodes, deltaN);
+}
+
+Eigen::ArrayXd
 NormalModeAnalyzer::evaluateLossModulusKPM(const Eigen::ArrayXd& omega,
                                            size_t numMoments,
                                            size_t numRandomVectors,
                                            size_t numQuadraturePoints) const
 {
-  Eigen::ArrayXd result = Eigen::ArrayXd::Zero(omega.size());
   std::vector<double> lambdaNodes;
   std::vector<double> deltaN;
   computeEffectiveSpectrumKPM(
     numMoments, numRandomVectors, numQuadraturePoints, lambdaNodes, deltaN);
+  return evaluateLossModulusFromSpectrum(omega, lambdaNodes, deltaN);
+}
 
-  for (size_t k = 0; k < lambdaNodes.size(); ++k) {
-    Eigen::ArrayXd term = (omega / (2.0 * lambdaNodes[k]));
-    result += deltaN[k] * (term / (1.0 + term.square()));
+void
+NormalModeAnalyzer::computeConnectedComponents(
+  size_t& numComponents,
+  std::vector<size_t>& labels,
+  std::vector<size_t>& counts) const
+{
+  const size_t n = static_cast<size_t>(this->assembledConnectivityMatrix.rows());
+  labels.assign(n, 0);
+  counts.clear();
+  numComponents = 0;
+  if (n == 0) {
+    return;
   }
-  return result;
+
+  std::vector<size_t> parent(n);
+  std::iota(parent.begin(), parent.end(), 0);
+  std::function<size_t(size_t)> findRoot = [&](size_t i) -> size_t {
+    while (parent[i] != i) {
+      parent[i] = parent[parent[i]];
+      i = parent[i];
+    }
+    return i;
+  };
+
+  for (Eigen::Index u = 0; u < static_cast<Eigen::Index>(n); ++u) {
+    for (Eigen::SparseMatrix<double>::InnerIterator it(
+           this->assembledConnectivityMatrix, u);
+         it;
+         ++it) {
+      const Eigen::Index v = it.row();
+      if (v > u) {
+        const size_t ru = findRoot(static_cast<size_t>(u));
+        const size_t rv = findRoot(static_cast<size_t>(v));
+        if (ru != rv) {
+          parent[ru] = rv;
+        }
+      }
+    }
+  }
+
+  std::unordered_map<size_t, size_t> rootToLabel;
+  rootToLabel.reserve(16);
+  for (size_t i = 0; i < n; ++i) {
+    const size_t root = findRoot(i);
+    std::unordered_map<size_t, size_t>::const_iterator it =
+      rootToLabel.find(root);
+    if (it == rootToLabel.end()) {
+      const size_t id = numComponents++;
+      rootToLabel[root] = id;
+      labels[i] = id;
+      counts.push_back(1);
+    } else {
+      labels[i] = it->second;
+      counts[it->second]++;
+    }
+  }
+}
+
+void
+NormalModeAnalyzer::runDeflatedSLQ(size_t numSteps,
+                                   size_t numRandomVectors,
+                                   size_t numComponents,
+                                   const std::vector<size_t>& labels,
+                                   const std::vector<size_t>& counts,
+                                   const Eigen::MatrixXd* deflationBasis,
+                                   std::vector<double>& lambdaNodes,
+                                   std::vector<double>& deltaN) const
+{
+  const Eigen::Index n = this->assembledConnectivityMatrix.rows();
+  if (n == 0 || numSteps == 0 || numRandomVectors == 0) {
+    return;
+  }
+
+  std::mt19937_64 rng(42);
+  std::uniform_int_distribution<int> coin(0, 1);
+
+  std::vector<Eigen::VectorXd> randomVectors(numRandomVectors,
+                                             Eigen::VectorXd(n));
+  for (size_t r = 0; r < numRandomVectors; ++r) {
+    Eigen::VectorXd& v = randomVectors[r];
+    for (Eigen::Index i = 0; i < n; ++i) {
+      v[i] = coin(rng) ? 1.0 : -1.0;
+    }
+    // Project out connected-component means (exact lambda = 0 nullspace)
+    std::vector<double> compSums(numComponents, 0.0);
+    for (Eigen::Index i = 0; i < n; ++i) {
+      compSums[labels[static_cast<size_t>(i)]] += v[i];
+    }
+    for (Eigen::Index i = 0; i < n; ++i) {
+      const size_t c = labels[static_cast<size_t>(i)];
+      v[i] -= compSums[c] / static_cast<double>(counts[c]);
+    }
+    if (deflationBasis != nullptr && deflationBasis->cols() > 0) {
+      v.noalias() -= (*deflationBasis) * (deflationBasis->transpose() * v);
+    }
+  }
+
+  const size_t maxSteps = std::min(numSteps, static_cast<size_t>(n));
+  std::vector<std::vector<double>> perVecLambdas(numRandomVectors);
+  std::vector<std::vector<double>> perVecWeights(numRandomVectors);
+
+#ifdef OPENMP_FOUND
+#pragma omp parallel for schedule(dynamic)
+#endif
+  for (size_t r = 0; r < numRandomVectors; ++r) {
+    const Eigen::VectorXd& v = randomVectors[r];
+    const double normV = v.norm();
+    if (normV < 1e-13) {
+      continue;
+    }
+
+    Eigen::VectorXd q = v / normV;
+    Eigen::VectorXd qPrev = Eigen::VectorXd::Zero(n);
+    Eigen::VectorXd w(n);
+    std::vector<double> alpha;
+    std::vector<double> beta;
+    alpha.reserve(maxSteps);
+    beta.reserve(maxSteps > 0 ? maxSteps - 1 : 0);
+
+    for (size_t j = 0; j < maxSteps; ++j) {
+      w.noalias() = this->assembledConnectivityMatrix * q;
+      if (j > 0) {
+        w -= beta.back() * qPrev;
+      }
+      const double a = q.dot(w);
+      alpha.push_back(a);
+      w -= a * q;
+      if (j + 1 < maxSteps) {
+        const double b = w.norm();
+        if (b < 1e-13) {
+          break;
+        }
+        beta.push_back(b);
+        qPrev = q;
+        q = w / b;
+      }
+    }
+
+    const Eigen::Index mActual = static_cast<Eigen::Index>(alpha.size());
+    if (mActual == 0) {
+      continue;
+    }
+    const double normV2 = normV * normV;
+    const double invR = 1.0 / static_cast<double>(numRandomVectors);
+
+    if (mActual == 1) {
+      if (alpha[0] > 1e-11) {
+        perVecLambdas[r].push_back(alpha[0]);
+        perVecWeights[r].push_back(normV2 * invR);
+      }
+      continue;
+    }
+
+    Eigen::VectorXd diag =
+      Eigen::Map<const Eigen::VectorXd>(alpha.data(), mActual);
+    Eigen::VectorXd subdiag =
+      Eigen::Map<const Eigen::VectorXd>(beta.data(), mActual - 1);
+    Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> tridiagSolver;
+    tridiagSolver.computeFromTridiagonal(
+      diag, subdiag, Eigen::ComputeEigenvectors);
+    if (tridiagSolver.info() != Eigen::Success) {
+      continue;
+    }
+
+    const Eigen::VectorXd& evals = tridiagSolver.eigenvalues();
+    const Eigen::MatrixXd& evecs = tridiagSolver.eigenvectors();
+    perVecLambdas[r].reserve(static_cast<size_t>(mActual));
+    perVecWeights[r].reserve(static_cast<size_t>(mActual));
+    for (Eigen::Index j = 0; j < mActual; ++j) {
+      const double lam = evals[j];
+      if (lam > 1e-11) {
+        const double q0j = evecs(0, j);
+        perVecLambdas[r].push_back(lam);
+        perVecWeights[r].push_back(normV2 * q0j * q0j * invR);
+      }
+    }
+  }
+
+  for (size_t r = 0; r < numRandomVectors; ++r) {
+    lambdaNodes.insert(
+      lambdaNodes.end(), perVecLambdas[r].begin(), perVecLambdas[r].end());
+    deltaN.insert(
+      deltaN.end(), perVecWeights[r].begin(), perVecWeights[r].end());
+  }
+}
+
+void
+NormalModeAnalyzer::computeEffectiveSpectrumHybrid(
+  size_t numSteps,
+  size_t numRandomVectors,
+  size_t numExactLowModes,
+  std::vector<double>& lambdaNodes,
+  std::vector<double>& deltaN) const
+{
+  const Eigen::Index n = this->assembledConnectivityMatrix.rows();
+  if (n == 0) {
+    return;
+  }
+
+  size_t numComponents = 0;
+  std::vector<size_t> labels;
+  std::vector<size_t> counts;
+  computeConnectedComponents(numComponents, labels, counts);
+
+  std::vector<std::vector<size_t>> componentNodes(numComponents);
+  for (size_t c = 0; c < numComponents; ++c) {
+    componentNodes[c].reserve(counts[c]);
+  }
+  for (size_t i = 0; i < static_cast<size_t>(n); ++i) {
+    componentNodes[labels[i]].push_back(i);
+  }
+
+  std::vector<Eigen::VectorXd> deflationCols;
+  for (size_t c = 0; c < numComponents; ++c) {
+    const std::vector<size_t>& nodes = componentNodes[c];
+    const size_t compSize = nodes.size();
+    if (compSize <= 1) {
+      continue;
+    }
+
+    std::unordered_map<size_t, Eigen::Index> localIdx;
+    localIdx.reserve(compSize);
+    for (size_t i = 0; i < compSize; ++i) {
+      localIdx[nodes[i]] = static_cast<Eigen::Index>(i);
+    }
+
+    std::vector<Eigen::Triplet<double>> triplets;
+    triplets.reserve(compSize * 4);
+    for (size_t u : nodes) {
+      const Eigen::Index lu = localIdx[u];
+      for (Eigen::SparseMatrix<double>::InnerIterator it(
+             this->assembledConnectivityMatrix, static_cast<Eigen::Index>(u));
+           it;
+           ++it) {
+        const Eigen::Index lv = localIdx[static_cast<size_t>(it.row())];
+        triplets.emplace_back(
+          static_cast<int>(lu), static_cast<int>(lv), it.value());
+      }
+    }
+
+    Eigen::SparseMatrix<double> subMat(static_cast<Eigen::Index>(compSize),
+                                       static_cast<Eigen::Index>(compSize));
+    subMat.setFromTriplets(triplets.begin(), triplets.end());
+
+    if (compSize <= 64) {
+      Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> es(
+        Eigen::MatrixXd(subMat), Eigen::ComputeEigenvectors);
+      if (es.info() == Eigen::Success) {
+        const Eigen::VectorXd& evals = es.eigenvalues();
+        const Eigen::MatrixXd& evecs = es.eigenvectors();
+        for (Eigen::Index j = 0; j < evals.size(); ++j) {
+          if (evals[j] > 1e-9) {
+            lambdaNodes.push_back(evals[j]);
+            deltaN.push_back(1.0);
+            Eigen::VectorXd fullVec = Eigen::VectorXd::Zero(n);
+            for (size_t i = 0; i < compSize; ++i) {
+              fullVec[static_cast<Eigen::Index>(nodes[i])] =
+                evecs(static_cast<Eigen::Index>(i), j);
+            }
+            deflationCols.push_back(std::move(fullVec));
+          }
+        }
+      }
+    } else if (numExactLowModes > 0 && compSize >= 4) {
+      const size_t kReq = std::min(numExactLowModes + 1, compSize - 2);
+      const size_t ncv = std::min(2 * kReq + 1, compSize);
+      try {
+        Spectra::SparseSymShiftSolve<double> op(subMat);
+        Spectra::SymEigsShiftSolver<Spectra::SparseSymShiftSolve<double>> eigs(
+          op,
+          static_cast<Eigen::Index>(kReq),
+          static_cast<Eigen::Index>(ncv),
+          -1e-5);
+        eigs.init();
+        eigs.compute(Spectra::SortRule::LargestMagn);
+        if (eigs.info() == Spectra::CompInfo::Successful) {
+          const Eigen::VectorXd evals = eigs.eigenvalues();
+          const Eigen::MatrixXd evecs = eigs.eigenvectors();
+          for (Eigen::Index j = 0; j < evals.size(); ++j) {
+            if (evals[j] > 1e-9) {
+              lambdaNodes.push_back(evals[j]);
+              deltaN.push_back(1.0);
+              Eigen::VectorXd fullVec = Eigen::VectorXd::Zero(n);
+              for (size_t i = 0; i < compSize; ++i) {
+                fullVec[static_cast<Eigen::Index>(nodes[i])] =
+                  evecs(static_cast<Eigen::Index>(i), j);
+              }
+              deflationCols.push_back(std::move(fullVec));
+            }
+          }
+        }
+      } catch (...) {
+        // Fall back to SLQ on this component if shift-invert fails
+      }
+    }
+  }
+
+  Eigen::MatrixXd deflationBasis;
+  if (!deflationCols.empty()) {
+    deflationBasis.resize(n, static_cast<Eigen::Index>(deflationCols.size()));
+    for (size_t j = 0; j < deflationCols.size(); ++j) {
+      deflationBasis.col(static_cast<Eigen::Index>(j)) = deflationCols[j];
+    }
+  }
+
+  runDeflatedSLQ(numSteps,
+                 numRandomVectors,
+                 numComponents,
+                 labels,
+                 counts,
+                 deflationCols.empty() ? nullptr : &deflationBasis,
+                 lambdaNodes,
+                 deltaN);
+}
+
+void
+NormalModeAnalyzer::ensureApproxSpectrumCached(StochasticSpectralMethod method,
+                                               size_t numSteps,
+                                               size_t numRandomVectors,
+                                               size_t numExactLowModes) const
+{
+  StochasticSpectralMethod resolvedMethod = method;
+  if (resolvedMethod == StochasticSpectralMethod::AUTO) {
+    const size_t n =
+      static_cast<size_t>(this->assembledConnectivityMatrix.rows());
+    resolvedMethod = (n <= 30000 && numExactLowModes > 0)
+                       ? StochasticSpectralMethod::HYBRID
+                       : StochasticSpectralMethod::SLQ;
+  }
+
+  if (this->hasCachedApproxSpectrum_ &&
+      this->cachedApproxMethod_ == resolvedMethod &&
+      this->cachedApproxSteps_ == numSteps &&
+      this->cachedApproxVectors_ == numRandomVectors &&
+      this->cachedApproxLowModes_ == numExactLowModes) {
+    return;
+  }
+
+  std::vector<double> lambdaNodes;
+  std::vector<double> deltaN;
+
+  switch (resolvedMethod) {
+    case StochasticSpectralMethod::SLQ: {
+      size_t numComponents = 0;
+      std::vector<size_t> labels;
+      std::vector<size_t> counts;
+      computeConnectedComponents(numComponents, labels, counts);
+      runDeflatedSLQ(numSteps,
+                     numRandomVectors,
+                     numComponents,
+                     labels,
+                     counts,
+                     nullptr,
+                     lambdaNodes,
+                     deltaN);
+      break;
+    }
+    case StochasticSpectralMethod::HYBRID:
+      computeEffectiveSpectrumHybrid(
+        numSteps, numRandomVectors, numExactLowModes, lambdaNodes, deltaN);
+      break;
+    case StochasticSpectralMethod::KPM:
+      computeEffectiveSpectrumKPM(
+        numSteps, numRandomVectors, std::max<size_t>(2 * numSteps, 1024), lambdaNodes, deltaN);
+      break;
+    case StochasticSpectralMethod::AUTO:
+      break;
+  }
+
+  this->cachedApproxMethod_ = resolvedMethod;
+  this->cachedApproxSteps_ = numSteps;
+  this->cachedApproxVectors_ = numRandomVectors;
+  this->cachedApproxLowModes_ = numExactLowModes;
+  this->cachedApproxLambdaNodes_ = std::move(lambdaNodes);
+  this->cachedApproxDeltaN_ = std::move(deltaN);
+  this->hasCachedApproxSpectrum_ = true;
+}
+
+Eigen::ArrayXd
+NormalModeAnalyzer::evaluateStressAutocorrelationApprox(
+  const Eigen::ArrayXd& t,
+  StochasticSpectralMethod method,
+  size_t numSteps,
+  size_t numRandomVectors,
+  size_t numExactLowModes) const
+{
+  ensureApproxSpectrumCached(
+    method, numSteps, numRandomVectors, numExactLowModes);
+  return evaluateStressAutocorrelationFromSpectrum(
+    t, this->cachedApproxLambdaNodes_, this->cachedApproxDeltaN_);
+}
+
+Eigen::ArrayXd
+NormalModeAnalyzer::evaluateStorageModulusApprox(
+  const Eigen::ArrayXd& omega,
+  StochasticSpectralMethod method,
+  size_t numSteps,
+  size_t numRandomVectors,
+  size_t numExactLowModes) const
+{
+  ensureApproxSpectrumCached(
+    method, numSteps, numRandomVectors, numExactLowModes);
+  return evaluateStorageModulusFromSpectrum(
+    omega, this->cachedApproxLambdaNodes_, this->cachedApproxDeltaN_);
+}
+
+Eigen::ArrayXd
+NormalModeAnalyzer::evaluateLossModulusApprox(
+  const Eigen::ArrayXd& omega,
+  StochasticSpectralMethod method,
+  size_t numSteps,
+  size_t numRandomVectors,
+  size_t numExactLowModes) const
+{
+  ensureApproxSpectrumCached(
+    method, numSteps, numRandomVectors, numExactLowModes);
+  return evaluateLossModulusFromSpectrum(
+    omega, this->cachedApproxLambdaNodes_, this->cachedApproxDeltaN_);
 }
 }

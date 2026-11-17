@@ -3,7 +3,11 @@ import pickle
 import unittest
 
 import numpy as np
-from pylimer_tools_cpp import NormalModeAnalyzer, NormalModeSolver
+from pylimer_tools_cpp import (
+    NormalModeAnalyzer,
+    NormalModeSolver,
+    StochasticSpectralMethod,
+)
 
 
 class TestNormalModeAnalyzer(unittest.TestCase):
@@ -130,6 +134,63 @@ class TestNormalModeAnalyzer(unittest.TestCase):
         )
         self.assertEqual(len(gt_kpm), 3)
         self.assertTrue(gt_kpm[0] >= gt_kpm[1] >= gt_kpm[2])
+
+    def test_approx_spectral_methods(self):
+        n = 120
+        from_nodes = list(range(n - 1)) + list(range(0, 100, 10))
+        to_nodes = list(range(1, n)) + list(range(20, 120, 10))
+        nma = NormalModeAnalyzer(from_nodes, to_nodes, n + 2)
+        nma.find_all_eigenvalues()
+
+        omega = np.logspace(-4, 2, 10)
+        gp_ex = nma.evaluate_storage_modulus(omega)
+        gpp_ex = nma.evaluate_loss_modulus(omega)
+        t = np.array([0.0, 0.5, 2.0])
+        gt_ex = nma.evaluate_stress_autocorrelation(t)
+
+        for method in (
+            StochasticSpectralMethod.SLQ,
+            StochasticSpectralMethod.HYBRID,
+            StochasticSpectralMethod.AUTO,
+        ):
+            gp = nma.evaluate_storage_modulus_approx(
+                omega,
+                method=method,
+                num_steps=120,
+                num_random_vectors=30,
+                num_exact_low_modes=30,
+            )
+            gpp = nma.evaluate_loss_modulus_approx(
+                omega,
+                method=method,
+                num_steps=120,
+                num_random_vectors=30,
+                num_exact_low_modes=30,
+            )
+            gt = nma.evaluate_stress_autocorrelation_approx(
+                t,
+                method=method,
+                num_steps=120,
+                num_random_vectors=30,
+                num_exact_low_modes=30,
+            )
+            self.assertEqual(len(gp), len(omega))
+            self.assertEqual(len(gpp), len(omega))
+            self.assertTrue(np.all(np.isfinite(gp)))
+            self.assertTrue(np.all(np.isfinite(gpp)))
+            self.assertTrue(gt[0] >= gt[1] >= gt[2])
+            np.testing.assert_allclose(gt[0], gt_ex[0], rtol=0.15)
+            np.testing.assert_allclose(gp, gp_ex, rtol=0.25)
+            np.testing.assert_allclose(gpp, gpp_ex, rtol=0.25)
+
+        gp_kpm = nma.evaluate_storage_modulus_approx(
+            omega,
+            method=StochasticSpectralMethod.KPM,
+            num_steps=256,
+            num_random_vectors=20,
+        )
+        self.assertEqual(len(gp_kpm), len(omega))
+        self.assertTrue(np.all(np.isfinite(gp_kpm)))
 
     def test_serialization(self):
         self.nma_ring.find_all_eigenvalues()

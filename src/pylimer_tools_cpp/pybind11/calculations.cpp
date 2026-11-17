@@ -40,6 +40,17 @@ init_pylimer_bound_calc(py::module_& m)
     .value("METAL", calc::NormalModeSolver::METAL)
     .finalize();
 
+  py::native_enum<calc::StochasticSpectralMethod>(
+    m,
+    "StochasticSpectralMethod",
+    "enum.Enum",
+    "Approximate spectral methods for large-scale normal mode analysis")
+    .value("AUTO", calc::StochasticSpectralMethod::AUTO)
+    .value("SLQ", calc::StochasticSpectralMethod::SLQ)
+    .value("HYBRID", calc::StochasticSpectralMethod::HYBRID)
+    .value("KPM", calc::StochasticSpectralMethod::KPM)
+    .finalize();
+
   py::class_<NormalModeAnalyzer>(m,
                                  "NormalModeAnalyzer",
                                  py::module_local(),
@@ -259,6 +270,57 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("num_moments") = 1024,
          py::arg("num_random_vectors") = 20,
          py::arg("num_quadrature_points") = 2048)
+    .def("evaluate_stress_autocorrelation_approx",
+         &NormalModeAnalyzer::evaluateStressAutocorrelationApprox,
+         R"pbdoc(
+         Evaluate stress autocorrelation G(t) using an approximate spectral method.
+
+         :param t: Time points to evaluate
+         :param method: StochasticSpectralMethod (AUTO, SLQ, HYBRID, or KPM)
+         :param num_steps: Lanczos steps (SLQ/HYBRID) or Chebyshev moments (KPM)
+         :param num_random_vectors: Number of Rademacher random vectors (default: 20)
+         :param num_exact_low_modes: Exact lowest nonzero modes for HYBRID (default: 100)
+         :return: Stress autocorrelation values
+         )pbdoc",
+         py::arg("t"),
+         py::arg("method") = calc::StochasticSpectralMethod::AUTO,
+         py::arg("num_steps") = 200,
+         py::arg("num_random_vectors") = 20,
+         py::arg("num_exact_low_modes") = 100)
+    .def("evaluate_storage_modulus_approx",
+         &NormalModeAnalyzer::evaluateStorageModulusApprox,
+         R"pbdoc(
+         Evaluate storage modulus G' using an approximate spectral method.
+
+         :param omega: Angular frequencies to evaluate
+         :param method: StochasticSpectralMethod (AUTO, SLQ, HYBRID, or KPM)
+         :param num_steps: Lanczos steps (SLQ/HYBRID) or Chebyshev moments (KPM)
+         :param num_random_vectors: Number of Rademacher random vectors (default: 20)
+         :param num_exact_low_modes: Exact lowest nonzero modes for HYBRID (default: 100)
+         :return: Storage modulus values
+         )pbdoc",
+         py::arg("omega"),
+         py::arg("method") = calc::StochasticSpectralMethod::AUTO,
+         py::arg("num_steps") = 200,
+         py::arg("num_random_vectors") = 20,
+         py::arg("num_exact_low_modes") = 100)
+    .def("evaluate_loss_modulus_approx",
+         &NormalModeAnalyzer::evaluateLossModulusApprox,
+         R"pbdoc(
+         Evaluate loss modulus G'' using an approximate spectral method.
+
+         :param omega: Angular frequencies to evaluate
+         :param method: StochasticSpectralMethod (AUTO, SLQ, HYBRID, or KPM)
+         :param num_steps: Lanczos steps (SLQ/HYBRID) or Chebyshev moments (KPM)
+         :param num_random_vectors: Number of Rademacher random vectors (default: 20)
+         :param num_exact_low_modes: Exact lowest nonzero modes for HYBRID (default: 100)
+         :return: Loss modulus values
+         )pbdoc",
+         py::arg("omega"),
+         py::arg("method") = calc::StochasticSpectralMethod::AUTO,
+         py::arg("num_steps") = 200,
+         py::arg("num_random_vectors") = 20,
+         py::arg("num_exact_low_modes") = 100)
 #ifdef CEREALIZABLE
     .def(py::pickle(
       [](const NormalModeAnalyzer& u) {

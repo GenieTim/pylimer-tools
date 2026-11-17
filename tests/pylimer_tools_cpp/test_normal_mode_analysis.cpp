@@ -353,6 +353,75 @@ TEST_CASE("NormalModeAnalyzer KPM computes continuous spectra and moduli",
   }
 }
 
+TEST_CASE("NormalModeAnalyzer SLQ and Hybrid approximate spectra match exact",
+          "[analysis][NormalModeAnalyzer][SLQ]")
+{
+  // Build a disconnected network: a 120-node cross-linked graph + a 10-node
+  // chain + 2 isolated nodes (singletons) to exercise zero-mode deflation.
+  std::vector<size_t> springFrom;
+  std::vector<size_t> springTo;
+  for (size_t i = 0; i < 119; ++i) {
+    springFrom.push_back(i);
+    springTo.push_back(i + 1);
+  }
+  for (size_t i = 0; i < 100; i += 10) {
+    springFrom.push_back(i);
+    springTo.push_back(i + 20);
+  }
+  for (size_t i = 120; i < 129; ++i) {
+    springFrom.push_back(i);
+    springTo.push_back(i + 1);
+  }
+
+  pc::NormalModeAnalyzer nma(springFrom, springTo, 132);
+  nma.computeAllEigenvalues(pc::NormalModeSolver::AUTO);
+
+  Eigen::ArrayXd omega(6);
+  omega << 1e-4, 1e-3, 1e-2, 1e-1, 1.0, 10.0;
+  Eigen::ArrayXd gpExact = nma.evaluateStorageModulus(omega);
+  Eigen::ArrayXd gppExact = nma.evaluateLossModulus(omega);
+
+  Eigen::ArrayXd t(3);
+  t << 0.0, 0.5, 5.0;
+  Eigen::ArrayXd gtExact = nma.evaluateStressAutocorrelation(t);
+
+  // SLQ with zero-mode deflation should match well even at low omega
+  Eigen::ArrayXd gpSLQ = nma.evaluateStorageModulusApprox(
+    omega, pc::StochasticSpectralMethod::SLQ, 120, 30);
+  Eigen::ArrayXd gppSLQ = nma.evaluateLossModulusApprox(
+    omega, pc::StochasticSpectralMethod::SLQ, 120, 30);
+  Eigen::ArrayXd gtSLQ = nma.evaluateStressAutocorrelationApprox(
+    t, pc::StochasticSpectralMethod::SLQ, 120, 30);
+  REQUIRE(gpSLQ.size() == 6);
+  REQUIRE(gppSLQ.size() == 6);
+  REQUIRE(gtSLQ.size() == 3);
+  CHECK(gtSLQ[0] >= gtSLQ[1]);
+  CHECK(gtSLQ[1] >= gtSLQ[2]);
+  CHECK_THAT(gtSLQ[0], Catch::Matchers::WithinRel(gtExact[0], 0.15));
+  for (Eigen::Index i = 0; i < omega.size(); ++i) {
+    CHECK_THAT(gpSLQ[i], Catch::Matchers::WithinRel(gpExact[i], 0.25));
+    CHECK_THAT(gppSLQ[i], Catch::Matchers::WithinRel(gppExact[i], 0.25));
+  }
+
+  // Hybrid (exact low modes + SLQ) should be even tighter
+  Eigen::ArrayXd gpHybrid = nma.evaluateStorageModulusApprox(
+    omega, pc::StochasticSpectralMethod::HYBRID, 80, 30, 30);
+  Eigen::ArrayXd gppHybrid = nma.evaluateLossModulusApprox(
+    omega, pc::StochasticSpectralMethod::HYBRID, 80, 30, 30);
+  for (Eigen::Index i = 0; i < omega.size(); ++i) {
+    CHECK_THAT(gpHybrid[i], Catch::Matchers::WithinRel(gpExact[i], 0.15));
+    CHECK_THAT(gppHybrid[i], Catch::Matchers::WithinRel(gppExact[i], 0.15));
+  }
+
+  // AUTO and KPM paths should also run cleanly
+  Eigen::ArrayXd gpAuto =
+    nma.evaluateStorageModulusApprox(omega, pc::StochasticSpectralMethod::AUTO);
+  Eigen::ArrayXd gpKpm = nma.evaluateStorageModulusApprox(
+    omega, pc::StochasticSpectralMethod::KPM, 256, 20);
+  CHECK(gpAuto.allFinite());
+  CHECK(gpKpm.allFinite());
+}
+
 TEST_CASE("NormalModeAnalyzer edge cases and multigraphs",
           "[analysis][NormalModeAnalyzer]")
 {
