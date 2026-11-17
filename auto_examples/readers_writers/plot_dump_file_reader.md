@@ -67,13 +67,12 @@ Dump file contains 3 frames
 
 ## Visualizing Box Dimensions Across Trajectory Frames
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 53-67 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 53-66 -->
 ```Python
 import matplotlib.pyplot as plt
 
 frame_indices = list(range(len(sequence)))
-box_volumes = [sequence.at_index(i).get_box().get_volume()
-               for i in frame_indices]
+box_volumes = [sequence.at_index(i).get_box().get_volume() for i in frame_indices]
 
 plt.figure(figsize=(6, 4))
 plt.plot(frame_indices, box_volumes, marker="o", color="#4C72B0", lw=2)
@@ -85,7 +84,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.095 seconds)
+**Total running time of the script:** (0 minutes 0.078 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-dump-file-reader-py"></a>
 

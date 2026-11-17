@@ -108,15 +108,7 @@ zs = [p[2] for p in coords]
 
 fig = plt.figure(figsize=(7, 5))
 ax = fig.add_subplot(111, projection="3d")
-sc = ax.scatter(
-    xs,
-    ys,
-    zs,
-    c=zs,
-    cmap="viridis",
-    s=30,
-    edgecolor="k",
-    alpha=0.8)
+sc = ax.scatter(xs, ys, zs, c=zs, cmap="viridis", s=30, edgecolor="k", alpha=0.8)
 ax.set_xlabel("X")
 ax.set_ylabel("Y")
 ax.set_zlabel("Z")

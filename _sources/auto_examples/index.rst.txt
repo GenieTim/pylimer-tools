@@ -130,23 +130,6 @@ See:
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="In MEHPForceBalance (gusev_numerical_2019, bernhard_phantom_2025), entanglement links can either remain frozen at their initial contour positions (``disable_slipping=True``) or slide dynamically along the polymer strands to balance contour tension (``disable_slipping=False``).">
-
-.. only:: html
-
-  .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_slipping_vs_fixed_links_thumb.png
-    :alt:
-
-  :doc:`/auto_examples/force_balance/plot_slipping_vs_fixed_links`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Slipping vs. Fixed Entanglement Links</div>
-    </div>
-
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="In MEHPForceBalance2 (gusev_numerical_2019, bernhard_phantom_2025), users can choose between two representations for sampled entanglements via entanglements_as_springs:">
 
 .. only:: html
@@ -159,6 +142,23 @@ See:
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Entanglement Links vs. Springs</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="In MEHPForceBalance (gusev_numerical_2019, bernhard_phantom_2025), entanglement links can either remain frozen at their initial contour positions (``disable_slipping=True``) or slide dynamically along the polymer strands to balance contour tension (``disable_slipping=False``).">
+
+.. only:: html
+
+  .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_slipping_vs_fixed_links_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/force_balance/plot_slipping_vs_fixed_links`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Slipping vs. Fixed Entanglement Links</div>
     </div>
 
 
@@ -655,23 +655,6 @@ The library supports four main file I/O operations:
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Read LAMMPS log files containing thermodynamic output from the thermo command.">
-
-.. only:: html
-
-  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_log_thermo_file_reader_thumb.png
-    :alt:
-
-  :doc:`/auto_examples/readers_writers/plot_log_thermo_file_reader`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Log & Thermo File Reader</div>
-    </div>
-
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="Read correlation functions from fix ave/correlate and fix ave/correlate/long commands.">
 
 .. only:: html
@@ -684,6 +667,23 @@ The library supports four main file I/O operations:
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Correlated Averages Reader</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Read LAMMPS log files containing thermodynamic output from the thermo command.">
+
+.. only:: html
+
+  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_log_thermo_file_reader_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/readers_writers/plot_log_thermo_file_reader`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Log & Thermo File Reader</div>
     </div>
 
 

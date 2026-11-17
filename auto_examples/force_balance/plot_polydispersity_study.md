@@ -58,7 +58,7 @@ Pass a per-strand list of lengths to [`add_strands()`](../../api/pylimer_tools_c
 and compare [`get_force_balance2()`](../../api/pylimer_tools_cpp.MCUniverseGenerator.md#pylimer_tools_cpp.MCUniverseGenerator.get_force_balance2) with and
 without sampled entanglements.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 48-81 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 48-79 -->
 ```Python
 rng = random.Random(42)
 d, avg_len, n_strands = 1.5, 50, 200
@@ -87,9 +87,7 @@ print(
     f"Dangling fraction: {fb_total.get_dangling_weight_fraction():.3f}"
 )
 
-cache_path = get_example_cache_path(
-    "polydispersity_study_cache.npz",
-    "force_balance")
+cache_path = get_example_cache_path("polydispersity_study_cache.npz", "force_balance")
 data = load_or_compute_cache(cache_path, run_polydispersity_simulation)
 ```
 
@@ -98,7 +96,7 @@ Active fraction: 0.863, Dangling fraction: 0.132
 Loading cached example data from polydispersity_study_cache.npz...
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 82-87 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 80-85 -->
 
 ## Shear Modulus & Topological Fractions vs. Polydispersity
 
@@ -106,13 +104,13 @@ Across moderate polydispersities ($1.0 \le D \le 1.8$, $N_{\text{strands}} = 10\
 95% confidence intervals over 8 repeats), $G_{\text{total}}$ and $w_{\text{active}}$
 remain remarkably stable because $\langle N \rangle$ is held constant.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 87-90 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 85-88 -->
 ```Python
 plot_polydispersity_modulus(data)
 plot_polydispersity_fractions(data)
 ```
 
-**Total running time of the script:** (0 minutes 0.391 seconds)
+**Total running time of the script:** (0 minutes 0.329 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-polydispersity-study-py"></a>
 

@@ -50,11 +50,10 @@ from pylimer_tools_cpp import BackTrackStatus, MCUniverseGenerator, MEHPForceBal
 Using a callback allows for more complex logic, such as
 stopping the process based on multiple criteria as illustrated here.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 41-128 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 41-126 -->
 ```Python
 # Get parameters for PDMS polymer density and bead distance
-params = get_parameters_for_polymer(
-    "PDMS", parameter_type=ParameterType.GAUSSIAN)
+params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
 
 n_xlinks = 500  # Number of crosslinkers
 n_strands = 1000  # Number of strands
@@ -134,8 +133,7 @@ def conversion_callback(gen, steps_remaining):
 generator.link_strands_callback(conversion_callback, 1.0)
 
 final_conversion = generator.get_current_crosslinker_conversion()
-print(
-    f"  Final conversion: {final_conversion:.3f} and w_sol: {wsol_values[-1]:.3f}")
+print(f"  Final conversion: {final_conversion:.3f} and w_sol: {wsol_values[-1]:.3f}")
 ```
 
 ```none
@@ -143,14 +141,14 @@ Target conversion 0.9 or soluble fraction 0.2 reached at step 1473.
 Final conversion: 0.736 and w_sol: 0.198
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 129-134 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 127-132 -->
 
 ## Visualizing the Results
 
 Let’s plot the evolution of crosslinker conversion
 and soluble fraction over the steps.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 134-145 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 132-143 -->
 ```Python
 fig, ax = plt.subplots()
 
@@ -164,7 +162,7 @@ ax.legend()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.457 seconds)
+**Total running time of the script:** (0 minutes 0.409 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-custom-crosslinking-callback-py"></a>
 

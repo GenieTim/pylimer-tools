@@ -96,8 +96,7 @@ ents_disc = pt.randomly_sample_entanglements(
 fb_disc = pt.MEHPForceBalance2(universe, ents_disc)
 fb_disc.run_force_relaxation(pt.StructureSimplificationMode.INACTIVE_THEN_X2F)
 
-print(
-    f"On-demand links: {len(es_od)}, Discrete links: {len(ents_disc.pairs_of_atoms)}")
+print(f"On-demand links: {len(es_od)}, Discrete links: {len(ents_disc.pairs_of_atoms)}")
 
 cache_path = get_example_cache_path(
     "entanglement_sampling_comparison_cache.npz", "force_balance"

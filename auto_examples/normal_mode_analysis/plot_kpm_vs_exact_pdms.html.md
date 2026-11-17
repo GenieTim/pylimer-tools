@@ -154,7 +154,7 @@ data = load_or_compute_cache(cache_path, run_kpm_vs_exact_pdms_study)
 ```
 
 ```none
-Demo PDMS box (L=12 nm, N_atoms=3819, N_ent=84): Exact=9.43s, KPM=0.12s
+Demo PDMS box (L=12 nm, N_atoms=3819, N_ent=84): Exact=7.70s, KPM=0.13s
 Loading cached example data from kpm_vs_exact_pdms_cache.npz...
 ```
 
@@ -270,7 +270,7 @@ Runtime comparison per network (single-threaded worker, mean over repeats):
      36 |   103816 |   2321 |    skipped |    9.783s |        -
 ```
 
-**Total running time of the script:** (0 minutes 12.754 seconds)
+**Total running time of the script:** (0 minutes 10.530 seconds)
 
 <a id="sphx-glr-download-auto-examples-normal-mode-analysis-plot-kpm-vs-exact-pdms-py"></a>
 

@@ -16,7 +16,7 @@ This example demonstrates how to use the Maximum Entropy Homogenization Procedur
 (Gusev [[Gus19](../../acknowledgements.md#id8)]) with slip-links to homogenize a polymer network and predict
 its equilibrium shear modulus.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 10-91 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 10-90 -->
 ```Python
 from pathlib import Path
 
@@ -32,8 +32,7 @@ from pylimer_tools.io.read_lammps_output_file import read_data_file
 from pylimer_tools_cpp import MEHPForceBalance, Universe
 
 # Get parameters for conversion factors
-params = get_parameters_for_polymer(
-    "PDMS", parameter_type=ParameterType.GAUSSIAN)
+params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
 assert isinstance(params, Parameters)
 
 
@@ -100,11 +99,11 @@ gz = (
 ```
 
 ```none
-Final residual (should be close to 0): 1.7675392742791471e-07
-Shear Modulus [MPa]: 0.0353
+Final residual (should be close to 0): 2.4639806078438567e-06
+Shear Modulus [MPa]: 0.0355
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 92-97 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 91-96 -->
 
 ## Visualization
 
@@ -112,7 +111,7 @@ We plot the distribution of strand elastic factors $\Gamma$ and the directional
 shear moduli $G_x, G_y, G_z$ compared to the total shear modulus
 $G$.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 97-165 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 96-164 -->
 ```Python
 active_gammas = gamma_factors[gamma_factors > 1e-4]
 
@@ -183,7 +182,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.536 seconds)
+**Total running time of the script:** (0 minutes 0.456 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-force-balance-py"></a>
 

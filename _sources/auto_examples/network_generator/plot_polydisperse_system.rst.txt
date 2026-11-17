@@ -28,7 +28,7 @@ For strand length distribution, in this example,
 we show how to use the log-normal distribution as proposed by :cite:t:`tsimouri_monte_2021`.
 Alternatives were proposed as well, such as the inverse Gaussian or a ternary distribution.
 
-.. GENERATED FROM PYTHON SOURCE LINES 13-74
+.. GENERATED FROM PYTHON SOURCE LINES 13-73
 
 .. code-block:: Python
 
@@ -46,8 +46,7 @@ Alternatives were proposed as well, such as the inverse Gaussian or a ternary di
 
     # Get parameters for PDMS polymer density, bead distance, and
     # characteristic ratio
-    params = get_parameters_for_polymer(
-        "PDMS", parameter_type=ParameterType.GAUSSIAN)
+    params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
     C_inf = params.get_characteristic_ratio()
 
     # setup strand lengths
@@ -100,20 +99,19 @@ Alternatives were proposed as well, such as the inverse Gaussian or a ternary di
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 75-79
+.. GENERATED FROM PYTHON SOURCE LINES 74-78
 
 Refer to :ref:`sphx_glr_auto_examples_readers_writers` for how you can save the universe to a file.
 
 For now, we will show that this produces a variety of different strand
 lengths:
 
-.. GENERATED FROM PYTHON SOURCE LINES 79-90
+.. GENERATED FROM PYTHON SOURCE LINES 78-88
 
 .. code-block:: Python
 
 
-    strand_lengths = [m.get_nr_of_atoms()
-                      for m in universe.get_chains_with_crosslinker(2)]
+    strand_lengths = [m.get_nr_of_atoms() for m in universe.get_chains_with_crosslinker(2)]
 
     # Plot the distribution of strand lengths
     plt.figure()
@@ -137,7 +135,7 @@ lengths:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.409 seconds)
+   **Total running time of the script:** (0 minutes 0.348 seconds)
 
 
 .. _sphx_glr_download_auto_examples_network_generator_plot_polydisperse_system.py:

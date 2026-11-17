@@ -214,8 +214,8 @@
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../auto_examples/force_balance/index.html">Force Balance, Maximum Entropy Homogenization Procedures</a><input aria-label="Toggle navigation of Force Balance, Maximum Entropy Homogenization Procedures" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/force_balance/plot_slipping_vs_fixed_links.html">Slipping vs. Fixed Entanglement Links</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/force_balance/plot_entanglement_link_vs_spring.html">Entanglement Links vs. Springs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/force_balance/plot_slipping_vs_fixed_links.html">Slipping vs. Fixed Entanglement Links</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/force_balance/plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/force_balance/plot_sampling_cutoff_effect.html">Sampling Cut-Off Effect</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/force_balance/plot_inactive_removal_and_sampling.html">Inactive Removal &amp; Sampling</a></li>
@@ -248,8 +248,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_pylimer_tools_output_reader.html">pylimer-tools Output Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_histogram_reader.html">Histogram Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_performance_caching.html">Performance and Caching</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_time_averaged_data_reader.html">Time-Averaged Data Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_unit_conversion.html">Unit Conversion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_dump_file_reader.html">Dump File Reader</a></li>
@@ -524,12 +524,7 @@
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"header must have more than zero characters"</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span>
-        <span class="n">header</span><span class="p">,</span>
-        <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span>
-        <span class="nb">isinstance</span><span class="p">(</span>
-            <span class="n">header</span><span class="p">,</span>
-            <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">header</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">header</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
     <span class="n">csv_file_to_write</span> <span class="o">=</span> <span class="s2">"</span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
         <span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">(),</span>
         <span class="n">hashlib</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span>
@@ -545,8 +540,7 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">header</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">min_line_len</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">min_line_len</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="o">.</span><span class="n">split</span><span class="p">()))</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">min_line_len</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">min_line_len</span><span class="p">,</span>
-                               <span class="nb">min</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">split</span><span class="p">())</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">header</span><span class="p">]))</span>
+            <span class="n">min_line_len</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">min_line_len</span><span class="p">,</span> <span class="nb">min</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">split</span><span class="p">())</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">header</span><span class="p">]))</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">check_skip_line</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">header</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">line</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
@@ -560,8 +554,7 @@
             <span class="k">return</span> <span class="kc">True</span>
 
         <span class="n">skip_line_fun</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">check_skip_line_header_list</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span>
-                <span class="n">header</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="n">check_skip_line</span>
+            <span class="n">check_skip_line_header_list</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">header</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="n">check_skip_line</span>
         <span class="p">)</span>
         <span class="c1"># skip lines up until header (or file ending)</span>
         <span class="n">n_lines_skipped</span> <span class="o">=</span> <span class="mi">0</span>
@@ -619,8 +612,7 @@
 <div class="viewcode-block" id="get_thermo_cache_name_suffix">
 <a class="viewcode-back" href="../../../pylimer_tools.io.html#pylimer_tools.io.extract_thermo_data.get_thermo_cache_name_suffix">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_thermo_cache_name_suffix</span><span class="p">(</span>
-    <span class="n">header</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-                  <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"Step Temp E_pair E_mol TotEng Press"</span><span class="p">,</span>
+    <span class="n">header</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"Step Temp E_pair E_mol TotEng Press"</span><span class="p">,</span>
     <span class="n">texts_to_read</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
     <span class="n">min_line_len</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -653,8 +645,7 @@
 <a class="viewcode-back" href="../../../pylimer_tools.io.html#pylimer_tools.io.extract_thermo_data.extract_thermo_params">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">extract_thermo_params</span><span class="p">(</span>
     <span class="n">file</span><span class="p">,</span>
-    <span class="n">header</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-                  <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"Step Temp E_pair E_mol TotEng Press"</span><span class="p">,</span>
+    <span class="n">header</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"Step Temp E_pair E_mol TotEng Press"</span><span class="p">,</span>
     <span class="n">texts_to_read</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
     <span class="n">min_line_len</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
     <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -727,15 +718,12 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                    <span class="s2">"Could not remove file </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                        <span class="n">filepath</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">"Could not remove file </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
                 <span class="k">pass</span>
             <span class="k">return</span> <span class="n">tmp_df</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s2">"Error reading temporary CSV thermo file '</span><span class="si">{}</span><span class="s2">': </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">filepath</span><span class="p">,</span> <span class="n">e</span><span class="p">),</span>
+                <span class="s2">"Error reading temporary CSV thermo file '</span><span class="si">{}</span><span class="s2">': </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">e</span><span class="p">),</span>
                 <span class="n">source</span><span class="o">=</span><span class="n">e</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
@@ -890,8 +878,7 @@
             <span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">h</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">headers</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">h</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">all_headers</span><span class="p">:</span>
-                <span class="n">first_line_split</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span>
-                    <span class="s2">"</span><span class="si">{}</span><span class="s2">+"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">separator</span><span class="p">),</span> <span class="n">first_line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+                <span class="n">first_line_split</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"</span><span class="si">{}</span><span class="s2">+"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">separator</span><span class="p">),</span> <span class="n">first_line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">first_line_split</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">headers</span><span class="p">):</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                         <span class="s2">"Headers and first line do not match in nr of values"</span><span class="p">,</span>
@@ -929,15 +916,12 @@
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">csv_file</span><span class="p">)</span>
                 <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                        <span class="s2">"Could not remove file </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                            <span class="n">csv_file</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">"Could not remove file </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">csv_file</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
                     <span class="k">pass</span>
                 <span class="k">continue</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">csv_file</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
                 <span class="n">header_line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
-                <span class="n">split_header</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span>
-                    <span class="s2">"</span><span class="si">{}</span><span class="s2">+"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">separator</span><span class="p">),</span> <span class="n">header_line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+                <span class="n">split_header</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"</span><span class="si">{}</span><span class="s2">+"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">separator</span><span class="p">),</span> <span class="n">header_line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
                 <span class="n">map_to_col</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="n">n_found</span> <span class="o">=</span> <span class="mi">0</span>
                 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">all_headers</span><span class="p">):</span>
@@ -950,8 +934,7 @@
                 <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">fp</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">line</span> <span class="o">==</span> <span class="n">header_line</span> <span class="ow">or</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"Step"</span><span class="p">):</span>
                         <span class="k">continue</span>
-                    <span class="n">split_line</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span>
-                        <span class="s2">"</span><span class="si">{}</span><span class="s2">+"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">separator</span><span class="p">),</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+                    <span class="n">split_line</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"</span><span class="si">{}</span><span class="s2">+"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">separator</span><span class="p">),</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
                     <span class="n">str_to_write</span> <span class="o">=</span> <span class="n">separator</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
                         <span class="p">[</span><span class="n">split_line</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="k">else</span> <span class="s2">"NaN"</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">map_to_col</span><span class="p">]</span>
                     <span class="p">)</span>
@@ -959,9 +942,7 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">csv_file</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                    <span class="s2">"Could not remove file </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                        <span class="n">csv_file</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">"Could not remove file </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">csv_file</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
                 <span class="k">pass</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">"File </span><span class="si">{}</span><span class="s2"> handled"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">csv_file</span><span class="p">))</span>
     <span class="c1"># read the csv files again</span>
@@ -981,9 +962,7 @@
     <span class="k">try</span><span class="p">:</span>
         <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">csv_file_to_write</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s2">"Could not remove file </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">csv_file_to_write</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">"Could not remove file </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">csv_file_to_write</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
         <span class="k">pass</span>
     <span class="c1"># doCache(reduce_mem_usage(df), file, suffix)</span>
     <span class="c1"># print("Read {} rows for file {}".format(len(df), file))</span>

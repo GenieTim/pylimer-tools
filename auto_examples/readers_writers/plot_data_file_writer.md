@@ -121,7 +121,7 @@ writer.config_molecule_idx_for_swap(True)
 
 We display the 3D coordinates of the generated atoms:
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 101-127 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 101-119 -->
 ```Python
 import matplotlib.pyplot as plt
 
@@ -132,15 +132,7 @@ zs = [p[2] for p in coords]
 
 fig = plt.figure(figsize=(7, 5))
 ax = fig.add_subplot(111, projection="3d")
-sc = ax.scatter(
-    xs,
-    ys,
-    zs,
-    c=zs,
-    cmap="viridis",
-    s=30,
-    edgecolor="k",
-    alpha=0.8)
+sc = ax.scatter(xs, ys, zs, c=zs, cmap="viridis", s=30, edgecolor="k", alpha=0.8)
 ax.set_xlabel("X")
 ax.set_ylabel("Y")
 ax.set_zlabel("Z")
@@ -150,7 +142,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.153 seconds)
+**Total running time of the script:** (0 minutes 0.131 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-data-file-writer-py"></a>
 

@@ -214,8 +214,8 @@
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../auto_examples/force_balance/index.html">Force Balance, Maximum Entropy Homogenization Procedures</a><input aria-label="Toggle navigation of Force Balance, Maximum Entropy Homogenization Procedures" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../auto_examples/force_balance/plot_slipping_vs_fixed_links.html">Slipping vs. Fixed Entanglement Links</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../auto_examples/force_balance/plot_entanglement_link_vs_spring.html">Entanglement Links vs. Springs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../auto_examples/force_balance/plot_slipping_vs_fixed_links.html">Slipping vs. Fixed Entanglement Links</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../auto_examples/force_balance/plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../auto_examples/force_balance/plot_sampling_cutoff_effect.html">Sampling Cut-Off Effect</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../auto_examples/force_balance/plot_inactive_removal_and_sampling.html">Inactive Removal &amp; Sampling</a></li>
@@ -248,8 +248,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../auto_examples/readers_writers/plot_pylimer_tools_output_reader.html">pylimer-tools Output Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../auto_examples/readers_writers/plot_histogram_reader.html">Histogram Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../auto_examples/readers_writers/plot_performance_caching.html">Performance and Caching</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../auto_examples/readers_writers/plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../auto_examples/readers_writers/plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../auto_examples/readers_writers/plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../auto_examples/readers_writers/plot_time_averaged_data_reader.html">Time-Averaged Data Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../auto_examples/readers_writers/plot_unit_conversion.html">Unit Conversion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../auto_examples/readers_writers/plot_dump_file_reader.html">Dump File Reader</a></li>
@@ -473,8 +473,7 @@
     <span class="k">if</span> <span class="n">target_p</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">target_wsol</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"target_p or target_wsol must be provided"</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">target_p</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">target_wsol</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">"Only one of target_p and target_wsol should be provided"</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Only one of target_p and target_wsol should be provided"</span><span class="p">)</span>
 
     <span class="n">n_crosslinks</span> <span class="o">=</span> <span class="n">n_chains_crosslinkers</span>
 
@@ -640,8 +639,7 @@
             <span class="n">z_score_std_mult</span><span class="o">=</span><span class="n">z_score_std_mult</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">"Error during structure generation for network activity assessment: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Error during structure generation for network activity assessment: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">False</span>
 
     <span class="k">try</span><span class="p">:</span>
@@ -953,8 +951,7 @@
             <span class="s2">"Only one of --target-p and --target-wsol should be provided"</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="n">target_p</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">target_wsol</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">click</span><span class="o">.</span><span class="n">UsageError</span><span class="p">(</span>
-            <span class="s2">"Either --target-p or --target-wsol must be provided"</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">click</span><span class="o">.</span><span class="n">UsageError</span><span class="p">(</span><span class="s2">"Either --target-p or --target-wsol must be provided"</span><span class="p">)</span>
 
     <span class="n">params</span> <span class="o">=</span> <span class="n">get_parameters_for_polymer</span><span class="p">(</span>
         <span class="n">polymer_name</span><span class="p">,</span> <span class="n">parameter_type</span><span class="o">=</span><span class="n">ParameterType</span><span class="p">[</span><span class="n">parameter_type</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span>

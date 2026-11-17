@@ -76,7 +76,7 @@ Pass a per-strand list of lengths to :meth:`~pylimer_tools_cpp.MCUniverseGenerat
 and compare :meth:`~pylimer_tools_cpp.MCUniverseGenerator.get_force_balance2` with and
 without sampled entanglements.
 
-.. GENERATED FROM PYTHON SOURCE LINES 48-81
+.. GENERATED FROM PYTHON SOURCE LINES 48-79
 
 .. code-block:: Python
 
@@ -108,9 +108,7 @@ without sampled entanglements.
         f"Dangling fraction: {fb_total.get_dangling_weight_fraction():.3f}"
     )
 
-    cache_path = get_example_cache_path(
-        "polydispersity_study_cache.npz",
-        "force_balance")
+    cache_path = get_example_cache_path("polydispersity_study_cache.npz", "force_balance")
     data = load_or_compute_cache(cache_path, run_polydispersity_simulation)
 
 
@@ -127,7 +125,7 @@ without sampled entanglements.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 82-87
+.. GENERATED FROM PYTHON SOURCE LINES 80-85
 
 Shear Modulus & Topological Fractions vs. Polydispersity
 --------------------------------------------------------
@@ -135,7 +133,7 @@ Across moderate polydispersities (:math:`1.0 \le D \le 1.8`, :math:`N_{\text{str
 95% confidence intervals over 8 repeats), :math:`G_{\text{total}}` and :math:`w_{\text{active}}`
 remain remarkably stable because :math:`\langle N \rangle` is held constant.
 
-.. GENERATED FROM PYTHON SOURCE LINES 87-90
+.. GENERATED FROM PYTHON SOURCE LINES 85-88
 
 .. code-block:: Python
 
@@ -169,7 +167,7 @@ remain remarkably stable because :math:`\langle N \rangle` is held constant.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.391 seconds)
+   **Total running time of the script:** (0 minutes 0.329 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_polydispersity_study.py:

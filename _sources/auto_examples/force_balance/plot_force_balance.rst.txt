@@ -25,7 +25,7 @@ This example demonstrates how to use the Maximum Entropy Homogenization Procedur
 (:cite:t:`gusev_numerical_2019`) with slip-links to homogenize a polymer network and predict
 its equilibrium shear modulus.
 
-.. GENERATED FROM PYTHON SOURCE LINES 10-91
+.. GENERATED FROM PYTHON SOURCE LINES 10-90
 
 .. code-block:: Python
 
@@ -44,8 +44,7 @@ its equilibrium shear modulus.
     from pylimer_tools_cpp import MEHPForceBalance, Universe
 
     # Get parameters for conversion factors
-    params = get_parameters_for_polymer(
-        "PDMS", parameter_type=ParameterType.GAUSSIAN)
+    params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
     assert isinstance(params, Parameters)
 
 
@@ -118,13 +117,13 @@ its equilibrium shear modulus.
 
  .. code-block:: none
 
-    Final residual (should be close to 0): 1.7675392742791471e-07
-    Shear Modulus [MPa]: 0.0353
+    Final residual (should be close to 0): 2.4639806078438567e-06
+    Shear Modulus [MPa]: 0.0355
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 92-97
+.. GENERATED FROM PYTHON SOURCE LINES 91-96
 
 Visualization
 -------------
@@ -132,7 +131,7 @@ We plot the distribution of strand elastic factors :math:`\Gamma` and the direct
 shear moduli :math:`G_x, G_y, G_z` compared to the total shear modulus
 :math:`G`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 97-165
+.. GENERATED FROM PYTHON SOURCE LINES 96-164
 
 .. code-block:: Python
 
@@ -231,7 +230,7 @@ shear moduli :math:`G_x, G_y, G_z` compared to the total shear modulus
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.536 seconds)
+   **Total running time of the script:** (0 minutes 0.456 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_force_balance.py:

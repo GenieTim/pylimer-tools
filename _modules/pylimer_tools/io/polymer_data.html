@@ -214,8 +214,8 @@
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../auto_examples/force_balance/index.html">Force Balance, Maximum Entropy Homogenization Procedures</a><input aria-label="Toggle navigation of Force Balance, Maximum Entropy Homogenization Procedures" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/force_balance/plot_slipping_vs_fixed_links.html">Slipping vs. Fixed Entanglement Links</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/force_balance/plot_entanglement_link_vs_spring.html">Entanglement Links vs. Springs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/force_balance/plot_slipping_vs_fixed_links.html">Slipping vs. Fixed Entanglement Links</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/force_balance/plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/force_balance/plot_sampling_cutoff_effect.html">Sampling Cut-Off Effect</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/force_balance/plot_inactive_removal_and_sampling.html">Inactive Removal &amp; Sampling</a></li>
@@ -248,8 +248,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_pylimer_tools_output_reader.html">pylimer-tools Output Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_histogram_reader.html">Histogram Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_performance_caching.html">Performance and Caching</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_time_averaged_data_reader.html">Time-Averaged Data Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_unit_conversion.html">Unit Conversion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_dump_file_reader.html">Dump File Reader</a></li>
@@ -609,8 +609,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
             <span class="p">)</span>
         <span class="p">)</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"   "</span> <span class="o">+</span>
-                     <span class="s2">"  "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">col</span><span class="si">:</span><span class="s2">&gt;12</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_columns</span><span class="p">[:</span><span class="mi">5</span><span class="p">]))</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"   "</span> <span class="o">+</span> <span class="s2">"  "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">col</span><span class="si">:</span><span class="s2">&gt;12</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_columns</span><span class="p">[:</span><span class="mi">5</span><span class="p">]))</span>
 
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">polymer</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_polymers</span><span class="p">[:</span><span class="mi">5</span><span class="p">]):</span>
             <span class="n">values</span> <span class="o">=</span> <span class="p">[]</span>
@@ -696,10 +695,7 @@
 
     <span class="k">for</span> <span class="n">polymer_dict</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">_polymers</span><span class="p">:</span>
         <span class="n">polymer_data_name</span> <span class="o">=</span> <span class="n">polymer_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"name"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
-        <span class="n">normalized_name</span> <span class="o">=</span> <span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-            <span class="nb">filter</span><span class="p">(</span>
-                <span class="nb">str</span><span class="o">.</span><span class="n">isalnum</span><span class="p">,</span>
-                <span class="nb">str</span><span class="p">(</span><span class="n">polymer_data_name</span><span class="p">)))</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">normalized_name</span> <span class="o">=</span> <span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">isalnum</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">polymer_data_name</span><span class="p">)))</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">normalized_input</span> <span class="o">==</span> <span class="n">normalized_name</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">PolymerData</span><span class="p">(</span><span class="n">polymer_dict</span><span class="p">)</span>

@@ -64,9 +64,7 @@ bars = plt.bar(
 plt.yscale("log")
 plt.xlabel("LAMMPS Unit Style", fontsize=11)
 plt.ylabel("1 Unit of Pressure [Pa] (log scale)", fontsize=11)
-plt.title(
-    "Pressure Conversion to SI (Pa) Across LAMMPS Unit Styles",
-    fontsize=12)
+plt.title("Pressure Conversion to SI (Pa) Across LAMMPS Unit Styles", fontsize=12)
 plt.grid(True, which="both", axis="y", linestyle=":", alpha=0.6)
 plt.tight_layout()
 plt.show()

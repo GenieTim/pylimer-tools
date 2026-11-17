@@ -48,7 +48,7 @@ The :class:`~pylimer_tools_cpp.UniverseSequence` class provides automatic memory
 For large trajectories, frames are loaded on-demand
 Load a LAMMPS dump trajectory file (replace with your file)
 
-.. GENERATED FROM PYTHON SOURCE LINES 20-65
+.. GENERATED FROM PYTHON SOURCE LINES 20-64
 
 .. code-block:: Python
 
@@ -94,8 +94,7 @@ Load a LAMMPS dump trajectory file (replace with your file)
     print("\n--- Memory Usage Report ---")
     print(f"Memory before processing: {mem_before / (1024 * 1024):.2f} MB")
     print(f"Memory after processing:  {mem_after / (1024 * 1024):.2f} MB")
-    print(
-        f"Memory used by script:    {(mem_after - mem_before) / (1024 * 1024):.2f} MB")
+    print(f"Memory used by script:    {(mem_after - mem_before) / (1024 * 1024):.2f} MB")
 
 
 
@@ -7540,21 +7539,21 @@ Load a LAMMPS dump trajectory file (replace with your file)
     Processing frame 74320 with 32 atoms
 
     --- Memory Usage Report ---
-    Memory before processing: 945.73 MB
-    Memory after processing:  945.73 MB
+    Memory before processing: 954.73 MB
+    Memory after processing:  954.73 MB
     Memory used by script:    0.00 MB
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 66-70
+.. GENERATED FROM PYTHON SOURCE LINES 65-69
 
 Memory Stability Visualization
 ------------------------------
 Demonstrating that on-demand loading with ``forget_at_index`` maintains
 a flat memory profile:
 
-.. GENERATED FROM PYTHON SOURCE LINES 70-82
+.. GENERATED FROM PYTHON SOURCE LINES 69-81
 
 .. code-block:: Python
 
@@ -7591,7 +7590,7 @@ a flat memory profile:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 3.627 seconds)
+   **Total running time of the script:** (0 minutes 3.186 seconds)
 
 
 .. _sphx_glr_download_auto_examples_readers_writers_plot_memory_efficient_dump_file_reading.py:

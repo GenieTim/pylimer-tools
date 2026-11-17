@@ -21,7 +21,7 @@ Tetra-PEG networks are model systems commonly used in soft matter research where
 
 The thumbnail was created using the [polymer-graph-sketcher](https://genietim.github.io/polymer-graph-sketcher/) tool.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 15-166 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 15-158 -->
 ```Python
 # sphinx_gallery_thumbnail_path = '_static/thumbnails/network_generator/tetra-link.png'
 import datetime
@@ -87,9 +87,7 @@ print(f"  Total atoms: {generator.get_current_nr_of_atoms()}")
 print(f"  Total bonds: {generator.get_current_nr_of_bonds()}")
 
 # Now link free strand ends to each other to form the final network
-print(
-    f"Linking strand ends to achieve {
-        strand_to_strand_conversion:.1%} conversion...")
+print(f"Linking strand ends to achieve {strand_to_strand_conversion:.1%} conversion...")
 generator.link_strands_to_strands_to_conversion(
     target_strand_conversion=strand_to_strand_conversion
 )
@@ -97,9 +95,7 @@ generator.link_strands_to_strands_to_conversion(
 print("System after strand-strand linking:")
 print(f"  Total atoms: {generator.get_current_nr_of_atoms()}")
 print(f"  Total bonds: {generator.get_current_nr_of_bonds()}")
-print(
-    f"  Final strand conversion: {
-        generator.get_current_strand_conversion():.3f}")
+print(f"  Final strand conversion: {generator.get_current_strand_conversion():.3f}")
 
 # Optional: Relax crosslink positions for better equilibration
 print("Relaxing crosslink positions...")
@@ -119,11 +115,7 @@ print("Final network statistics:")
 print(f"  Total atoms: {universe.get_nr_of_atoms()}")
 print(f"  Total bonds: {universe.get_nr_of_bonds()}")
 box = universe.get_box()
-print(
-    f"  Box dimensions: {
-        box.get_lx():.1f} × {
-            box.get_ly():.1f} × {
-                box.get_lz():.1f}")
+print(f"  Box dimensions: {box.get_lx():.1f} × {box.get_ly():.1f} × {box.get_lz():.1f}")
 
 # Estimate network properties
 total_star_arms = n_star_crosslinkers * star_functionality
@@ -175,7 +167,7 @@ print("Network saved to 'generated_structures/tetra_peg_network.data'")
 ```
 
 ```none
-Starting tetra-PEG network generation at 2026-11-17 09:06:31.414179
+Starting tetra-PEG network generation at 2026-11-17 16:05:43.404171
 System parameters:
   Box size: 80.0³
   Star crosslinkers: 150
@@ -195,7 +187,7 @@ System after strand-strand linking:
   Final strand conversion: 0.822
 Relaxing crosslink positions...
 Generating final universe with bead coordinates...
-Network generation completed at 2026-11-17 09:06:31.435564
+Network generation completed at 2026-11-17 16:05:43.422635
 Final network statistics:
   Total atoms: 12900
   Total bonds: 12985
@@ -210,13 +202,13 @@ Saving network structure...
 Network saved to 'generated_structures/tetra_peg_network.data'
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 167-170 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 159-162 -->
 
 ## Visualizing Strand Topology Breakdown
 
 We analyze and plot the distribution of strand types after crosslinking:
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 170-214 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 162-206 -->
 ```Python
 import matplotlib.pyplot as plt
 
@@ -263,7 +255,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.170 seconds)
+**Total running time of the script:** (0 minutes 0.148 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-tetra-peg-network-py"></a>
 

@@ -214,8 +214,8 @@
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../auto_examples/force_balance/index.html">Force Balance, Maximum Entropy Homogenization Procedures</a><input aria-label="Toggle navigation of Force Balance, Maximum Entropy Homogenization Procedures" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/force_balance/plot_slipping_vs_fixed_links.html">Slipping vs. Fixed Entanglement Links</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/force_balance/plot_entanglement_link_vs_spring.html">Entanglement Links vs. Springs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/force_balance/plot_slipping_vs_fixed_links.html">Slipping vs. Fixed Entanglement Links</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/force_balance/plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/force_balance/plot_sampling_cutoff_effect.html">Sampling Cut-Off Effect</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/force_balance/plot_inactive_removal_and_sampling.html">Inactive Removal &amp; Sampling</a></li>
@@ -248,8 +248,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_pylimer_tools_output_reader.html">pylimer-tools Output Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_histogram_reader.html">Histogram Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_performance_caching.html">Performance and Caching</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_time_averaged_data_reader.html">Time-Averaged Data Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_unit_conversion.html">Unit Conversion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_dump_file_reader.html">Dump File Reader</a></li>
@@ -443,8 +443,7 @@
 <span class="sd">    ToDo:</span>
 <span class="sd">      - Support more than one crosslinker type (as is supported by original formula)</span>
 <span class="sd">    """</span>
-    <span class="n">g_mmt_phantom</span><span class="p">,</span> <span class="n">g_mmt_entanglement</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">compute_modulus_decomposition</span><span class="p">(</span>
-        <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">g_mmt_phantom</span><span class="p">,</span> <span class="n">g_mmt_entanglement</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">compute_modulus_decomposition</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">g_mmt_phantom</span> <span class="o">+</span> <span class="n">g_mmt_entanglement</span>  <span class="c1"># type: ignore</span></div>
 
 
@@ -799,15 +798,13 @@
 <span class="sd">    :param g: The functionality of the ordinary chains</span>
 <span class="sd">    """</span>
     <span class="n">alpha</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">compute_miller_macosko_probabilities</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">w_f</span> <span class="o">*</span> <span class="p">(</span><span class="n">alpha</span><span class="o">**</span><span class="n">f</span><span class="p">)</span> <span class="o">+</span> <span class="n">w_g</span> <span class="o">*</span> \
-        <span class="p">((</span><span class="n">r</span> <span class="o">*</span> <span class="n">p</span> <span class="o">*</span> <span class="p">(</span><span class="n">alpha</span> <span class="o">**</span> <span class="p">(</span><span class="n">f</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">r</span> <span class="o">*</span> <span class="n">p</span><span class="p">)</span> <span class="o">**</span> <span class="n">g</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">w_f</span> <span class="o">*</span> <span class="p">(</span><span class="n">alpha</span><span class="o">**</span><span class="n">f</span><span class="p">)</span> <span class="o">+</span> <span class="n">w_g</span> <span class="o">*</span> <span class="p">((</span><span class="n">r</span> <span class="o">*</span> <span class="n">p</span> <span class="o">*</span> <span class="p">(</span><span class="n">alpha</span> <span class="o">**</span> <span class="p">(</span><span class="n">f</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">r</span> <span class="o">*</span> <span class="n">p</span><span class="p">)</span> <span class="o">**</span> <span class="n">g</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="compute_miller_macosko_probabilities">
 <a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.miller_macosko_theory.compute_miller_macosko_probabilities">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">compute_miller_macosko_probabilities</span><span class="p">(</span>
-        <span class="n">r</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">b2</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_miller_macosko_probabilities</span><span class="p">(</span><span class="n">r</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">b2</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute Macosko and Miller's probabilities :math:`P(F_A)` and :math:`P(F_B)`</span>
 <span class="sd">    i.e., the probability that a randomly chosen A (crosslink) or B (strand-end),</span>
@@ -853,8 +850,7 @@
     <span class="k">if</span> <span class="n">f</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
         <span class="n">alpha</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">r</span> <span class="o">*</span> <span class="n">p</span> <span class="o">*</span> <span class="n">p</span> <span class="o">*</span> <span class="n">b2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">r</span> <span class="o">*</span> <span class="n">p</span> <span class="o">*</span> <span class="n">p</span> <span class="o">*</span> <span class="n">b2</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">f</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
-        <span class="n">alpha</span> <span class="o">=</span> <span class="p">((</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">r</span> <span class="o">*</span> <span class="n">p</span> <span class="o">*</span> <span class="n">p</span> <span class="o">*</span> <span class="n">b2</span><span class="p">))</span> <span class="o">-</span> <span class="mf">3.0</span> <span class="o">/</span>
-                 <span class="mf">4.0</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="p">((</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">r</span> <span class="o">*</span> <span class="n">p</span> <span class="o">*</span> <span class="n">p</span> <span class="o">*</span> <span class="n">b2</span><span class="p">))</span> <span class="o">-</span> <span class="mf">3.0</span> <span class="o">/</span> <span class="mf">4.0</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">f</span> <span class="o">&gt;</span> <span class="mi">4</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
@@ -870,8 +866,7 @@
             <span class="p">)</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">fun_to_root_for_alpha</span><span class="p">(</span><span class="n">alpha</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">r</span> <span class="o">*</span> <span class="n">b2</span> <span class="o">*</span> <span class="n">p</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> \
-                <span class="n">alpha</span> <span class="o">**</span> <span class="p">(</span><span class="n">f</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">alpha</span> <span class="o">-</span> <span class="n">r</span> <span class="o">*</span> <span class="n">b2</span> <span class="o">*</span> <span class="p">(</span><span class="n">p</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">return</span> <span class="n">r</span> <span class="o">*</span> <span class="n">b2</span> <span class="o">*</span> <span class="n">p</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">alpha</span> <span class="o">**</span> <span class="p">(</span><span class="n">f</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">alpha</span> <span class="o">-</span> <span class="n">r</span> <span class="o">*</span> <span class="n">b2</span> <span class="o">*</span> <span class="p">(</span><span class="n">p</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">fun_to_root_for_alpha_prime</span><span class="p">(</span><span class="n">alpha</span><span class="p">):</span>
             <span class="k">return</span> <span class="o">-</span><span class="mi">1</span> <span class="o">+</span> <span class="n">alpha</span> <span class="o">**</span> <span class="p">(</span><span class="n">f</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">+</span> <span class="n">f</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">p</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">*</span> <span class="n">b2</span>
@@ -980,9 +975,7 @@
 
     <span class="k">if</span> <span class="n">temperature</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">temperature</span> <span class="o">=</span> <span class="p">(</span><span class="mf">273.15</span> <span class="o">+</span> <span class="mi">25</span><span class="p">)</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">kelvin</span>  <span class="c1"># Temperature in Kelvin</span>
-    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span>
-        <span class="n">temperature</span><span class="p">,</span>
-        <span class="n">ureg</span><span class="o">.</span><span class="n">Quantity</span><span class="p">)</span> <span class="ow">and</span> <span class="n">temperature</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="s2">"[temperature]"</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">temperature</span><span class="p">,</span> <span class="n">ureg</span><span class="o">.</span><span class="n">Quantity</span><span class="p">)</span> <span class="ow">and</span> <span class="n">temperature</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="s2">"[temperature]"</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">g_e_1</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">g_e_1</span> <span class="o">=</span> <span class="p">(</span>
             <span class="mf">8.3145</span>  <span class="c1"># gas constant, J/(mol*K)</span>
@@ -1000,12 +993,10 @@
     <span class="c1"># If given as molar concentration, convert to number density (molecules</span>
     <span class="c1"># per volume)</span>
     <span class="k">if</span> <span class="n">nu</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="s2">"[substance]/[volume]"</span><span class="p">):</span>
-        <span class="n">nu</span> <span class="o">=</span> <span class="n">nu</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">"mol/meter**3"</span><span class="p">)</span><span class="o">.</span><span class="n">magnitude</span> <span class="o">*</span> \
-            <span class="n">ureg</span><span class="p">(</span><span class="s2">"1/meter**3"</span><span class="p">)</span> <span class="o">*</span> <span class="mf">6.02214076e23</span>
+        <span class="n">nu</span> <span class="o">=</span> <span class="n">nu</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">"mol/meter**3"</span><span class="p">)</span><span class="o">.</span><span class="n">magnitude</span> <span class="o">*</span> <span class="n">ureg</span><span class="p">(</span><span class="s2">"1/meter**3"</span><span class="p">)</span> <span class="o">*</span> <span class="mf">6.02214076e23</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">nu</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="s2">"1/[volume]"</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">"nu must have dimensionality of number density (1/volume)."</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"nu must have dimensionality of number density (1/volume)."</span><span class="p">)</span>
 
     <span class="c1"># Boltzmann constant</span>
     <span class="n">kb</span> <span class="o">=</span> <span class="mf">1.380649e-23</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">joule</span> <span class="o">/</span> <span class="n">ureg</span><span class="o">.</span><span class="n">kelvin</span>
@@ -1443,8 +1434,7 @@
         <span class="p">)</span>
     <span class="k">if</span> <span class="n">r</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">"The stoichiometric imbalance `r` must be positive, got </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">r</span><span class="p">)</span>
+            <span class="s2">"The stoichiometric imbalance `r` must be positive, got </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="n">f</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -1507,9 +1497,7 @@
     <span class="p">),</span>
     <span class="n">_ParamValidatorAssembler</span><span class="p">(</span>
         <span class="s2">"crosslinker_type"</span><span class="p">,</span>
-        <span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="nb">max</span><span class="p">(</span>
-            <span class="n">p</span><span class="p">[</span><span class="s2">"functionality_per_type"</span><span class="p">],</span>
-            <span class="n">key</span><span class="o">=</span><span class="n">p</span><span class="p">[</span><span class="s2">"functionality_per_type"</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">),</span>
+        <span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="nb">max</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">"functionality_per_type"</span><span class="p">],</span> <span class="n">key</span><span class="o">=</span><span class="n">p</span><span class="p">[</span><span class="s2">"functionality_per_type"</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">),</span>
         <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="p">[</span><span class="s2">"functionality_per_type"</span><span class="p">],</span>
     <span class="p">),</span>
@@ -1603,8 +1591,7 @@
         <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">_param_is_ready</span><span class="p">(</span><span class="n">dep</span><span class="p">)</span> <span class="k">for</span> <span class="n">dep</span> <span class="ow">in</span> <span class="n">param</span><span class="o">.</span><span class="n">dependencies</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_validate</span><span class="p">(</span><span class="n">param_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">_validator_per_name</span><span class="p">[</span><span class="n">param_name</span><span class="p">]</span><span class="o">.</span><span class="n">param_validator</span><span class="p">(</span>
-                <span class="n">given_parameters</span><span class="p">[</span><span class="n">p</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_validator_per_name</span><span class="p">[</span><span class="n">param_name</span><span class="p">]</span><span class="o">.</span><span class="n">param_validator</span><span class="p">(</span><span class="n">given_parameters</span><span class="p">[</span><span class="n">p</span><span class="p">]):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">"Invalid value for parameter '</span><span class="si">{}</span><span class="s2">' (got </span><span class="si">{}</span><span class="s2">)."</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="n">param_name</span><span class="p">,</span> <span class="n">given_parameters</span><span class="p">[</span><span class="n">param_name</span><span class="p">]</span>
@@ -1617,8 +1604,7 @@
         <span class="n">_validate</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
 
     <span class="c1"># first, determine all parameters to compute</span>
-    <span class="n">to_compute</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
-        <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">required_parameters</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">_param_is_ready</span><span class="p">(</span><span class="n">d</span><span class="p">)])</span>
+    <span class="n">to_compute</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">required_parameters</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">_param_is_ready</span><span class="p">(</span><span class="n">d</span><span class="p">)])</span>
     <span class="c1"># add dependencies</span>
     <span class="n">found_last_iteration</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="k">while</span> <span class="n">found_last_iteration</span><span class="p">:</span>

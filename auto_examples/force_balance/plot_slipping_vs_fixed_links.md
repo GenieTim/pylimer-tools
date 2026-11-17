@@ -49,7 +49,7 @@ On a generated network, `disable_slipping=True` freezes the sampled contour frac
 whereas `disable_slipping=False` updates them iteratively during force
 relaxation.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 38-69 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 38-67 -->
 ```Python
 gen = pt.MCUniverseGenerator(18.0, 18.0, 18.0)
 gen.set_seed(42)
@@ -76,9 +76,7 @@ print(
     f"slipping: {fb_slip.get_nr_of_iterations()}"
 )
 
-cache_path = get_example_cache_path(
-    "slipping_vs_fixed_cache.npz",
-    "force_balance")
+cache_path = get_example_cache_path("slipping_vs_fixed_cache.npz", "force_balance")
 data = load_or_compute_cache(cache_path, run_slipping_vs_fixed_simulation)
 ```
 
@@ -87,7 +85,7 @@ Iterations — fixed: 300, slipping: 941
 Loading cached example data from slipping_vs_fixed_cache.npz...
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 70-75 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 68-73 -->
 
 ## Modulus Reduction & Convergence Cost
 
@@ -95,13 +93,13 @@ Multi-seed ensemble results (95% confidence intervals) confirm that dynamic slip
 the predicted shear modulus by ~30–40% at high entanglement densities while requiring 2–3x more
 relaxation iterations.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 75-78 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 73-76 -->
 ```Python
 plot_slipping_vs_fixed_modulus(data)
 plot_slipping_vs_fixed_iterations(data)
 ```
 
-**Total running time of the script:** (0 minutes 0.511 seconds)
+**Total running time of the script:** (0 minutes 0.414 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-slipping-vs-fixed-links-py"></a>
 

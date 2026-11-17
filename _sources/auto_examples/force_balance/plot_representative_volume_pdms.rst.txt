@@ -87,13 +87,12 @@ with ``ParameterType.GAUSSIAN``, we parameterize a realistic PDMS box of side
 length :math:`L = 25\,\text{nm}`, sample entanglements on demand, and evaluate
 :math:`G` with :class:`~pylimer_tools_cpp.MEHPForceBalance2`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 59-104
+.. GENERATED FROM PYTHON SOURCE LINES 59-102
 
 .. code-block:: Python
 
 
-    params = get_parameters_for_polymer(
-        "PDMS", parameter_type=ParameterType.GAUSSIAN)
+    params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
     assert isinstance(params, Parameters)
     dist_unit = params.get("distance_units")
     b = params.get("<b>").to(dist_unit).magnitude
@@ -104,8 +103,7 @@ length :math:`L = 25\,\text{nm}`, sample entanglements on demand, and evaluate
     box_l = 25.0
     vol = box_l**3
     strand_len, p_demo, r_demo = 100, 0.95, 1.0
-    n_strands = int(round(params.get_bead_density() *
-                    vol / (strand_len + 0.5 * r_demo)))
+    n_strands = int(round(params.get_bead_density() * vol / (strand_len + 0.5 * r_demo)))
     n_xlinks = int(round(0.5 * r_demo * n_strands))
 
     gen = pt.MCUniverseGenerator(box_l, box_l, box_l)
@@ -150,7 +148,7 @@ length :math:`L = 25\,\text{nm}`, sample entanglements on demand, and evaluate
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 105-116
+.. GENERATED FROM PYTHON SOURCE LINES 103-114
 
 Effect of Chain Length (:math:`N`)
 ----------------------------------
@@ -164,7 +162,7 @@ density drops as :math:`1/N`, small boxes (:math:`L \lesssim R_0`) overestimate
 :math:`L / R_0` shows that a box size of :math:`L \gtrsim 3\text{--}4\,R_0`
 reduces the coefficient of variation (CV) below 2–5%.
 
-.. GENERATED FROM PYTHON SOURCE LINES 116-119
+.. GENERATED FROM PYTHON SOURCE LINES 114-117
 
 .. code-block:: Python
 
@@ -183,7 +181,7 @@ reduces the coefficient of variation (CV) below 2–5%.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 120-129
+.. GENERATED FROM PYTHON SOURCE LINES 118-127
 
 Effect of Cross-link Conversion (:math:`p`)
 -------------------------------------------
@@ -195,7 +193,7 @@ connectivity fluctuations grow, inflating both the finite-size bias in small
 boxes and the sample-to-sample CV by roughly an order of magnitude compared
 to well-cross-linked networks (:math:`p \ge 0.925`).
 
-.. GENERATED FROM PYTHON SOURCE LINES 129-132
+.. GENERATED FROM PYTHON SOURCE LINES 127-130
 
 .. code-block:: Python
 
@@ -214,7 +212,7 @@ to well-cross-linked networks (:math:`p \ge 0.925`).
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 133-143
+.. GENERATED FROM PYTHON SOURCE LINES 131-141
 
 Effect of Stoichiometric Imbalance (:math:`r`)
 ----------------------------------------------
@@ -227,7 +225,7 @@ scatter. By contrast, excess cross-linker (:math:`r = 1.25`, corresponding to
 95% strand conversion) preserves a high active fraction and converges nearly as
 fast as the stoichiometric reference (:math:`r = 1.00`).
 
-.. GENERATED FROM PYTHON SOURCE LINES 143-146
+.. GENERATED FROM PYTHON SOURCE LINES 141-144
 
 .. code-block:: Python
 
@@ -246,7 +244,7 @@ fast as the stoichiometric reference (:math:`r = 1.00`).
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 147-157
+.. GENERATED FROM PYTHON SOURCE LINES 145-155
 
 Number of Samples vs. Representative Volume
 -------------------------------------------
@@ -259,7 +257,7 @@ cannot eliminate systematic finite-size bias. Choosing :math:`L \ge 56\,\text{nm
 independent realizations keeps both finite-size bias and statistical
 uncertainty below 1–2%.
 
-.. GENERATED FROM PYTHON SOURCE LINES 157-159
+.. GENERATED FROM PYTHON SOURCE LINES 155-157
 
 .. code-block:: Python
 
@@ -280,7 +278,7 @@ uncertainty below 1–2%.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 3.238 seconds)
+   **Total running time of the script:** (0 minutes 2.663 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_representative_volume_pdms.py:

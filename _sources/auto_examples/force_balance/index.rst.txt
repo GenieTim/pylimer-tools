@@ -48,23 +48,6 @@ See:
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="In MEHPForceBalance (gusev_numerical_2019, bernhard_phantom_2025), entanglement links can either remain frozen at their initial contour positions (``disable_slipping=True``) or slide dynamically along the polymer strands to balance contour tension (``disable_slipping=False``).">
-
-.. only:: html
-
-  .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_slipping_vs_fixed_links_thumb.png
-    :alt:
-
-  :doc:`/auto_examples/force_balance/plot_slipping_vs_fixed_links`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Slipping vs. Fixed Entanglement Links</div>
-    </div>
-
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="In MEHPForceBalance2 (gusev_numerical_2019, bernhard_phantom_2025), users can choose between two representations for sampled entanglements via entanglements_as_springs:">
 
 .. only:: html
@@ -77,6 +60,23 @@ See:
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Entanglement Links vs. Springs</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="In MEHPForceBalance (gusev_numerical_2019, bernhard_phantom_2025), entanglement links can either remain frozen at their initial contour positions (``disable_slipping=True``) or slide dynamically along the polymer strands to balance contour tension (``disable_slipping=False``).">
+
+.. only:: html
+
+  .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_slipping_vs_fixed_links_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/force_balance/plot_slipping_vs_fixed_links`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Slipping vs. Fixed Entanglement Links</div>
     </div>
 
 
@@ -243,8 +243,8 @@ See:
 .. toctree::
    :hidden:
 
-   /auto_examples/force_balance/plot_slipping_vs_fixed_links
    /auto_examples/force_balance/plot_entanglement_link_vs_spring
+   /auto_examples/force_balance/plot_slipping_vs_fixed_links
    /auto_examples/force_balance/plot_polydispersity_study
    /auto_examples/force_balance/plot_sampling_cutoff_effect
    /auto_examples/force_balance/plot_inactive_removal_and_sampling

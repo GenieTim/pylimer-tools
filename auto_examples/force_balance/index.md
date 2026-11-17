@@ -31,16 +31,16 @@ See:
 - [Representative Volume Study for PDMS Networks](plot_representative_volume_pdms.md) for a representative volume element (RVE) study of realistic PDMS networks across chain length $N$, conversion $p$, stoichiometric imbalance $r$, and ensemble sample count.
 
 <div id='sg-tag-list' class='sphx-glr-tag-list'></div><div class="sphx-glr-thumbnails">
-<!-- thumbnail-parent-div-open --><div class="sphx-glr-thumbcontainer" tooltip="In MEHPForceBalance (gusev_numerical_2019, bernhard_phantom_2025), entanglement links can either remain frozen at their initial contour positions (\`\`disable_slipping=True\`\`) or slide dynamically along the polymer strands to balance contour tension (\`\`disable_slipping=False\`\`).">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_slipping_vs_fixed_links_thumb.png)
-
-[Slipping vs. Fixed Entanglement Links](plot_slipping_vs_fixed_links.md)
-
-  <div class="sphx-glr-thumbnail-title">Slipping vs. Fixed Entanglement Links</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="In MEHPForceBalance2 (gusev_numerical_2019, bernhard_phantom_2025), users can choose between two representations for sampled entanglements via entanglements_as_springs:">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_entanglement_link_vs_spring_thumb.png)
+<!-- thumbnail-parent-div-open --><div class="sphx-glr-thumbcontainer" tooltip="In MEHPForceBalance2 (gusev_numerical_2019, bernhard_phantom_2025), users can choose between two representations for sampled entanglements via entanglements_as_springs:">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_entanglement_link_vs_spring_thumb.png)
 
 [Entanglement Links vs. Springs](plot_entanglement_link_vs_spring.md)
 
   <div class="sphx-glr-thumbnail-title">Entanglement Links vs. Springs</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="In MEHPForceBalance (gusev_numerical_2019, bernhard_phantom_2025), entanglement links can either remain frozen at their initial contour positions (\`\`disable_slipping=True\`\`) or slide dynamically along the polymer strands to balance contour tension (\`\`disable_slipping=False\`\`).">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_slipping_vs_fixed_links_thumb.png)
+
+[Slipping vs. Fixed Entanglement Links](plot_slipping_vs_fixed_links.md)
+
+  <div class="sphx-glr-thumbnail-title">Slipping vs. Fixed Entanglement Links</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="In this example, we study the effect of precursor strand length polydispersity on the equilibrium shear modulus and topological network structure of end-linked polymer networks (tsimouri_monte_2021, bernhard_phantom_2025).">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_polydispersity_study_thumb.png)
 
 [Polydispersity Study](plot_polydispersity_study.md)

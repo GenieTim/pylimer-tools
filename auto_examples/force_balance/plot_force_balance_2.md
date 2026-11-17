@@ -53,10 +53,9 @@ We load Gaussian bead-spring parameters for PDMS (polydimethylsiloxane),
 providing the mean-squared bond distance $\langle R_0^2 \rangle$,
 melt entanglement density, and unit conversions.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 43-56 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 43-55 -->
 ```Python
-params = get_parameters_for_polymer(
-    "PDMS", parameter_type=ParameterType.GAUSSIAN)
+params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
 assert isinstance(params, Parameters)
 
 r02_slope = params.get("R02")
@@ -67,13 +66,13 @@ gamma_conversion_factor = (
 )
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 57-60 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 56-59 -->
 
 ## Network Structure Loading
 
 Load a pre-equilibrated test network structure:
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 60-80 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 59-79 -->
 ```Python
 def _find_fixtures_dir() -> Path:
     for cur in (
@@ -94,7 +93,7 @@ assert isinstance(universe, Universe)
 vol = universe.get_volume()
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 81-89 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 80-88 -->
 
 ## Force Balance Relaxation (Entangled vs. Phantom)
 
@@ -105,7 +104,7 @@ We configure two simulations:
 2. **Phantom Network**: Zero entanglements, providing the baseline elasticity
    governed solely by permanent chemical crosslinks.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 89-117 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 88-115 -->
 ```Python
 # 1. Entangled network simulation
 n_entanglements = int(params.get_entanglement_density() * vol)
@@ -119,8 +118,7 @@ mehp_fb = MEHPForceBalance2(
 mehp_fb.run_force_relaxation()
 
 print(
-    f"Entangled final residual norm: {
-        mehp_fb.get_displacement_residual_norm():.3e} "
+    f"Entangled final residual norm: {mehp_fb.get_displacement_residual_norm():.3e} "
     f"(iterations: {mehp_fb.get_nr_of_iterations()})"
 )
 
@@ -139,7 +137,7 @@ mehp_phantom.run_force_relaxation()
 Entangled final residual norm: 1.840e-08 (iterations: 214)
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 118-126 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 116-124 -->
 
 ## Elastic Modulus & Directional Decomposition
 
@@ -150,7 +148,7 @@ $$
 G = \frac{k_B T}{V} \sum_{i} \Gamma_i
 $$
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 126-158 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 124-156 -->
 ```Python
 gamma_factors = mehp_fb.get_gamma_factors(r02_slope_magnitude)
 shear_modulus = gamma_conversion_factor * np.sum(gamma_factors) / vol
@@ -191,7 +189,7 @@ Directional Moduli       : Gx=0.0245, Gy=0.0066, Gz=0.0217 MPa (sum=0.0528)
 Active weight fraction   : 0.539
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 159-168 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 157-166 -->
 
 ## Visualization of Elastic Contributions & Isotropy
 
@@ -203,7 +201,7 @@ We visualize:
 - **Second figure**: Modulus comparison between phantom and entangled states, alongside
   Cartesian components $G_x, G_y, G_z$, showing mechanical isotropy.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 168-238 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 166-236 -->
 ```Python
 active_gammas = gamma_factors[gamma_factors > 1e-4]
 
@@ -276,7 +274,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.490 seconds)
+**Total running time of the script:** (0 minutes 0.393 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-force-balance-2-py"></a>
 

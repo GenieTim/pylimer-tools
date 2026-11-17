@@ -27,16 +27,16 @@ The library supports four main file I/O operations:
 [Performance and Caching](plot_performance_caching.md)
 
   <div class="sphx-glr-thumbnail-title">Performance and Caching</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="Read LAMMPS log files containing thermodynamic output from the thermo command.">![](auto_examples/readers_writers/images/thumb/sphx_glr_plot_log_thermo_file_reader_thumb.png)
-
-[Log & Thermo File Reader](plot_log_thermo_file_reader.md)
-
-  <div class="sphx-glr-thumbnail-title">Log & Thermo File Reader</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="Read correlation functions from fix ave/correlate and fix ave/correlate/long commands.">![](auto_examples/readers_writers/images/thumb/sphx_glr_plot_correlated_averages_reader_thumb.png)
 
 [Correlated Averages Reader](plot_correlated_averages_reader.md)
 
   <div class="sphx-glr-thumbnail-title">Correlated Averages Reader</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Read LAMMPS log files containing thermodynamic output from the thermo command.">![](auto_examples/readers_writers/images/thumb/sphx_glr_plot_log_thermo_file_reader_thumb.png)
+
+[Log & Thermo File Reader](plot_log_thermo_file_reader.md)
+
+  <div class="sphx-glr-thumbnail-title">Log & Thermo File Reader</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="Read output from LAMMPS fix ave/time commands.">![](auto_examples/readers_writers/images/thumb/sphx_glr_plot_time_averaged_data_reader_thumb.png)
 
 [Time-Averaged Data Reader](plot_time_averaged_data_reader.md)

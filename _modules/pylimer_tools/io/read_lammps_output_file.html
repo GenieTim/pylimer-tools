@@ -214,8 +214,8 @@
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../auto_examples/force_balance/index.html">Force Balance, Maximum Entropy Homogenization Procedures</a><input aria-label="Toggle navigation of Force Balance, Maximum Entropy Homogenization Procedures" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/force_balance/plot_slipping_vs_fixed_links.html">Slipping vs. Fixed Entanglement Links</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/force_balance/plot_entanglement_link_vs_spring.html">Entanglement Links vs. Springs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/force_balance/plot_slipping_vs_fixed_links.html">Slipping vs. Fixed Entanglement Links</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/force_balance/plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/force_balance/plot_sampling_cutoff_effect.html">Sampling Cut-Off Effect</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/force_balance/plot_inactive_removal_and_sampling.html">Inactive Removal &amp; Sampling</a></li>
@@ -248,8 +248,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_pylimer_tools_output_reader.html">pylimer-tools Output Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_histogram_reader.html">Histogram Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_performance_caching.html">Performance and Caching</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_time_averaged_data_reader.html">Time-Averaged Data Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_unit_conversion.html">Unit Conversion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_dump_file_reader.html">Dump File Reader</a></li>
@@ -417,8 +417,7 @@
 
 <div class="viewcode-block" id="read_log_file">
 <a class="viewcode-back" href="../../../pylimer_tools.io.html#pylimer_tools.io.read_lammps_output_file.read_log_file">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">read_log_file</span><span class="p">(</span>
-        <span class="n">filepath</span><span class="p">,</span> <span class="n">lines_to_read_to_detect_header</span><span class="o">=</span><span class="mi">500000</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_log_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">lines_to_read_to_detect_header</span><span class="o">=</span><span class="mi">500000</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Read a LAMMPS' log (thermo output) file.</span>
 
@@ -480,8 +479,7 @@
 <span class="sd">    :raises FileNotFoundError: If the structure file does not exist</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">structure_file</span><span class="p">)):</span>
-        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">"Structure-file '</span><span class="si">{</span><span class="n">structure_file</span><span class="si">}</span><span class="s2">' not found."</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Structure-file '</span><span class="si">{</span><span class="n">structure_file</span><span class="si">}</span><span class="s2">' not found."</span><span class="p">)</span>
     <span class="n">u_s</span> <span class="o">=</span> <span class="n">UniverseSequence</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">atom_style</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">u_s</span><span class="o">.</span><span class="n">set_data_file_atom_style</span><span class="p">(</span><span class="n">atom_style</span><span class="p">)</span>
@@ -494,8 +492,7 @@
 
 <div class="viewcode-block" id="read_averages_file">
 <a class="viewcode-back" href="../../../pylimer_tools.io.html#pylimer_tools.io.read_lammps_output_file.read_averages_file">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">read_averages_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-                       <span class="n">sep</span><span class="o">=</span><span class="s2">" "</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_averages_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">" "</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Read a file written by a `fix ave/time` command.</span>
 
@@ -531,11 +528,7 @@
     <span class="n">header_line</span> <span class="o">=</span> <span class="n">header_line</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="s2">"#"</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
-            <span class="n">filepath</span><span class="p">,</span>
-            <span class="n">comment</span><span class="o">=</span><span class="s2">"#"</span><span class="p">,</span>
-            <span class="n">names</span><span class="o">=</span><span class="n">header_line</span><span class="o">.</span><span class="n">split</span><span class="p">(),</span>
-            <span class="n">sep</span><span class="o">=</span><span class="n">sep</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s2">"#"</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">header_line</span><span class="o">.</span><span class="n">split</span><span class="p">(),</span> <span class="n">sep</span><span class="o">=</span><span class="n">sep</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">pd</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">EmptyDataError</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
 
@@ -545,8 +538,7 @@
 
 <div class="viewcode-block" id="read_sectioned_averages_file">
 <a class="viewcode-back" href="../../../pylimer_tools.io.html#pylimer_tools.io.read_lammps_output_file.read_sectioned_averages_file">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">read_sectioned_averages_file</span><span class="p">(</span>
-        <span class="n">filepath</span><span class="p">,</span> <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_sectioned_averages_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Read a file written by a `fix ave/time` command with multiple sections.</span>
 

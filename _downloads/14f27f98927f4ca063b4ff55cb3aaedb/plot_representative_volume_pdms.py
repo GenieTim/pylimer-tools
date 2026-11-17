@@ -57,8 +57,7 @@ import pylimer_tools_cpp as pt  # noqa: E402
 # length :math:`L = 25\,\text{nm}`, sample entanglements on demand, and evaluate
 # :math:`G` with :class:`~pylimer_tools_cpp.MEHPForceBalance2`.
 
-params = get_parameters_for_polymer(
-    "PDMS", parameter_type=ParameterType.GAUSSIAN)
+params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
 assert isinstance(params, Parameters)
 dist_unit = params.get("distance_units")
 b = params.get("<b>").to(dist_unit).magnitude
@@ -69,8 +68,7 @@ gamma_conv = params.get_gamma_conversion_factor().to("MPa").magnitude
 box_l = 25.0
 vol = box_l**3
 strand_len, p_demo, r_demo = 100, 0.95, 1.0
-n_strands = int(round(params.get_bead_density() *
-                vol / (strand_len + 0.5 * r_demo)))
+n_strands = int(round(params.get_bead_density() * vol / (strand_len + 0.5 * r_demo)))
 n_xlinks = int(round(0.5 * r_demo * n_strands))
 
 gen = pt.MCUniverseGenerator(box_l, box_l, box_l)

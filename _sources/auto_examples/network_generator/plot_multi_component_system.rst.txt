@@ -23,7 +23,7 @@ Multi-Component System
 
 Create complex systems with multiple components:
 
-.. GENERATED FROM PYTHON SOURCE LINES 8-89
+.. GENERATED FROM PYTHON SOURCE LINES 8-88
 
 .. code-block:: Python
 
@@ -105,8 +105,7 @@ Create complex systems with multiple components:
     if not os.path.exists("generated_structures"):
         os.makedirs("generated_structures")
 
-    writer.write_to_file(
-        "generated_structures/multi_component_polymer_network.data")
+    writer.write_to_file("generated_structures/multi_component_polymer_network.data")
 
 
 
@@ -116,22 +115,22 @@ Create complex systems with multiple components:
 
  .. code-block:: none
 
-    Starting network generation at 2026-11-17 09:06:30.483176
+    Starting network generation at 2026-11-17 16:05:42.557774
     Adding crosslinkers...
     Adding solvent chains...
     Adding and linking polymer strands...
-    Network generation completed at 2026-11-17 09:06:30.485135
+    Network generation completed at 2026-11-17 16:05:42.559663
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 90-93
+.. GENERATED FROM PYTHON SOURCE LINES 89-92
 
 Component Composition Visualization
 -----------------------------------
 We plot the distribution of atoms across all network components:
 
-.. GENERATED FROM PYTHON SOURCE LINES 93-131
+.. GENERATED FROM PYTHON SOURCE LINES 92-130
 
 .. code-block:: Python
 
@@ -188,7 +187,7 @@ We plot the distribution of atoms across all network components:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.136 seconds)
+   **Total running time of the script:** (0 minutes 0.111 seconds)
 
 
 .. _sphx_glr_download_auto_examples_network_generator_plot_multi_component_system.py:

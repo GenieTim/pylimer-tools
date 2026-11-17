@@ -14,7 +14,7 @@ to download the full example code.
 
 Read correlation functions from `fix ave/correlate` and `fix ave/correlate/long` commands.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 8-49 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 8-48 -->
 ```Python
 import os
 from pathlib import Path
@@ -43,8 +43,7 @@ correlation_data = read_correlation_file(correlation_file)
 
 # Access correlation data by timestep
 last_timestep = correlation_data["Timestep"].max()
-last_correlation = correlation_data[correlation_data["Timestep"]
-                                    == last_timestep]
+last_correlation = correlation_data[correlation_data["Timestep"] == last_timestep]
 
 ax = last_correlation.plot(
     x="Time",
@@ -58,7 +57,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.113 seconds)
+**Total running time of the script:** (0 minutes 0.092 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-correlated-averages-reader-py"></a>
 

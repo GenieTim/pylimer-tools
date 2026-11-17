@@ -62,17 +62,15 @@ Apart from the z-score, there are two more methods to configure the limit used:
 - [`disable_max_distance()`](../../api/pylimer_tools_cpp.MCUniverseGenerator.md#pylimer_tools_cpp.MCUniverseGenerator.disable_max_distance)
 - [`use_linear_max_distance()`](../../api/pylimer_tools_cpp.MCUniverseGenerator.md#pylimer_tools_cpp.MCUniverseGenerator.use_linear_max_distance)
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 52-105 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 52-99 -->
 ```Python
 # Get parameters for PDMS polymer density and bead distance
-params = get_parameters_for_polymer(
-    "PDMS", parameter_type=ParameterType.GAUSSIAN)
+params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
 
 n_strands = 50000
 n_atoms_per_strand = 50
 
-volume = (n_strands * n_atoms_per_strand + 0.5 *
-          n_strands) / params.get_bead_density()
+volume = (n_strands * n_atoms_per_strand + 0.5 * n_strands) / params.get_bead_density()
 
 generator_without_zscore = MCUniverseGenerator(
     volume ** (1 / 3),
@@ -91,21 +89,17 @@ generator_without_zscore.disable_max_distance()
 generator_with_zscore = copy.copy(generator_without_zscore)
 
 start_time_without = time.time()
-generator_without_zscore.link_strands_to_conversion(
-    crosslinker_conversion=0.925)
+generator_without_zscore.link_strands_to_conversion(crosslinker_conversion=0.925)
 end_time_without = time.time()
 print(
-    f"Time without max distance: {
-        end_time_without -
-        start_time_without: .2f} seconds"
+    f"Time without max distance: {end_time_without - start_time_without: .2f} seconds"
 )
 
 generator_with_zscore.use_zscore_max_distance(3.0)
 start_time_with = time.time()
 generator_with_zscore.link_strands_to_conversion(crosslinker_conversion=0.925)
 end_time_with = time.time()
-print(
-    f"Time with z-score max distance: {end_time_with - start_time_with:.2f} seconds")
+print(f"Time with z-score max distance: {end_time_with - start_time_with:.2f} seconds")
 
 # plot the difference for the thumbnail
 plt.figure()
@@ -119,11 +113,11 @@ plt.show()
 ```
 
 ```none
-Time without max distance:  29.26 seconds
-Time with z-score max distance: 9.07 seconds
+Time without max distance:  28.66 seconds
+Time with z-score max distance: 7.18 seconds
 ```
 
-**Total running time of the script:** (0 minutes 38.575 seconds)
+**Total running time of the script:** (0 minutes 36.031 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-monte-carlo-configuration-py"></a>
 

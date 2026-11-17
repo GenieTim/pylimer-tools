@@ -169,7 +169,7 @@ Visualizing Generated Atom Coordinates
 --------------------------------------
 We display the 3D coordinates of the generated atoms:
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-127
+.. GENERATED FROM PYTHON SOURCE LINES 101-119
 
 .. code-block:: Python
 
@@ -183,15 +183,7 @@ We display the 3D coordinates of the generated atoms:
 
     fig = plt.figure(figsize=(7, 5))
     ax = fig.add_subplot(111, projection="3d")
-    sc = ax.scatter(
-        xs,
-        ys,
-        zs,
-        c=zs,
-        cmap="viridis",
-        s=30,
-        edgecolor="k",
-        alpha=0.8)
+    sc = ax.scatter(xs, ys, zs, c=zs, cmap="viridis", s=30, edgecolor="k", alpha=0.8)
     ax.set_xlabel("X")
     ax.set_ylabel("Y")
     ax.set_zlabel("Z")
@@ -214,7 +206,7 @@ We display the 3D coordinates of the generated atoms:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.153 seconds)
+   **Total running time of the script:** (0 minutes 0.131 seconds)
 
 
 .. _sphx_glr_download_auto_examples_readers_writers_plot_data_file_writer.py:

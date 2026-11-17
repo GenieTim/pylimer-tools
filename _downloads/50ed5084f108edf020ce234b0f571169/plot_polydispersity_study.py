@@ -73,9 +73,7 @@ print(
     f"Dangling fraction: {fb_total.get_dangling_weight_fraction():.3f}"
 )
 
-cache_path = get_example_cache_path(
-    "polydispersity_study_cache.npz",
-    "force_balance")
+cache_path = get_example_cache_path("polydispersity_study_cache.npz", "force_balance")
 data = load_or_compute_cache(cache_path, run_polydispersity_simulation)
 
 # %%

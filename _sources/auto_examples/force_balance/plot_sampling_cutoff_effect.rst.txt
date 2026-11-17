@@ -76,7 +76,7 @@ Pass ``upper_cutoff`` to :meth:`~pylimer_tools_cpp.MCUniverseGenerator.sample_en
 and compare rigid links (``entanglements_as_springs=False``) vs. compliant springs
 (``entanglements_as_springs=True``).
 
-.. GENERATED FROM PYTHON SOURCE LINES 47-73
+.. GENERATED FROM PYTHON SOURCE LINES 47-68
 
 .. code-block:: Python
 
@@ -96,14 +96,9 @@ and compare rigid links (``entanglements_as_springs=False``) vs. compliant sprin
         )
         fb = gen.get_force_balance2(es, entanglements_as_springs=False)
         fb.run_force_relaxation()
-        print(
-            f"r_cut={r_cut}: sampled={
-                len(es)}, iterations={
-                fb.get_nr_of_iterations()}")
+        print(f"r_cut={r_cut}: sampled={len(es)}, iterations={fb.get_nr_of_iterations()}")
 
-    cache_path = get_example_cache_path(
-        "sampling_cutoff_effect_cache.npz",
-        "force_balance")
+    cache_path = get_example_cache_path("sampling_cutoff_effect_cache.npz", "force_balance")
     data = load_or_compute_cache(cache_path, run_sampling_cutoff_simulation)
 
 
@@ -121,7 +116,7 @@ and compare rigid links (``entanglements_as_springs=False``) vs. compliant sprin
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 74-79
+.. GENERATED FROM PYTHON SOURCE LINES 69-74
 
 Modulus & Initial Force Residual vs. :math:`r_{\text{cut}}`
 -----------------------------------------------------------
@@ -129,7 +124,7 @@ Increasing :math:`r_{\text{cut}}` inflates both the initial force residual (from
 separated beads) and the relaxed shear modulus :math:`G`, especially for
 rigid links.
 
-.. GENERATED FROM PYTHON SOURCE LINES 79-83
+.. GENERATED FROM PYTHON SOURCE LINES 74-78
 
 .. code-block:: Python
 
@@ -161,7 +156,7 @@ rigid links.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 84-89
+.. GENERATED FROM PYTHON SOURCE LINES 79-84
 
 Interactions with Strand Length :math:`N`, Conversion :math:`p`, and Stoichiometry :math:`r`
 ---------------------------------------------------------------------------------------------
@@ -169,7 +164,7 @@ Longer strands (:math:`N = 70`) amplify entanglement sensitivity relative to cro
 elasticity, while incomplete conversion (:math:`p = 0.82`) or stoichiometric imbalance
 (:math:`r = 0.75`) reduce the active network modulus uniformly.
 
-.. GENERATED FROM PYTHON SOURCE LINES 89-93
+.. GENERATED FROM PYTHON SOURCE LINES 84-88
 
 .. code-block:: Python
 
@@ -201,14 +196,14 @@ elasticity, while incomplete conversion (:math:`p = 0.82`) or stoichiometric imb
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-98
+.. GENERATED FROM PYTHON SOURCE LINES 89-93
 
 Sampled Pair Distance Distribution & Solver Iterations
 ------------------------------------------------------
 Sampled pair distances follow :math:`P(r) \propto r^2` up to :math:`r_{\text{cut}}`,
 and larger pre-strains require more relaxation iterations to converge.
 
-.. GENERATED FROM PYTHON SOURCE LINES 98-101
+.. GENERATED FROM PYTHON SOURCE LINES 93-96
 
 .. code-block:: Python
 
@@ -242,7 +237,7 @@ and larger pre-strains require more relaxation iterations to converge.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.916 seconds)
+   **Total running time of the script:** (0 minutes 0.764 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_sampling_cutoff_effect.py:

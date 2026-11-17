@@ -214,8 +214,8 @@
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../auto_examples/force_balance/index.html">Force Balance, Maximum Entropy Homogenization Procedures</a><input aria-label="Toggle navigation of Force Balance, Maximum Entropy Homogenization Procedures" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/force_balance/plot_slipping_vs_fixed_links.html">Slipping vs. Fixed Entanglement Links</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/force_balance/plot_entanglement_link_vs_spring.html">Entanglement Links vs. Springs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/force_balance/plot_slipping_vs_fixed_links.html">Slipping vs. Fixed Entanglement Links</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/force_balance/plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/force_balance/plot_sampling_cutoff_effect.html">Sampling Cut-Off Effect</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/force_balance/plot_inactive_removal_and_sampling.html">Inactive Removal &amp; Sampling</a></li>
@@ -248,8 +248,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_pylimer_tools_output_reader.html">pylimer-tools Output Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_histogram_reader.html">Histogram Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_performance_caching.html">Performance and Caching</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_time_averaged_data_reader.html">Time-Averaged Data Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_unit_conversion.html">Unit Conversion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_dump_file_reader.html">Dump File Reader</a></li>
@@ -557,8 +557,7 @@
 
 <div class="viewcode-block" id="UnitStyleFactory.get_unit_style">
 <a class="viewcode-back" href="../../../pylimer_tools.io.html#pylimer_tools.io.unit_styles.UnitStyleFactory.get_unit_style">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_unit_style</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-                       <span class="n">dimension</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UnitStyle</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_unit_style</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dimension</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UnitStyle</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Get a UnitStyle instance corresponding to the unit system requested.</span>
 
@@ -625,8 +624,7 @@
             <span class="c1"># follow derivation for more accurate results</span>
             <span class="c1"># sigma_conversion = polymer_data.sigma</span>
             <span class="n">sigma_conversion</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="mf">0.1</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">polymer_data</span><span class="o">.</span><span class="n">l_K</span><span class="p">)</span> <span class="o">/</span>
-                <span class="p">(</span><span class="mf">0.965</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">polymer_data</span><span class="o">.</span><span class="n">Cb</span><span class="p">))</span>
+                <span class="mf">0.1</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">polymer_data</span><span class="o">.</span><span class="n">l_K</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">0.965</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">polymer_data</span><span class="o">.</span><span class="n">Cb</span><span class="p">))</span>
             <span class="p">)</span>
             <span class="n">ureg</span><span class="o">.</span><span class="n">define</span><span class="p">(</span><span class="s2">"sigma = </span><span class="si">{}</span><span class="s2"> * nanometer"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sigma_conversion</span><span class="p">))</span>
             <span class="n">ureg</span><span class="o">.</span><span class="n">define</span><span class="p">(</span><span class="s2">"eps = </span><span class="si">{}</span><span class="s2">e-21 joule"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">polymer_data</span><span class="o">.</span><span class="n">kB_Tref</span><span class="p">))</span>
@@ -676,8 +674,7 @@
             <span class="k">return</span> <span class="n">UnitStyle</span><span class="p">(</span>
                 <span class="p">{</span>
                     <span class="s2">"mass"</span><span class="p">:</span> <span class="p">(</span>
-                        <span class="n">ureg</span><span class="p">(</span><span class="s2">"g/mol"</span><span class="p">)</span> <span class="k">if</span> <span class="n">accept_mol</span> <span class="k">else</span> <span class="n">ureg</span><span class="p">(</span><span class="s2">"g"</span><span class="p">)</span> <span class="o">/</span>
-                        <span class="n">avogadro_constant</span>
+                        <span class="n">ureg</span><span class="p">(</span><span class="s2">"g/mol"</span><span class="p">)</span> <span class="k">if</span> <span class="n">accept_mol</span> <span class="k">else</span> <span class="n">ureg</span><span class="p">(</span><span class="s2">"g"</span><span class="p">)</span> <span class="o">/</span> <span class="n">avogadro_constant</span>
                     <span class="p">),</span>
                     <span class="s2">"distance"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">angstrom</span><span class="p">,</span>
                     <span class="s2">"time"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">femtosecond</span><span class="p">,</span>
@@ -713,8 +710,7 @@
             <span class="k">return</span> <span class="n">UnitStyle</span><span class="p">(</span>
                 <span class="p">{</span>
                     <span class="s2">"mass"</span><span class="p">:</span> <span class="p">(</span>
-                        <span class="n">ureg</span><span class="p">(</span><span class="s2">"g/mol"</span><span class="p">)</span> <span class="k">if</span> <span class="n">accept_mol</span> <span class="k">else</span> <span class="n">ureg</span><span class="p">(</span><span class="s2">"g"</span><span class="p">)</span> <span class="o">/</span>
-                        <span class="n">avogadro_constant</span>
+                        <span class="n">ureg</span><span class="p">(</span><span class="s2">"g/mol"</span><span class="p">)</span> <span class="k">if</span> <span class="n">accept_mol</span> <span class="k">else</span> <span class="n">ureg</span><span class="p">(</span><span class="s2">"g"</span><span class="p">)</span> <span class="o">/</span> <span class="n">avogadro_constant</span>
                     <span class="p">),</span>
                     <span class="s2">"distance"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">angstrom</span><span class="p">,</span>
                     <span class="s2">"time"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">picosecond</span><span class="p">,</span>

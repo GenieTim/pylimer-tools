@@ -14,7 +14,7 @@ to download the full example code.
 
 In this example, we create a vulcanized network using the pylimer-tools library.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 8-96 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 8-91 -->
 ```Python
 import os
 import matplotlib.pyplot as plt
@@ -31,8 +31,7 @@ from pylimer_tools_cpp import (
 )
 
 # Get parameters for PDMS polymer density and bead distance
-params = get_parameters_for_polymer(
-    "PDMS", parameter_type=ParameterType.GAUSSIAN)
+params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
 
 n_strands = 10000
 n_atoms_per_strand = 50
@@ -75,19 +74,15 @@ n_sampled_crosslinks = len(sampled_crosslinks.pairs_of_atoms)
 # Add sampled crosslinks as bonds to the universe
 universe.add_bonds(
     n_sampled_crosslinks,
-    [sampled_crosslinks.pairs_of_atoms[i][0]
-        for i in range(n_sampled_crosslinks)],
-    [sampled_crosslinks.pairs_of_atoms[i][1]
-        for i in range(n_sampled_crosslinks)],
+    [sampled_crosslinks.pairs_of_atoms[i][0] for i in range(n_sampled_crosslinks)],
+    [sampled_crosslinks.pairs_of_atoms[i][1] for i in range(n_sampled_crosslinks)],
     [2 for _ in range(n_sampled_crosslinks)],  # Bond type 2
 )
 
 # Set the crosslinker type to 2 (vulcanization)
 for i in range(n_sampled_crosslinks):
-    universe.set_vertex_property(
-        sampled_crosslinks.pairs_of_atoms[i][0], "type", 2)
-    universe.set_vertex_property(
-        sampled_crosslinks.pairs_of_atoms[i][1], "type", 2)
+    universe.set_vertex_property(sampled_crosslinks.pairs_of_atoms[i][0], "type", 2)
+    universe.set_vertex_property(sampled_crosslinks.pairs_of_atoms[i][1], "type", 2)
 
 print("Generated vulcanized network with {} crosslinks".format(n_sampled_crosslinks))
 
@@ -108,17 +103,16 @@ writer.write_to_file("generated_structures/vulcanized_network.data")
 Generated vulcanized network with 7500 crosslinks
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 97-101 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 92-96 -->
 
 Refer to [File I/O: Readers & Writers](../readers_writers/index.md#sphx-glr-auto-examples-readers-writers) for more details on how you can save the universe to a file.
 
 For now, we will show that this produces a variety of different strand
 lengths:
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 101-112 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 96-106 -->
 ```Python
-strand_lengths = [m.get_nr_of_atoms()
-                  for m in universe.get_chains_with_crosslinker(2)]
+strand_lengths = [m.get_nr_of_atoms() for m in universe.get_chains_with_crosslinker(2)]
 
 # Plot the distribution of strand lengths
 plt.figure()
@@ -129,7 +123,7 @@ plt.title("Distribution of Strand Lengths in Vulcanized Network")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 22.267 seconds)
+**Total running time of the script:** (0 minutes 22.113 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-vulcanized-network-py"></a>
 

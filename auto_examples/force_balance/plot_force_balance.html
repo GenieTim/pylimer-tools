@@ -234,8 +234,8 @@
 </ul>
 </li>
 <li class="toctree-l2 current has-children"><a class="reference internal" href="index.html">Force Balance, Maximum Entropy Homogenization Procedures</a><input aria-label="Toggle navigation of Force Balance, Maximum Entropy Homogenization Procedures" checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="plot_slipping_vs_fixed_links.html">Slipping vs. Fixed Entanglement Links</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_entanglement_link_vs_spring.html">Entanglement Links vs. Springs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_slipping_vs_fixed_links.html">Slipping vs. Fixed Entanglement Links</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_sampling_cutoff_effect.html">Sampling Cut-Off Effect</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_inactive_removal_and_sampling.html">Inactive Removal &amp; Sampling</a></li>
@@ -268,8 +268,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_pylimer_tools_output_reader.html">pylimer-tools Output Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_histogram_reader.html">Histogram Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_performance_caching.html">Performance and Caching</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_time_averaged_data_reader.html">Time-Averaged Data Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_unit_conversion.html">Unit Conversion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_dump_file_reader.html">Dump File Reader</a></li>
@@ -444,8 +444,7 @@ its equilibrium shear modulus.</p>
 </span><span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools_cpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">MEHPForceBalance</span><span class="p">,</span> <a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class reference internal" href="../../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="n">Universe</span></a><span class="w">
 </span><span class="w">
 </span><span class="c1"># Get parameters for conversion factors</span><span class="w">
-</span><a class="sphx-glr-backref-module-pylimer_tools-io-bead_spring_parameter_provider sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.Parameters" title="pylimer_tools.io.bead_spring_parameter_provider.Parameters"><span class="n">params</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-pylimer_tools-io-bead_spring_parameter_provider sphx-glr-backref-type-py-function reference internal" href="../../pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.get_parameters_for_polymer" title="pylimer_tools.io.bead_spring_parameter_provider.get_parameters_for_polymer"><span class="n">get_parameters_for_polymer</span></a><span class="p">(</span><span class="w">
-</span>    <span class="s2">&quot;</span><span class="s2">PDMS</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">parameter_type</span><span class="o">=</span><a class="sphx-glr-backref-module-pylimer_tools-io-bead_spring_parameter_provider sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.ParameterType" title="pylimer_tools.io.bead_spring_parameter_provider.ParameterType"><span class="n">ParameterType</span><span class="o">.</span><span class="n">GAUSSIAN</span></a><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-pylimer_tools-io-bead_spring_parameter_provider sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.Parameters" title="pylimer_tools.io.bead_spring_parameter_provider.Parameters"><span class="n">params</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-pylimer_tools-io-bead_spring_parameter_provider sphx-glr-backref-type-py-function reference internal" href="../../pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.get_parameters_for_polymer" title="pylimer_tools.io.bead_spring_parameter_provider.get_parameters_for_polymer"><span class="n">get_parameters_for_polymer</span></a><span class="p">(</span><span class="s2">&quot;</span><span class="s2">PDMS</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">parameter_type</span><span class="o">=</span><a class="sphx-glr-backref-module-pylimer_tools-io-bead_spring_parameter_provider sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.ParameterType" title="pylimer_tools.io.bead_spring_parameter_provider.ParameterType"><span class="n">ParameterType</span><span class="o">.</span><span class="n">GAUSSIAN</span></a><span class="p">)</span><span class="w">
 </span><span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><a class="sphx-glr-backref-module-pylimer_tools-io-bead_spring_parameter_provider sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.Parameters" title="pylimer_tools.io.bead_spring_parameter_provider.Parameters"><span class="n">params</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-pylimer_tools-io-bead_spring_parameter_provider sphx-glr-backref-type-py-class reference internal" href="../../pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.Parameters" title="pylimer_tools.io.bead_spring_parameter_provider.Parameters"><span class="n">Parameters</span></a><span class="p">)</span><span class="w">
 </span><span class="w">
 </span><span class="w">
@@ -510,8 +509,8 @@ its equilibrium shear modulus.</p>
 </span>    <span class="o">/</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">vol</span></a><span class="w">
 </span><span class="p">)</span><span class="w">
 </span></pre></div></div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Final residual (should be close to 0): 1.7675392742791471e-07
-Shear Modulus [MPa]: 0.0353
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Final residual (should be close to 0): 2.4639806078438567e-06
+Shear Modulus [MPa]: 0.0355
 </pre></div>
 </div>
 <section id="visualization">
@@ -591,7 +590,7 @@ shear moduli <span class="math notranslate nohighlight">\(G_x, G_y, G_z\)</span>
 <li><img src="../../_images/sphx_glr_plot_force_balance_001.png" srcset="../../_images/sphx_glr_plot_force_balance_001.png" alt="Distribution of Strand Elastic Factors" class = "sphx-glr-multi-img"/></li>
 <li><img src="../../_images/sphx_glr_plot_force_balance_002.png" srcset="../../_images/sphx_glr_plot_force_balance_002.png" alt="Shear Modulus & Directional Decomposition" class = "sphx-glr-multi-img"/></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.536 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.456 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-force-balance-plot-force-balance-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/1060533adab89eaeb1fc311189732520/plot_force_balance.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_force_balance.ipynb</span></code></a></p>

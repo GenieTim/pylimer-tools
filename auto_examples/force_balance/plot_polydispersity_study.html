@@ -22,7 +22,7 @@
 <link rel="manifest" href="/_static/favicon/site.webmanifest" />
 
 <link rel="alternate" type="text/markdown" href="plot_polydispersity_study.html.md">
-<link rel="describedby" href="llms.txt"><link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Sampling Cut-Off Effect" href="plot_sampling_cutoff_effect.html"><link rel="prev" title="Entanglement Links vs. Springs" href="plot_entanglement_link_vs_spring.html">
+<link rel="describedby" href="llms.txt"><link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Sampling Cut-Off Effect" href="plot_sampling_cutoff_effect.html"><link rel="prev" title="Slipping vs. Fixed Entanglement Links" href="plot_slipping_vs_fixed_links.html">
 
     <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
         <title>Polydispersity Study - pylimer-tools</title>
@@ -234,8 +234,8 @@
 </ul>
 </li>
 <li class="toctree-l2 current has-children"><a class="reference internal" href="index.html">Force Balance, Maximum Entropy Homogenization Procedures</a><input aria-label="Toggle navigation of Force Balance, Maximum Entropy Homogenization Procedures" checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="plot_slipping_vs_fixed_links.html">Slipping vs. Fixed Entanglement Links</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_entanglement_link_vs_spring.html">Entanglement Links vs. Springs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_slipping_vs_fixed_links.html">Slipping vs. Fixed Entanglement Links</a></li>
 <li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_sampling_cutoff_effect.html">Sampling Cut-Off Effect</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_inactive_removal_and_sampling.html">Inactive Removal &amp; Sampling</a></li>
@@ -268,8 +268,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_pylimer_tools_output_reader.html">pylimer-tools Output Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_histogram_reader.html">Histogram Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_performance_caching.html">Performance and Caching</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_time_averaged_data_reader.html">Time-Averaged Data Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_unit_conversion.html">Unit Conversion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_dump_file_reader.html">Dump File Reader</a></li>
@@ -491,9 +491,7 @@ without sampled entanglements.</p>
 </span>    <span class="sa">f</span><span class="s2">&quot;</span><span class="s2">Dangling fraction: </span><span class="si">{</span><a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method reference internal" href="../../api/pylimer_tools_cpp.MEHPForceBalance2.html#pylimer_tools_cpp.MEHPForceBalance2.get_dangling_weight_fraction" title="pylimer_tools_cpp.MEHPForceBalance2.get_dangling_weight_fraction"><span class="n">fb_total</span><span class="o">.</span><span class="n">get_dangling_weight_fraction</span></a><span class="p">(</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="w">
 </span><span class="p">)</span><span class="w">
 </span><span class="w">
-</span><a class="sphx-glr-backref-module-pathlib sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.PosixPath" title="pathlib.PosixPath"><span class="n">cache_path</span></a> <span class="o">=</span> <span class="n">get_example_cache_path</span><span class="p">(</span><span class="w">
-</span>    <span class="s2">&quot;</span><span class="s2">polydispersity_study_cache.npz</span><span class="s2">&quot;</span><span class="p">,</span><span class="w">
-</span>    <span class="s2">&quot;</span><span class="s2">force_balance</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-pathlib sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.PosixPath" title="pathlib.PosixPath"><span class="n">cache_path</span></a> <span class="o">=</span> <span class="n">get_example_cache_path</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">polydispersity_study_cache.npz</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="s2">force_balance</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
 </span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="dict"><span class="n">data</span></a> <span class="o">=</span> <span class="n">load_or_compute_cache</span><span class="p">(</span><a class="sphx-glr-backref-module-pathlib sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.PosixPath" title="pathlib.PosixPath"><span class="n">cache_path</span></a><span class="p">,</span> <span class="n">run_polydispersity_simulation</span><span class="p">)</span><span class="w">
 </span></pre></div></div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Active fraction: 0.863, Dangling fraction: 0.132
@@ -513,7 +511,7 @@ remain remarkably stable because <span class="math notranslate nohighlight">\(\l
 <li><img src="../../_images/sphx_glr_plot_polydispersity_study_001.png" srcset="../../_images/sphx_glr_plot_polydispersity_study_001.png" alt="Elastic Shear Modulus vs. Polydispersity ($N_{\mathrm{strands}} = 10,000$, $N_{\mathrm{repeats}} = 8$)" class = "sphx-glr-multi-img"/></li>
 <li><img src="../../_images/sphx_glr_plot_polydispersity_study_002.png" srcset="../../_images/sphx_glr_plot_polydispersity_study_002.png" alt="Network Topology vs. Polydispersity (Conversion $p = 92.5\%$, $f = 4$)" class = "sphx-glr-multi-img"/></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.391 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.329 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-force-balance-plot-polydispersity-study-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/ec9f887a216190a5d2b44d4a1449cdab/plot_polydispersity_study.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_polydispersity_study.ipynb</span></code></a></p>
@@ -543,14 +541,14 @@ remain remarkably stable because <span class="math notranslate nohighlight">\(\l
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="plot_entanglement_link_vs_spring.html">
+          <a class="prev-page" href="plot_slipping_vs_fixed_links.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Entanglement Links vs. Springs</div>
+                <div class="title">Slipping vs. Fixed Entanglement Links</div>
                 
               </div>
             </a>

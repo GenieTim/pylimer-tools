@@ -28,9 +28,7 @@ def _find_repo_root() -> Path:
 
 
 _examples_dir = _find_repo_root() / "examples"
-example_file = str(
-    _examples_dir /
-    "dpd_simulations/dpd_simulation_avg_output.txt")
+example_file = str(_examples_dir / "dpd_simulations/dpd_simulation_avg_output.txt")
 
 # Read pylimer-tools averages file
 pylimer_data = read_avg_file(example_file)

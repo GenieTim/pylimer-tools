@@ -16,7 +16,7 @@ This example demonstrates how to use
 the “original” MEHP implementation (see Gusev [[Gus19](../../acknowledgements.md#id8)])
 without slip-links or entanglements.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 10-150 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 10-144 -->
 ```Python
 import os
 from pathlib import Path
@@ -51,13 +51,12 @@ class CustomForceEvaluator(MEHPForceEvaluator):
         super().__init__()
         self.kappa = kappa
 
-    def evaluate_force_set_gradient(
-            self, n, spring_distances, compute_gradient):
+    def evaluate_force_set_gradient(self, n, spring_distances, compute_gradient):
         network = self.network
         nr_springs = network.nr_of_springs
         force = 0.0
         for i in range(nr_springs):
-            spring_vec = spring_distances[3 * i: 3 * i + 3]
+            spring_vec = spring_distances[3 * i : 3 * i + 3]
             r_squared = np.sum(spring_vec**2)
             contour_length = network.spring_contour_length[i]
             force += r_squared / contour_length
@@ -77,12 +76,10 @@ class CustomForceEvaluator(MEHPForceEvaluator):
                     gradient[3 * b + dir_idx] -= grad_term
         return (force, gradient)
 
-    def evaluate_stress_contribution(
-            self, spring_distances, i, j, spring_index):
+    def evaluate_stress_contribution(self, spring_distances, i, j, spring_index):
         network = self.network
         contour_length = network.spring_contour_length[spring_index]
-        return self.kappa * spring_distances[i] * \
-            spring_distances[j] / contour_length
+        return self.kappa * spring_distances[i] * spring_distances[j] / contour_length
 
     def prepare_for_evaluations(self):
         pass
@@ -107,8 +104,7 @@ universe = read_data_file(
 assert isinstance(universe, Universe)
 
 # Prepare parameters for conversion factors
-params = get_parameters_for_polymer(
-    "PDMS", parameter_type=ParameterType.GAUSSIAN)
+params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
 r02_slope = params.get("R02")
 r02_slope_magnitude = r02_slope.to(params.get("distance_units") ** 2).magnitude
 kbt = params.get("T") * params.get("kb")
@@ -153,9 +149,7 @@ shear_modulus_custom = (
     * np.sum(mehp_relax.get_gamma_factors(r02_slope_magnitude))
     / universe.get_volume()
 )
-print(
-    f"Phantom Shear Modulus [MPa] (Custom Evaluator): {
-        shear_modulus_custom:.4f}")
+print(f"Phantom Shear Modulus [MPa] (Custom Evaluator): {shear_modulus_custom:.4f}")
 ```
 
 ```none
@@ -164,19 +158,16 @@ Phantom Shear Modulus [MPa] (Langevin): 0.0061
 Phantom Shear Modulus [MPa] (Custom Evaluator): 0.0061
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 151-155 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 145-149 -->
 
 ## Comparison of Force Evaluators
 
 We visualize the predicted equilibrium phantom shear modulus for each
 force evaluator.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 155-184 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 149-175 -->
 ```Python
-labels = [
-    "Simple Spring\n(Linear)",
-    "Non-Gaussian\n(Langevin)",
-    "Custom\n(Harmonic)"]
+labels = ["Simple Spring\n(Linear)", "Non-Gaussian\n(Langevin)", "Custom\n(Harmonic)"]
 moduli = [shear_modulus_linear, shear_modulus_langevin, shear_modulus_custom]
 colors = ["#4C72B0", "#55A868", "#DD8452"]
 
@@ -203,7 +194,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 3.794 seconds)
+**Total running time of the script:** (0 minutes 3.105 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-force-relaxation-py"></a>
 

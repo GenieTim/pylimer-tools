@@ -70,16 +70,16 @@ See:
 - plot_representative_volume_pdms for a representative volume element (RVE) study of realistic PDMS networks across chain length $N$, conversion $p$, stoichiometric imbalance $r$, and ensemble sample count.
 
 <div id='sg-tag-list' class='sphx-glr-tag-list'></div><div class="sphx-glr-thumbnails">
-<!-- thumbnail-parent-div-open --><div class="sphx-glr-thumbcontainer" tooltip="In MEHPForceBalance (gusev_numerical_2019, bernhard_phantom_2025), entanglement links can either remain frozen at their initial contour positions (\`\`disable_slipping=True\`\`) or slide dynamically along the polymer strands to balance contour tension (\`\`disable_slipping=False\`\`).">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_slipping_vs_fixed_links_thumb.png)
-
-[Slipping vs. Fixed Entanglement Links](force_balance/plot_slipping_vs_fixed_links.md)
-
-  <div class="sphx-glr-thumbnail-title">Slipping vs. Fixed Entanglement Links</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="In MEHPForceBalance2 (gusev_numerical_2019, bernhard_phantom_2025), users can choose between two representations for sampled entanglements via entanglements_as_springs:">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_entanglement_link_vs_spring_thumb.png)
+<!-- thumbnail-parent-div-open --><div class="sphx-glr-thumbcontainer" tooltip="In MEHPForceBalance2 (gusev_numerical_2019, bernhard_phantom_2025), users can choose between two representations for sampled entanglements via entanglements_as_springs:">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_entanglement_link_vs_spring_thumb.png)
 
 [Entanglement Links vs. Springs](force_balance/plot_entanglement_link_vs_spring.md)
 
   <div class="sphx-glr-thumbnail-title">Entanglement Links vs. Springs</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="In MEHPForceBalance (gusev_numerical_2019, bernhard_phantom_2025), entanglement links can either remain frozen at their initial contour positions (\`\`disable_slipping=True\`\`) or slide dynamically along the polymer strands to balance contour tension (\`\`disable_slipping=False\`\`).">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_slipping_vs_fixed_links_thumb.png)
+
+[Slipping vs. Fixed Entanglement Links](force_balance/plot_slipping_vs_fixed_links.md)
+
+  <div class="sphx-glr-thumbnail-title">Slipping vs. Fixed Entanglement Links</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="In this example, we study the effect of precursor strand length polydispersity on the equilibrium shear modulus and topological network structure of end-linked polymer networks (tsimouri_monte_2021, bernhard_phantom_2025).">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_polydispersity_study_thumb.png)
 
 [Polydispersity Study](force_balance/plot_polydispersity_study.md)
@@ -250,16 +250,16 @@ The library supports four main file I/O operations:
 [Performance and Caching](readers_writers/plot_performance_caching.md)
 
   <div class="sphx-glr-thumbnail-title">Performance and Caching</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="Read LAMMPS log files containing thermodynamic output from the thermo command.">![](auto_examples/readers_writers/images/thumb/sphx_glr_plot_log_thermo_file_reader_thumb.png)
-
-[Log & Thermo File Reader](readers_writers/plot_log_thermo_file_reader.md)
-
-  <div class="sphx-glr-thumbnail-title">Log & Thermo File Reader</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="Read correlation functions from fix ave/correlate and fix ave/correlate/long commands.">![](auto_examples/readers_writers/images/thumb/sphx_glr_plot_correlated_averages_reader_thumb.png)
 
 [Correlated Averages Reader](readers_writers/plot_correlated_averages_reader.md)
 
   <div class="sphx-glr-thumbnail-title">Correlated Averages Reader</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Read LAMMPS log files containing thermodynamic output from the thermo command.">![](auto_examples/readers_writers/images/thumb/sphx_glr_plot_log_thermo_file_reader_thumb.png)
+
+[Log & Thermo File Reader](readers_writers/plot_log_thermo_file_reader.md)
+
+  <div class="sphx-glr-thumbnail-title">Log & Thermo File Reader</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="Read output from LAMMPS fix ave/time commands.">![](auto_examples/readers_writers/images/thumb/sphx_glr_plot_time_averaged_data_reader_thumb.png)
 
 [Time-Averaged Data Reader](readers_writers/plot_time_averaged_data_reader.md)

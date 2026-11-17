@@ -55,7 +55,7 @@ At $p = 0.80$, comparing `EntanglementFilteringMode.NONE` + `NO_SIMPLIFICATION`
 against `OMIT_INACTIVE` + `INACTIVE_THEN_X2F` demonstrates how inactive pruning
 eliminates unphysical dead-end constraints and shrinks the linear system.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 44-79 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 44-77 -->
 ```Python
 gen = pt.MCUniverseGenerator(18.0, 18.0, 18.0)
 gen.set_seed(42)
@@ -87,9 +87,7 @@ print(
 cache_path = get_example_cache_path(
     "inactive_removal_and_sampling_cache.npz", "force_balance"
 )
-data = load_or_compute_cache(
-    cache_path,
-    run_inactive_removal_and_sampling_simulation)
+data = load_or_compute_cache(cache_path, run_inactive_removal_and_sampling_simulation)
 ```
 
 ```none
@@ -97,7 +95,7 @@ Springs — naive: 200, simplified: 69
 Loading cached example data from inactive_removal_and_sampling_cache.npz...
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 80-85 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 78-83 -->
 
 ## Shear Modulus Convergence & The Dangling-Chain Trap
 
@@ -105,13 +103,13 @@ Without filtering or simplification, pinned dangling chains inflate $G$ by hundr
 thousands of percent below $p \approx 0.90$. Either pre-filtering or solver-level
 inactive removal restores the true physical percolation curve.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 85-89 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 83-87 -->
 ```Python
 plot_inactive_modulus_convergence(data)
 plot_inactive_relative_error(data)
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 90-95 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 88-93 -->
 
 ## Topological Compression & Solver Complexity
 
@@ -119,13 +117,13 @@ plot_inactive_relative_error(data)
 active system size and solver iterations substantially near the gelation
 threshold.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 95-98 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 93-96 -->
 ```Python
 plot_inactive_topological_fractions(data)
 plot_inactive_solver_complexity(data)
 ```
 
-**Total running time of the script:** (0 minutes 0.882 seconds)
+**Total running time of the script:** (0 minutes 0.725 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-inactive-removal-and-sampling-py"></a>
 

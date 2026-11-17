@@ -58,7 +58,7 @@ Pass `upper_cutoff` to [`sample_entanglements()`](../../api/pylimer_tools_cpp.MC
 and compare rigid links (`entanglements_as_springs=False`) vs. compliant springs
 (`entanglements_as_springs=True`).
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 47-73 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 47-68 -->
 ```Python
 gen = pt.MCUniverseGenerator(18.0, 18.0, 18.0)
 gen.set_seed(42)
@@ -75,14 +75,9 @@ for r_cut in (1.2, 2.6):
     )
     fb = gen.get_force_balance2(es, entanglements_as_springs=False)
     fb.run_force_relaxation()
-    print(
-        f"r_cut={r_cut}: sampled={
-            len(es)}, iterations={
-            fb.get_nr_of_iterations()}")
+    print(f"r_cut={r_cut}: sampled={len(es)}, iterations={fb.get_nr_of_iterations()}")
 
-cache_path = get_example_cache_path(
-    "sampling_cutoff_effect_cache.npz",
-    "force_balance")
+cache_path = get_example_cache_path("sampling_cutoff_effect_cache.npz", "force_balance")
 data = load_or_compute_cache(cache_path, run_sampling_cutoff_simulation)
 ```
 
@@ -92,7 +87,7 @@ r_cut=2.6: sampled=241, iterations=169
 Loading cached example data from sampling_cutoff_effect_cache.npz...
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 74-79 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 69-74 -->
 
 ## Modulus & Initial Force Residual vs. $r_{\text{cut}}$
 
@@ -100,13 +95,13 @@ Increasing $r_{\text{cut}}$ inflates both the initial force residual (from mergi
 separated beads) and the relaxed shear modulus $G$, especially for
 rigid links.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 79-83 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 74-78 -->
 ```Python
 plot_cutoff_modulus_vs_rcut(data)
 plot_cutoff_residual_vs_rcut(data)
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 84-89 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 79-84 -->
 
 ## Interactions with Strand Length $N$, Conversion $p$, and Stoichiometry $r$
 
@@ -114,26 +109,26 @@ Longer strands ($N = 70$) amplify entanglement sensitivity relative to crosslink
 elasticity, while incomplete conversion ($p = 0.82$) or stoichiometric imbalance
 ($r = 0.75$) reduce the active network modulus uniformly.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 89-93 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 84-88 -->
 ```Python
 plot_cutoff_strand_length_interaction(data)
 plot_cutoff_network_parameter_interaction(data)
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 94-98 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 89-93 -->
 
 ## Sampled Pair Distance Distribution & Solver Iterations
 
 Sampled pair distances follow $P(r) \propto r^2$ up to $r_{\text{cut}}$,
 and larger pre-strains require more relaxation iterations to converge.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 98-101 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 93-96 -->
 ```Python
 plot_cutoff_pair_distance_distribution(data)
 plot_cutoff_solver_iterations(data)
 ```
 
-**Total running time of the script:** (0 minutes 0.916 seconds)
+**Total running time of the script:** (0 minutes 0.764 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-sampling-cutoff-effect-py"></a>
 

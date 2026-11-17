@@ -73,7 +73,7 @@ At :math:`p = 0.80`, comparing ``EntanglementFilteringMode.NONE`` + ``NO_SIMPLIF
 against ``OMIT_INACTIVE`` + ``INACTIVE_THEN_X2F`` demonstrates how inactive pruning
 eliminates unphysical dead-end constraints and shrinks the linear system.
 
-.. GENERATED FROM PYTHON SOURCE LINES 44-79
+.. GENERATED FROM PYTHON SOURCE LINES 44-77
 
 .. code-block:: Python
 
@@ -108,9 +108,7 @@ eliminates unphysical dead-end constraints and shrinks the linear system.
     cache_path = get_example_cache_path(
         "inactive_removal_and_sampling_cache.npz", "force_balance"
     )
-    data = load_or_compute_cache(
-        cache_path,
-        run_inactive_removal_and_sampling_simulation)
+    data = load_or_compute_cache(cache_path, run_inactive_removal_and_sampling_simulation)
 
 
 
@@ -126,7 +124,7 @@ eliminates unphysical dead-end constraints and shrinks the linear system.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 80-85
+.. GENERATED FROM PYTHON SOURCE LINES 78-83
 
 Shear Modulus Convergence & The Dangling-Chain Trap
 ---------------------------------------------------
@@ -134,7 +132,7 @@ Without filtering or simplification, pinned dangling chains inflate :math:`G` by
 thousands of percent below :math:`p \approx 0.90`. Either pre-filtering or solver-level
 inactive removal restores the true physical percolation curve.
 
-.. GENERATED FROM PYTHON SOURCE LINES 85-89
+.. GENERATED FROM PYTHON SOURCE LINES 83-87
 
 .. code-block:: Python
 
@@ -166,7 +164,7 @@ inactive removal restores the true physical percolation curve.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 90-95
+.. GENERATED FROM PYTHON SOURCE LINES 88-93
 
 Topological Compression & Solver Complexity
 -------------------------------------------
@@ -174,7 +172,7 @@ Topological Compression & Solver Complexity
 active system size and solver iterations substantially near the gelation
 threshold.
 
-.. GENERATED FROM PYTHON SOURCE LINES 95-98
+.. GENERATED FROM PYTHON SOURCE LINES 93-96
 
 .. code-block:: Python
 
@@ -208,7 +206,7 @@ threshold.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.882 seconds)
+   **Total running time of the script:** (0 minutes 0.725 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_inactive_removal_and_sampling.py:

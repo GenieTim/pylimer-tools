@@ -66,13 +66,12 @@ writer.write_to_file("generated_structures/final_configuration.data")
 We analyze and plot the bond length distribution in the extracted final
 frame:
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 52-72 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 52-71 -->
 ```Python
 import matplotlib.pyplot as plt
 import numpy as np
 
-bond_lengths = [np.linalg.norm(vec)
-                for vec in final_universe.compute_bond_vectors()]
+bond_lengths = [np.linalg.norm(vec) for vec in final_universe.compute_bond_vectors()]
 
 plt.figure(figsize=(6, 4))
 plt.hist(bond_lengths, bins=25, color="#4C72B0", edgecolor="white", alpha=0.8)
@@ -89,7 +88,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.224 seconds)
+**Total running time of the script:** (0 minutes 0.189 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-convert-trajectory-to-frame-py"></a>
 

@@ -16,7 +16,7 @@ This example shows how to use the MEHPForceBalance2 class in a deformation exper
 
 It also shows, that deformation is an equivalent method to the $\Gamma$ factor to obtain the modulus.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 9-142 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 9-137 -->
 ```Python
 import copy
 from pathlib import Path
@@ -35,8 +35,7 @@ from pylimer_tools.io.read_lammps_output_file import read_data_file
 from pylimer_tools_cpp import Box, MEHPForceBalance2, Universe
 
 # Get parameters for conversion factors
-params = get_parameters_for_polymer(
-    "PDMS", parameter_type=ParameterType.GAUSSIAN)
+params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
 assert isinstance(params, Parameters)
 
 
@@ -138,11 +137,7 @@ for lmbda in lmbdas:
 # plot deformation results
 plt.figure()
 plt.plot(lmbdas, moduli_deformed, marker="o", label="From Deformation")
-plt.axhline(
-    y=shear_modulus,
-    color="r",
-    linestyle="--",
-    label="From Equilibrium")
+plt.axhline(y=shear_modulus, color="r", linestyle="--", label="From Equilibrium")
 plt.xlabel("Deformation Ratio (λ)")
 plt.ylabel("Shear Modulus [MPa]")
 plt.ylim(0, max(moduli_deformed) * 1.1)
@@ -152,17 +147,17 @@ plt.show()
 ```
 
 ```none
-Final residual (should be close to 0): 1.223093867065926e-08
-Shear Modulus from Equilibrium [MPa]:  0.054605828300604044
+Final residual (should be close to 0): 1.81430947362797e-08
+Shear Modulus from Equilibrium [MPa]:  0.07155345309010697
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 143-146 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 138-141 -->
 
 Rather than using the nominal stress, you can also use the
 stress tensor directly to compute the shear modulus.
 Therewith, you could try to investigate e.g. the Mooney-Rivlin behaviour.
 
-**Total running time of the script:** (0 minutes 0.287 seconds)
+**Total running time of the script:** (0 minutes 0.234 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-fb-deformation-exp-py"></a>
 

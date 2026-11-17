@@ -79,7 +79,7 @@ Multi-seed scaling and ensemble plots in the following sections load precomputed
 benchmark data (recomputable via `--recompute` or
 `PYLIMER_RECOMPUTE_CACHE=1`).
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 68-107 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 68-106 -->
 ```Python
 gen = pt.MCUniverseGenerator(18.0, 18.0, 18.0)
 gen.set_seed(42)
@@ -111,8 +111,7 @@ ents_disc = pt.randomly_sample_entanglements(
 fb_disc = pt.MEHPForceBalance2(universe, ents_disc)
 fb_disc.run_force_relaxation(pt.StructureSimplificationMode.INACTIVE_THEN_X2F)
 
-print(
-    f"On-demand links: {len(es_od)}, Discrete links: {len(ents_disc.pairs_of_atoms)}")
+print(f"On-demand links: {len(es_od)}, Discrete links: {len(ents_disc.pairs_of_atoms)}")
 
 cache_path = get_example_cache_path(
     "entanglement_sampling_comparison_cache.npz", "force_balance"
@@ -125,7 +124,7 @@ On-demand links: 226, Discrete links: 234
 Loading cached example data from entanglement_sampling_comparison_cache.npz...
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 108-113 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 107-112 -->
 
 ## Memory Footprint & Runtime Scaling
 
@@ -133,13 +132,13 @@ Explicit bead generation inflates peak resident memory (RSS) due to bead coordin
 neighbor search structures, and igraph graphs. On-demand bounding-box sampling keeps memory
 nearly flat while also running faster on large networks.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 113-117 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 112-116 -->
 ```Python
 plot_sampling_memory_scaling(data)
 plot_sampling_runtime_scaling(data)
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 118-124 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 117-123 -->
 
 ## Strand-Length Scaling & Phase Breakdown
 
@@ -148,13 +147,13 @@ between $O(N_{\text{strands}})$ and $O(N_{\text{atoms}})$ work. The phase breakd
 isolates where discrete sampling spends its time (`get_universe`,
 sampling, and graph build).
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 124-128 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 123-127 -->
 ```Python
 plot_sampling_strand_length_scaling(data)
 plot_sampling_phase_breakdown(data)
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 129-134 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 128-133 -->
 
 ## Conformational Distributions ($\alpha$ and $r$)
 
@@ -162,12 +161,12 @@ Because on-demand sampling regenerates exact discrete bead paths inside candidat
 both contour positions $\alpha$ (uniform) and spatial pair separations $r$
 ($\propto r^2$) match discrete sampling.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 134-137 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 133-136 -->
 ```Python
 plot_sampling_distributions(data)
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 138-149 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 137-148 -->
 
 ## Defective Networks Across Conversion ($p \in [0.75, 1.00]$)
 
@@ -181,12 +180,12 @@ Below full conversion, dangling chains and sol fractions must be handled consist
   effective entanglement density when nominal $N_{\text{ent}}$ is
   fixed per total volume).
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 149-151 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 148-150 -->
 ```Python
 plot_sampling_conversion_sweep(data)
 ```
 
-**Total running time of the script:** (0 minutes 1.751 seconds)
+**Total running time of the script:** (0 minutes 1.404 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-entanglement-sampling-comparison-py"></a>
 

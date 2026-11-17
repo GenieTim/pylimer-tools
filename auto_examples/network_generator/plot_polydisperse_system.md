@@ -19,7 +19,7 @@ For strand length distribution, in this example,
 we show how to use the log-normal distribution as proposed by Tsimouri *et al.* [[TCG21](../../acknowledgements.md#id24)].
 Alternatives were proposed as well, such as the inverse Gaussian or a ternary distribution.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 13-74 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 13-73 -->
 ```Python
 import math
 import random
@@ -34,8 +34,7 @@ from pylimer_tools_cpp import MCUniverseGenerator
 
 # Get parameters for PDMS polymer density, bead distance, and
 # characteristic ratio
-params = get_parameters_for_polymer(
-    "PDMS", parameter_type=ParameterType.GAUSSIAN)
+params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
 C_inf = params.get_characteristic_ratio()
 
 # setup strand lengths
@@ -82,17 +81,16 @@ assert math.isclose(
 )
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 75-79 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 74-78 -->
 
 Refer to [File I/O: Readers & Writers](../readers_writers/index.md#sphx-glr-auto-examples-readers-writers) for how you can save the universe to a file.
 
 For now, we will show that this produces a variety of different strand
 lengths:
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 79-90 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 78-88 -->
 ```Python
-strand_lengths = [m.get_nr_of_atoms()
-                  for m in universe.get_chains_with_crosslinker(2)]
+strand_lengths = [m.get_nr_of_atoms() for m in universe.get_chains_with_crosslinker(2)]
 
 # Plot the distribution of strand lengths
 plt.figure()
@@ -103,7 +101,7 @@ plt.title("Distribution of Strand Lengths in Polydisperse Network")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.409 seconds)
+**Total running time of the script:** (0 minutes 0.348 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-polydisperse-system-py"></a>
 

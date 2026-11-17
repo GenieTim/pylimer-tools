@@ -46,7 +46,7 @@ print(f"1 'lj' pressure in Pascal: {pressure_lj_pa:.2f} Pa")
 ```
 
 ```none
-/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/site-packages/pylimer_tools/io/unit_styles.py:177: UserWarning: LJ unit styles are derived. Reference used: https://doi.org/10.1021/acs.macromol.9b02428
+/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/site-packages/pylimer_tools/io/unit_styles.py:176: UserWarning: LJ unit styles are derived. Reference used: https://doi.org/10.1021/acs.macromol.9b02428
   warnings.warn(
 1 'real' pressure (atm) in Pascal: 101325.00 Pa
 1 'lj' pressure in Pascal: 17600000.00 Pa
@@ -59,7 +59,7 @@ print(f"1 'lj' pressure in Pascal: {pressure_lj_pa:.2f} Pa")
 We compare the SI equivalent of 1 pressure unit across all supported
 LAMMPS styles:
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 44-73 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 44-71 -->
 ```Python
 styles = ["real", "metal", "si", "nano", "lj"]
 pressures_in_pa = []
@@ -83,15 +83,13 @@ bars = plt.bar(
 plt.yscale("log")
 plt.xlabel("LAMMPS Unit Style", fontsize=11)
 plt.ylabel("1 Unit of Pressure [Pa] (log scale)", fontsize=11)
-plt.title(
-    "Pressure Conversion to SI (Pa) Across LAMMPS Unit Styles",
-    fontsize=12)
+plt.title("Pressure Conversion to SI (Pa) Across LAMMPS Unit Styles", fontsize=12)
 plt.grid(True, which="both", axis="y", linestyle=":", alpha=0.6)
 plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.484 seconds)
+**Total running time of the script:** (0 minutes 0.376 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-unit-conversion-py"></a>
 

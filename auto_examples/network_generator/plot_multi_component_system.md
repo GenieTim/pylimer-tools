@@ -14,7 +14,7 @@ to download the full example code.
 
 Create complex systems with multiple components:
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 8-89 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 8-88 -->
 ```Python
 import datetime
 import os
@@ -93,25 +93,24 @@ writer = DataFileWriter(universe)
 if not os.path.exists("generated_structures"):
     os.makedirs("generated_structures")
 
-writer.write_to_file(
-    "generated_structures/multi_component_polymer_network.data")
+writer.write_to_file("generated_structures/multi_component_polymer_network.data")
 ```
 
 ```none
-Starting network generation at 2026-11-17 09:06:30.483176
+Starting network generation at 2026-11-17 16:05:42.557774
 Adding crosslinkers...
 Adding solvent chains...
 Adding and linking polymer strands...
-Network generation completed at 2026-11-17 09:06:30.485135
+Network generation completed at 2026-11-17 16:05:42.559663
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 90-93 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 89-92 -->
 
 ## Component Composition Visualization
 
 We plot the distribution of atoms across all network components:
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 93-131 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 92-130 -->
 ```Python
 import matplotlib.pyplot as plt
 
@@ -152,7 +151,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.136 seconds)
+**Total running time of the script:** (0 minutes 0.111 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-multi-component-system-py"></a>
 

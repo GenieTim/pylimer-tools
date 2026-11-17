@@ -29,7 +29,7 @@ from pylimer_tools_cpp import UniverseSequence
 For large trajectories, frames are loaded on-demand
 Load a LAMMPS dump trajectory file (replace with your file)
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 20-65 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 20-64 -->
 ```Python
 def _find_fixtures_dir() -> Path:
     for cur in (
@@ -73,8 +73,7 @@ dump_file_size = os.path.getsize(dump_file_path)
 print("\n--- Memory Usage Report ---")
 print(f"Memory before processing: {mem_before / (1024 * 1024):.2f} MB")
 print(f"Memory after processing:  {mem_after / (1024 * 1024):.2f} MB")
-print(
-    f"Memory used by script:    {(mem_after - mem_before) / (1024 * 1024):.2f} MB")
+print(f"Memory used by script:    {(mem_after - mem_before) / (1024 * 1024):.2f} MB")
 ```
 
 ```none
@@ -7513,19 +7512,19 @@ Processing frame 74310 with 32 atoms
 Processing frame 74320 with 32 atoms
 
 --- Memory Usage Report ---
-Memory before processing: 945.73 MB
-Memory after processing:  945.73 MB
+Memory before processing: 954.73 MB
+Memory after processing:  954.73 MB
 Memory used by script:    0.00 MB
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 66-70 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 65-69 -->
 
 ## Memory Stability Visualization
 
 Demonstrating that on-demand loading with `forget_at_index` maintains
 a flat memory profile:
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 70-82 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 69-81 -->
 ```Python
 import matplotlib.pyplot as plt
 
@@ -7544,7 +7543,7 @@ print(f"Dump file size:           {dump_file_size / (1024 * 1024):.2f} MB")
 Dump file size:           83.32 MB
 ```
 
-**Total running time of the script:** (0 minutes 3.627 seconds)
+**Total running time of the script:** (0 minutes 3.186 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-memory-efficient-dump-file-reading-py"></a>
 

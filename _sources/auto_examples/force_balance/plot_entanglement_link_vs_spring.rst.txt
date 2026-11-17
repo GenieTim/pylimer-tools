@@ -69,7 +69,7 @@ Passing the same sampled entanglements to :meth:`~pylimer_tools_cpp.MCUniverseGe
 with ``entanglements_as_springs=False`` vs. ``True`` toggles between rigid merged junctions and
 compliant Hookean entanglement springs.
 
-.. GENERATED FROM PYTHON SOURCE LINES 40-72
+.. GENERATED FROM PYTHON SOURCE LINES 40-71
 
 .. code-block:: Python
 
@@ -102,8 +102,7 @@ compliant Hookean entanglement springs.
     cache_path = get_example_cache_path(
         "entanglement_link_vs_spring_cache.npz", "force_balance"
     )
-    data = load_or_compute_cache(cache_path,
-                                 run_entanglement_link_vs_spring_simulation)
+    data = load_or_compute_cache(cache_path, run_entanglement_link_vs_spring_simulation)
 
 
 
@@ -119,7 +118,7 @@ compliant Hookean entanglement springs.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-80
+.. GENERATED FROM PYTHON SOURCE LINES 72-79
 
 Equilibrium Shear Modulus & System Degrees of Freedom
 -----------------------------------------------------
@@ -129,7 +128,7 @@ Multi-seed ensemble results (95% Student's t confidence intervals):
   whereas entanglement springs saturate because the intermediate spring adds series compliance.
 - **System Size**: Entanglement springs add twice as many extra nodes to the linear system.
 
-.. GENERATED FROM PYTHON SOURCE LINES 80-83
+.. GENERATED FROM PYTHON SOURCE LINES 79-82
 
 .. code-block:: Python
 
@@ -163,7 +162,7 @@ Multi-seed ensemble results (95% Student's t confidence intervals):
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.328 seconds)
+   **Total running time of the script:** (0 minutes 0.327 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_entanglement_link_vs_spring.py:

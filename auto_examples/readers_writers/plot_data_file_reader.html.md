@@ -74,16 +74,13 @@ Loaded universe with 56000 atoms
 
 ## Visualizing Loaded Network Statistics
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 60-90 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 60-87 -->
 ```Python
 import matplotlib.pyplot as plt
 import numpy as np
 
 names = ["Melt (single)", "Diamond (imperfect)", "Diamond (fixed)"]
-universes = [
-    one_universe_seq.at_index(0),
-    sequence.at_index(0),
-    sequence.at_index(1)]
+universes = [one_universe_seq.at_index(0), sequence.at_index(0), sequence.at_index(1)]
 atom_counts = [u.get_nr_of_atoms() for u in universes]
 bond_counts = [u.get_nr_of_bonds() for u in universes]
 
@@ -107,7 +104,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 91-96 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 88-93 -->
 
 Please note that the `hybrid` and `tdpd` atom styles are not fully supported.
 
@@ -115,7 +112,7 @@ If your data files don’t hint the atom style in the line that starts with “A
 you should specify it manually, see [`read()`](../../api/pylimer_tools_cpp.DataFileReader.html.md#pylimer_tools_cpp.DataFileReader.read)
 and [`set_data_file_atom_style()`](../../api/pylimer_tools_cpp.UniverseSequence.html.md#pylimer_tools_cpp.UniverseSequence.set_data_file_atom_style).
 
-**Total running time of the script:** (0 minutes 0.377 seconds)
+**Total running time of the script:** (0 minutes 0.352 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-data-file-reader-py"></a>
 

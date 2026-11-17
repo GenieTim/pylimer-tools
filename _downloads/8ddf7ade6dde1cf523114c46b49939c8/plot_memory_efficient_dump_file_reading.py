@@ -59,8 +59,7 @@ dump_file_size = os.path.getsize(dump_file_path)
 print("\n--- Memory Usage Report ---")
 print(f"Memory before processing: {mem_before / (1024 * 1024):.2f} MB")
 print(f"Memory after processing:  {mem_after / (1024 * 1024):.2f} MB")
-print(
-    f"Memory used by script:    {(mem_after - mem_before) / (1024 * 1024):.2f} MB")
+print(f"Memory used by script:    {(mem_after - mem_before) / (1024 * 1024):.2f} MB")
 
 # %%
 # Memory Stability Visualization

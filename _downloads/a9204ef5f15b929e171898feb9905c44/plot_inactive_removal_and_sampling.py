@@ -72,9 +72,7 @@ print(
 cache_path = get_example_cache_path(
     "inactive_removal_and_sampling_cache.npz", "force_balance"
 )
-data = load_or_compute_cache(
-    cache_path,
-    run_inactive_removal_and_sampling_simulation)
+data = load_or_compute_cache(cache_path, run_inactive_removal_and_sampling_simulation)
 
 # %%
 # Shear Modulus Convergence & The Dangling-Chain Trap

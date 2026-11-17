@@ -53,8 +53,7 @@ writer.write_to_file("generated_structures/final_configuration.data")
 import matplotlib.pyplot as plt
 import numpy as np
 
-bond_lengths = [np.linalg.norm(vec)
-                for vec in final_universe.compute_bond_vectors()]
+bond_lengths = [np.linalg.norm(vec) for vec in final_universe.compute_bond_vectors()]
 
 plt.figure(figsize=(6, 4))
 plt.hist(bond_lengths, bins=25, color="#4C72B0", edgecolor="white", alpha=0.8)
