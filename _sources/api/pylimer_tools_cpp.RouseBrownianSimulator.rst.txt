@@ -11,6 +11,7 @@ RouseBrownianSimulator
    .. autosummary::
 
       ~RouseBrownianSimulator.compute_center_of_mass_msd
+      ~RouseBrownianSimulator.compute_end_to_end_autocorrelation
       ~RouseBrownianSimulator.compute_msd
       ~RouseBrownianSimulator.create_linear_chain
       ~RouseBrownianSimulator.create_ring
@@ -22,12 +23,15 @@ RouseBrownianSimulator
       ~RouseBrownianSimulator.get_end_to_end_vector
       ~RouseBrownianSimulator.get_gamma
       ~RouseBrownianSimulator.get_k
+      ~RouseBrownianSimulator.get_kb
       ~RouseBrownianSimulator.get_laplacian
       ~RouseBrownianSimulator.get_nr_of_nodes
       ~RouseBrownianSimulator.get_positions
+      ~RouseBrownianSimulator.get_positions_flattened
       ~RouseBrownianSimulator.get_potential_energy
       ~RouseBrownianSimulator.get_radius_of_gyration
       ~RouseBrownianSimulator.get_shifted_matrix
+      ~RouseBrownianSimulator.get_solver_type
       ~RouseBrownianSimulator.get_temperature
       ~RouseBrownianSimulator.initialize_linear_positions
       ~RouseBrownianSimulator.initialize_random_walk
@@ -35,18 +39,22 @@ RouseBrownianSimulator
       ~RouseBrownianSimulator.set_dt
       ~RouseBrownianSimulator.set_gamma
       ~RouseBrownianSimulator.set_k
+      ~RouseBrownianSimulator.set_kb
       ~RouseBrownianSimulator.set_parameters
       ~RouseBrownianSimulator.set_positions
+      ~RouseBrownianSimulator.set_positions_flattened
       ~RouseBrownianSimulator.set_seed
       ~RouseBrownianSimulator.set_solver_type
       ~RouseBrownianSimulator.set_temperature
       ~RouseBrownianSimulator.step
       ~RouseBrownianSimulator.step_deterministic
+      ~RouseBrownianSimulator.step_deterministic_with_external_forces
       ~RouseBrownianSimulator.step_with_external_forces
 
    .. rubric:: Methods Documentation
 
    .. automethod:: compute_center_of_mass_msd
+   .. automethod:: compute_end_to_end_autocorrelation
    .. automethod:: compute_msd
    .. automethod:: create_linear_chain
    .. automethod:: create_ring
@@ -58,12 +66,15 @@ RouseBrownianSimulator
    .. automethod:: get_end_to_end_vector
    .. automethod:: get_gamma
    .. automethod:: get_k
+   .. automethod:: get_kb
    .. automethod:: get_laplacian
    .. automethod:: get_nr_of_nodes
    .. automethod:: get_positions
+   .. automethod:: get_positions_flattened
    .. automethod:: get_potential_energy
    .. automethod:: get_radius_of_gyration
    .. automethod:: get_shifted_matrix
+   .. automethod:: get_solver_type
    .. automethod:: get_temperature
    .. automethod:: initialize_linear_positions
    .. automethod:: initialize_random_walk
@@ -71,11 +82,14 @@ RouseBrownianSimulator
    .. automethod:: set_dt
    .. automethod:: set_gamma
    .. automethod:: set_k
+   .. automethod:: set_kb
    .. automethod:: set_parameters
    .. automethod:: set_positions
+   .. automethod:: set_positions_flattened
    .. automethod:: set_seed
    .. automethod:: set_solver_type
    .. automethod:: set_temperature
    .. automethod:: step
    .. automethod:: step_deterministic
+   .. automethod:: step_deterministic_with_external_forces
    .. automethod:: step_with_external_forces

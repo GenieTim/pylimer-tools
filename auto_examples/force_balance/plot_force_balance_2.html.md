@@ -274,7 +274,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.284 seconds)
+**Total running time of the script:** (0 minutes 0.286 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-force-balance-2-py"></a>
 

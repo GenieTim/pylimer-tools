@@ -4,6 +4,8 @@
 
 Bases: [`IntEnum`](https://docs.python.org/3/library/enum.html#enum.IntEnum)
 
+Linear solver algorithm for implicit Rouse/Brownian time-stepping.
+
 ### Attributes Summary
 
 | [`CONJUGATE_GRADIENT`](#pylimer_tools_cpp.RouseSolverType.CONJUGATE_GRADIENT)   |                                                      |

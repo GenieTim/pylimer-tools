@@ -360,15 +360,13 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedBalance2Network.html">SimplifiedBalance2Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedBalanceNetwork.html">SimplifiedBalanceNetwork</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedNetwork.html">SimplifiedNetwork</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.StochasticSpectralMethod.html">StochasticSpectralMethod</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.StrandCategory.html">StrandCategory</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.StrandPairEntanglements.html">StrandPairEntanglements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.StructureSimplificationMode.html">StructureSimplificationMode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.Universe.html">Universe</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.UniverseSequence.html">UniverseSequence</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.ZScoreMaxDistanceProvider.html">ZScoreMaxDistanceProvider</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.CONJUGATE_GRADIENT.html">CONJUGATE_GRADIENT</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.DIRECT_LDLT.html">DIRECT_LDLT</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.DIRECT_LLT.html">DIRECT_LLT</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.STOP.html">STOP</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.TRACK_BACKWARD.html">TRACK_BACKWARD</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.TRACK_FORWARD.html">TRACK_FORWARD</a></li>
@@ -424,80 +422,113 @@
 <dt class="sig sig-object py" id="pylimer_tools_cpp.ResistanceDistanceAnalysis">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">ResistanceDistanceAnalysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>Analysis of topological resistance distances, Kirchhoff index,
+and random-walk commute times on graph Laplacians.</p>
 <p>Overloaded function.</p>
-<ol class="arabic simple">
-<li><p>__init__(self: pylimer_tools_cpp.ResistanceDistanceAnalysis, spring_from: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], spring_to: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], weights: collections.abc.Sequence[typing.SupportsFloat | typing.SupportsIndex] = [], num_nodes: typing.SupportsInt | typing.SupportsIndex = 0) -&gt; None</p></li>
-<li><p>__init__(self: pylimer_tools_cpp.ResistanceDistanceAnalysis, L: scipy.sparse.csc_matrix[numpy.float64]) -&gt; None</p></li>
+<ol class="arabic">
+<li><p>__init__(self: pylimer_tools_cpp.ResistanceDistanceAnalysis, spring_from: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], spring_to: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], weights: collections.abc.Sequence[typing.SupportsFloat | typing.SupportsIndex] = [], num_nodes: typing.SupportsInt | typing.SupportsIndex = 0) -&gt; None</p>
+<blockquote>
+<div><p>Construct from edge lists (spring_from, spring_to), optional edge weights,
+and optional number of nodes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">param spring_from<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Source node indices of edges</p>
+</dd>
+<dt class="field-even">param spring_to<span class="colon">:</span></dt>
+<dd class="field-even"><p>Target node indices of edges</p>
+</dd>
+<dt class="field-odd">param weights<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Optional weights (spring constants) of edges (defaults to 1.0)</p>
+</dd>
+<dt class="field-even">param num_nodes<span class="colon">:</span></dt>
+<dd class="field-even"><p>Optional total number of nodes (deduced if 0)</p>
+</dd>
+</dl>
+</div></blockquote>
+</li>
+<li><p>__init__(self: pylimer_tools_cpp.ResistanceDistanceAnalysis, L: scipy.sparse.csc_matrix[numpy.float64]) -&gt; None</p>
+<blockquote>
+<div><p>Construct from a pre-assembled sparse scalar graph Laplacian matrix L.</p>
+<dl class="field-list simple">
+<dt class="field-odd">param L<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Symmetric positive semidefinite graph Laplacian matrix</p>
+</dd>
+</dl>
+</div></blockquote>
+</li>
 </ol>
 <p class="rubric">Methods Summary</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_all_pairs_commute_time" title="pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_all_pairs_commute_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_all_pairs_commute_time</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Compute the N x N matrix of all-pairs random-walk commute times.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_all_pairs_effective_resistance" title="pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_all_pairs_effective_resistance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_all_pairs_effective_resistance</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Compute the N x N symmetric matrix of all-pairs effective resistances.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_commute_time" title="pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_commute_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_commute_time</span></code></a>(self, i, j)</p></td>
-<td><p></p></td>
+<td><p>Compute the random-walk commute time C_ij = 2 * M * R_ij between nodes i and j.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_effective_resistance" title="pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_effective_resistance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_effective_resistance</span></code></a>(self, i, j)</p></td>
-<td><p></p></td>
+<td><p>Compute the effective resistance between nodes i and j.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_effective_resistance_batched" title="pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_effective_resistance_batched"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_effective_resistance_batched</span></code></a>(self, pairs)</p></td>
-<td><p></p></td>
+<td><p>Compute the effective resistance for a batch of node pairs using a single multi-RHS solve.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_kirchhoff_index" title="pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_kirchhoff_index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_kirchhoff_index</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Compute the Kirchhoff index K(G) = sum_{i &lt; j} R_ij without allocating the full N x N matrix.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_kirchhoff_index_spectral" title="pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_kirchhoff_index_spectral"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_kirchhoff_index_spectral</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Compute the Kirchhoff index from the non-zero eigenvalues of the Laplacian.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_moore_penrose_pseudo_inverse" title="pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_moore_penrose_pseudo_inverse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_moore_penrose_pseudo_inverse</span></code></a>(self[, ...])</p></td>
-<td><p></p></td>
+<td><p>Compute the Moore-Penrose pseudo-inverse L^+ of the graph Laplacian.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_resistance_centrality" title="pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_resistance_centrality"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_resistance_centrality</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Compute the resistance centrality (N - 1) / sum_{j != i} R_ij for each node.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_total_resistance_per_node" title="pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_total_resistance_per_node"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_total_resistance_per_node</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Compute the sum of effective resistances from each node to all other nodes.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.create_complete" title="pylimer_tools_cpp.ResistanceDistanceAnalysis.create_complete"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_complete</span></code></a>(num_nodes)</p></td>
-<td><p></p></td>
+<td><p>Create a ResistanceDistanceAnalysis instance for a complete graph K_N.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.create_linear_chain" title="pylimer_tools_cpp.ResistanceDistanceAnalysis.create_linear_chain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_linear_chain</span></code></a>(num_nodes)</p></td>
-<td><p></p></td>
+<td><p>Create a ResistanceDistanceAnalysis instance for a linear chain of num_nodes nodes.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.create_ring" title="pylimer_tools_cpp.ResistanceDistanceAnalysis.create_ring"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_ring</span></code></a>(num_nodes)</p></td>
-<td><p></p></td>
+<td><p>Create a ResistanceDistanceAnalysis instance for a ring graph of num_nodes nodes.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.create_star" title="pylimer_tools_cpp.ResistanceDistanceAnalysis.create_star"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_star</span></code></a>(num_arms[, arm_length])</p></td>
-<td><p></p></td>
+<td><p>Create a ResistanceDistanceAnalysis instance for a star graph.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.get_connected_components" title="pylimer_tools_cpp.ResistanceDistanceAnalysis.get_connected_components"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_connected_components</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the list of node indices for each connected component.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.get_laplacian" title="pylimer_tools_cpp.ResistanceDistanceAnalysis.get_laplacian"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_laplacian</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the sparse graph Laplacian matrix L.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.get_nr_of_connected_components" title="pylimer_tools_cpp.ResistanceDistanceAnalysis.get_nr_of_connected_components"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_connected_components</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the number of connected components in the graph.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.get_nr_of_edges" title="pylimer_tools_cpp.ResistanceDistanceAnalysis.get_nr_of_edges"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_edges</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the number of non-self-loop edges in the graph.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.get_nr_of_nodes" title="pylimer_tools_cpp.ResistanceDistanceAnalysis.get_nr_of_nodes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_nodes</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the number of nodes in the graph.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.get_total_edge_weight" title="pylimer_tools_cpp.ResistanceDistanceAnalysis.get_total_edge_weight"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_total_edge_weight</span></code></a>(self)</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.get_pinned_laplacian" title="pylimer_tools_cpp.ResistanceDistanceAnalysis.get_pinned_laplacian"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_pinned_laplacian</span></code></a>(self)</p></td>
+<td><p>Get the sparse pinned Laplacian matrix with reference nodes pinned to 1 on the diagonal.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.is_connected" title="pylimer_tools_cpp.ResistanceDistanceAnalysis.is_connected"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_connected</span></code></a>(self)</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.get_total_edge_weight" title="pylimer_tools_cpp.ResistanceDistanceAnalysis.get_total_edge_weight"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_total_edge_weight</span></code></a>(self)</p></td>
+<td><p>Get the total weight of all edges in the graph.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.solve_identity_chunked" title="pylimer_tools_cpp.ResistanceDistanceAnalysis.solve_identity_chunked"><code class="xref py py-obj docutils literal notranslate"><span class="pre">solve_identity_chunked</span></code></a>(self[, chunk_size])</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.is_connected" title="pylimer_tools_cpp.ResistanceDistanceAnalysis.is_connected"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_connected</span></code></a>(self)</p></td>
+<td><p>Check whether the graph consists of a single connected component.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.solve_identity_chunked" title="pylimer_tools_cpp.ResistanceDistanceAnalysis.solve_identity_chunked"><code class="xref py py-obj docutils literal notranslate"><span class="pre">solve_identity_chunked</span></code></a>(self[, chunk_size])</p></td>
+<td><p>Solve L_pinned * X = I in multi-column chunks.</p></td>
 </tr>
 </tbody>
 </table>
@@ -506,112 +537,294 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_all_pairs_commute_time">
 <span class="sig-name descname"><span class="pre">compute_all_pairs_commute_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis" title="pylimer_tools_cpp.ResistanceDistanceAnalysis"><span class="pre">pylimer_tools_cpp.ResistanceDistanceAnalysis</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.15)"><span class="pre">Annotated</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.typing.NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'[m,</span> <span class="pre">n]'</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_all_pairs_commute_time" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the N x N matrix of all-pairs random-walk commute times.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>N x N matrix of commute times</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_all_pairs_effective_resistance">
 <span class="sig-name descname"><span class="pre">compute_all_pairs_effective_resistance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis" title="pylimer_tools_cpp.ResistanceDistanceAnalysis"><span class="pre">pylimer_tools_cpp.ResistanceDistanceAnalysis</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsInt" title="(in Python v3.15)"><span class="pre">SupportsInt</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsIndex" title="(in Python v3.15)"><span class="pre">SupportsIndex</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">128</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.15)"><span class="pre">Annotated</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.typing.NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'[m,</span> <span class="pre">n]'</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_all_pairs_effective_resistance" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the N x N symmetric matrix of all-pairs effective resistances.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_all_pairs_effective_resistance.params.chunk_size"></span><strong>chunk_size</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_all_pairs_effective_resistance.params.chunk_size">¶</a> – Number of columns per solve chunk (defaults to 128)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>N x N matrix of effective resistances</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_commute_time">
 <span class="sig-name descname"><span class="pre">compute_commute_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis" title="pylimer_tools_cpp.ResistanceDistanceAnalysis"><span class="pre">pylimer_tools_cpp.ResistanceDistanceAnalysis</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsInt" title="(in Python v3.15)"><span class="pre">SupportsInt</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsIndex" title="(in Python v3.15)"><span class="pre">SupportsIndex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsInt" title="(in Python v3.15)"><span class="pre">SupportsInt</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsIndex" title="(in Python v3.15)"><span class="pre">SupportsIndex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_commute_time" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the random-walk commute time C_ij = 2 * M * R_ij between nodes i and j.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_commute_time.params.i"></span><strong>i</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_commute_time.params.i">¶</a> – First node index</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_commute_time.params.j"></span><strong>j</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_commute_time.params.j">¶</a> – Second node index</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Commute time C_ij</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_effective_resistance">
 <span class="sig-name descname"><span class="pre">compute_effective_resistance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis" title="pylimer_tools_cpp.ResistanceDistanceAnalysis"><span class="pre">pylimer_tools_cpp.ResistanceDistanceAnalysis</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsInt" title="(in Python v3.15)"><span class="pre">SupportsInt</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsIndex" title="(in Python v3.15)"><span class="pre">SupportsIndex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsInt" title="(in Python v3.15)"><span class="pre">SupportsInt</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsIndex" title="(in Python v3.15)"><span class="pre">SupportsIndex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_effective_resistance" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the effective resistance between nodes i and j.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_effective_resistance.params.i"></span><strong>i</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_effective_resistance.params.i">¶</a> – First node index</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_effective_resistance.params.j"></span><strong>j</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_effective_resistance.params.j">¶</a> – Second node index</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Effective resistance R_ij (or inf if in different components)</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_effective_resistance_batched">
 <span class="sig-name descname"><span class="pre">compute_effective_resistance_batched</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis" title="pylimer_tools_cpp.ResistanceDistanceAnalysis"><span class="pre">pylimer_tools_cpp.ResistanceDistanceAnalysis</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">pairs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.15)"><span class="pre">collections.abc.Sequence</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsInt" title="(in Python v3.15)"><span class="pre">SupportsInt</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsIndex" title="(in Python v3.15)"><span class="pre">SupportsIndex</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsInt" title="(in Python v3.15)"><span class="pre">SupportsInt</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsIndex" title="(in Python v3.15)"><span class="pre">SupportsIndex</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.15)"><span class="pre">Annotated</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.typing.NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'[m,</span> <span class="pre">1]'</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_effective_resistance_batched" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the effective resistance for a batch of node pairs using a single multi-RHS solve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_effective_resistance_batched.params.pairs"></span><strong>pairs</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_effective_resistance_batched.params.pairs">¶</a> – List of (i, j) node index pairs</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Vector of effective resistances for each pair</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_kirchhoff_index">
 <span class="sig-name descname"><span class="pre">compute_kirchhoff_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis" title="pylimer_tools_cpp.ResistanceDistanceAnalysis"><span class="pre">pylimer_tools_cpp.ResistanceDistanceAnalysis</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_kirchhoff_index" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the Kirchhoff index K(G) = sum_{i &lt; j} R_ij without allocating the full N x N matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Kirchhoff index (or inf if disconnected)</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_kirchhoff_index_spectral">
 <span class="sig-name descname"><span class="pre">compute_kirchhoff_index_spectral</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis" title="pylimer_tools_cpp.ResistanceDistanceAnalysis"><span class="pre">pylimer_tools_cpp.ResistanceDistanceAnalysis</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_kirchhoff_index_spectral" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the Kirchhoff index from the non-zero eigenvalues of the Laplacian.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Kirchhoff index (or inf if disconnected)</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_moore_penrose_pseudo_inverse">
 <span class="sig-name descname"><span class="pre">compute_moore_penrose_pseudo_inverse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis" title="pylimer_tools_cpp.ResistanceDistanceAnalysis"><span class="pre">pylimer_tools_cpp.ResistanceDistanceAnalysis</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsInt" title="(in Python v3.15)"><span class="pre">SupportsInt</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsIndex" title="(in Python v3.15)"><span class="pre">SupportsIndex</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">128</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.15)"><span class="pre">Annotated</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.typing.NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'[m,</span> <span class="pre">n]'</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_moore_penrose_pseudo_inverse" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the Moore-Penrose pseudo-inverse L^+ of the graph Laplacian.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_moore_penrose_pseudo_inverse.params.chunk_size"></span><strong>chunk_size</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_moore_penrose_pseudo_inverse.params.chunk_size">¶</a> – Number of columns per solve chunk (defaults to 128)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>N x N Moore-Penrose pseudo-inverse matrix</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_resistance_centrality">
 <span class="sig-name descname"><span class="pre">compute_resistance_centrality</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis" title="pylimer_tools_cpp.ResistanceDistanceAnalysis"><span class="pre">pylimer_tools_cpp.ResistanceDistanceAnalysis</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.15)"><span class="pre">Annotated</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.typing.NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'[m,</span> <span class="pre">1]'</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_resistance_centrality" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the resistance centrality (N - 1) / sum_{j != i} R_ij for each node.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Vector of resistance centralities</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_total_resistance_per_node">
 <span class="sig-name descname"><span class="pre">compute_total_resistance_per_node</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis" title="pylimer_tools_cpp.ResistanceDistanceAnalysis"><span class="pre">pylimer_tools_cpp.ResistanceDistanceAnalysis</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.15)"><span class="pre">Annotated</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.typing.NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'[m,</span> <span class="pre">1]'</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_total_resistance_per_node" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the sum of effective resistances from each node to all other nodes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Vector of total resistance per node</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.ResistanceDistanceAnalysis.create_complete">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">create_complete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsInt" title="(in Python v3.15)"><span class="pre">SupportsInt</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsIndex" title="(in Python v3.15)"><span class="pre">SupportsIndex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis" title="pylimer_tools_cpp.ResistanceDistanceAnalysis"><span class="pre">pylimer_tools_cpp.ResistanceDistanceAnalysis</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.create_complete" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Create a ResistanceDistanceAnalysis instance for a complete graph K_N.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.ResistanceDistanceAnalysis.create_complete.params.num_nodes"></span><strong>num_nodes</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.create_complete.params.num_nodes">¶</a> – Number of nodes in the complete graph (at least 2)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>ResistanceDistanceAnalysis instance</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.ResistanceDistanceAnalysis.create_linear_chain">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">create_linear_chain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsInt" title="(in Python v3.15)"><span class="pre">SupportsInt</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsIndex" title="(in Python v3.15)"><span class="pre">SupportsIndex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis" title="pylimer_tools_cpp.ResistanceDistanceAnalysis"><span class="pre">pylimer_tools_cpp.ResistanceDistanceAnalysis</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.create_linear_chain" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Create a ResistanceDistanceAnalysis instance for a linear chain of num_nodes nodes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.ResistanceDistanceAnalysis.create_linear_chain.params.num_nodes"></span><strong>num_nodes</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.create_linear_chain.params.num_nodes">¶</a> – Number of nodes in the linear chain</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>ResistanceDistanceAnalysis instance</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.ResistanceDistanceAnalysis.create_ring">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">create_ring</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsInt" title="(in Python v3.15)"><span class="pre">SupportsInt</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsIndex" title="(in Python v3.15)"><span class="pre">SupportsIndex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis" title="pylimer_tools_cpp.ResistanceDistanceAnalysis"><span class="pre">pylimer_tools_cpp.ResistanceDistanceAnalysis</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.create_ring" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Create a ResistanceDistanceAnalysis instance for a ring graph of num_nodes nodes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.ResistanceDistanceAnalysis.create_ring.params.num_nodes"></span><strong>num_nodes</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.create_ring.params.num_nodes">¶</a> – Number of nodes in the ring (at least 3)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>ResistanceDistanceAnalysis instance</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.ResistanceDistanceAnalysis.create_star">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">create_star</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_arms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsInt" title="(in Python v3.15)"><span class="pre">SupportsInt</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsIndex" title="(in Python v3.15)"><span class="pre">SupportsIndex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arm_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsInt" title="(in Python v3.15)"><span class="pre">SupportsInt</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsIndex" title="(in Python v3.15)"><span class="pre">SupportsIndex</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis" title="pylimer_tools_cpp.ResistanceDistanceAnalysis"><span class="pre">pylimer_tools_cpp.ResistanceDistanceAnalysis</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.create_star" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Create a ResistanceDistanceAnalysis instance for a star graph.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="pylimer_tools_cpp.ResistanceDistanceAnalysis.create_star.params.num_arms"></span><strong>num_arms</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.create_star.params.num_arms">¶</a> – Number of arms (at least 2)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.ResistanceDistanceAnalysis.create_star.params.arm_length"></span><strong>arm_length</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.create_star.params.arm_length">¶</a> – Number of edges per arm (defaults to 1)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>ResistanceDistanceAnalysis instance</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.ResistanceDistanceAnalysis.get_connected_components">
 <span class="sig-name descname"><span class="pre">get_connected_components</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis" title="pylimer_tools_cpp.ResistanceDistanceAnalysis"><span class="pre">pylimer_tools_cpp.ResistanceDistanceAnalysis</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.get_connected_components" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the list of node indices for each connected component.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of node index lists per connected component</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.ResistanceDistanceAnalysis.get_laplacian">
 <span class="sig-name descname"><span class="pre">get_laplacian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis" title="pylimer_tools_cpp.ResistanceDistanceAnalysis"><span class="pre">pylimer_tools_cpp.ResistanceDistanceAnalysis</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csc_matrix.html#scipy.sparse.csc_matrix" title="(in SciPy v1.18.0)"><span class="pre">scipy.sparse.csc_matrix</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.get_laplacian" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the sparse graph Laplacian matrix L.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Sparse Laplacian matrix</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.ResistanceDistanceAnalysis.get_nr_of_connected_components">
 <span class="sig-name descname"><span class="pre">get_nr_of_connected_components</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis" title="pylimer_tools_cpp.ResistanceDistanceAnalysis"><span class="pre">pylimer_tools_cpp.ResistanceDistanceAnalysis</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.get_nr_of_connected_components" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the number of connected components in the graph.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of connected components</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.ResistanceDistanceAnalysis.get_nr_of_edges">
 <span class="sig-name descname"><span class="pre">get_nr_of_edges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis" title="pylimer_tools_cpp.ResistanceDistanceAnalysis"><span class="pre">pylimer_tools_cpp.ResistanceDistanceAnalysis</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.get_nr_of_edges" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the number of non-self-loop edges in the graph.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of edges</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.ResistanceDistanceAnalysis.get_nr_of_nodes">
 <span class="sig-name descname"><span class="pre">get_nr_of_nodes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis" title="pylimer_tools_cpp.ResistanceDistanceAnalysis"><span class="pre">pylimer_tools_cpp.ResistanceDistanceAnalysis</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.get_nr_of_nodes" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the number of nodes in the graph.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of nodes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.ResistanceDistanceAnalysis.get_pinned_laplacian">
+<span class="sig-name descname"><span class="pre">get_pinned_laplacian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis" title="pylimer_tools_cpp.ResistanceDistanceAnalysis"><span class="pre">pylimer_tools_cpp.ResistanceDistanceAnalysis</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csc_matrix.html#scipy.sparse.csc_matrix" title="(in SciPy v1.18.0)"><span class="pre">scipy.sparse.csc_matrix</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.get_pinned_laplacian" title="Link to this definition">¶</a></dt>
+<dd><p>Get the sparse pinned Laplacian matrix with reference nodes pinned to 1 on the diagonal.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Sparse pinned Laplacian matrix</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.ResistanceDistanceAnalysis.get_total_edge_weight">
 <span class="sig-name descname"><span class="pre">get_total_edge_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis" title="pylimer_tools_cpp.ResistanceDistanceAnalysis"><span class="pre">pylimer_tools_cpp.ResistanceDistanceAnalysis</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.get_total_edge_weight" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the total weight of all edges in the graph.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Total edge weight</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.ResistanceDistanceAnalysis.is_connected">
 <span class="sig-name descname"><span class="pre">is_connected</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis" title="pylimer_tools_cpp.ResistanceDistanceAnalysis"><span class="pre">pylimer_tools_cpp.ResistanceDistanceAnalysis</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.is_connected" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Check whether the graph consists of a single connected component.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if connected, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.ResistanceDistanceAnalysis.solve_identity_chunked">
 <span class="sig-name descname"><span class="pre">solve_identity_chunked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis" title="pylimer_tools_cpp.ResistanceDistanceAnalysis"><span class="pre">pylimer_tools_cpp.ResistanceDistanceAnalysis</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsInt" title="(in Python v3.15)"><span class="pre">SupportsInt</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsIndex" title="(in Python v3.15)"><span class="pre">SupportsIndex</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">128</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.15)"><span class="pre">Annotated</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.typing.NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'[m,</span> <span class="pre">n]'</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.solve_identity_chunked" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Solve L_pinned * X = I in multi-column chunks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.ResistanceDistanceAnalysis.solve_identity_chunked.params.chunk_size"></span><strong>chunk_size</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.solve_identity_chunked.params.chunk_size">¶</a> – Number of columns per solve chunk (defaults to 128)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>N x N solution matrix X</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -693,6 +906,7 @@
 <li><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.get_nr_of_connected_components"><code class="docutils literal notranslate"><span class="pre">ResistanceDistanceAnalysis.get_nr_of_connected_components()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.get_nr_of_edges"><code class="docutils literal notranslate"><span class="pre">ResistanceDistanceAnalysis.get_nr_of_edges()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.get_nr_of_nodes"><code class="docutils literal notranslate"><span class="pre">ResistanceDistanceAnalysis.get_nr_of_nodes()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.get_pinned_laplacian"><code class="docutils literal notranslate"><span class="pre">ResistanceDistanceAnalysis.get_pinned_laplacian()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.get_total_edge_weight"><code class="docutils literal notranslate"><span class="pre">ResistanceDistanceAnalysis.get_total_edge_weight()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.is_connected"><code class="docutils literal notranslate"><span class="pre">ResistanceDistanceAnalysis.is_connected()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.ResistanceDistanceAnalysis.solve_identity_chunked"><code class="docutils literal notranslate"><span class="pre">ResistanceDistanceAnalysis.solve_identity_chunked()</span></code></a></li>

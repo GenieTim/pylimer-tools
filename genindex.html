@@ -341,15 +341,13 @@
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.SimplifiedBalance2Network.html">SimplifiedBalance2Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.SimplifiedBalanceNetwork.html">SimplifiedBalanceNetwork</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.SimplifiedNetwork.html">SimplifiedNetwork</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.StochasticSpectralMethod.html">StochasticSpectralMethod</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.StrandCategory.html">StrandCategory</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.StrandPairEntanglements.html">StrandPairEntanglements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.StructureSimplificationMode.html">StructureSimplificationMode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html">Universe</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.UniverseSequence.html">UniverseSequence</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.ZScoreMaxDistanceProvider.html">ZScoreMaxDistanceProvider</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.CONJUGATE_GRADIENT.html">CONJUGATE_GRADIENT</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.DIRECT_LDLT.html">DIRECT_LDLT</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.DIRECT_LLT.html">DIRECT_LLT</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.STOP.html">STOP</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.TRACK_BACKWARD.html">TRACK_BACKWARD</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.TRACK_FORWARD.html">TRACK_FORWARD</a></li>
@@ -741,15 +739,17 @@
           <li><a href="pylimer_tools.utils.html#pylimer_tools.utils.cache_utility.load_cache.params.anyway">(pylimer_tools.utils.cache_utility.load_cache parameter)</a>
 </li>
         </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pylimer_tools_cpp.OutputConfiguration.html#pylimer_tools_cpp.OutputConfiguration.append">append (pylimer_tools_cpp.OutputConfiguration attribute)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pylimer_tools_cpp.Box.html#pylimer_tools_cpp.Box.apply_pbc">apply_pbc() (pylimer_tools_cpp.Box method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.Box.html#pylimer_tools_cpp.Box.apply_simple_shear">apply_simple_shear() (pylimer_tools_cpp.Box method)</a>
 </li>
         <li><a href="pylimer_tools.utils.html#pylimer_tools.utils.data_utility.apply_to_numeric_ignore_compat">apply_to_numeric_ignore_compat() (in module pylimer_tools.utils.data_utility)</a>
+</li>
+        <li><a href="api/pylimer_tools_cpp.ResistanceDistanceAnalysis.html#pylimer_tools_cpp.ResistanceDistanceAnalysis.create_star.params.arm_length">arm_length (pylimer_tools_cpp.ResistanceDistanceAnalysis.create_star parameter)</a>, <a href="api/pylimer_tools_cpp.ResistanceDistanceAnalysis.html#pylimer_tools_cpp.ResistanceDistanceAnalysis.create_star.params.arm_length">[1]</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.ComputedDoubleValues.html#pylimer_tools_cpp.ComputedDoubleValues.as_integer_ratio">as_integer_ratio() (pylimer_tools_cpp.ComputedDoubleValues method)</a>
 
@@ -873,6 +873,8 @@
 
         <ul>
           <li><a href="api/pylimer_tools_cpp.SLESolver.html#pylimer_tools_cpp.SLESolver.AUTO">(pylimer_tools_cpp.SLESolver attribute)</a>
+</li>
+          <li><a href="api/pylimer_tools_cpp.StochasticSpectralMethod.html#pylimer_tools_cpp.StochasticSpectralMethod.AUTO">(pylimer_tools_cpp.StochasticSpectralMethod attribute)</a>
 </li>
         </ul></li>
         <li><a href="api/pylimer_tools_cpp.AveFileReader.html#pylimer_tools_cpp.AveFileReader.autocorrelate_column">autocorrelate_column() (pylimer_tools_cpp.AveFileReader method)</a>
@@ -1119,6 +1121,14 @@
         </ul></li>
         <li><a href="api/pylimer_tools_cpp.AtomStyle.html#pylimer_tools_cpp.AtomStyle.CHARGE">CHARGE (pylimer_tools_cpp.AtomStyle attribute)</a>
 </li>
+        <li><a href="api/pylimer_tools_cpp.ResistanceDistanceAnalysis.html#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_all_pairs_effective_resistance.params.chunk_size">chunk_size (pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_all_pairs_effective_resistance parameter)</a>, <a href="api/pylimer_tools_cpp.ResistanceDistanceAnalysis.html#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_all_pairs_effective_resistance.params.chunk_size">[1]</a>
+
+        <ul>
+          <li><a href="api/pylimer_tools_cpp.ResistanceDistanceAnalysis.html#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_moore_penrose_pseudo_inverse.params.chunk_size">(pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_moore_penrose_pseudo_inverse parameter)</a>, <a href="api/pylimer_tools_cpp.ResistanceDistanceAnalysis.html#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_moore_penrose_pseudo_inverse.params.chunk_size">[1]</a>
+</li>
+          <li><a href="api/pylimer_tools_cpp.ResistanceDistanceAnalysis.html#pylimer_tools_cpp.ResistanceDistanceAnalysis.solve_identity_chunked.params.chunk_size">(pylimer_tools_cpp.ResistanceDistanceAnalysis.solve_identity_chunked parameter)</a>, <a href="api/pylimer_tools_cpp.ResistanceDistanceAnalysis.html#pylimer_tools_cpp.ResistanceDistanceAnalysis.solve_identity_chunked.params.chunk_size">[1]</a>
+</li>
+        </ul></li>
         <li><a href="api/pylimer_tools_cpp.CrosslinkerUniverse.html#pylimer_tools_cpp.CrosslinkerUniverse.classify_strand">classify_strand() (pylimer_tools_cpp.CrosslinkerUniverse method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.clear_caches">clear_caches() (pylimer_tools_cpp.Universe method)</a>
@@ -1213,6 +1223,8 @@
           <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.find_sparse_eigenvalues.params.compute_eigenvectors">(pylimer_tools_cpp.NormalModeAnalyzer.find_sparse_eigenvalues parameter)</a>, <a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.find_sparse_eigenvalues.params.compute_eigenvectors">[1]</a>
 </li>
         </ul></li>
+        <li><a href="api/pylimer_tools_cpp.RouseBrownianSimulator.html#pylimer_tools_cpp.RouseBrownianSimulator.compute_end_to_end_autocorrelation">compute_end_to_end_autocorrelation() (pylimer_tools_cpp.RouseBrownianSimulator static method)</a>
+</li>
         <li><a href="api/pylimer_tools_cpp.Molecule.html#pylimer_tools_cpp.Molecule.compute_end_to_end_distance">compute_end_to_end_distance() (pylimer_tools_cpp.Molecule method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.Molecule.html#pylimer_tools_cpp.Molecule.compute_end_to_end_distance_with_derived_image_flags">compute_end_to_end_distance_with_derived_image_flags() (pylimer_tools_cpp.Molecule method)</a>
@@ -1373,14 +1385,14 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.DPDSimulator.html#pylimer_tools_cpp.DPDSimulator.config_average_output">config_average_output() (pylimer_tools_cpp.DPDSimulator method)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pylimer_tools_cpp.DPDSimulator.html#pylimer_tools_cpp.DPDSimulator.config_bond_formation">config_bond_formation() (pylimer_tools_cpp.DPDSimulator method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.DPDSimulator.html#pylimer_tools_cpp.DPDSimulator.config_box_deformation">config_box_deformation() (pylimer_tools_cpp.DPDSimulator method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.MEHPForceBalance2.html#pylimer_tools_cpp.MEHPForceBalance2.config_cg_fallback_max_iterations">config_cg_fallback_max_iterations() (pylimer_tools_cpp.MEHPForceBalance2 method)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pylimer_tools_cpp.DataFileWriter.html#pylimer_tools_cpp.DataFileWriter.config_crosslinker_type">config_crosslinker_type() (pylimer_tools_cpp.DataFileWriter method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance.config_entanglement_type">config_entanglement_type() (pylimer_tools_cpp.MEHPForceBalance method)</a>
@@ -1471,11 +1483,9 @@
           <li><a href="api/pylimer_tools_cpp.StrandCategory.html#pylimer_tools_cpp.StrandCategory.conjugate">(pylimer_tools_cpp.StrandCategory method)</a>
 </li>
         </ul></li>
-        <li><a href="api/pylimer_tools_cpp.CONJUGATE_GRADIENT.html#pylimer_tools_cpp.CONJUGATE_GRADIENT">CONJUGATE_GRADIENT (in module pylimer_tools_cpp)</a>
+        <li><a href="api/pylimer_tools_cpp.RouseSolverType.html#pylimer_tools_cpp.RouseSolverType.CONJUGATE_GRADIENT">CONJUGATE_GRADIENT (pylimer_tools_cpp.RouseSolverType attribute)</a>
 
         <ul>
-          <li><a href="api/pylimer_tools_cpp.RouseSolverType.html#pylimer_tools_cpp.RouseSolverType.CONJUGATE_GRADIENT">(pylimer_tools_cpp.RouseSolverType attribute)</a>
-</li>
           <li><a href="api/pylimer_tools_cpp.SLESolver.html#pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT">(pylimer_tools_cpp.SLESolver attribute)</a>
 </li>
         </ul></li>
@@ -1825,18 +1835,10 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.DumpFileReader.html#pylimer_tools_cpp.DumpFileReader.key_has_directional_column.params.dir_suffix">dir_suffix (pylimer_tools_cpp.DumpFileReader.key_has_directional_column parameter)</a>, <a href="api/pylimer_tools_cpp.DumpFileReader.html#pylimer_tools_cpp.DumpFileReader.key_has_directional_column.params.dir_suffix">[1]</a>
 </li>
-        <li><a href="api/pylimer_tools_cpp.DIRECT_LDLT.html#pylimer_tools_cpp.DIRECT_LDLT">DIRECT_LDLT (in module pylimer_tools_cpp)</a>
-
-        <ul>
-          <li><a href="api/pylimer_tools_cpp.RouseSolverType.html#pylimer_tools_cpp.RouseSolverType.DIRECT_LDLT">(pylimer_tools_cpp.RouseSolverType attribute)</a>
+        <li><a href="api/pylimer_tools_cpp.RouseSolverType.html#pylimer_tools_cpp.RouseSolverType.DIRECT_LDLT">DIRECT_LDLT (pylimer_tools_cpp.RouseSolverType attribute)</a>
 </li>
-        </ul></li>
-        <li><a href="api/pylimer_tools_cpp.DIRECT_LLT.html#pylimer_tools_cpp.DIRECT_LLT">DIRECT_LLT (in module pylimer_tools_cpp)</a>
-
-        <ul>
-          <li><a href="api/pylimer_tools_cpp.RouseSolverType.html#pylimer_tools_cpp.RouseSolverType.DIRECT_LLT">(pylimer_tools_cpp.RouseSolverType attribute)</a>
+        <li><a href="api/pylimer_tools_cpp.RouseSolverType.html#pylimer_tools_cpp.RouseSolverType.DIRECT_LLT">DIRECT_LLT (pylimer_tools_cpp.RouseSolverType attribute)</a>
 </li>
-        </ul></li>
         <li><a href="api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance.get_gamma_factors_in_dir.params.direction">direction (pylimer_tools_cpp.MEHPForceBalance.get_gamma_factors_in_dir parameter)</a>, <a href="api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance.get_gamma_factors_in_dir.params.direction">[1]</a>
 
         <ul>
@@ -1963,6 +1965,8 @@
         </ul></li>
         <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus">evaluate_loss_modulus() (pylimer_tools_cpp.NormalModeAnalyzer method)</a>
 </li>
+        <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_approx">evaluate_loss_modulus_approx() (pylimer_tools_cpp.NormalModeAnalyzer method)</a>
+</li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_kpm">evaluate_loss_modulus_kpm() (pylimer_tools_cpp.NormalModeAnalyzer method)</a>
@@ -1981,9 +1985,13 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus">evaluate_storage_modulus() (pylimer_tools_cpp.NormalModeAnalyzer method)</a>
 </li>
+        <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus_approx">evaluate_storage_modulus_approx() (pylimer_tools_cpp.NormalModeAnalyzer method)</a>
+</li>
         <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus_kpm">evaluate_storage_modulus_kpm() (pylimer_tools_cpp.NormalModeAnalyzer method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation">evaluate_stress_autocorrelation() (pylimer_tools_cpp.NormalModeAnalyzer method)</a>
+</li>
+        <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_approx">evaluate_stress_autocorrelation_approx() (pylimer_tools_cpp.NormalModeAnalyzer method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_kpm">evaluate_stress_autocorrelation_kpm() (pylimer_tools_cpp.NormalModeAnalyzer method)</a>
 </li>
@@ -2605,6 +2613,8 @@
 </li>
         <li><a href="pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_kappa">get_kappa() (pylimer_tools.io.bead_spring_parameter_provider.Parameters method)</a>
 </li>
+        <li><a href="api/pylimer_tools_cpp.RouseBrownianSimulator.html#pylimer_tools_cpp.RouseBrownianSimulator.get_kb">get_kb() (pylimer_tools_cpp.RouseBrownianSimulator method)</a>
+</li>
         <li><a href="api/pylimer_tools_cpp.Molecule.html#pylimer_tools_cpp.Molecule.get_key">get_key() (pylimer_tools_cpp.Molecule method)</a>
 </li>
         <li><a href="pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.get_kg_lj_parameters_for_polymer">get_kg_lj_parameters_for_polymer() (in module pylimer_tools.io.bead_spring_parameter_provider)</a>
@@ -2875,9 +2885,13 @@
         </ul></li>
         <li><a href="pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.get_parameters_for_polymer">get_parameters_for_polymer() (in module pylimer_tools.io.bead_spring_parameter_provider)</a>
 </li>
+        <li><a href="api/pylimer_tools_cpp.ResistanceDistanceAnalysis.html#pylimer_tools_cpp.ResistanceDistanceAnalysis.get_pinned_laplacian">get_pinned_laplacian() (pylimer_tools_cpp.ResistanceDistanceAnalysis method)</a>
+</li>
         <li><a href="pylimer_tools.io.html#pylimer_tools.io.polymer_data.get_polymer_by_name">get_polymer_by_name() (in module pylimer_tools.io.polymer_data)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.RouseBrownianSimulator.html#pylimer_tools_cpp.RouseBrownianSimulator.get_positions">get_positions() (pylimer_tools_cpp.RouseBrownianSimulator method)</a>
+</li>
+        <li><a href="api/pylimer_tools_cpp.RouseBrownianSimulator.html#pylimer_tools_cpp.RouseBrownianSimulator.get_positions_flattened">get_positions_flattened() (pylimer_tools_cpp.RouseBrownianSimulator method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.RouseBrownianSimulator.html#pylimer_tools_cpp.RouseBrownianSimulator.get_potential_energy">get_potential_energy() (pylimer_tools_cpp.RouseBrownianSimulator method)</a>
 </li>
@@ -2915,6 +2929,8 @@
           <li><a href="api/pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation.get_soluble_weight_fraction">(pylimer_tools_cpp.MEHPForceRelaxation method)</a>
 </li>
         </ul></li>
+        <li><a href="api/pylimer_tools_cpp.RouseBrownianSimulator.html#pylimer_tools_cpp.RouseBrownianSimulator.get_solver_type">get_solver_type() (pylimer_tools_cpp.RouseBrownianSimulator method)</a>
+</li>
         <li><a href="api/pylimer_tools_cpp.DPDSimulator.html#pylimer_tools_cpp.DPDSimulator.get_spring_constant">get_spring_constant() (pylimer_tools_cpp.DPDSimulator method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation.get_spring_contour_length">get_spring_contour_length() (pylimer_tools_cpp.MEHPForceRelaxation method)</a>
@@ -3084,7 +3100,11 @@
 </li>
         </ul></li>
         <li><a href="api/pylimer_tools_cpp.AtomStyle.html#pylimer_tools_cpp.AtomStyle.HYBRID">HYBRID (pylimer_tools_cpp.AtomStyle attribute)</a>
+
+        <ul>
+          <li><a href="api/pylimer_tools_cpp.StochasticSpectralMethod.html#pylimer_tools_cpp.StochasticSpectralMethod.HYBRID">(pylimer_tools_cpp.StochasticSpectralMethod attribute)</a>
 </li>
+        </ul></li>
     </ul></td>
   </tr></table>
 </section>
@@ -3097,6 +3117,10 @@
 
         <ul>
           <li><a href="api/pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html#pylimer_tools_cpp.NonGaussianSpringForceEvaluator.evaluate_stress_contribution.params.i">(pylimer_tools_cpp.NonGaussianSpringForceEvaluator.evaluate_stress_contribution parameter)</a>, <a href="api/pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html#pylimer_tools_cpp.NonGaussianSpringForceEvaluator.evaluate_stress_contribution.params.i">[1]</a>
+</li>
+          <li><a href="api/pylimer_tools_cpp.ResistanceDistanceAnalysis.html#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_commute_time.params.i">(pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_commute_time parameter)</a>, <a href="api/pylimer_tools_cpp.ResistanceDistanceAnalysis.html#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_commute_time.params.i">[1]</a>
+</li>
+          <li><a href="api/pylimer_tools_cpp.ResistanceDistanceAnalysis.html#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_effective_resistance.params.i">(pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_effective_resistance parameter)</a>, <a href="api/pylimer_tools_cpp.ResistanceDistanceAnalysis.html#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_effective_resistance.params.i">[1]</a>
 </li>
           <li><a href="api/pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html#pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.evaluate_stress_contribution.params.i">(pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.evaluate_stress_contribution parameter)</a>, <a href="api/pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html#pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.evaluate_stress_contribution.params.i">[1]</a>
 </li>
@@ -3161,10 +3185,10 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.UniverseSequence.html#pylimer_tools_cpp.UniverseSequence.initialize_from_data_sequence">initialize_from_data_sequence() (pylimer_tools_cpp.UniverseSequence method)</a>
 </li>
-        <li><a href="api/pylimer_tools_cpp.UniverseSequence.html#pylimer_tools_cpp.UniverseSequence.initialize_from_dump_file">initialize_from_dump_file() (pylimer_tools_cpp.UniverseSequence method)</a>
-</li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/pylimer_tools_cpp.UniverseSequence.html#pylimer_tools_cpp.UniverseSequence.initialize_from_dump_file">initialize_from_dump_file() (pylimer_tools_cpp.UniverseSequence method)</a>
+</li>
         <li><a href="api/pylimer_tools_cpp.RouseBrownianSimulator.html#pylimer_tools_cpp.RouseBrownianSimulator.initialize_linear_positions">initialize_linear_positions() (pylimer_tools_cpp.RouseBrownianSimulator method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.RouseBrownianSimulator.html#pylimer_tools_cpp.RouseBrownianSimulator.initialize_random_walk">initialize_random_walk() (pylimer_tools_cpp.RouseBrownianSimulator method)</a>
@@ -3242,6 +3266,10 @@
         <ul>
           <li><a href="api/pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html#pylimer_tools_cpp.NonGaussianSpringForceEvaluator.evaluate_stress_contribution.params.j">(pylimer_tools_cpp.NonGaussianSpringForceEvaluator.evaluate_stress_contribution parameter)</a>, <a href="api/pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html#pylimer_tools_cpp.NonGaussianSpringForceEvaluator.evaluate_stress_contribution.params.j">[1]</a>
 </li>
+          <li><a href="api/pylimer_tools_cpp.ResistanceDistanceAnalysis.html#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_commute_time.params.j">(pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_commute_time parameter)</a>, <a href="api/pylimer_tools_cpp.ResistanceDistanceAnalysis.html#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_commute_time.params.j">[1]</a>
+</li>
+          <li><a href="api/pylimer_tools_cpp.ResistanceDistanceAnalysis.html#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_effective_resistance.params.j">(pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_effective_resistance parameter)</a>, <a href="api/pylimer_tools_cpp.ResistanceDistanceAnalysis.html#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_effective_resistance.params.j">[1]</a>
+</li>
           <li><a href="api/pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html#pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.evaluate_stress_contribution.params.j">(pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.evaluate_stress_contribution parameter)</a>, <a href="api/pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html#pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.evaluate_stress_contribution.params.j">[1]</a>
 </li>
         </ul></li>
@@ -3267,15 +3295,17 @@
           <li><a href="api/pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html#pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.params.kappa">(pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator parameter)</a>, <a href="pylimer_tools_cpp.html#pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.params.kappa">[1]</a>
 </li>
         </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="pylimer_tools.utils.html#pylimer_tools.utils.data_utility.unify_data_stepsizes.params.key">key (pylimer_tools.utils.data_utility.unify_data_stepsizes parameter)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pylimer_tools_cpp.DumpFileReader.html#pylimer_tools_cpp.DumpFileReader.key_has_column">key_has_column() (pylimer_tools_cpp.DumpFileReader method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.DumpFileReader.html#pylimer_tools_cpp.DumpFileReader.key_has_directional_column">key_has_directional_column() (pylimer_tools_cpp.DumpFileReader method)</a>
 </li>
         <li><a href="pylimer_tools.io.html#id1">KG_LJ (pylimer_tools.io.bead_spring_parameter_provider.ParameterType attribute)</a>, <a href="pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.ParameterType.KG_LJ">[1]</a>
+</li>
+        <li><a href="api/pylimer_tools_cpp.StochasticSpectralMethod.html#pylimer_tools_cpp.StochasticSpectralMethod.KPM">KPM (pylimer_tools_cpp.StochasticSpectralMethod attribute)</a>
 </li>
         <li><a href="pylimer_tools.io.html#id2">KUHN (pylimer_tools.io.bead_spring_parameter_provider.ParameterType attribute)</a>, <a href="pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.ParameterType.KUHN">[1]</a>
 </li>
@@ -3540,6 +3570,14 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.SLESolver.html#pylimer_tools_cpp.SLESolver.METAL_CG">METAL_CG (pylimer_tools_cpp.SLESolver attribute)</a>
 </li>
+        <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_approx.params.method">method (pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_approx parameter)</a>, <a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_approx.params.method">[1]</a>
+
+        <ul>
+          <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus_approx.params.method">(pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus_approx parameter)</a>, <a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus_approx.params.method">[1]</a>
+</li>
+          <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_approx.params.method">(pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_approx parameter)</a>, <a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_approx.params.method">[1]</a>
+</li>
+        </ul></li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pylimer_tools_cpp.BondLengthStats.html#pylimer_tools_cpp.BondLengthStats.min_bond_length">min_bond_length (pylimer_tools_cpp.BondLengthStats attribute)</a>
@@ -3821,8 +3859,6 @@
           <li><a href="api/pylimer_tools_cpp.EntanglementFilteringMode.html#pylimer_tools_cpp.EntanglementFilteringMode.NONE">(pylimer_tools_cpp.EntanglementFilteringMode attribute)</a>
 </li>
         </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html#pylimer_tools_cpp.NonGaussianSpringForceEvaluator">NonGaussianSpringForceEvaluator (class in pylimer_tools_cpp)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer">NormalModeAnalyzer (class in pylimer_tools_cpp)</a>
@@ -3839,6 +3875,8 @@
           <li><a href="api/pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factor.params.nr_of_chains">(pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factor parameter)</a>, <a href="api/pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factor.params.nr_of_chains">[1]</a>
 </li>
         </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance.run_force_relaxation.params.nr_of_crosslink_swaps_allowed_per_sliplink">nr_of_crosslink_swaps_allowed_per_sliplink (pylimer_tools_cpp.MEHPForceBalance.run_force_relaxation parameter)</a>, <a href="api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance.run_force_relaxation.params.nr_of_crosslink_swaps_allowed_per_sliplink">[1]</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.SimplifiedBalanceNetwork.html#pylimer_tools_cpp.SimplifiedBalanceNetwork.nr_of_crosslink_swaps_endured">nr_of_crosslink_swaps_endured (pylimer_tools_cpp.SimplifiedBalanceNetwork attribute)</a>
@@ -3915,6 +3953,8 @@
           <li><a href="pylimer_tools.calc.html#pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition.params.nu">(pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition parameter)</a>
 </li>
         </ul></li>
+        <li><a href="api/pylimer_tools_cpp.ResistanceDistanceAnalysis.html#pylimer_tools_cpp.ResistanceDistanceAnalysis.create_star.params.num_arms">num_arms (pylimer_tools_cpp.ResistanceDistanceAnalysis.create_star parameter)</a>, <a href="api/pylimer_tools_cpp.ResistanceDistanceAnalysis.html#pylimer_tools_cpp.ResistanceDistanceAnalysis.create_star.params.num_arms">[1]</a>
+</li>
         <li><a href="api/pylimer_tools_cpp.ComputedIntValues.html#pylimer_tools_cpp.ComputedIntValues.NUM_ATOMS">NUM_ATOMS (pylimer_tools_cpp.ComputedIntValues attribute)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.ComputedIntValues.html#pylimer_tools_cpp.ComputedIntValues.NUM_BONDS">NUM_BONDS (pylimer_tools_cpp.ComputedIntValues attribute)</a>
@@ -3923,6 +3963,14 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.DPDSimulator.html#pylimer_tools_cpp.DPDSimulator.config_auto_correlator_output.params.num_corr_in">num_corr_in (pylimer_tools_cpp.DPDSimulator.config_auto_correlator_output parameter)</a>, <a href="api/pylimer_tools_cpp.DPDSimulator.html#pylimer_tools_cpp.DPDSimulator.config_auto_correlator_output.params.num_corr_in">[1]</a>
 </li>
+        <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_approx.params.num_exact_low_modes">num_exact_low_modes (pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_approx parameter)</a>, <a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_approx.params.num_exact_low_modes">[1]</a>
+
+        <ul>
+          <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus_approx.params.num_exact_low_modes">(pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus_approx parameter)</a>, <a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus_approx.params.num_exact_low_modes">[1]</a>
+</li>
+          <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_approx.params.num_exact_low_modes">(pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_approx parameter)</a>, <a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_approx.params.num_exact_low_modes">[1]</a>
+</li>
+        </ul></li>
         <li><a href="api/pylimer_tools_cpp.ComputedIntValues.html#pylimer_tools_cpp.ComputedIntValues.NUM_EXTRA_ATOMS">NUM_EXTRA_ATOMS (pylimer_tools_cpp.ComputedIntValues attribute)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.ComputedIntValues.html#pylimer_tools_cpp.ComputedIntValues.NUM_EXTRA_BONDS">NUM_EXTRA_BONDS (pylimer_tools_cpp.ComputedIntValues attribute)</a>
@@ -3941,6 +3989,14 @@
           <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_kpm.params.num_moments">(pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_kpm parameter)</a>, <a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_kpm.params.num_moments">[1]</a>
 </li>
         </ul></li>
+        <li><a href="api/pylimer_tools_cpp.ResistanceDistanceAnalysis.html#pylimer_tools_cpp.ResistanceDistanceAnalysis.create_complete.params.num_nodes">num_nodes (pylimer_tools_cpp.ResistanceDistanceAnalysis.create_complete parameter)</a>, <a href="api/pylimer_tools_cpp.ResistanceDistanceAnalysis.html#pylimer_tools_cpp.ResistanceDistanceAnalysis.create_complete.params.num_nodes">[1]</a>
+
+        <ul>
+          <li><a href="api/pylimer_tools_cpp.ResistanceDistanceAnalysis.html#pylimer_tools_cpp.ResistanceDistanceAnalysis.create_linear_chain.params.num_nodes">(pylimer_tools_cpp.ResistanceDistanceAnalysis.create_linear_chain parameter)</a>, <a href="api/pylimer_tools_cpp.ResistanceDistanceAnalysis.html#pylimer_tools_cpp.ResistanceDistanceAnalysis.create_linear_chain.params.num_nodes">[1]</a>
+</li>
+          <li><a href="api/pylimer_tools_cpp.ResistanceDistanceAnalysis.html#pylimer_tools_cpp.ResistanceDistanceAnalysis.create_ring.params.num_nodes">(pylimer_tools_cpp.ResistanceDistanceAnalysis.create_ring parameter)</a>, <a href="api/pylimer_tools_cpp.ResistanceDistanceAnalysis.html#pylimer_tools_cpp.ResistanceDistanceAnalysis.create_ring.params.num_nodes">[1]</a>
+</li>
+        </ul></li>
         <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_kpm.params.num_quadrature_points">num_quadrature_points (pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_kpm parameter)</a>, <a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_kpm.params.num_quadrature_points">[1]</a>
 
         <ul>
@@ -3956,9 +4012,15 @@
 </li>
           <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.compute_density_of_states_kpm.params.num_random_vectors">(pylimer_tools_cpp.NormalModeAnalyzer.compute_density_of_states_kpm parameter)</a>, <a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.compute_density_of_states_kpm.params.num_random_vectors">[1]</a>
 </li>
+          <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_approx.params.num_random_vectors">(pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_approx parameter)</a>, <a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_approx.params.num_random_vectors">[1]</a>
+</li>
           <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_kpm.params.num_random_vectors">(pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_kpm parameter)</a>, <a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_kpm.params.num_random_vectors">[1]</a>
 </li>
+          <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus_approx.params.num_random_vectors">(pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus_approx parameter)</a>, <a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus_approx.params.num_random_vectors">[1]</a>
+</li>
           <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus_kpm.params.num_random_vectors">(pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus_kpm parameter)</a>, <a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus_kpm.params.num_random_vectors">[1]</a>
+</li>
+          <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_approx.params.num_random_vectors">(pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_approx parameter)</a>, <a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_approx.params.num_random_vectors">[1]</a>
 </li>
           <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_kpm.params.num_random_vectors">(pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_kpm parameter)</a>, <a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_kpm.params.num_random_vectors">[1]</a>
 </li>
@@ -3971,6 +4033,12 @@
 
         <ul>
           <li><a href="api/pylimer_tools_cpp.DPDSimulator.html#pylimer_tools_cpp.DPDSimulator.config_num_steps_mc.params.num_steps">(pylimer_tools_cpp.DPDSimulator.config_num_steps_mc parameter)</a>, <a href="api/pylimer_tools_cpp.DPDSimulator.html#pylimer_tools_cpp.DPDSimulator.config_num_steps_mc.params.num_steps">[1]</a>
+</li>
+          <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_approx.params.num_steps">(pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_approx parameter)</a>, <a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_approx.params.num_steps">[1]</a>
+</li>
+          <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus_approx.params.num_steps">(pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus_approx parameter)</a>, <a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus_approx.params.num_steps">[1]</a>
+</li>
+          <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_approx.params.num_steps">(pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_approx parameter)</a>, <a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_approx.params.num_steps">[1]</a>
 </li>
         </ul></li>
         <li><a href="api/pylimer_tools_cpp.ComputedDoubleValues.html#pylimer_tools_cpp.ComputedDoubleValues.numerator">numerator (pylimer_tools_cpp.ComputedDoubleValues attribute)</a>
@@ -4030,9 +4098,13 @@
         <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus.params.omega">omega (pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus parameter)</a>, <a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus.params.omega">[1]</a>
 
         <ul>
+          <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_approx.params.omega">(pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_approx parameter)</a>, <a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_approx.params.omega">[1]</a>
+</li>
           <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_kpm.params.omega">(pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_kpm parameter)</a>, <a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_kpm.params.omega">[1]</a>
 </li>
           <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus.params.omega">(pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus parameter)</a>, <a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus.params.omega">[1]</a>
+</li>
+          <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus_approx.params.omega">(pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus_approx parameter)</a>, <a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus_approx.params.omega">[1]</a>
 </li>
           <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus_kpm.params.omega">(pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus_kpm parameter)</a>, <a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus_kpm.params.omega">[1]</a>
 </li>
@@ -4120,6 +4192,8 @@
 </li>
         </ul></li>
         <li><a href="api/pylimer_tools_cpp.AtomPairEntanglements.html#pylimer_tools_cpp.AtomPairEntanglements.pair_of_atom">pair_of_atom (pylimer_tools_cpp.AtomPairEntanglements attribute)</a>
+</li>
+        <li><a href="api/pylimer_tools_cpp.ResistanceDistanceAnalysis.html#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_effective_resistance_batched.params.pairs">pairs (pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_effective_resistance_batched parameter)</a>, <a href="api/pylimer_tools_cpp.ResistanceDistanceAnalysis.html#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_effective_resistance_batched.params.pairs">[1]</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.AtomPairEntanglements.html#pylimer_tools_cpp.AtomPairEntanglements.pairs_of_atoms">pairs_of_atoms (pylimer_tools_cpp.AtomPairEntanglements attribute)</a>
 </li>
@@ -4701,6 +4775,8 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.RouseBrownianSimulator.html#pylimer_tools_cpp.RouseBrownianSimulator.set_k">set_k() (pylimer_tools_cpp.RouseBrownianSimulator method)</a>
 </li>
+        <li><a href="api/pylimer_tools_cpp.RouseBrownianSimulator.html#pylimer_tools_cpp.RouseBrownianSimulator.set_kb">set_kb() (pylimer_tools_cpp.RouseBrownianSimulator method)</a>
+</li>
         <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.set_mass">set_mass() (pylimer_tools_cpp.Universe method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.set_masses">set_masses() (pylimer_tools_cpp.Universe method)</a>
@@ -4710,6 +4786,8 @@
         <li><a href="api/pylimer_tools_cpp.RouseBrownianSimulator.html#pylimer_tools_cpp.RouseBrownianSimulator.set_parameters">set_parameters() (pylimer_tools_cpp.RouseBrownianSimulator method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.RouseBrownianSimulator.html#pylimer_tools_cpp.RouseBrownianSimulator.set_positions">set_positions() (pylimer_tools_cpp.RouseBrownianSimulator method)</a>
+</li>
+        <li><a href="api/pylimer_tools_cpp.RouseBrownianSimulator.html#pylimer_tools_cpp.RouseBrownianSimulator.set_positions_flattened">set_positions_flattened() (pylimer_tools_cpp.RouseBrownianSimulator method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.set_seed">set_seed() (pylimer_tools_cpp.MCUniverseGenerator method)</a>
 
@@ -4770,6 +4848,8 @@
         <li><a href="api/pylimer_tools_cpp.SLESolver.html#pylimer_tools_cpp.SLESolver">SLESolver (class in pylimer_tools_cpp)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.LinkSwappingMode.html#pylimer_tools_cpp.LinkSwappingMode.SLIPLINKS_ONLY">SLIPLINKS_ONLY (pylimer_tools_cpp.LinkSwappingMode attribute)</a>
+</li>
+        <li><a href="api/pylimer_tools_cpp.StochasticSpectralMethod.html#pylimer_tools_cpp.StochasticSpectralMethod.SLQ">SLQ (pylimer_tools_cpp.StochasticSpectralMethod attribute)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.AtomStyle.html#pylimer_tools_cpp.AtomStyle.SMD">SMD (pylimer_tools_cpp.AtomStyle attribute)</a>
 </li>
@@ -4907,9 +4987,13 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.RouseBrownianSimulator.html#pylimer_tools_cpp.RouseBrownianSimulator.step_deterministic">step_deterministic() (pylimer_tools_cpp.RouseBrownianSimulator method)</a>
 </li>
+        <li><a href="api/pylimer_tools_cpp.RouseBrownianSimulator.html#pylimer_tools_cpp.RouseBrownianSimulator.step_deterministic_with_external_forces">step_deterministic_with_external_forces() (pylimer_tools_cpp.RouseBrownianSimulator method)</a>
+</li>
         <li><a href="pylimer_tools.utils.html#pylimer_tools.utils.data_utility.unify_data_stepsizes.params.step_size">step_size (pylimer_tools.utils.data_utility.unify_data_stepsizes parameter)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.RouseBrownianSimulator.html#pylimer_tools_cpp.RouseBrownianSimulator.step_with_external_forces">step_with_external_forces() (pylimer_tools_cpp.RouseBrownianSimulator method)</a>
+</li>
+        <li><a href="api/pylimer_tools_cpp.StochasticSpectralMethod.html#pylimer_tools_cpp.StochasticSpectralMethod">StochasticSpectralMethod (class in pylimer_tools_cpp)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.STOP.html#pylimer_tools_cpp.STOP">STOP (in module pylimer_tools_cpp)</a>
 
@@ -5062,6 +5146,8 @@
         <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation.params.t">t (pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation parameter)</a>, <a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation.params.t">[1]</a>
 
         <ul>
+          <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_approx.params.t">(pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_approx parameter)</a>, <a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_approx.params.t">[1]</a>
+</li>
           <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_kpm.params.t">(pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_kpm parameter)</a>, <a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_kpm.params.t">[1]</a>
 </li>
         </ul></li>

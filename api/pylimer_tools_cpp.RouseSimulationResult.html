@@ -360,15 +360,13 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedBalance2Network.html">SimplifiedBalance2Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedBalanceNetwork.html">SimplifiedBalanceNetwork</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedNetwork.html">SimplifiedNetwork</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.StochasticSpectralMethod.html">StochasticSpectralMethod</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.StrandCategory.html">StrandCategory</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.StrandPairEntanglements.html">StrandPairEntanglements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.StructureSimplificationMode.html">StructureSimplificationMode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.Universe.html">Universe</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.UniverseSequence.html">UniverseSequence</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.ZScoreMaxDistanceProvider.html">ZScoreMaxDistanceProvider</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.CONJUGATE_GRADIENT.html">CONJUGATE_GRADIENT</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.DIRECT_LDLT.html">DIRECT_LDLT</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.DIRECT_LLT.html">DIRECT_LLT</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.STOP.html">STOP</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.TRACK_BACKWARD.html">TRACK_BACKWARD</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.TRACK_FORWARD.html">TRACK_FORWARD</a></li>
@@ -424,24 +422,25 @@
 <dt class="sig sig-object py" id="pylimer_tools_cpp.RouseSimulationResult">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">RouseSimulationResult</span></span><a class="headerlink" href="#pylimer_tools_cpp.RouseSimulationResult" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>Output container for Rouse dynamics simulation runs.</p>
 <p class="rubric">Attributes Summary</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.RouseSimulationResult.end_to_end_correlation" title="pylimer_tools_cpp.RouseSimulationResult.end_to_end_correlation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">end_to_end_correlation</span></code></a></p></td>
-<td><p></p></td>
+<td><p>Normalized end-to-end vector autocorrelation at sampled times.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.RouseSimulationResult.msd" title="pylimer_tools_cpp.RouseSimulationResult.msd"><code class="xref py py-obj docutils literal notranslate"><span class="pre">msd</span></code></a></p></td>
-<td><p></p></td>
+<td><p>Bead mean-squared displacement at sampled times.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.RouseSimulationResult.msd_center_of_mass" title="pylimer_tools_cpp.RouseSimulationResult.msd_center_of_mass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">msd_center_of_mass</span></code></a></p></td>
-<td><p></p></td>
+<td><p>Center-of-mass mean-squared displacement at sampled times.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.RouseSimulationResult.times" title="pylimer_tools_cpp.RouseSimulationResult.times"><code class="xref py py-obj docutils literal notranslate"><span class="pre">times</span></code></a></p></td>
-<td><p></p></td>
+<td><p>Sampled simulation times.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.RouseSimulationResult.trajectory" title="pylimer_tools_cpp.RouseSimulationResult.trajectory"><code class="xref py py-obj docutils literal notranslate"><span class="pre">trajectory</span></code></a></p></td>
-<td><p></p></td>
+<td><p>List of (N, 3) position matrices if save_trajectory was enabled.</p></td>
 </tr>
 </tbody>
 </table>
@@ -450,27 +449,32 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.RouseSimulationResult.end_to_end_correlation">
 <span class="sig-name descname"><span class="pre">end_to_end_correlation</span></span><a class="headerlink" href="#pylimer_tools_cpp.RouseSimulationResult.end_to_end_correlation" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Normalized end-to-end vector autocorrelation at sampled times.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.RouseSimulationResult.msd">
 <span class="sig-name descname"><span class="pre">msd</span></span><a class="headerlink" href="#pylimer_tools_cpp.RouseSimulationResult.msd" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Bead mean-squared displacement at sampled times.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.RouseSimulationResult.msd_center_of_mass">
 <span class="sig-name descname"><span class="pre">msd_center_of_mass</span></span><a class="headerlink" href="#pylimer_tools_cpp.RouseSimulationResult.msd_center_of_mass" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Center-of-mass mean-squared displacement at sampled times.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.RouseSimulationResult.times">
 <span class="sig-name descname"><span class="pre">times</span></span><a class="headerlink" href="#pylimer_tools_cpp.RouseSimulationResult.times" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Sampled simulation times.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.RouseSimulationResult.trajectory">
 <span class="sig-name descname"><span class="pre">trajectory</span></span><a class="headerlink" href="#pylimer_tools_cpp.RouseSimulationResult.trajectory" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>List of (N, 3) position matrices if save_trajectory was enabled.</p>
+</dd></dl>
 
 </dd></dl>
 

@@ -99,7 +99,7 @@ plot_slipping_vs_fixed_modulus(data)
 plot_slipping_vs_fixed_iterations(data)
 ```
 
-**Total running time of the script:** (0 minutes 0.287 seconds)
+**Total running time of the script:** (0 minutes 0.303 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-slipping-vs-fixed-links-py"></a>
 

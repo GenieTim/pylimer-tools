@@ -212,7 +212,7 @@ $G_{junctions} = k_B T [A_f]_0 \sum_{m=3}^{f} \frac{m-2}{2} P(X_{m,f})$.
 * **Returns:**
   The junction modulus contribution
 
-### pylimer_tools.calc.miller_macosko_theory.compute_miller_macosko_probabilities(r: [float](https://docs.python.org/3/builtins/functions.html#float), p: [float](https://docs.python.org/3/builtins/functions.html#float), f: [int](https://docs.python.org/3/builtins/functions.html#int), b2: [float](https://docs.python.org/3/builtins/functions.html#float) = 1.0)
+### pylimer_tools.calc.miller_macosko_theory.compute_miller_macosko_probabilities(r: [float](https://docs.python.org/3/builtins/functions.html#float), p: [float](https://docs.python.org/3/builtins/functions.html#float), f: [int](https://docs.python.org/3/builtins/functions.html#int), b2: [float](https://docs.python.org/3/builtins/functions.html#float) = 1.0) → [Tuple](https://docs.python.org/3/library/typing.html#typing.Tuple)[[float](https://docs.python.org/3/builtins/functions.html#float), [float](https://docs.python.org/3/builtins/functions.html#float)]
 
 Compute Macosko and Miller’s probabilities $P(F_A)$ and $P(F_B)$
 i.e., the probability that a randomly chosen A (crosslink) or B (strand-end),
@@ -407,14 +407,8 @@ Source:
     in a mixture of B1 and B2
 * **Returns:**
   $W_{sol}$ (float): The weight fraction of soluble material according to MMT.
-* **Returns:**
-  weight_fractions (dict): a dictionary with key: type, and value: weight fraction of type
-* **Returns:**
-  $\alpha$ (float): Macosko & Miller’s $P(F_A)$
-* **Returns:**
-  $\beta$ (float): Macosko & Miller’s $P(F_B)$
 
-### pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material_from_weight_fractions(r: [float](https://docs.python.org/3/builtins/functions.html#float), p: [float](https://docs.python.org/3/builtins/functions.html#float), f: [int](https://docs.python.org/3/builtins/functions.html#int), w_f: [float](https://docs.python.org/3/builtins/functions.html#float), w_g: [float](https://docs.python.org/3/builtins/functions.html#float), g: [int](https://docs.python.org/3/builtins/functions.html#int) = 2)
+### pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material_from_weight_fractions(r: [float](https://docs.python.org/3/builtins/functions.html#float), p: [float](https://docs.python.org/3/builtins/functions.html#float), f: [int](https://docs.python.org/3/builtins/functions.html#int), w_f: [float](https://docs.python.org/3/builtins/functions.html#float), w_g: [float](https://docs.python.org/3/builtins/functions.html#float), g: [int](https://docs.python.org/3/builtins/functions.html#int) = 2) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Use MMT to compute the weight fraction of soluble material using
 
@@ -490,7 +484,7 @@ Source:
 * **Returns:**
   nu: The predicted number density of network strands
 
-### pylimer_tools.calc.miller_macosko_theory.predict_p_from_w_sol(w_sol: [float](https://docs.python.org/3/builtins/functions.html#float), network: [Universe](api/pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2, functionality_per_type: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, weight_fractions: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, r: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, b2: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None)
+### pylimer_tools.calc.miller_macosko_theory.predict_p_from_w_sol(w_sol: [float](https://docs.python.org/3/builtins/functions.html#float), network: [Universe](api/pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2, functionality_per_type: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, weight_fractions: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, r: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, b2: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Compute the extent of reaction based on the weight fraction of soluble material.
 

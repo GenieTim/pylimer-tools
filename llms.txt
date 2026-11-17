@@ -124,26 +124,24 @@
 - [SimplifiedBalance2Network](api/pylimer_tools_cpp.SimplifiedBalance2Network.html.md): Bases: &#96;pybind11_object&#96;
 - [SimplifiedBalanceNetwork](api/pylimer_tools_cpp.SimplifiedBalanceNetwork.html.md): Bases: &#96;pybind11_object&#96;
 - [SimplifiedNetwork](api/pylimer_tools_cpp.SimplifiedNetwork.html.md): Bases: &#96;pybind11_object&#96;
+- [StochasticSpectralMethod](api/pylimer_tools_cpp.StochasticSpectralMethod.html.md): Bases: &#96;Enum&#96;
 - [StrandCategory](api/pylimer_tools_cpp.StrandCategory.html.md): Bases: &#96;IntEnum&#96;
 - [StrandPairEntanglements](api/pylimer_tools_cpp.StrandPairEntanglements.html.md): Bases: &#96;pybind11_object&#96;
 - [StructureSimplificationMode](api/pylimer_tools_cpp.StructureSimplificationMode.html.md): Bases: &#96;Enum&#96;
 - [Universe](api/pylimer_tools_cpp.Universe.html.md): Bases: &#96;pybind11_object&#96;
 - [UniverseSequence](api/pylimer_tools_cpp.UniverseSequence.html.md): Bases: &#96;pybind11_object&#96;
 - [ZScoreMaxDistanceProvider](api/pylimer_tools_cpp.ZScoreMaxDistanceProvider.html.md): Bases: &#96;MaxDistanceProvider&#96;
-- [CONJUGATE_GRADIENT](api/pylimer_tools_cpp.CONJUGATE_GRADIENT.html.md): Page content
-- [DIRECT_LDLT](api/pylimer_tools_cpp.DIRECT_LDLT.html.md): Page content
-- [DIRECT_LLT](api/pylimer_tools_cpp.DIRECT_LLT.html.md): Page content
 - [STOP](api/pylimer_tools_cpp.STOP.html.md): Stop the linking process
 - [TRACK_BACKWARD](api/pylimer_tools_cpp.TRACK_BACKWARD.html.md): Track backward in the linking process
 - [TRACK_FORWARD](api/pylimer_tools_cpp.TRACK_FORWARD.html.md): Continue linking forward
-- [Computation times](auto_examples/dpd_simulations/sg_execution_times.html.md): &#42;&#42;00:03.442&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/dpd_simulations&#42;&#42;:
-- [Computation times](auto_examples/force_balance/sg_execution_times.html.md): &#42;&#42;00:08.039&#42;&#42; total execution time for 11 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
-- [Computation times](auto_examples/network_generator/sg_execution_times.html.md): &#42;&#42;00:40.585&#42;&#42; total execution time for 9 files &#42;&#42;from auto_examples/network_generator&#42;&#42;:
-- [Computation times](auto_examples/normal_mode_analysis/sg_execution_times.html.md): &#42;&#42;00:24.959&#42;&#42; total execution time for 2 files &#42;&#42;from auto_examples/normal_mode_analysis&#42;&#42;:
-- [Computation times](auto_examples/readers_writers/sg_execution_times.html.md): &#42;&#42;00:03.194&#42;&#42; total execution time for 13 files &#42;&#42;from auto_examples/readers_writers&#42;&#42;:
+- [Computation times](auto_examples/dpd_simulations/sg_execution_times.html.md): &#42;&#42;00:04.384&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/dpd_simulations&#42;&#42;:
+- [Computation times](auto_examples/force_balance/sg_execution_times.html.md): &#42;&#42;00:07.876&#42;&#42; total execution time for 11 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
+- [Computation times](auto_examples/network_generator/sg_execution_times.html.md): &#42;&#42;00:44.247&#42;&#42; total execution time for 9 files &#42;&#42;from auto_examples/network_generator&#42;&#42;:
+- [Computation times](auto_examples/normal_mode_analysis/sg_execution_times.html.md): &#42;&#42;00:18.286&#42;&#42; total execution time for 2 files &#42;&#42;from auto_examples/normal_mode_analysis&#42;&#42;:
+- [Computation times](auto_examples/readers_writers/sg_execution_times.html.md): &#42;&#42;00:03.750&#42;&#42; total execution time for 13 files &#42;&#42;from auto_examples/readers_writers&#42;&#42;:
 - [Computation times](auto_examples/sg_execution_times.html.md): &#42;&#42;00:00.000&#42;&#42; total execution time for 0 files &#42;&#42;from auto_examples&#42;&#42;:
-- [Computation times](auto_examples/structure_analysis/sg_execution_times.html.md): &#42;&#42;00:00.234&#42;&#42; total execution time for 4 files &#42;&#42;from auto_examples/structure_analysis&#42;&#42;:
-- [Computation times](auto_examples/trajectory_analysis/sg_execution_times.html.md): &#42;&#42;02:32.601&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/trajectory_analysis&#42;&#42;:
+- [Computation times](auto_examples/structure_analysis/sg_execution_times.html.md): &#42;&#42;00:00.224&#42;&#42; total execution time for 4 files &#42;&#42;from auto_examples/structure_analysis&#42;&#42;:
+- [Computation times](auto_examples/trajectory_analysis/sg_execution_times.html.md): &#42;&#42;03:03.128&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/trajectory_analysis&#42;&#42;:
 
 ## Optional
 

@@ -1,0 +1,23 @@
+StochasticSpectralMethod
+========================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: StochasticSpectralMethod
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~StochasticSpectralMethod.AUTO
+      ~StochasticSpectralMethod.HYBRID
+      ~StochasticSpectralMethod.KPM
+      ~StochasticSpectralMethod.SLQ
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: AUTO
+   .. autoattribute:: HYBRID
+   .. autoattribute:: KPM
+   .. autoattribute:: SLQ

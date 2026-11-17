@@ -181,7 +181,7 @@ KPM moduli.
 
  .. code-block:: none
 
-    Demo PDMS box (L=12 nm, N_atoms=3819, N_ent=84): Exact=7.36s, KPM=0.09s
+    Demo PDMS box (L=12 nm, N_atoms=3819, N_ent=84): Exact=5.85s, KPM=0.10s
     Loading cached example data from kpm_vs_exact_pdms_cache.npz...
 
 
@@ -360,7 +360,7 @@ target 95% confidence interval.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 9.450 seconds)
+   **Total running time of the script:** (0 minutes 7.909 seconds)
 
 
 .. _sphx_glr_download_auto_examples_normal_mode_analysis_plot_kpm_vs_exact_pdms.py:

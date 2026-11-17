@@ -29,6 +29,7 @@ ResistanceDistanceAnalysis
       ~ResistanceDistanceAnalysis.get_nr_of_connected_components
       ~ResistanceDistanceAnalysis.get_nr_of_edges
       ~ResistanceDistanceAnalysis.get_nr_of_nodes
+      ~ResistanceDistanceAnalysis.get_pinned_laplacian
       ~ResistanceDistanceAnalysis.get_total_edge_weight
       ~ResistanceDistanceAnalysis.is_connected
       ~ResistanceDistanceAnalysis.solve_identity_chunked
@@ -54,6 +55,7 @@ ResistanceDistanceAnalysis
    .. automethod:: get_nr_of_connected_components
    .. automethod:: get_nr_of_edges
    .. automethod:: get_nr_of_nodes
+   .. automethod:: get_pinned_laplacian
    .. automethod:: get_total_edge_weight
    .. automethod:: is_connected
    .. automethod:: solve_identity_chunked

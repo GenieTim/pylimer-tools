@@ -147,8 +147,8 @@ plt.show()
 ```
 
 ```none
-Final residual (should be close to 0): 1.762542020227551e-08
-Shear Modulus from Equilibrium [MPa]:  0.06896808559693962
+Final residual (should be close to 0): 3.567399245205835e-09
+Shear Modulus from Equilibrium [MPa]:  0.035923918723891016
 ```
 
 <!-- GENERATED FROM PYTHON SOURCE LINES 138-141 -->
@@ -157,7 +157,7 @@ Rather than using the nominal stress, you can also use the
 stress tensor directly to compute the shear modulus.
 Therewith, you could try to investigate e.g. the Mooney-Rivlin behaviour.
 
-**Total running time of the script:** (0 minutes 0.163 seconds)
+**Total running time of the script:** (0 minutes 0.173 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-fb-deformation-exp-py"></a>
 

@@ -342,15 +342,13 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.SimplifiedBalance2Network.html">SimplifiedBalance2Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.SimplifiedBalanceNetwork.html">SimplifiedBalanceNetwork</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.SimplifiedNetwork.html">SimplifiedNetwork</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.StochasticSpectralMethod.html">StochasticSpectralMethod</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.StrandCategory.html">StrandCategory</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.StrandPairEntanglements.html">StrandPairEntanglements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.StructureSimplificationMode.html">StructureSimplificationMode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.Universe.html">Universe</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.UniverseSequence.html">UniverseSequence</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.ZScoreMaxDistanceProvider.html">ZScoreMaxDistanceProvider</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.CONJUGATE_GRADIENT.html">CONJUGATE_GRADIENT</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.DIRECT_LDLT.html">DIRECT_LDLT</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.DIRECT_LLT.html">DIRECT_LLT</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.STOP.html">STOP</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.TRACK_BACKWARD.html">TRACK_BACKWARD</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.TRACK_FORWARD.html">TRACK_FORWARD</a></li>
@@ -739,9 +737,6 @@
 <span class="sd">    :param b2: The mole fraction of reactive sites in B2 among all reactive sites</span>
 <span class="sd">        in a mixture of B1 and B2</span>
 <span class="sd">    :return: :math:`W_{sol}` (float): The weight fraction of soluble material according to MMT.</span>
-<span class="sd">    :return: weight_fractions (dict): a dictionary with key: type, and value: weight fraction of type</span>
-<span class="sd">    :return: :math:`\\alpha` (float): Macosko &amp; Miller's :math:`P(F_A)`</span>
-<span class="sd">    :return: :math:`\\beta` (float): Macosko &amp; Miller's :math:`P(F_B)`</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="n">network</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">network</span><span class="o">.</span><span class="n">get_nr_of_bonds</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="mf">1.0</span>
@@ -783,7 +778,7 @@
 <a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material_from_weight_fractions">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_weight_fraction_of_soluble_material_from_weight_fractions</span><span class="p">(</span>
     <span class="n">r</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">w_f</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">w_g</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
-<span class="p">):</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Use MMT to compute the weight fraction of soluble material using</span>
 
@@ -804,7 +799,9 @@
 
 <div class="viewcode-block" id="compute_miller_macosko_probabilities">
 <a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.miller_macosko_theory.compute_miller_macosko_probabilities">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">compute_miller_macosko_probabilities</span><span class="p">(</span><span class="n">r</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">b2</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_miller_macosko_probabilities</span><span class="p">(</span>
+    <span class="n">r</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">b2</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute Macosko and Miller's probabilities :math:`P(F_A)` and :math:`P(F_B)`</span>
 <span class="sd">    i.e., the probability that a randomly chosen A (crosslink) or B (strand-end),</span>
@@ -1345,7 +1342,7 @@
     <span class="n">weight_fractions</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">r</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">b2</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">):</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute the extent of reaction based on the weight fraction of soluble material.</span>
 
@@ -1413,7 +1410,7 @@
 
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_validate_r_and_p</span><span class="p">(</span><span class="n">r</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_validate_r_and_p</span><span class="p">(</span><span class="n">r</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Validate the parameters used in Miller-Macosko theory calculations.</span>
 
@@ -1590,8 +1587,10 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">_can_be_computed</span><span class="p">(</span><span class="n">param</span><span class="p">:</span> <span class="n">_ParamValidatorAssembler</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">_param_is_ready</span><span class="p">(</span><span class="n">dep</span><span class="p">)</span> <span class="k">for</span> <span class="n">dep</span> <span class="ow">in</span> <span class="n">param</span><span class="o">.</span><span class="n">dependencies</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_validate</span><span class="p">(</span><span class="n">param_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">_validator_per_name</span><span class="p">[</span><span class="n">param_name</span><span class="p">]</span><span class="o">.</span><span class="n">param_validator</span><span class="p">(</span><span class="n">given_parameters</span><span class="p">[</span><span class="n">p</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate</span><span class="p">(</span><span class="n">param_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_validator_per_name</span><span class="p">[</span><span class="n">param_name</span><span class="p">]</span><span class="o">.</span><span class="n">param_validator</span><span class="p">(</span>
+            <span class="n">given_parameters</span><span class="p">[</span><span class="n">param_name</span><span class="p">]</span>
+        <span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">"Invalid value for parameter '</span><span class="si">{}</span><span class="s2">' (got </span><span class="si">{}</span><span class="s2">)."</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="n">param_name</span><span class="p">,</span> <span class="n">given_parameters</span><span class="p">[</span><span class="n">param_name</span><span class="p">]</span>
