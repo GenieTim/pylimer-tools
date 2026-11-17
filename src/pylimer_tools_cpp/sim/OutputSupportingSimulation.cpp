@@ -16,7 +16,7 @@ OutputSupportingSimulation::prepareAllOutputs()
   // prepare averages
   const int numAverages = this->openFilesOutputHeader(
     this->outputAverageConfigs, "# OutputStep\t", this->outputConfigs.size());
-  RUNTIME_EXP_IFN(runningAverages.size() == numAverages,
+  RUNTIME_EXP_IFN(runningAverages.size() == static_cast<size_t>(numAverages),
                   "The nr. of running averages is not consistent with the "
                   "number of output quantities.");
 
@@ -284,7 +284,8 @@ OutputSupportingSimulation::handleOutput(const long int currentStep)
                         "Autocorrelation states are inconsistent.");
       }
 
-      for (size_t output_idx = 0; output_idx < static_cast<size_t>(npcorr);
+      for (Eigen::Index output_idx = 0;
+           output_idx < static_cast<Eigen::Index>(npcorr);
            output_idx += 1) {
         outputBuffer += std::to_string(
           this->autocorrelators[autocorrelator_idx_before].t[output_idx]);

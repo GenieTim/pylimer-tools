@@ -2,6 +2,8 @@
 #include "../utils/StringUtils.h"
 #include "../utils/utilityMacros.h"
 #include <cassert>
+#include <cctype>
+#include <cstdlib>
 #include <filesystem>
 #include <fstream> // std::ifstream
 #include <iostream>
@@ -332,8 +334,7 @@ DataFileParser::getAtomStyleDescriptor(AtomStyle style) const
                  FT::Z,
                  FT::NX,
                  FT::NY,
-                 FT::NZ },
-               "%lu %d %d %le %le %le %lu %lu %lu" };
+                 FT::NZ } };
 
     case AtomStyle::ATOMIC:
       return { { FT::ATOM_ID,
@@ -343,8 +344,7 @@ DataFileParser::getAtomStyleDescriptor(AtomStyle style) const
                  FT::Z,
                  FT::NX,
                  FT::NY,
-                 FT::NZ },
-               "%lu %d %le %le %le %ld %ld %ld" };
+                 FT::NZ } };
 
     case AtomStyle::BODY:
       return { { FT::ATOM_ID,
@@ -356,8 +356,7 @@ DataFileParser::getAtomStyleDescriptor(AtomStyle style) const
                  FT::Z,
                  FT::NX,
                  FT::NY,
-                 FT::NZ },
-               "%lu %d %d %le %le %le %le %ld %ld %ld" };
+                 FT::NZ } };
 
     case AtomStyle::BPM_SPHERE:
       return { { FT::ATOM_ID,
@@ -370,8 +369,7 @@ DataFileParser::getAtomStyleDescriptor(AtomStyle style) const
                  FT::Z,
                  FT::NX,
                  FT::NY,
-                 FT::NZ },
-               "%lu %d %d %le %le %le %le %le %ld %ld %ld" };
+                 FT::NZ } };
 
     case AtomStyle::CHARGE:
       return { { FT::ATOM_ID,
@@ -382,30 +380,26 @@ DataFileParser::getAtomStyleDescriptor(AtomStyle style) const
                  FT::Z,
                  FT::NX,
                  FT::NY,
-                 FT::NZ },
-               "%zd %d %le %le %le %le %ld %ld %ld" };
+                 FT::NZ } };
 
     case AtomStyle::DIELECTRIC:
-      return {
-        { FT::ATOM_ID,
-          FT::ATOM_TYPE,
-          FT::ATOM_CHARGE,
-          FT::X,
-          FT::Y,
-          FT::Z,
-          FT::MUX,
-          FT::MUY,
-          FT::MUZ,
-          FT::AREA,
-          FT::ED,
-          FT::EM,
-          FT::EPSILON,
-          FT::CURVATURE,
-          FT::NX,
-          FT::NY,
-          FT::NZ },
-        "%lu %d %le %le %le %le %le %le %le %le %le %le %le %le %ld %ld %ld"
-      };
+      return { { FT::ATOM_ID,
+                 FT::ATOM_TYPE,
+                 FT::ATOM_CHARGE,
+                 FT::X,
+                 FT::Y,
+                 FT::Z,
+                 FT::MUX,
+                 FT::MUY,
+                 FT::MUZ,
+                 FT::AREA,
+                 FT::ED,
+                 FT::EM,
+                 FT::EPSILON,
+                 FT::CURVATURE,
+                 FT::NX,
+                 FT::NY,
+                 FT::NZ } };
 
     case AtomStyle::DIPOLE:
       return { { FT::ATOM_ID,
@@ -419,8 +413,7 @@ DataFileParser::getAtomStyleDescriptor(AtomStyle style) const
                  FT::MUZ,
                  FT::NX,
                  FT::NY,
-                 FT::NZ },
-               "%zd %d %le %le %le %le %le %le %le %ld %ld %ld" };
+                 FT::NZ } };
 
     case AtomStyle::DPD:
       return { { FT::ATOM_ID,
@@ -431,8 +424,7 @@ DataFileParser::getAtomStyleDescriptor(AtomStyle style) const
                  FT::Z,
                  FT::NX,
                  FT::NY,
-                 FT::NZ },
-               "%zd %d %le %le %le %le %ld %ld %ld" };
+                 FT::NZ } };
 
     case AtomStyle::EDPD:
       return { { FT::ATOM_ID,
@@ -444,8 +436,7 @@ DataFileParser::getAtomStyleDescriptor(AtomStyle style) const
                  FT::Z,
                  FT::NX,
                  FT::NY,
-                 FT::NZ },
-               "%lu %d %le %le %le %le %le %ld %ld %ld" };
+                 FT::NZ } };
 
     case AtomStyle::ELECTRON:
       return { { FT::ATOM_ID,
@@ -458,8 +449,7 @@ DataFileParser::getAtomStyleDescriptor(AtomStyle style) const
                  FT::Z,
                  FT::NX,
                  FT::NY,
-                 FT::NZ },
-               "%lu %d %le %le %le %le %le %le %ld %ld %ld" };
+                 FT::NZ } };
 
     case AtomStyle::ELLIPSOID:
       return { { FT::ATOM_ID,
@@ -471,8 +461,7 @@ DataFileParser::getAtomStyleDescriptor(AtomStyle style) const
                  FT::Z,
                  FT::NX,
                  FT::NY,
-                 FT::NZ },
-               "%lu %d %d %le %le %le %le %ld %ld %ld" };
+                 FT::NZ } };
 
     case AtomStyle::LINE:
       return { { FT::ATOM_ID,
@@ -485,8 +474,7 @@ DataFileParser::getAtomStyleDescriptor(AtomStyle style) const
                  FT::Z,
                  FT::NX,
                  FT::NY,
-                 FT::NZ },
-               "%lu %d %d %d %le %le %le %le %ld %ld %ld" };
+                 FT::NZ } };
 
     case AtomStyle::MDPD:
       return { { FT::ATOM_ID,
@@ -497,8 +485,7 @@ DataFileParser::getAtomStyleDescriptor(AtomStyle style) const
                  FT::Z,
                  FT::NX,
                  FT::NY,
-                 FT::NZ },
-               "%zd %d %le %le %le %le %ld %ld %ld" };
+                 FT::NZ } };
 
     case AtomStyle::PERI:
       return { { FT::ATOM_ID,
@@ -510,8 +497,7 @@ DataFileParser::getAtomStyleDescriptor(AtomStyle style) const
                  FT::Z,
                  FT::NX,
                  FT::NY,
-                 FT::NZ },
-               "%lu %d %le %le %le %le %le %ld %ld %ld" };
+                 FT::NZ } };
 
     case AtomStyle::RHEO:
       return { { FT::ATOM_ID,
@@ -523,8 +509,7 @@ DataFileParser::getAtomStyleDescriptor(AtomStyle style) const
                  FT::Z,
                  FT::NX,
                  FT::NY,
-                 FT::NZ },
-               "%lu %d %d %le %le %le %le %ld %ld %ld" };
+                 FT::NZ } };
 
     case AtomStyle::RHEO_THERMAL:
       return { { FT::ATOM_ID,
@@ -537,29 +522,25 @@ DataFileParser::getAtomStyleDescriptor(AtomStyle style) const
                  FT::Z,
                  FT::NX,
                  FT::NY,
-                 FT::NZ },
-               "%lu %d %d %le %le %le %le %le %ld %ld %ld" };
+                 FT::NZ } };
 
     case AtomStyle::SMD:
-      return {
-        { FT::ATOM_ID,
-          FT::ATOM_TYPE,
-          FT::MOLECULE_ID,
-          FT::VOLUME,
-          FT::MASS,
-          FT::KRADIUS,
-          FT::CRADIUS,
-          FT::X0,
-          FT::Y0,
-          FT::Z0,
-          FT::X,
-          FT::Y,
-          FT::Z,
-          FT::NX,
-          FT::NY,
-          FT::NZ },
-        "%lu %d %d %le %le %le %le %le %le %le %le %le %le %ld %ld %ld"
-      };
+      return { { FT::ATOM_ID,
+                 FT::ATOM_TYPE,
+                 FT::MOLECULE_ID,
+                 FT::VOLUME,
+                 FT::MASS,
+                 FT::KRADIUS,
+                 FT::CRADIUS,
+                 FT::X0,
+                 FT::Y0,
+                 FT::Z0,
+                 FT::X,
+                 FT::Y,
+                 FT::Z,
+                 FT::NX,
+                 FT::NY,
+                 FT::NZ } };
 
     case AtomStyle::SPH:
       return { { FT::ATOM_ID,
@@ -572,8 +553,7 @@ DataFileParser::getAtomStyleDescriptor(AtomStyle style) const
                  FT::Z,
                  FT::NX,
                  FT::NY,
-                 FT::NZ },
-               "%lu %d %le %le %le %le %le %le %ld %ld %ld" };
+                 FT::NZ } };
 
     case AtomStyle::SPHERE:
       return { { FT::ATOM_ID,
@@ -585,8 +565,7 @@ DataFileParser::getAtomStyleDescriptor(AtomStyle style) const
                  FT::Z,
                  FT::NX,
                  FT::NY,
-                 FT::NZ },
-               "%zd %d %le %le %le %le %le %ld %ld %ld" };
+                 FT::NZ } };
 
     case AtomStyle::SPIN:
       return { { FT::ATOM_ID,
@@ -600,8 +579,7 @@ DataFileParser::getAtomStyleDescriptor(AtomStyle style) const
                  FT::SP,
                  FT::NX,
                  FT::NY,
-                 FT::NZ },
-               "%lu %d %le %le %le %le %le %le %le %ld %ld %ld" };
+                 FT::NZ } };
 
     case AtomStyle::TDPD:
       return { { FT::ATOM_ID,
@@ -613,8 +591,7 @@ DataFileParser::getAtomStyleDescriptor(AtomStyle style) const
                  FT::CC2,
                  FT::NX,
                  FT::NY,
-                 FT::NZ },
-               "%lu %d %le %le %le %le %le %ld %ld %ld" };
+                 FT::NZ } };
 
     case AtomStyle::TEMPLATE:
       return { { FT::ATOM_ID,
@@ -627,8 +604,7 @@ DataFileParser::getAtomStyleDescriptor(AtomStyle style) const
                  FT::Z,
                  FT::NX,
                  FT::NY,
-                 FT::NZ },
-               "%lu %d %d %d %d %le %le %le %ld %ld %ld" };
+                 FT::NZ } };
 
     case AtomStyle::TRI:
       return { { FT::ATOM_ID,
@@ -641,8 +617,7 @@ DataFileParser::getAtomStyleDescriptor(AtomStyle style) const
                  FT::Z,
                  FT::NX,
                  FT::NY,
-                 FT::NZ },
-               "%lu %d %d %d %le %le %le %le %ld %ld %ld" };
+                 FT::NZ } };
 
     case AtomStyle::WAVEPACKET:
       return { { FT::ATOM_ID,
@@ -658,8 +633,7 @@ DataFileParser::getAtomStyleDescriptor(AtomStyle style) const
                  FT::Z,
                  FT::NX,
                  FT::NY,
-                 FT::NZ },
-               "%lu %d %le %le %le %d %le %le %le %le %le %ld %ld %ld" };
+                 FT::NZ } };
 
     case AtomStyle::FULL:
       return { { FT::ATOM_ID,
@@ -671,13 +645,41 @@ DataFileParser::getAtomStyleDescriptor(AtomStyle style) const
                  FT::Z,
                  FT::NX,
                  FT::NY,
-                 FT::NZ },
-               "%zd %d %d %le %le %le %le %zd %zd %zd" };
+                 FT::NZ } };
 
     default:
       throw std::invalid_argument("Unsupported atom style for generic parsing");
   }
 }
+
+namespace {
+  template<typename T>
+  inline bool parseAtomToken(const char*& p, T& out)
+  {
+    char* endptr = nullptr;
+    if constexpr (std::is_floating_point_v<T>) {
+      const double val = std::strtod(p, &endptr);
+      if (endptr == p) {
+        return false;
+      }
+      out = static_cast<T>(val);
+    } else if constexpr (std::is_signed_v<T>) {
+      const long long val = std::strtoll(p, &endptr, 10);
+      if (endptr == p) {
+        return false;
+      }
+      out = static_cast<T>(val);
+    } else {
+      const unsigned long long val = std::strtoull(p, &endptr, 10);
+      if (endptr == p) {
+        return false;
+      }
+      out = static_cast<T>(val);
+    }
+    p = endptr;
+    return true;
+  }
+} // namespace
 
 template<typename... Args>
 void
@@ -685,8 +687,20 @@ DataFileParser::readAtomGeneric(const std::string& line,
                                 const AtomFieldDescriptor& descriptor,
                                 Args&... args)
 {
-  const int resFound =
-    sscanf(line.c_str(), descriptor.format.c_str(), &args...);
+  const char* cursor = line.c_str();
+  int resFound = 0;
+  bool ok = true;
+  (
+    [&](auto& arg) {
+      if (ok) {
+        if (parseAtomToken(cursor, arg)) {
+          ++resFound;
+        } else {
+          ok = false;
+        }
+      }
+    }(args),
+    ...);
 
   RUNTIME_EXP_IFN(resFound >= static_cast<int>(descriptor.fields.size()) - 3,
                   "Did not find enough data in line '" + line + "': only " +
@@ -885,7 +899,8 @@ void
 DataFileParser::readAtom(const std::string& line)
 {
   auto descriptor = getAtomStyleDescriptor(AtomStyle::MOLECULAR);
-  size_t atomId, nx, ny, nz;
+  size_t atomId;
+  long int nx, ny, nz;
   int atomType, moleculeId;
   double x, y, z;
 
@@ -897,7 +912,8 @@ void
 DataFileParser::readAtomFull(const std::string& line)
 {
   auto descriptor = getAtomStyleDescriptor(AtomStyle::FULL);
-  size_t atomId, nx, ny, nz;
+  size_t atomId;
+  long int nx, ny, nz;
   int atomType, moleculeId;
   double charge, x, y, z;
 
@@ -1354,12 +1370,13 @@ DataFileParser::readAtomHybrid(const std::string& line,
     throw std::runtime_error(
       "This combination is not implemented for hybrid atom style");
   }
-  size_t atomId, nx, ny, nz;
+  size_t atomId;
+  long int nx, ny, nz;
   int atomType, moleculeId;
   double x, y, z;
   double edpdTemp, edpd;
   int resFound = sscanf(line.c_str(),
-                        "%zd %d %le %le %le %d %le %le %zd %zd %zd",
+                        "%zu %d %le %le %le %d %le %le %ld %ld %ld",
                         &atomId,
                         &atomType,
                         &x,
@@ -1376,7 +1393,7 @@ DataFileParser::readAtomHybrid(const std::string& line,
                   "Did not find enough data in line '" + line + "': only " +
                     std::to_string(resFound) + ".");
 
-  this->atomIds.push_back(atomId);
+  this->atomIds.push_back(static_cast<long>(atomId));
   this->moleculeIds.push_back(moleculeId);
   this->atomTypes.push_back(atomType);
   this->atomX.push_back(x);
@@ -1386,9 +1403,9 @@ DataFileParser::readAtomHybrid(const std::string& line,
   this->additionalAtomData["edpd"].push_back(edpd);
 
   if (resFound > 8) {
-    this->atomNx.push_back(nx);
-    this->atomNy.push_back(ny);
-    this->atomNz.push_back(nz);
+    this->atomNx.push_back(static_cast<int>(nx));
+    this->atomNy.push_back(static_cast<int>(ny));
+    this->atomNz.push_back(static_cast<int>(nz));
   }
 }
 
@@ -1425,10 +1442,10 @@ DataFileParser::readBond(const std::string& line)
          &bondType,
          &newBondFrom,
          &newBondTo);
-  this->bondIds.push_back(bondId);
-  this->bondTypes.push_back(bondType);
-  this->bondFrom.push_back(newBondFrom);
-  this->bondTo.push_back(newBondTo);
+  this->bondIds.push_back(static_cast<long>(bondId));
+  this->bondTypes.push_back(static_cast<int>(bondType));
+  this->bondFrom.push_back(static_cast<long>(newBondFrom));
+  this->bondTo.push_back(static_cast<long>(newBondTo));
 }
 
 void
@@ -1466,11 +1483,11 @@ DataFileParser::readAngle(const std::string& line)
          &newAngleVia,
          &newAngleTo);
 
-  this->angleIds.push_back(newAngleId);
-  this->angleTypes.push_back(newAngleType);
-  this->angleFrom.push_back(newAngleFrom);
-  this->angleVia.push_back(newAngleVia);
-  this->angleTo.push_back(newAngleTo);
+  this->angleIds.push_back(static_cast<long>(newAngleId));
+  this->angleTypes.push_back(static_cast<int>(newAngleType));
+  this->angleFrom.push_back(static_cast<long>(newAngleFrom));
+  this->angleVia.push_back(static_cast<long>(newAngleVia));
+  this->angleTo.push_back(static_cast<long>(newAngleTo));
 }
 
 void
@@ -1511,12 +1528,12 @@ DataFileParser::readDihedralAngle(const std::string& line)
          &newAngleVia2,
          &newAngleTo);
 
-  this->dihedralAngleIds.push_back(newAngleId);
-  this->dihedralAngleTypes.push_back(newAngleType);
-  this->dihedralAngleFrom.push_back(newAngleFrom);
-  this->dihedralAngleVia1.push_back(newAngleVia1);
-  this->dihedralAngleVia2.push_back(newAngleVia2);
-  this->dihedralAngleTo.push_back(newAngleTo);
+  this->dihedralAngleIds.push_back(static_cast<long>(newAngleId));
+  this->dihedralAngleTypes.push_back(static_cast<int>(newAngleType));
+  this->dihedralAngleFrom.push_back(static_cast<long>(newAngleFrom));
+  this->dihedralAngleVia1.push_back(static_cast<long>(newAngleVia1));
+  this->dihedralAngleVia2.push_back(static_cast<long>(newAngleVia2));
+  this->dihedralAngleTo.push_back(static_cast<long>(newAngleTo));
 }
 
 void
@@ -1544,7 +1561,7 @@ DataFileParser::readVelocities(std::ifstream& file, std::string& line)
     unorderedVz.push_back(vz);
     atomIdToIdx[atomId] = i;
 
-    if (!getline(file, line) && i + 1 < this->nAtoms) {
+    if (!getline(file, line) && i + 1 < static_cast<size_t>(this->nAtoms)) {
       throw std::runtime_error("Data file ended too early. Not enough "
                                "velocities read. Read " +
                                std::to_string(i + 1) + " of " +
@@ -1552,7 +1569,7 @@ DataFileParser::readVelocities(std::ifstream& file, std::string& line)
                                " expected velocities.");
     }
   }
-  assert(unorderedVx.size() == this->nAtoms);
+  assert(unorderedVx.size() == static_cast<size_t>(this->nAtoms));
 
   // re-order for the other stuff
   std::vector<double> orderedVx, orderedVy, orderedVz;

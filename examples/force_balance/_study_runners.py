@@ -9,6 +9,7 @@ usage and resulting plots.
 from __future__ import annotations
 
 from concurrent.futures import ProcessPoolExecutor, as_completed
+from enum import Enum
 import json
 import math
 from pathlib import Path
@@ -2093,3 +2094,416 @@ def run_all_benchmarks(max_workers: Optional[int] = None) -> Dict[str, Any]:
     combined.update(run_distribution_comparison())
     combined.update(run_conversion_sweep(max_workers=max_workers))
     return combined
+
+
+# --- Representative Volume Element (RVE) Study for Realistic PDMS ---
+
+
+class _RveStudyKind(Enum):
+    """Identifier for sub-studies in the PDMS Representative Volume Element sweep."""
+
+    CHAIN_LENGTH = "N"
+    CONVERSION = "p"
+    STOICHIOMETRY = "r"
+    SAMPLES = "samples"
+
+
+def _run_single_pdms_rve_point(
+    box_l: float,
+    strand_len: int,
+    conversion: float,
+    stoichiometry_r: float,
+    seed: int,
+    b: float,
+    b2: float,
+    r02: float,
+    cutoff: float,
+    ent_density: float,
+    bead_density: float,
+    gamma_conv: float,
+) -> Tuple[float, float, float, int, int]:
+    """Simulate a single PDMS network realization at a given box size."""
+    vol = box_l**3
+    n_beads_target = bead_density * vol
+    n_strands = max(
+        10, int(round(n_beads_target / (strand_len + 0.5 * stoichiometry_r)))
+    )
+    n_xlinks = max(5, int(math.floor(0.5 * stoichiometry_r * n_strands)))
+    max_p = min(1.0, (2.0 * n_strands) / (4.0 * n_xlinks))
+    effective_p = min(conversion, max_p)
+
+    gen = MCUniverseGenerator(box_l, box_l, box_l)
+    gen.set_seed(seed)
+    gen.config_nr_of_mc_steps(0)
+    gen.set_bead_distance(b)
+    gen.set_mean_squared_bead_distance(b2)
+    gen.add_strands(n_strands, [strand_len] * n_strands)
+    gen.add_crosslinkers(n_xlinks, 4)
+    gen.link_strands_to_conversion(effective_p)
+
+    es = gen.sample_entanglements(
+        nr_of_entanglements_to_sample=int(ent_density * vol),
+        upper_cutoff=cutoff,
+        seed=f"rve_{seed}",
+        filtering_mode=EntanglementFilteringMode.OMIT_INACTIVE,
+    )
+    fb_ent = gen.get_force_balance2(es, entanglements_as_springs=False)
+    fb_ent.run_force_relaxation(
+        pt.StructureSimplificationMode.INACTIVE_THEN_X2F
+    )
+    g_total = float(
+        gamma_conv * fb_ent.get_gamma_factor(r02, nr_of_chains=1) / vol
+    )
+    w_active = float(fb_ent.get_active_weight_fraction())
+
+    fb_ph = gen.get_force_balance2()
+    fb_ph.run_force_relaxation(
+        pt.StructureSimplificationMode.INACTIVE_THEN_X2F
+    )
+    g_phantom = float(
+        gamma_conv * fb_ph.get_gamma_factor(r02, nr_of_chains=1) / vol
+    )
+
+    n_atoms = n_strands * strand_len + n_xlinks
+    return g_total, g_phantom, w_active, n_strands, n_atoms
+
+
+def _simulate_rve_sweep_repeat(
+    study_kind: _RveStudyKind,
+    param_idx: int,
+    repeat_idx: int,
+    seed: int,
+    box_lengths: Sequence[float],
+    strand_len: int,
+    conversion: float,
+    stoichiometry_r: float,
+    b: float,
+    b2: float,
+    r02: float,
+    cutoff: float,
+    ent_density: float,
+    bead_density: float,
+    gamma_conv: float,
+) -> Tuple[
+    _RveStudyKind,
+    int,
+    int,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+]:
+    """Execute all box sizes for a single (study, parameter, repeat) combination."""
+    n_boxes = len(box_lengths)
+    g_total = np.zeros(n_boxes)
+    g_phantom = np.zeros(n_boxes)
+    w_active = np.zeros(n_boxes)
+    n_strands_arr = np.zeros(n_boxes, dtype=int)
+    n_atoms_arr = np.zeros(n_boxes, dtype=int)
+
+    for j, box_l in enumerate(box_lengths):
+        g_t, g_p, w_a, n_str, n_at = _run_single_pdms_rve_point(
+            box_l=box_l,
+            strand_len=strand_len,
+            conversion=conversion,
+            stoichiometry_r=stoichiometry_r,
+            seed=seed + 37 * j,
+            b=b,
+            b2=b2,
+            r02=r02,
+            cutoff=cutoff,
+            ent_density=ent_density,
+            bead_density=bead_density,
+            gamma_conv=gamma_conv,
+        )
+        g_total[j] = g_t
+        g_phantom[j] = g_p
+        w_active[j] = w_a
+        n_strands_arr[j] = n_str
+        n_atoms_arr[j] = n_at
+
+    return (
+        study_kind,
+        param_idx,
+        repeat_idx,
+        g_total,
+        g_phantom,
+        w_active,
+        n_strands_arr,
+        n_atoms_arr,
+    )
+
+
+def run_representative_volume_pdms_study(
+    box_lengths: Sequence[float] = (14.0, 20.0, 28.0, 40.0, 56.0, 80.0, 110.0),
+    n_values: Sequence[int] = (50, 100, 200, 400),
+    p_values: Sequence[float] = (0.75, 0.85, 0.925, 0.98),
+    r_values: Sequence[float] = (0.65, 0.80, 1.00, 1.25),
+    n_repeats: int = 12,
+    n_samples_study: int = 24,
+    base_seed: int = 1000,
+    max_workers: Optional[int] = None,
+) -> Dict[str, Any]:
+    """Execute the multi-seed Representative Volume Element (RVE) study for PDMS networks.
+
+    Varies box length L across four sub-studies:
+      1. Chain length N (at p=0.95, r=1.0)
+      2. Cross-link conversion p (at N=100, r=1.0)
+      3. Stoichiometric imbalance r (at N=100, p = 0.95 * min(1, 1/r))
+      4. Sample count precision vs. box size (at N=100, p=0.925, r=1.0, 24 repeats)
+    """
+    params = get_parameters_for_polymer(
+        "PDMS", parameter_type=ParameterType.GAUSSIAN)
+    dist_unit = params.get("distance_units")
+    b = params.get("<b>").to(dist_unit).magnitude
+    b2 = params.get("<b^2>").to(dist_unit**2).magnitude
+    r02 = params.get("R02").to(dist_unit**2).magnitude
+    cutoff = params.get_sampling_cutoff()
+    ent_density = params.get_entanglement_density()
+    bead_density = params.get_bead_density()
+    gamma_conv = params.get_gamma_conversion_factor().to("MPa").magnitude
+
+    n_boxes = len(box_lengths)
+    r_conversions = [0.95 * min(1.0, 1.0 / r_val) for r_val in r_values]
+
+    # Preallocate result arrays
+    n_g_tot = np.zeros((len(n_values), n_boxes, n_repeats))
+    n_g_ph = np.zeros((len(n_values), n_boxes, n_repeats))
+    n_w_act = np.zeros((len(n_values), n_boxes, n_repeats))
+    n_strands_grid = np.zeros((len(n_values), n_boxes), dtype=int)
+    n_atoms_grid = np.zeros((len(n_values), n_boxes), dtype=int)
+
+    p_g_tot = np.zeros((len(p_values), n_boxes, n_repeats))
+    p_g_ph = np.zeros((len(p_values), n_boxes, n_repeats))
+    p_w_act = np.zeros((len(p_values), n_boxes, n_repeats))
+
+    r_g_tot = np.zeros((len(r_values), n_boxes, n_repeats))
+    r_g_ph = np.zeros((len(r_values), n_boxes, n_repeats))
+    r_w_act = np.zeros((len(r_values), n_boxes, n_repeats))
+
+    s_g_tot = np.zeros((n_boxes, n_samples_study))
+    s_g_ph = np.zeros((n_boxes, n_samples_study))
+    s_w_act = np.zeros((n_boxes, n_samples_study))
+    s_atoms_grid = np.zeros(n_boxes, dtype=int)
+
+    tasks = []
+    # Study 1: Chain length N
+    for idx, n_len in enumerate(n_values):
+        for rep in range(n_repeats):
+            tasks.append(
+                (
+                    _RveStudyKind.CHAIN_LENGTH,
+                    idx,
+                    rep,
+                    base_seed + 10000 * idx + 503 * rep,
+                    box_lengths,
+                    int(n_len),
+                    0.95,
+                    1.0,
+                    b,
+                    b2,
+                    r02,
+                    cutoff,
+                    ent_density,
+                    bead_density,
+                    gamma_conv,
+                )
+            )
+
+    # Study 2: Conversion p
+    for idx, p_val in enumerate(p_values):
+        for rep in range(n_repeats):
+            tasks.append(
+                (
+                    _RveStudyKind.CONVERSION,
+                    idx,
+                    rep,
+                    base_seed + 100000 + 10000 * idx + 503 * rep,
+                    box_lengths,
+                    100,
+                    float(p_val),
+                    1.0,
+                    b,
+                    b2,
+                    r02,
+                    cutoff,
+                    ent_density,
+                    bead_density,
+                    gamma_conv,
+                )
+            )
+
+    # Study 3: Stoichiometric imbalance r
+    for idx, (r_val, conv_val) in enumerate(zip(r_values, r_conversions)):
+        for rep in range(n_repeats):
+            tasks.append(
+                (
+                    _RveStudyKind.STOICHIOMETRY,
+                    idx,
+                    rep,
+                    base_seed + 200000 + 10000 * idx + 503 * rep,
+                    box_lengths,
+                    100,
+                    float(conv_val),
+                    float(r_val),
+                    b,
+                    b2,
+                    r02,
+                    cutoff,
+                    ent_density,
+                    bead_density,
+                    gamma_conv,
+                )
+            )
+
+    # Study 4: Sample count study (N=100, p=0.925, r=1.0)
+    for rep in range(n_samples_study):
+        tasks.append(
+            (
+                _RveStudyKind.SAMPLES,
+                0,
+                rep,
+                base_seed + 300000 + 503 * rep,
+                box_lengths,
+                100,
+                0.925,
+                1.0,
+                b,
+                b2,
+                r02,
+                cutoff,
+                ent_density,
+                bead_density,
+                gamma_conv,
+            )
+        )
+
+    workers = min(resolve_max_workers(max_workers), len(tasks))
+    configure_process_threading(workers)
+    total_tasks = len(tasks)
+
+    def _store_result(
+        res: Tuple[
+            _RveStudyKind,
+            int,
+            int,
+            np.ndarray,
+            np.ndarray,
+            np.ndarray,
+            np.ndarray,
+            np.ndarray,
+        ],
+    ) -> None:
+        kind, p_idx, rep_idx, gt, gp, wa, n_str, n_at = res
+        if kind == _RveStudyKind.CHAIN_LENGTH:
+            n_g_tot[p_idx, :, rep_idx] = gt
+            n_g_ph[p_idx, :, rep_idx] = gp
+            n_w_act[p_idx, :, rep_idx] = wa
+            n_strands_grid[p_idx, :] = n_str
+            n_atoms_grid[p_idx, :] = n_at
+        elif kind == _RveStudyKind.CONVERSION:
+            p_g_tot[p_idx, :, rep_idx] = gt
+            p_g_ph[p_idx, :, rep_idx] = gp
+            p_w_act[p_idx, :, rep_idx] = wa
+        elif kind == _RveStudyKind.STOICHIOMETRY:
+            r_g_tot[p_idx, :, rep_idx] = gt
+            r_g_ph[p_idx, :, rep_idx] = gp
+            r_w_act[p_idx, :, rep_idx] = wa
+        elif kind == _RveStudyKind.SAMPLES:
+            s_g_tot[:, rep_idx] = gt
+            s_g_ph[:, rep_idx] = gp
+            s_w_act[:, rep_idx] = wa
+            s_atoms_grid[:] = n_at
+
+    if workers > 1:
+        print(
+            f"Executing {total_tasks} PDMS RVE sweep tasks in parallel across {workers} workers..."
+        )
+        completed = 0
+        with ProcessPoolExecutor(
+            max_workers=workers, initializer=worker_process_initializer
+        ) as executor:
+            futures = [
+                executor.submit(
+                    _simulate_rve_sweep_repeat,
+                    *t) for t in tasks]
+            for fut in as_completed(futures):
+                _store_result(fut.result())
+                completed += 1
+                if completed % 20 == 0 or completed == total_tasks:
+                    print(
+                        f"  [PDMS RVE Study] Completed {completed}/{total_tasks} tasks..."
+                    )
+    else:
+        for idx, t in enumerate(tasks, start=1):
+            _store_result(_simulate_rve_sweep_repeat(*t))
+            if idx % 20 == 0 or idx == total_tasks:
+                print(
+                    f"  [PDMS RVE Study] Completed {idx}/{total_tasks} tasks...")
+
+    stat_n_gt = compute_ensemble_statistics(n_g_tot, axis=2)
+    stat_n_gp = compute_ensemble_statistics(n_g_ph, axis=2)
+    stat_n_wa = compute_ensemble_statistics(n_w_act, axis=2)
+
+    stat_p_gt = compute_ensemble_statistics(p_g_tot, axis=2)
+    stat_p_gp = compute_ensemble_statistics(p_g_ph, axis=2)
+    stat_p_wa = compute_ensemble_statistics(p_w_act, axis=2)
+
+    stat_r_gt = compute_ensemble_statistics(r_g_tot, axis=2)
+    stat_r_gp = compute_ensemble_statistics(r_g_ph, axis=2)
+    stat_r_wa = compute_ensemble_statistics(r_w_act, axis=2)
+
+    stat_s_gt = compute_ensemble_statistics(s_g_tot, axis=1)
+    stat_s_gp = compute_ensemble_statistics(s_g_ph, axis=1)
+    stat_s_wa = compute_ensemble_statistics(s_w_act, axis=1)
+
+    n_r0_nm = np.array([math.sqrt(n_len * b2) for n_len in n_values])
+
+    return {
+        "box_lengths": np.array(box_lengths, dtype=float),
+        "n_repeats": np.array(n_repeats),
+        "n_samples_study": np.array(n_samples_study),
+        "bead_density": np.array(bead_density),
+        "ent_density": np.array(ent_density),
+        "r02_nm2": np.array(r02),
+        # Study 1: Chain length N
+        "n_values": np.array(n_values, dtype=int),
+        "n_r0_nm": n_r0_nm,
+        "n_strands_grid": n_strands_grid,
+        "n_atoms_grid": n_atoms_grid,
+        "n_g_total_raw": n_g_tot,
+        "n_g_total_mean": stat_n_gt["mean"],
+        "n_g_total_std": stat_n_gt["std"],
+        "n_g_total_ci": stat_n_gt["ci"],
+        "n_g_phantom_mean": stat_n_gp["mean"],
+        "n_g_phantom_ci": stat_n_gp["ci"],
+        "n_w_active_mean": stat_n_wa["mean"],
+        # Study 2: Conversion p
+        "p_values": np.array(p_values, dtype=float),
+        "p_g_total_raw": p_g_tot,
+        "p_g_total_mean": stat_p_gt["mean"],
+        "p_g_total_std": stat_p_gt["std"],
+        "p_g_total_ci": stat_p_gt["ci"],
+        "p_g_phantom_mean": stat_p_gp["mean"],
+        "p_g_phantom_ci": stat_p_gp["ci"],
+        "p_w_active_mean": stat_p_wa["mean"],
+        # Study 3: Stoichiometric imbalance r
+        "r_values": np.array(r_values, dtype=float),
+        "r_conversions": np.array(r_conversions, dtype=float),
+        "r_g_total_raw": r_g_tot,
+        "r_g_total_mean": stat_r_gt["mean"],
+        "r_g_total_std": stat_r_gt["std"],
+        "r_g_total_ci": stat_r_gt["ci"],
+        "r_g_phantom_mean": stat_r_gp["mean"],
+        "r_g_phantom_ci": stat_r_gp["ci"],
+        "r_w_active_mean": stat_r_wa["mean"],
+        # Study 4: Sample count study
+        "s_atoms_grid": s_atoms_grid,
+        "s_g_total_raw": s_g_tot,
+        "s_g_total_mean": stat_s_gt["mean"],
+        "s_g_total_std": stat_s_gt["std"],
+        "s_g_total_ci": stat_s_gt["ci"],
+        "s_g_phantom_mean": stat_s_gp["mean"],
+        "s_w_active_mean": stat_s_wa["mean"],
+    }

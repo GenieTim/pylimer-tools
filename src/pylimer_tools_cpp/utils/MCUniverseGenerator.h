@@ -465,8 +465,10 @@ public:
                   const int chainLength,
                   const int strandAtomType = 1)
   {
+    INVALIDARG_EXP_IFN(nrOfStrands >= 0, "nrOfStrands must be non-negative.");
     const std::vector<int> chainLengths =
-      pylimer_tools::utils::initializeWithValue<int>(nrOfStrands, chainLength);
+      pylimer_tools::utils::initializeWithValue<int>(
+        static_cast<size_t>(nrOfStrands), chainLength);
     return this->addStrands(nrOfStrands, chainLengths, strandAtomType);
   }
 
@@ -690,7 +692,7 @@ public:
 
   size_t getCurrentNrOfAvailableCrosslinkSites() const
   {
-    return this->nrOfAvailableCrosslinkSites;
+    return static_cast<size_t>(this->nrOfAvailableCrosslinkSites);
   }
 
   /**

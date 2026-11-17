@@ -1,5 +1,9 @@
 
+#pragma once
+
 #include "../utils/StringUtils.h"
+#include <atomic>
+#include <chrono>
 #include <filesystem>
 #include <fstream> // std::ifstream
 #include <iostream>
@@ -9,6 +13,24 @@
 
 namespace pylimer_tools {
 namespace utils {
+  inline std::string makeTempCsvFilePath()
+  {
+    static std::atomic<size_t> counter{ 0 };
+    const std::filesystem::path tempDir =
+      std::filesystem::temp_directory_path();
+    const long long timestamp =
+      std::chrono::steady_clock::now().time_since_epoch().count();
+    while (true) {
+      const size_t id = counter.fetch_add(1, std::memory_order_relaxed);
+      const std::filesystem::path candidate =
+        tempDir / ("pylimer_csv_" + std::to_string(timestamp) + "_" +
+                   std::to_string(id) + ".tmp");
+      if (!std::filesystem::exists(candidate)) {
+        return candidate.string();
+      }
+    }
+  }
+
   inline std::vector<std::string> splitCSV(const std::string& filePath,
                                            const std::string& delimiter)
   {
@@ -29,7 +51,7 @@ namespace utils {
     }
 
     std::ofstream outputFile;
-    std::string currentTempFile = std::tmpnam(nullptr);
+    std::string currentTempFile = makeTempCsvFilePath();
     outputFile.open(currentTempFile);
     int previousLen = -1;
     std::string shortenedLine = "";
@@ -46,7 +68,7 @@ namespace utils {
         // todo: also check for headers with same length?!?
         previousLen = newLength;
         outputFile.close();
-        currentTempFile = std::tmpnam(nullptr);
+        currentTempFile = makeTempCsvFilePath();
         // let's not care about the first one
         results.push_back(currentTempFile);
         outputFile.open(currentTempFile);

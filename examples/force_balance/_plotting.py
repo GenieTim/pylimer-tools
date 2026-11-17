@@ -1587,3 +1587,314 @@ def plot_sampling_conversion_sweep(data: Any) -> None:
 
     plt.tight_layout()
     plt.show()
+
+
+_RVE_COLORS = [
+    "#1b9e77",
+    "#d95f02",
+    "#7570b3",
+    "#e7298a",
+    "#66a61e",
+    "#e6ab02",
+    "#a6761d",
+]
+_RVE_MARKERS = ["o", "s", "^", "D", "v", "P", "*"]
+
+
+def _style_rve_box_axis(ax: plt.Axes, box_lengths: np.ndarray) -> None:
+    """Apply standard log-scale and tick formatting for cubic box side length L."""
+    ax.set_xscale("log")
+    ax.set_xticks(box_lengths)
+    ax.get_xaxis().set_major_formatter(ticker.ScalarFormatter())
+    ax.set_xlabel(r"Cubic Box Side Length $L$ [nm]")
+
+
+def _style_rve_cv_axis(
+    ax: plt.Axes,
+    title: str,
+    xlabel: str = r"Cubic Box Side Length $L$ [nm]",
+    box_lengths: Optional[np.ndarray] = None,
+    legend_fontsize: float = 8.5,
+) -> None:
+    """Apply reference threshold lines and log-log styling for CV scatter plots."""
+    ax.axhline(5.0, color="gray", linestyle="--", linewidth=1.1, label="5% CV")
+    ax.axhline(2.0, color="black", linestyle=":", linewidth=1.1, label="2% CV")
+    if box_lengths is not None:
+        _style_rve_box_axis(ax, box_lengths)
+    else:
+        ax.set_xscale("log")
+        ax.set_xlabel(xlabel)
+    ax.set_yscale("log")
+    ax.set_ylabel(r"Sample-to-Sample CV ($\sigma / \langle G \rangle$) [%]")
+    ax.set_title(title)
+    ax.grid(True, which="both", linestyle="--", alpha=0.45)
+    ax.legend(frameon=True, fontsize=legend_fontsize)
+
+
+def _plot_rve_normalized_sweep(
+    box_lengths: np.ndarray,
+    g_mean: np.ndarray,
+    g_std: np.ndarray,
+    g_ci: np.ndarray,
+    conv_labels: list[str],
+    cv_labels: list[str],
+    conv_title: str,
+    cv_title: str,
+    ylim: Tuple[float, float],
+    conv_legend_fontsize: float = 8.5,
+) -> None:
+    """Plot a two-panel normalized modulus convergence and CV scatter comparison."""
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4.8))
+
+    for i, (conv_lbl, cv_lbl) in enumerate(zip(conv_labels, cv_labels)):
+        c = _RVE_COLORS[i % len(_RVE_COLORS)]
+        m = _RVE_MARKERS[i % len(_RVE_MARKERS)]
+        g_ref = g_mean[i, -1]
+        ax1.errorbar(
+            box_lengths,
+            g_mean[i] / g_ref,
+            yerr=g_ci[i] / g_ref,
+            fmt=f"{m}-",
+            color=c,
+            linewidth=2,
+            markersize=6,
+            capsize=3.5,
+            elinewidth=1.2,
+            label=conv_lbl,
+        )
+
+        cv_pct = np.where(
+            g_mean[i] > 1e-9,
+            100.0 * g_std[i] / g_mean[i],
+            np.nan,
+        )
+        ax2.plot(
+            box_lengths,
+            cv_pct,
+            f"{m}-",
+            color=c,
+            linewidth=2,
+            markersize=6,
+            label=cv_lbl,
+        )
+
+    ax1.axhline(1.0, color="black", linestyle=":", linewidth=1.1)
+    ax1.axhspan(0.98, 1.02, color="gray", alpha=0.12, label=r"$\pm 2\%$ band")
+    _style_rve_box_axis(ax1, box_lengths)
+    ax1.set_ylabel(r"Normalized Modulus $G(L) / G(L_{\max})$")
+    ax1.set_title(conv_title)
+    ax1.set_ylim(*ylim)
+    ax1.grid(True, which="both", linestyle="--", alpha=0.45)
+    ax1.legend(frameon=True, fontsize=conv_legend_fontsize)
+
+    _style_rve_cv_axis(ax2, title=cv_title, box_lengths=box_lengths)
+
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_rve_chain_length_study(data: Any) -> None:
+    """Plot shear modulus convergence and CV vs. box size across chain lengths N."""
+    box_lengths = data["box_lengths"]
+    n_values = data["n_values"]
+    n_r0_nm = data["n_r0_nm"]
+    n_repeats = int(data.get("n_repeats", 12))
+    g_mean = data["n_g_total_mean"]
+    g_std = data["n_g_total_std"]
+    g_ci = data["n_g_total_ci"]
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4.8))
+
+    for i, (n_len, r0) in enumerate(zip(n_values, n_r0_nm)):
+        c = _RVE_COLORS[i % len(_RVE_COLORS)]
+        m = _RVE_MARKERS[i % len(_RVE_MARKERS)]
+        ax1.errorbar(
+            box_lengths,
+            g_mean[i],
+            yerr=g_ci[i],
+            fmt=f"{m}-",
+            color=c,
+            linewidth=2,
+            markersize=6,
+            capsize=3.5,
+            elinewidth=1.2,
+            label=rf"$N = {n_len}$ ($R_0 \approx {r0:.1f}\,\mathrm{{nm}}$)",
+        )
+        ax1.axhline(
+            g_mean[i, -1],
+            color=c,
+            linestyle=":",
+            linewidth=1.0,
+            alpha=0.65,
+        )
+
+        cv_pct = np.where(
+            g_mean[i] > 1e-9,
+            100.0 * g_std[i] / g_mean[i],
+            np.nan,
+        )
+        ax2.plot(
+            box_lengths / r0,
+            cv_pct,
+            f"{m}-",
+            color=c,
+            linewidth=2,
+            markersize=6,
+            label=rf"$N = {n_len}$",
+        )
+
+    _style_rve_box_axis(ax1, box_lengths)
+    ax1.set_ylabel(r"Shear Modulus $G$ [MPa]")
+    ax1.set_title(
+        f"Modulus Convergence vs. Box Size ($p=0.95, r=1.0, n={n_repeats}$)"
+    )
+    ax1.grid(True, which="both", linestyle="--", alpha=0.45)
+    ax1.legend(frameon=True, fontsize=8.5)
+
+    _style_rve_cv_axis(
+        ax2,
+        title=r"Relative Scatter vs. Normalized Box Size $L / R_0$",
+        xlabel=r"Normalized Box Size $L / R_0$",
+    )
+
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_rve_conversion_study(data: Any) -> None:
+    """Plot normalized modulus convergence and CV vs. box size across conversions p."""
+    box_lengths = data["box_lengths"]
+    p_values = data["p_values"]
+    n_repeats = int(data.get("n_repeats", 12))
+    g_mean = data["p_g_total_mean"]
+    g_std = data["p_g_total_std"]
+    g_ci = data["p_g_total_ci"]
+
+    conv_labels = [
+        rf"$p = {p_val:.3g}$ ($G_\infty = {g_mean[i, -1]:.3f}\,\mathrm{{MPa}}$)"
+        for i, p_val in enumerate(p_values)
+    ]
+    cv_labels = [rf"$p = {p_val:.3g}$" for p_val in p_values]
+    _plot_rve_normalized_sweep(
+        box_lengths=box_lengths,
+        g_mean=g_mean,
+        g_std=g_std,
+        g_ci=g_ci,
+        conv_labels=conv_labels,
+        cv_labels=cv_labels,
+        conv_title=f"Modulus Convergence vs. Conversion ($N=100, r=1.0, n={n_repeats}$)",
+        cv_title="Relative Scatter Across Conversions",
+        ylim=(0.7, 1.45),
+    )
+
+
+def plot_rve_stoichiometry_study(data: Any) -> None:
+    """Plot normalized modulus convergence and CV vs. box size across stoichiometry r."""
+    box_lengths = data["box_lengths"]
+    r_values = data["r_values"]
+    r_conversions = data["r_conversions"]
+    n_repeats = int(data.get("n_repeats", 12))
+    g_mean = data["r_g_total_mean"]
+    g_std = data["r_g_total_std"]
+    g_ci = data["r_g_total_ci"]
+
+    conv_labels = [
+        rf"$r = {r_val:.2f}$ ($p={p_val:.2f}$, $G_\infty = {g_mean[i, -1]:.3f}\,\mathrm{{MPa}}$)"
+        for i, (r_val, p_val) in enumerate(zip(r_values, r_conversions))
+    ]
+    cv_labels = [rf"$r = {r_val:.2f}$" for r_val in r_values]
+    _plot_rve_normalized_sweep(
+        box_lengths=box_lengths,
+        g_mean=g_mean,
+        g_std=g_std,
+        g_ci=g_ci,
+        conv_labels=conv_labels,
+        cv_labels=cv_labels,
+        conv_title=f"Modulus Convergence vs. Stoichiometry ($N=100, n={n_repeats}$)",
+        cv_title="Relative Scatter Across Stoichiometric Ratios",
+        ylim=(0.55, 1.55),
+        conv_legend_fontsize=8.0,
+    )
+
+
+def plot_rve_sample_count_study(data: Any) -> None:
+    """Plot 95% CI precision vs. sample count and finite-size bias vs. box size."""
+    from scipy import stats
+
+    box_lengths = data["box_lengths"]
+    g_mean = data["s_g_total_mean"]
+    g_std = data["s_g_total_std"]
+    g_ci = data["s_g_total_ci"]
+    n_samples_max = int(data.get("n_samples_study", 24))
+
+    sample_counts = np.array(
+        [2, 3, 4, 6, 8, 12, 16, 20, n_samples_max], dtype=int
+    )
+    sample_counts = sample_counts[sample_counts <= n_samples_max]
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4.8))
+
+    for idx, box_l in enumerate(box_lengths):
+        c = _RVE_COLORS[idx % len(_RVE_COLORS)]
+        m = _RVE_MARKERS[idx % len(_RVE_MARKERS)]
+        rel_ci_pct = [
+            100.0
+            * float(stats.t.ppf(0.975, df=n_s - 1))
+            * g_std[idx]
+            / (np.sqrt(n_s) * g_mean[idx])
+            for n_s in sample_counts
+        ]
+        ax1.plot(
+            sample_counts,
+            rel_ci_pct,
+            f"{m}-",
+            color=c,
+            linewidth=1.8,
+            markersize=5,
+            label=rf"$L = {box_l:.0f}\,\mathrm{{nm}}$",
+        )
+
+    ax1.axhline(5.0, color="gray", linestyle="--", linewidth=1.1, label="5% CI")
+    ax1.axhline(2.0, color="black", linestyle=":", linewidth=1.1, label="2% CI")
+    ax1.set_yscale("log")
+    ax1.set_xlabel(r"Number of Independent Samples $n_{\mathrm{samples}}$")
+    ax1.set_ylabel(r"Relative 95% CI Half-Width [%]")
+    ax1.set_title(
+        r"Statistical Precision vs. Number of Samples ($N=100, p=0.925$)"
+    )
+    ax1.grid(True, which="both", linestyle="--", alpha=0.45)
+    ax1.legend(frameon=True, fontsize=8, ncol=2)
+
+    g_ref = g_mean[-1]
+    rel_bias_pct = 100.0 * np.abs(g_mean - g_ref) / g_ref
+    rel_ci_max_pct = 100.0 * g_ci / g_ref
+    ax2.plot(
+        box_lengths,
+        rel_bias_pct,
+        "o-",
+        color="#d95f02",
+        linewidth=2,
+        markersize=6,
+        label=r"Finite-size bias $|\langle G(L)\rangle - G(L_{\max})| / G(L_{\max})$",
+    )
+    ax2.plot(
+        box_lengths,
+        rel_ci_max_pct,
+        "s--",
+        color="#1b9e77",
+        linewidth=2,
+        markersize=6,
+        label=rf"95% CI half-width ($n={n_samples_max}$)",
+    )
+    ax2.axhline(
+        2.0, color="black", linestyle=":", linewidth=1.1, label="2% threshold"
+    )
+    _style_rve_box_axis(ax2, box_lengths)
+    ax2.set_yscale("log")
+    ax2.set_ylabel("Relative Error [%]")
+    ax2.set_title("Systematic Finite-Size Bias vs. Statistical Uncertainty")
+    ax2.grid(True, which="both", linestyle="--", alpha=0.45)
+    ax2.legend(frameon=True, fontsize=8.5)
+
+    plt.tight_layout()
+    plt.show()

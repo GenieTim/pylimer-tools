@@ -130,7 +130,7 @@ namespace utils {
     // note that the bond size gets a bit destroyed
     // inspiration:
     // https://medium.com/@christopher.tabori/bridging-the-gap-an-introduction-to-brownian-bridge-simulations-10655b0baf02
-    for (size_t i = 1; i < chainLen + 2; ++i) {
+    for (int i = 1; i < chainLen + 2; ++i) {
       double pathFraction =
         static_cast<double>(i) / static_cast<double>(chainLen + 1);
       Eigen::Vector3d deterministicPosition = (from + dist) * pathFraction;
@@ -204,7 +204,12 @@ namespace utils {
 
     // then, do some MC steps to equilibrate the bond lengths
     pylimer_tools::sim::equilibrateChainWithMC(
-      coordinates, meanSquaredBeadDistance, rng, true, true, numIterations);
+      coordinates,
+      meanSquaredBeadDistance,
+      rng,
+      true,
+      true,
+      static_cast<size_t>(numIterations));
 
     // omit first and last positions
     return coordinates.segment(3, coordinates.size() - 6);

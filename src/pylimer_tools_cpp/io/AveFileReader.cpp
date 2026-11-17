@@ -186,6 +186,35 @@ AveFileReader::getData()
   return results;
 }
 
+namespace {
+  std::vector<double> autocorrelateArray(const Eigen::ArrayXd& colData,
+                                         const int nRows,
+                                         const std::vector<size_t>& dts)
+  {
+    for (size_t i = 0; i < dts.size(); ++i) {
+      if (i > 0) {
+        INVALIDARG_EXP_IFN(dts[i - 1] < dts[i],
+                           "Invalid dts: They need to be sequential.");
+      }
+      INVALIDARG_EXP_IFN(nRows > 1 && dts[i] < static_cast<size_t>(nRows - 1),
+                         "Invalid dts: got requested " +
+                           std::to_string(dts[i]) + ", but only got " +
+                           std::to_string(nRows) + " rows.");
+    }
+    RUNTIME_EXP_IFN(colData.size() == nRows, "Invalid row sizes");
+
+    std::vector<double> results;
+    results.reserve(dts.size());
+    for (const size_t dt : dts) {
+      const Eigen::Index dtIdx = static_cast<Eigen::Index>(dt);
+      results.push_back((colData.segment(0, nRows - dtIdx) *
+                         colData.segment(dtIdx, nRows - dtIdx))
+                          .mean());
+    }
+    return results;
+  }
+} // namespace
+
 /**
  * @brief Do autocorrelation for a given column and set of delta indices
  *
@@ -197,32 +226,17 @@ std::vector<double>
 AveFileReader::autocorrelateColumn(const int column,
                                    const std::vector<size_t>& dts)
 {
-  INVALIDINDEX_EXP_IFN(column < this->getNrOfColumns(), "Invalid column");
+  INVALIDINDEX_EXP_IFN(column >= 0 && column < this->getNrOfColumns(),
+                       "Invalid column");
 
-  int nRows = this->getNrOfRows();
-  // validate dts
-  for (size_t i = 1; i < dts.size(); ++i) {
-    INVALIDARG_EXP_IFN(dts[i - 1] < dts[i],
-                       "Invalid dts: They need to be sequential.");
-    INVALIDARG_EXP_IFN(dts[i] < nRows - 1,
-                       "Invalid dts: got requested " + std::to_string(dts[i]) +
-                         ", but only got " + std::to_string(nRows) + " rows.");
-  }
-
+  const int nRows = this->getNrOfRows();
   this->getData();
-  Eigen::ArrayXd colData = Eigen::Map<Eigen::ArrayXd, Eigen::Unaligned>(
-    this->data[column].data(), this->data[column].size());
-  RUNTIME_EXP_IFN(colData.size() == nRows, "Invalid row sizes");
+  const size_t colIdx = static_cast<size_t>(column);
+  const Eigen::ArrayXd colData = Eigen::Map<Eigen::ArrayXd, Eigen::Unaligned>(
+    this->data[colIdx].data(),
+    static_cast<Eigen::Index>(this->data[colIdx].size()));
 
-  std::vector<double> results;
-  results.reserve(dts.size());
-  for (size_t dt : dts) {
-    results.push_back(
-      (colData.segment(0, nRows - dt) * colData.segment(dt, nRows - dt))
-        .mean());
-  }
-
-  return results;
+  return autocorrelateArray(colData, nRows, dts);
 }
 
 /**
@@ -239,35 +253,23 @@ AveFileReader::autocorrelateColumnDifference(const int column1,
                                              const int column2,
                                              const std::vector<size_t>& dts)
 {
-  INVALIDINDEX_EXP_IFN(column1 < this->getNrOfColumns(), "Invalid column");
-  INVALIDINDEX_EXP_IFN(column2 < this->getNrOfColumns(), "Invalid column");
+  INVALIDINDEX_EXP_IFN(column1 >= 0 && column1 < this->getNrOfColumns(),
+                       "Invalid column");
+  INVALIDINDEX_EXP_IFN(column2 >= 0 && column2 < this->getNrOfColumns(),
+                       "Invalid column");
 
-  int nRows = this->getNrOfRows();
-  // validate dts
-  for (size_t i = 1; i < dts.size(); ++i) {
-    INVALIDARG_EXP_IFN(dts[i - 1] < dts[i],
-                       "Invalid dts: They need to be sequential.");
-    INVALIDARG_EXP_IFN(dts[i] < nRows - 1,
-                       "Invalid dts: got requested " + std::to_string(dts[i]) +
-                         ", but only got " + std::to_string(nRows) + " rows.");
-  }
-
-  Eigen::ArrayXd colData =
+  const int nRows = this->getNrOfRows();
+  const size_t col1Idx = static_cast<size_t>(column1);
+  const size_t col2Idx = static_cast<size_t>(column2);
+  const Eigen::ArrayXd colData =
     Eigen::Map<Eigen::ArrayXd, Eigen::Unaligned>(
-      this->getData()[column1].data(), this->getData()[column1].size()) -
+      this->getData()[col1Idx].data(),
+      static_cast<Eigen::Index>(this->getData()[col1Idx].size())) -
     Eigen::Map<Eigen::ArrayXd, Eigen::Unaligned>(
-      this->getData()[column2].data(), this->getData()[column2].size());
-  RUNTIME_EXP_IFN(colData.size() == nRows, "Invalid row sizes");
+      this->getData()[col2Idx].data(),
+      static_cast<Eigen::Index>(this->getData()[col2Idx].size()));
 
-  std::vector<double> results;
-  results.reserve(dts.size());
-  for (size_t dt : dts) {
-    results.push_back(
-      (colData.segment(0, nRows - dt) * colData.segment(dt, nRows - dt))
-        .mean());
-  }
-
-  return results;
+  return autocorrelateArray(colData, nRows, dts);
 }
 
 }

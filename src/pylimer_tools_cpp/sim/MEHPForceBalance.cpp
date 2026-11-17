@@ -79,7 +79,6 @@ MEHPForceBalance::runForceRelaxation(
   /* array allocation */
   std::vector<Eigen::ArrayXi> independentVertexSets;
   double maxDistanceMoved = 0.0;
-  size_t indexOfMaxDistanceMoved = 0;
 
   Eigen::VectorXd oneOverSpringPartitions =
     this->assembleOneOverSpringPartition(this->initialConfig,
@@ -228,7 +227,6 @@ MEHPForceBalance::runForceRelaxation(
                                        partialSpringIndicesOfLinks[link_idx]);
         if (distanceMoved > maxDistanceMoved) {
           maxDistanceMoved = distanceMoved;
-          indexOfMaxDistanceMoved = link_idx;
         }
       }
     } else {
@@ -1167,7 +1165,7 @@ MEHPForceBalance::addSliplinksBasedOnCycles(const int maxLoopLength)
   loopMinCoords.reserve(loops.size());
   std::vector<std::array<double, 3>> loopMaxCoords;
   loopMaxCoords.reserve(loops.size());
-  pylimer_tools::entities::Box box = this->box;
+  pylimer_tools::entities::Box universeBox = this->box;
   for (std::vector<igraph_integer_t> loop : loops) {
     // max & min coordinates
     // TODO: implement, such that the max & min work also with infinite
@@ -1175,7 +1173,7 @@ MEHPForceBalance::addSliplinksBasedOnCycles(const int maxLoopLength)
     // assume each subsequent atom is bonded with a bond shorter
     // than half the bond
     Eigen::VectorXd alignedLoopCoordinates =
-      this->universe.getUnwrappedVertexCoordinates(loop, box);
+      this->universe.getUnwrappedVertexCoordinates(loop, universeBox);
 
     std::array<double, 3> minCoords;
     std::array<double, 3> maxCoords;
@@ -4656,7 +4654,7 @@ MEHPForceBalance::evaluateForceOnLink(
 Eigen::VectorXd
 MEHPForceBalance::evaluateSpringVectors(const ForceBalanceNetwork& net,
                                         const Eigen::VectorXd& u,
-                                        const bool is2D,
+                                        const bool use2D,
                                         const bool assumeLarge) const
 {
   assert(u.size() == net.coordinates.size());
@@ -4673,7 +4671,7 @@ MEHPForceBalance::evaluateSpringVectors(const ForceBalanceNetwork& net,
     this->box.handlePBC(springVectors);
   } else {
     Eigen::VectorXd partialSpringVectors =
-      this->evaluatePartialSpringVectors(net, u, is2D, assumeLarge);
+      this->evaluatePartialSpringVectors(net, u, use2D, assumeLarge);
 
     // CAREFUL: this assumes a certain direction
     for (size_t i = 0; i < net.nrOfPartialSprings; ++i) {
@@ -4683,7 +4681,7 @@ MEHPForceBalance::evaluateSpringVectors(const ForceBalanceNetwork& net,
   }
 
   // reset for 2D systems
-  if (is2D && net.nrOfSprings > 0) {
+  if (use2D && net.nrOfSprings > 0) {
     // springDistances(Eigen::seq(2, net.nrOfSprings, 3)) =
     //   Eigen::VectorXd::Zero(net.nrOfSprings);
     for (size_t i = 2; i < 3 * net.nrOfSprings; i += 3) {
@@ -4705,13 +4703,13 @@ MEHPForceBalance::evaluateSpringVectors(const ForceBalanceNetwork& net,
 Eigen::VectorXd
 MEHPForceBalance::evaluateSpringLengths(const ForceBalanceNetwork& net,
                                         const Eigen::VectorXd& u,
-                                        const bool is2D) const
+                                        const bool use2D) const
 {
   // first, the distances
   assert(u.size() == net.coordinates.size());
 
   Eigen::VectorXd partialSpringVectors =
-    this->evaluatePartialSpringVectors(net, u);
+    this->evaluatePartialSpringVectors(net, u, use2D, true);
   assert(partialSpringVectors.size() == net.nrOfPartialSprings * 3);
 
   Eigen::VectorXd springLengths = Eigen::VectorXd::Zero(net.nrOfSprings);
@@ -4760,7 +4758,7 @@ MEHPForceBalance::getNumIntraChainSlipLinks() const
 Eigen::VectorXd
 MEHPForceBalance::evaluatePartialSpringVectors(const ForceBalanceNetwork& net,
                                                const Eigen::VectorXd& u,
-                                               const bool is2D,
+                                               const bool use2D,
                                                const bool assumeLarge) const
 {
   // first, the distances
@@ -4777,7 +4775,7 @@ MEHPForceBalance::evaluatePartialSpringVectors(const ForceBalanceNetwork& net,
   }
 
   // reset for 2D systems
-  if (is2D) {
+  if (use2D) {
     // partialDistances(Eigen::seq(2, net.nrOfPartialSprings, 3)) =
     //   Eigen::VectorXd::Zero(net.nrOfPartialSprings);
     for (size_t i = 2; i < 3 * net.nrOfPartialSprings; i += 3) {
@@ -5789,24 +5787,24 @@ MEHPForceBalance::getWeightedPartialSpringLength(
  */
 bool
 MEHPForceBalance::ConvertNetwork(ForceBalanceNetwork& net,
-                                 const int crossLinkerType,
+                                 const int xlinkType,
                                  bool remove2functionalCrosslinkers,
                                  bool removeDanglingChains)
 {
   if (remove2functionalCrosslinkers) {
     for (pylimer_tools::entities::Atom xlinker :
-         this->universe.getAtomsOfType(crossLinkerType)) {
+         this->universe.getAtomsOfType(xlinkType)) {
       // change type of crosslinkers with a degree <= 2 to "normal",
       // non-crosslink beads
       size_t vertexId = this->universe.getIdxByAtomId(xlinker.getId());
       if (this->universe.computeFunctionalityForVertex(vertexId) <= 2) {
-        this->universe.setPropertyValue(vertexId, "type", crossLinkerType - 1);
+        this->universe.setPropertyValue(vertexId, "type", xlinkType - 1);
       }
     }
   }
 
   std::vector<pylimer_tools::entities::Molecule> crossLinkerChains =
-    this->universe.getChainsWithCrosslinker(crossLinkerType);
+    this->universe.getChainsWithCrosslinker(xlinkType);
 
   // need to include all but dangling and free chains in order to
   // model entanglement
@@ -5824,15 +5822,14 @@ MEHPForceBalance::ConvertNetwork(ForceBalanceNetwork& net,
                     "detected. Cannot work like that.");
     if (crossLinkerChains[i].getType() ==
         pylimer_tools::entities::MoleculeType::NETWORK_STRAND) {
-      assert(crossLinkerChains[i].getChainEnds(crossLinkerType, true).size() ==
-             2);
+      assert(crossLinkerChains[i].getChainEnds(xlinkType, true).size() == 2);
       useChain[i] = true;
       nrOfSprings += 1;
     } else if (crossLinkerChains[i].getType() ==
                pylimer_tools::entities::MoleculeType::PRIMARY_LOOP) {
       // when omitting f=2 crosslinks, it's possible that we end up with
       // "free" primary loops – let's not use those
-      if (crossLinkerChains[i].getAtomsOfType(crossLinkerType).size() > 0) {
+      if (crossLinkerChains[i].getAtomsOfType(xlinkType).size() > 0) {
         useChain[i] = true;
         nrOfSprings += 1;
       }
@@ -5854,7 +5851,7 @@ MEHPForceBalance::ConvertNetwork(ForceBalanceNetwork& net,
 
     if (useChain[i]) {
       std::vector<pylimer_tools::entities::Atom> endAtoms =
-        crossLinkerChains[i].getChainEnds(crossLinkerType);
+        crossLinkerChains[i].getChainEnds(xlinkType);
       for (const pylimer_tools::entities::Atom& endAtom : endAtoms) {
         size_t atomVertexIdx = this->universe.getIdxByAtomId(endAtom.getId());
         if (vertexIdToLinkIdx[atomVertexIdx] == -1) {
@@ -5868,10 +5865,10 @@ MEHPForceBalance::ConvertNetwork(ForceBalanceNetwork& net,
   size_t nrOfXlinks = currentLinkIdx;
 
   // crossLinkerUniverse.simplify();
-  pylimer_tools::entities::Box box = this->box;
-  net.L[0] = box.getLx();
-  net.L[1] = box.getLy();
-  net.L[2] = box.getLz();
+  pylimer_tools::entities::Box universeBox = this->box;
+  net.L[0] = universeBox.getLx();
+  net.L[1] = universeBox.getLy();
+  net.L[2] = universeBox.getLz();
   net.boxHalfs[0] = 0.5 * net.L[0];
   net.boxHalfs[1] = 0.5 * net.L[1];
   net.boxHalfs[2] = 0.5 * net.L[2];
@@ -5931,9 +5928,9 @@ MEHPForceBalance::ConvertNetwork(ForceBalanceNetwork& net,
       continue;
     }
     std::vector<pylimer_tools::entities::Atom> xlinkersOfChain =
-      crossLinkerChains[i].getAtomsOfType(crossLinkerType);
+      crossLinkerChains[i].getAtomsOfType(xlinkType);
     std::vector<pylimer_tools::entities::Atom> chainEnds =
-      crossLinkerChains[i].getChainEnds(crossLinkerType, true);
+      crossLinkerChains[i].getChainEnds(xlinkType, true);
     RUNTIME_EXP_IFN(chainEnds.size() == 2,
                     "Expected two chain ends when converting structure. Got " +
                       std::to_string(chainEnds.size()) + ".");
@@ -6006,7 +6003,7 @@ MEHPForceBalance::ConvertNetwork(ForceBalanceNetwork& net,
       net.partialToFullSpringIndex[spring_idx] = (spring_idx);
 
       expectedDistance = crossLinkerChains[i].getOverallBondSumFromTo(
-        atomIdFrom, atomIdTo, crossLinkerType, true);
+        atomIdFrom, atomIdTo, xlinkType, true);
       Eigen::Vector3d actualDistance =
         net.coordinates.segment(3 * nodeIdxTo, 3) -
         net.coordinates.segment(3 * nodeIdxFrom, 3);

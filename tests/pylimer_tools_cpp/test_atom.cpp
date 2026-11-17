@@ -77,41 +77,39 @@ TEST_CASE("Atoms can calculate distances", "[entity][Atom][header_tests]")
 
   SECTION("Move to the mean position in box")
   {
-    pe::Atom atom1 = pe::Atom(0, 0, 0.0, 0.0, 0.0, 0, 0, 0);
-    pe::Atom atom2 = pe::Atom(0, 0, 1.0, 1.0, 1.0, 0, 0, 0);
-    Eigen::Vector3d meanPosition_12 = atom1.meanPositionWith(atom2, unitBox);
+    pe::Atom a1 = pe::Atom(0, 0, 0.0, 0.0, 0.0, 0, 0, 0);
+    pe::Atom a2 = pe::Atom(0, 0, 1.0, 1.0, 1.0, 0, 0, 0);
+    Eigen::Vector3d meanPosition_12 = a1.meanPositionWith(a2, unitBox);
     CHECK(meanPosition_12[0] == 0.0);
     CHECK(meanPosition_12[1] == 0.0);
     CHECK(meanPosition_12[2] == 0.0);
 
-    pe::Atom atom3 = pe::Atom(0, 0, 0.5, 0.5, 0.5, 0, 0, 0);
-    Eigen::Vector3d meanPosition_13 = atom1.meanPositionWith(atom3, unitBox);
+    pe::Atom a3 = pe::Atom(0, 0, 0.5, 0.5, 0.5, 0, 0, 0);
+    Eigen::Vector3d meanPosition_13 = a1.meanPositionWith(a3, unitBox);
     CHECK(meanPosition_13[0] == 0.25);
     CHECK(meanPosition_13[1] == 0.25);
     CHECK(meanPosition_13[2] == 0.25);
 
     pe::Box unitNegBox = pe::Box(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
-    Eigen::Vector3d meanPosition_13n =
-      atom1.meanPositionWith(atom3, unitNegBox);
+    Eigen::Vector3d meanPosition_13n = a1.meanPositionWith(a3, unitNegBox);
     CHECK(meanPosition_13n[0] == 0.25);
     CHECK(meanPosition_13n[1] == 0.25);
     CHECK(meanPosition_13n[2] == 0.25);
 
     pe::Atom negAtom4 = pe::Atom(0, 0, -2.0, 0.0, 0.0, 0, 0, 0);
-    Eigen::Vector3d meanPosition_24 =
-      atom2.meanPositionWith(negAtom4, unitNegBox);
+    Eigen::Vector3d meanPosition_24 = a2.meanPositionWith(negAtom4, unitNegBox);
     CHECK(meanPosition_24[0] == -0.5);
     CHECK(meanPosition_24[1] == 0.5);
     CHECK(meanPosition_24[2] == 0.5);
 
     pe::Atom negAtom5 = pe::Atom(0, 0, -2.0, -5.0, 1.0, 1, 1, 1);
     Eigen::Vector3d meanPosition_25 =
-      atom2.meanPositionWithUnwrapped(negAtom5, unitNegBox);
+      a2.meanPositionWithUnwrapped(negAtom5, unitNegBox);
     CHECK(meanPosition_25[0] == ((20. - 2.) + 1.) / 2.);
     CHECK(meanPosition_25[1] == ((20. - 5.) + 1.) / 2.);
     CHECK(meanPosition_25[2] == (((20. + 1.) + 1.) / 2.) - 20.);
 
-    meanPosition_25 = atom2.meanPositionWithUnwrapped(negAtom5, unitNegBox);
+    meanPosition_25 = a2.meanPositionWithUnwrapped(negAtom5, unitNegBox);
     CHECK(meanPosition_25[0] == ((20. - 2.) + 1.) / 2.);
     CHECK(meanPosition_25[1] == ((20. - 5.) + 1.) / 2.);
     CHECK(meanPosition_25[2] == (((20. + 1.) + 1.) / 2.) - 20.);

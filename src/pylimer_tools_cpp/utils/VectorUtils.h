@@ -168,7 +168,7 @@ index_of(std::vector<T>& vec, const T val)
   if (it == vec.end()) {
     throw std::invalid_argument("Value must be present, not found in vector");
   }
-  return std::distance(vec.begin(), it);
+  return static_cast<size_t>(std::distance(vec.begin(), it));
 }
 
 /**
@@ -611,12 +611,13 @@ append(std::vector<T>& v,
 {
   INVALIDARG_EXP_IFN(startOffset >= 0 && endOffset >= 0,
                      "Invalid offset, needs to be non-negative.");
-  INVALIDARG_EXP_IFN(startOffset + endOffset <= other.size(),
-                     "Invalid offset, expected total to at most skip adding "
-                     "the whole vector, got " +
-                       std::to_string(startOffset) + " + " +
-                       std::to_string(endOffset) + " vs. a total size of " +
-                       std::to_string(other.size()) + ".");
+  INVALIDARG_EXP_IFN(
+    static_cast<size_t>(startOffset) + static_cast<size_t>(endOffset) <=
+      other.size(),
+    "Invalid offset, expected total to at most skip adding "
+    "the whole vector, got " +
+      std::to_string(startOffset) + " + " + std::to_string(endOffset) +
+      " vs. a total size of " + std::to_string(other.size()) + ".");
   v.insert(v.end(), other.begin() + startOffset, other.end() - endOffset);
 }
 
@@ -642,12 +643,13 @@ append_inverse(std::vector<T>& v,
 {
   INVALIDARG_EXP_IFN(startOffset >= 0 && endOffset >= 0,
                      "Invalid offset, needs to be non-negative.");
-  INVALIDARG_EXP_IFN(startOffset + endOffset <= other.size(),
-                     "Invalid offset, expected total to at most skip adding "
-                     "the whole vector, got " +
-                       std::to_string(startOffset) + " + " +
-                       std::to_string(endOffset) + " vs. a total size of " +
-                       std::to_string(other.size()) + ".");
+  INVALIDARG_EXP_IFN(
+    static_cast<size_t>(startOffset) + static_cast<size_t>(endOffset) <=
+      other.size(),
+    "Invalid offset, expected total to at most skip adding "
+    "the whole vector, got " +
+      std::to_string(startOffset) + " + " + std::to_string(endOffset) +
+      " vs. a total size of " + std::to_string(other.size()) + ".");
   v.insert(v.end(), other.rbegin() + startOffset, other.rend() - endOffset);
 }
 
@@ -670,12 +672,13 @@ prepend(std::vector<T>& v,
 {
   INVALIDARG_EXP_IFN(startOffset >= 0 && endOffset >= 0,
                      "Invalid offset, needs to be non-negative.");
-  INVALIDARG_EXP_IFN(startOffset + endOffset <= other.size(),
-                     "Invalid offset, expected total to at most skip adding "
-                     "the whole vector, got " +
-                       std::to_string(startOffset) + " + " +
-                       std::to_string(endOffset) + " vs. a total size of " +
-                       std::to_string(other.size()) + ".");
+  INVALIDARG_EXP_IFN(
+    static_cast<size_t>(startOffset) + static_cast<size_t>(endOffset) <=
+      other.size(),
+    "Invalid offset, expected total to at most skip adding "
+    "the whole vector, got " +
+      std::to_string(startOffset) + " + " + std::to_string(endOffset) +
+      " vs. a total size of " + std::to_string(other.size()) + ".");
   v.insert(v.begin(), other.begin() + startOffset, other.end() - endOffset);
 }
 
@@ -700,12 +703,13 @@ prepend_inverse(std::vector<T>& v,
 {
   INVALIDARG_EXP_IFN(startOffset >= 0 && endOffset >= 0,
                      "Invalid offset, needs to be non-negative.");
-  INVALIDARG_EXP_IFN(startOffset + endOffset <= other.size(),
-                     "Invalid offset, expected total to at most skip adding "
-                     "the whole vector, got " +
-                       std::to_string(startOffset) + " + " +
-                       std::to_string(endOffset) + " vs. a total size of " +
-                       std::to_string(other.size()) + ".");
+  INVALIDARG_EXP_IFN(
+    static_cast<size_t>(startOffset) + static_cast<size_t>(endOffset) <=
+      other.size(),
+    "Invalid offset, expected total to at most skip adding "
+    "the whole vector, got " +
+      std::to_string(startOffset) + " + " + std::to_string(endOffset) +
+      " vs. a total size of " + std::to_string(other.size()) + ".");
   v.insert(v.begin(), other.rbegin() + startOffset, other.rend() - endOffset);
 }
 
@@ -830,7 +834,7 @@ vector_approx_equal(const IN& v1,
   if (v1.size() != v2.size()) {
     return false;
   }
-  for (size_t i = 0; i < v1.size(); ++i) {
+  for (decltype(v1.size()) i = 0; i < v1.size(); ++i) {
     if (!APPROX_EQUAL(v1[i], v2[i], absEps)) {
       if (echo) {
         std::cout << "Detected unequality: v1[" << i << "] = " << v1[i]
@@ -852,7 +856,7 @@ vector_approx_rel_equal(const IN& v1,
   if (v1.size() != v2.size()) {
     return false;
   }
-  for (size_t i = 0; i < v1.size(); ++i) {
+  for (decltype(v1.size()) i = 0; i < v1.size(); ++i) {
     if (!APPROX_REL_EQUAL(v1[i], v2[i], eps)) {
       if (echo) {
         std::cout << "Detected unequality: v1[" << i << "] = " << v1[i]

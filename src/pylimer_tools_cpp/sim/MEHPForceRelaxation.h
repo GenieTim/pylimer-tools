@@ -419,8 +419,10 @@ public:
     Eigen::ArrayXb springIsActive =
       this->findActiveSprings(&this->forceRelaxationNetwork, tolerance);
     for (size_t i = 0; i < crossLinkerChains.size(); ++i) {
-      if (this->forceRelaxationNetwork.moleculeIdxToSpring[i] >= 0 &&
-          springIsActive[this->forceRelaxationNetwork.moleculeIdxToSpring[i]]) {
+      const Eigen::Index idx = static_cast<Eigen::Index>(i);
+      if (this->forceRelaxationNetwork.moleculeIdxToSpring[idx] >= 0 &&
+          springIsActive[static_cast<Eigen::Index>(
+            this->forceRelaxationNetwork.moleculeIdxToSpring[idx])]) {
         resultingChains.push_back(crossLinkerChains[i]);
       }
     }
@@ -697,9 +699,9 @@ public:
     Eigen::VectorXd lens =
       Eigen::VectorXd::Zero(this->currentSpringDistances.size() / 3);
 
-    for (size_t i = 0; i < this->currentSpringDistances.size() / 3; ++i) {
-      const double b = lens.segment(3 * static_cast<Eigen::Index>(i), 3).norm();
-      lens[static_cast<Eigen::Index>(i)] = b;
+    for (Eigen::Index i = 0; i < this->currentSpringDistances.size() / 3; ++i) {
+      const double b = this->currentSpringDistances.segment(3 * i, 3).norm();
+      lens[i] = b;
     }
 
     return lens;
@@ -743,7 +745,7 @@ protected:
    * @return false
    */
   bool ConvertNetwork(Network* net,
-                      const int crossLinkerType = 2,
+                      const int xlinkType = 2,
                       bool remove2functionalCrosslinkers = false,
                       bool removeDanglingChains = false);
 
@@ -773,7 +775,7 @@ protected:
         this->forceRelaxationNetwork.springsContourLength.size() * 3,
       "Invalid sizes.");
     Eigen::VectorXd gammaFactors(springDistances.size() / 3);
-    for (size_t i = 0; i < springDistances.size() / 3; ++i) {
+    for (Eigen::Index i = 0; i < springDistances.size() / 3; ++i) {
       gammaFactors(i) =
         springDistances.segment(3 * i, 3).squaredNorm() /
         (this->forceRelaxationNetwork.springsContourLength(i) * b02);
@@ -900,17 +902,19 @@ protected:
     // then, iteratively walk along the springs to mark those as "active"
     // that are connected to active springs
     bool hadChanged = true;
-    Eigen::ArrayXb nodeIsActive = Eigen::ArrayXb::Zero(net->nrOfNodes);
+    Eigen::ArrayXb nodeIsActive =
+      Eigen::ArrayXb::Zero(static_cast<Eigen::Index>(net->nrOfNodes));
     while (hadChanged) {
       hadChanged = false;
       for (size_t i = 0; i < net->nrOfNodes; ++i) {
-        if (nodeIsActive[i]) {
+        const Eigen::Index iIdx = static_cast<Eigen::Index>(i);
+        if (nodeIsActive[iIdx]) {
           continue; // already active
         }
         // check whether any of the springs connected to this node is active
         bool anyActive = false;
         for (const size_t spring_idx : net->springIndicesOfLinks[i]) {
-          if (activeSprings[spring_idx]) {
+          if (activeSprings[static_cast<Eigen::Index>(spring_idx)]) {
             anyActive = true;
             break;
           }
@@ -919,9 +923,9 @@ protected:
         // connected to it
         if (anyActive) {
           hadChanged = true;
-          nodeIsActive(i) = true;
+          nodeIsActive(iIdx) = true;
           for (const size_t spring_idx : net->springIndicesOfLinks[i]) {
-            activeSprings[spring_idx] = true;
+            activeSprings[static_cast<Eigen::Index>(spring_idx)] = true;
           }
         }
       }

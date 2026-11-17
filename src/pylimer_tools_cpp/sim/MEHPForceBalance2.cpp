@@ -4016,8 +4016,13 @@ MEHPForceBalance2::getPartialSpringIndicesOfLink(
 Eigen::VectorXd
 MEHPForceBalance2::getBondLengths()
 {
-  return this->evaluateSpringVectors(this->initialConfig,
-                                     this->currentDisplacements);
+  const Eigen::VectorXd springVectors = this->evaluateSpringVectors(
+    this->initialConfig, this->currentDisplacements);
+  Eigen::VectorXd lens = Eigen::VectorXd::Zero(springVectors.size() / 3);
+  for (Eigen::Index i = 0; i < springVectors.size() / 3; ++i) {
+    lens[i] = springVectors.segment(3 * i, 3).norm();
+  }
+  return lens;
 }
 
 Eigen::VectorXd

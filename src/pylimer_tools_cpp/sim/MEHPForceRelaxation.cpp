@@ -38,7 +38,6 @@ MEHPForceRelaxation::runForceRelaxation(const char* algorithm,
   }
 
   const Network net = this->forceRelaxationNetwork;
-  const bool is2D = this->is2D;
 
   /* array allocation */
   std::vector<double> u0 =
@@ -98,7 +97,7 @@ MEHPForceRelaxation::runForceRelaxation(const char* algorithm,
   this->forceEvaluator->setNetwork(this->forceRelaxationNetwork);
   this->simulationSuggestsRerun = require_rerun;
   this->currentSpringDistances =
-    this->evaluateSpringDistances(&this->forceRelaxationNetwork, is2D);
+    this->evaluateSpringDistances(&this->forceRelaxationNetwork, this->is2D);
 
   this->exitReason = ExitReason::OTHER;
   if (nloptException != nullptr) {
@@ -274,12 +273,12 @@ MEHPForceRelaxation::findActiveSprings(const Network* net,
 
 bool
 MEHPForceRelaxation::ConvertNetwork(Network* net,
-                                    const int crossLinkerType,
+                                    const int xlinkType,
                                     bool remove2functionalCrosslinkers,
                                     bool removeDanglingChains)
 {
   std::vector<pylimer_tools::entities::Atom> springEndAtoms =
-    this->universe.getAtomsOfType(crossLinkerType);
+    this->universe.getAtomsOfType(xlinkType);
 
   if (remove2functionalCrosslinkers) {
     for (pylimer_tools::entities::Atom xlinker : springEndAtoms) {
@@ -287,14 +286,14 @@ MEHPForceRelaxation::ConvertNetwork(Network* net,
       // non-crosslink beads
       size_t vertexId = this->universe.getIdxByAtomId(xlinker.getId());
       if (this->universe.computeFunctionalityForVertex(vertexId) <= 2) {
-        this->universe.setPropertyValue(vertexId, "type", crossLinkerType - 1);
+        this->universe.setPropertyValue(vertexId, "type", xlinkType - 1);
       }
     }
-    springEndAtoms = this->universe.getAtomsOfType(crossLinkerType);
+    springEndAtoms = this->universe.getAtomsOfType(xlinkType);
   }
 
   std::vector<pylimer_tools::entities::Molecule> crossLinkerChains =
-    this->universe.getChainsWithCrosslinker(crossLinkerType);
+    this->universe.getChainsWithCrosslinker(xlinkType);
   net->moleculeIdxToSpring =
     Eigen::VectorXi::Constant(crossLinkerChains.size(), -1);
 
@@ -306,12 +305,11 @@ MEHPForceRelaxation::ConvertNetwork(Network* net,
     this->universe.getNrOfAtoms(), false);
   for (size_t i = 0; i < crossLinkerChains.size(); ++i) {
     std::vector<pylimer_tools::entities::Atom> endAtoms =
-      crossLinkerChains[i].getChainEnds(crossLinkerType, true);
+      crossLinkerChains[i].getChainEnds(xlinkType, true);
     for (pylimer_tools::entities::Atom endAtom : endAtoms) {
       size_t endAtomVertexId =
         static_cast<size_t>(this->universe.getIdxByAtomId(endAtom.getId()));
-      if (endAtom.getType() != crossLinkerType &&
-          !vertexAdded[endAtomVertexId]) {
+      if (endAtom.getType() != xlinkType && !vertexAdded[endAtomVertexId]) {
         springEndAtoms.push_back(endAtom);
         vertexAdded[endAtomVertexId] = true;
       }
@@ -375,9 +373,9 @@ MEHPForceRelaxation::ConvertNetwork(Network* net,
       continue;
     }
     std::vector<pylimer_tools::entities::Atom> xlinkersOfChain =
-      crossLinkerChains[i].getAtomsOfType(crossLinkerType);
+      crossLinkerChains[i].getAtomsOfType(xlinkType);
     std::vector<pylimer_tools::entities::Atom> endsOfChain =
-      crossLinkerChains[i].getChainEnds(crossLinkerType, true);
+      crossLinkerChains[i].getChainEnds(xlinkType, true);
     assert(endsOfChain.size() == 2);
     long int nodeIdxFrom = atomIdToNode.at(endsOfChain[0].getId());
     long int nodeIdxTo = atomIdToNode.at(endsOfChain[1].getId());
@@ -411,7 +409,7 @@ MEHPForceRelaxation::ConvertNetwork(Network* net,
       std::vector<pylimer_tools::entities::Atom> allChainAtoms =
         crossLinkerChains[i].getAtomsLinedUp();
       targetDistances.segment(3 * spring_idx, 3) =
-        crossLinkerChains[i].getOverallBondSum(crossLinkerType);
+        crossLinkerChains[i].getOverallBondSum(xlinkType);
 
       if (atomIdToNode.at(allChainAtoms[0].getId()) == nodeIdxTo) {
         targetDistances.segment(3 * spring_idx, 3) *= -1;

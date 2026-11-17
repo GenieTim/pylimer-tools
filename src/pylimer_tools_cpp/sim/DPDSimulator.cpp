@@ -628,7 +628,7 @@ DPDSimulator::computeForces(
   const Eigen::VectorXd& velocities,
   pylimer_tools::utils::PerformanceTimer<
     DPDPerformanceSections::NUM_PERFORMANCE_SECTIONS>& timer,
-  const double dt,
+  const double timeStep,
   const double cutoff)
 {
   // initialisation
@@ -711,7 +711,7 @@ DPDSimulator::computeForces(
     std::uniform_real_distribution<double> localDist =
       this->uniform_rand_mean0std1;
 
-    const double sigmaOverSqrtDt = this->sigma / std::sqrt(dt);
+    const double sigmaOverSqrtDt = this->sigma / std::sqrt(timeStep);
     // pre-allocate the neighbor indices array
     Eigen::ArrayXi neighbors = Eigen::ArrayXi(static_cast<int>(
       this->numAtoms *

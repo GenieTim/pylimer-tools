@@ -81,7 +81,8 @@ RouseBrownianSimulator::initializeFromEdges(
 
   std::vector<Eigen::Triplet<double>> triplets;
   triplets.reserve(springFrom.size() * 4);
-  Eigen::VectorXd diag = Eigen::VectorXd::Zero(numNodes_);
+  Eigen::VectorXd diag =
+    Eigen::VectorXd::Zero(static_cast<Eigen::Index>(numNodes_));
 
   for (size_t e = 0; e < springFrom.size(); ++e) {
     size_t u = springFrom[e];
@@ -103,7 +104,8 @@ RouseBrownianSimulator::initializeFromEdges(
     }
   }
 
-  L_.resize(numNodes_, numNodes_);
+  L_.resize(static_cast<Eigen::Index>(numNodes_),
+            static_cast<Eigen::Index>(numNodes_));
   L_.setFromTriplets(triplets.begin(), triplets.end());
 }
 
@@ -113,7 +115,7 @@ RouseBrownianSimulator::updateShiftedMatrixAndFactorization()
   // A = I + dt * (k / gamma) * L
   double alpha = dt_ * (k_ / gamma_);
   std::vector<Eigen::Triplet<double>> triplets;
-  triplets.reserve(L_.nonZeros() + numNodes_);
+  triplets.reserve(static_cast<size_t>(L_.nonZeros()) + numNodes_);
 
   for (int col = 0; col < L_.outerSize(); ++col) {
     for (Eigen::SparseMatrix<double>::InnerIterator it(L_, col); it; ++it) {

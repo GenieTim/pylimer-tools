@@ -58,7 +58,6 @@ andersonDarlingNormalDistributionTest(Eigen::VectorXd observations,
                                       const double expectedVariance)
 {
   std::ranges::sort(observations);
-  const double sampleMean = observations.mean();
   const double n = observations.size();
 
   // if (std::abs(sampleMean) < 1e-4 || std::abs(expectedMean) < 1e-4) {
@@ -1832,18 +1831,35 @@ TEST_CASE("linkStrandsToStrandsToConversion also works with free strands",
                "with free strands\""
             << std::endl;
 
-  pu::MCUniverseGenerator generator = pu::MCUniverseGenerator(80.0, 80.0, 80.0);
-  generator.setSeed(12345);
+  SECTION("Star crosslinkers added before free strands")
+  {
+    pu::MCUniverseGenerator generator =
+      pu::MCUniverseGenerator(80.0, 80.0, 80.0);
+    generator.setSeed(12345);
+    generator.setBeadDistance(1.0);
+    generator.configNrOfMCSteps(0);
+    generator.addStarCrosslinkers(150, 4, 20, 2, 1);
+    generator.addStrands(50, 15, 1);
 
-  generator.setBeadDistance(1.0);
+    CHECK_NOTHROW(generator.linkStrandsToStrandsToConversion(0.9));
+    CHECK_NOTHROW(generator.validateInternalState());
+    CHECK(generator.getCurrentNrOfAvailableCrosslinkSites() == 0);
+  }
 
-  generator.configNrOfMCSteps(0);
+  SECTION("Free strands added before star crosslinkers")
+  {
+    pu::MCUniverseGenerator generator =
+      pu::MCUniverseGenerator(80.0, 80.0, 80.0);
+    generator.setSeed(12345);
+    generator.setBeadDistance(1.0);
+    generator.configNrOfMCSteps(0);
+    generator.addStrands(50, 15, 1);
+    generator.addStarCrosslinkers(150, 4, 20, 2, 1);
 
-  generator.addStarCrosslinkers(150, 4, 20, 2, 1);
-
-  generator.addStrands(50, 15, 1);
-
-  CHECK_NOTHROW(generator.linkStrandsToStrandsToConversion(0.9));
+    CHECK_NOTHROW(generator.linkStrandsToStrandsToConversion(0.9));
+    CHECK_NOTHROW(generator.validateInternalState());
+    CHECK(generator.getCurrentNrOfAvailableCrosslinkSites() == 0);
+  }
 }
 
 TEST_CASE(

@@ -3605,19 +3605,20 @@ evaluateSpringStrainAndInactivityMetal(size_t numNodes,
 Eigen::VectorXd
 getGpuResidentCoordinates(size_t numCoords)
 {
+  const Eigen::Index nCoords = static_cast<Eigen::Index>(numCoords);
   MetalFBSBackend& backend = MetalFBSBackend::instance();
   if (!backend.isAvailable()) {
-    return Eigen::VectorXd::Zero(numCoords);
+    return Eigen::VectorXd::Zero(nCoords);
   }
 
   id<MTLBuffer> bufX = backend.getBufX();
   if (!bufX) {
-    return Eigen::VectorXd::Zero(numCoords);
+    return Eigen::VectorXd::Zero(nCoords);
   }
 
   float* xPtr = static_cast<float*>([bufX contents]);
-  Eigen::VectorXd res(numCoords);
-  for (size_t i = 0; i < numCoords; ++i) {
+  Eigen::VectorXd res(nCoords);
+  for (Eigen::Index i = 0; i < nCoords; ++i) {
     res[i] = static_cast<double>(xPtr[i]);
   }
   return res;

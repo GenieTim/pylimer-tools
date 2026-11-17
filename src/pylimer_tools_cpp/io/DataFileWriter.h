@@ -563,8 +563,8 @@ namespace utils {
       for (const pylimer_tools::entities::Atom& crossLinker : crossLinkers) {
         nAtomsOutput += 1;
         this->writeAtom(file, crossLinker, 0, nAtomsOutput);
-        vertexHasBeenOutput[this->universe.getIdxByAtomId(
-          crossLinker.getId())] = true;
+        vertexHasBeenOutput[static_cast<size_t>(
+          this->universe.getIdxByAtomId(crossLinker.getId()))] = true;
       }
 
       // then, we can output all others
@@ -582,8 +582,9 @@ namespace utils {
 
         for (size_t i = 0; i < atoms.size(); ++i) {
           pylimer_tools::entities::Atom atom = atoms[i];
-          if (vertexHasBeenOutput[this->universe.getIdxByAtomId(
-                atom.getId())]) {
+          const size_t vertexIdx =
+            static_cast<size_t>(this->universe.getIdxByAtomId(atom.getId()));
+          if (vertexHasBeenOutput[vertexIdx]) {
             continue;
           }
           nAtomsOutput += 1;
@@ -595,8 +596,7 @@ namespace utils {
                                     : nMoleculesOutput;
 
           this->writeAtom(file, atom, moleculeIdx, nAtomsOutput);
-          vertexHasBeenOutput[this->universe.getIdxByAtomId(atom.getId())] =
-            true;
+          vertexHasBeenOutput[vertexIdx] = true;
         }
       }
 

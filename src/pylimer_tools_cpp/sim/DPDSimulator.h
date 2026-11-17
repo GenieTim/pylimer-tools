@@ -238,7 +238,7 @@ namespace dpd {
       const Eigen::VectorXd& velocities,
       pylimer_tools::utils::PerformanceTimer<
         DPDPerformanceSections::NUM_PERFORMANCE_SECTIONS>& timer,
-      const double dt = 0.06,
+      const double timeStep = 0.06,
       const double cutoff =
         1.0); // unfortunately not const because of the random nr generator
 
@@ -407,26 +407,34 @@ namespace dpd {
       this->allowRelocationInNetwork = allowReloc;
       this->isRelocationTarget.setConstant(false);
       this->chainEndIndices.clear();
-      for (size_t i = 0; i < this->numAtoms; ++i) {
+      for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(this->numAtoms);
+           ++i) {
         if (this->idxFunctionalities[i] < 2) {
           this->isRelocationTarget[i] = true;
-          this->chainEndIndices.push_back(i);
-        } else if (allowReloc && this->atomTypes[i] != this->crossLinkerType) {
+          this->chainEndIndices.push_back(static_cast<size_t>(i));
+        } else if (allowReloc && this->atomTypes[static_cast<size_t>(i)] !=
+                                   this->crossLinkerType) {
           // check if this is a bead that's connected to a crosslinker
           if (this->idxFunctionalities[i] == 2) {
-            // this "any of" here might be a bit overkill, given that we know
-            // that there are only two cases
-            bool oneOfTheBeadsIsXlink = std::ranges::any_of(
-              this->bondsOfIndex[i], [&](const size_t bondIdx) {
-                assert(this->bondPartnersA[bondIdx] == i ||
-                       this->bondPartnersB[bondIdx] == i);
-                return this->atomTypes[this->bondPartnersA[bondIdx]] ==
-                         this->crossLinkerType ||
-                       this->atomTypes[this->bondPartnersB[bondIdx]] ==
-                         this->crossLinkerType;
-              });
-            this->isRelocationTarget[i] = true;
-            this->chainEndIndices.push_back(i);
+            const bool oneOfTheBeadsIsXlink =
+              std::ranges::any_of(this->bondsOfIndex[static_cast<size_t>(i)],
+                                  [&](const size_t bondIdx) {
+                                    if (bondIdx >= this->numBonds) {
+                                      return false;
+                                    }
+                                    assert(this->bondPartnersA[bondIdx] == i ||
+                                           this->bondPartnersB[bondIdx] == i);
+                                    return this->atomTypes[static_cast<size_t>(
+                                             this->bondPartnersA[bondIdx])] ==
+                                             this->crossLinkerType ||
+                                           this->atomTypes[static_cast<size_t>(
+                                             this->bondPartnersB[bondIdx])] ==
+                                             this->crossLinkerType;
+                                  });
+            if (oneOfTheBeadsIsXlink) {
+              this->isRelocationTarget[i] = true;
+              this->chainEndIndices.push_back(static_cast<size_t>(i));
+            }
           }
         }
       }
@@ -572,28 +580,40 @@ namespace dpd {
      *
      * @return Number of particles (same as getNumAtoms)
      */
-    size_t getNumParticles() override { return this->numAtoms; }
+    size_t getNumParticles() override
+    {
+      return static_cast<size_t>(this->numAtoms);
+    }
 
     /**
      * @brief Get the current number of slip-springs
      *
      * @return Number of slip-springs in the system
      */
-    size_t getNumSlipSprings() const { return this->numSlipSprings; }
+    size_t getNumSlipSprings() const
+    {
+      return static_cast<size_t>(this->numSlipSprings);
+    }
 
     /**
      * @brief Get the number of regular bonds (excluding slip-springs)
      *
      * @return Number of regular bonds
      */
-    size_t getNumBonds() override { return this->numBonds; }
+    size_t getNumBonds() override
+    {
+      return static_cast<size_t>(this->numBonds);
+    }
 
     /**
      * @brief Get the number of extra bonds (slip-springs)
      *
      * @return Number of slip-springs
      */
-    size_t getNumExtraBonds() override { return this->numSlipSprings; }
+    size_t getNumExtraBonds() override
+    {
+      return static_cast<size_t>(this->numSlipSprings);
+    }
 
     /**
      * @brief Get the number of bonds to be formed during simulation
@@ -607,7 +627,10 @@ namespace dpd {
      *
      * @return Number of atoms
      */
-    size_t getNumAtoms() override { return this->numAtoms; }
+    size_t getNumAtoms() override
+    {
+      return static_cast<size_t>(this->numAtoms);
+    }
 
     /**
      * @brief Get the number of extra atoms (always 0 for DPD simulations)
@@ -717,12 +740,12 @@ namespace dpd {
 #ifdef OPENMP_FOUND
       int nThreads =
         this->numOmpThreads > 0 ? this->numOmpThreads : omp_get_max_threads();
-      this->threadRNGs.resize(nThreads);
+      this->threadRNGs.resize(static_cast<size_t>(nThreads));
       for (int t = 0; t < nThreads; ++t) {
         std::string threadSeed =
           this->currentSeedString + "_omp_thread_" + std::to_string(t);
         std::seed_seq seedSeq(threadSeed.begin(), threadSeed.end());
-        this->threadRNGs[t] = std::mt19937(seedSeq);
+        this->threadRNGs[static_cast<size_t>(t)] = std::mt19937(seedSeq);
       }
 #endif
     }

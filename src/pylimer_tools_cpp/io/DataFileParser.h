@@ -170,7 +170,6 @@ private:
       CC2 // Can be extended for more species as needed
     };
     std::vector<FieldType> fields;
-    std::string format;
   };
 
   void readNs(const std::string& line);

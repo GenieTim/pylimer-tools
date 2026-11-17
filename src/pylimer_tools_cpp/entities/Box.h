@@ -339,7 +339,7 @@ public:
                          "Require distances to be a multiple of 3 to handle "
                          "PBC for sheared box.");
       // scaled coordinates in the initial cubic box
-      for (int j = 0; j < distances.size() / 3; ++j) {
+      for (decltype(distances.size()) j = 0; j < distances.size() / 3; ++j) {
         if (this->getShearDirection() == 0) {
           distances[3 * j] -= this->getShearMagnitude() * distances[3 * j + 1];
         }
@@ -357,7 +357,7 @@ public:
     // back to the physical space
     if (sheared) {
       // scaled coordinates in the initial cubic box
-      for (int j = 0; j < distances.size() / 3; ++j) {
+      for (decltype(distances.size()) j = 0; j < distances.size() / 3; ++j) {
         if (this->getShearDirection() == 0) {
           distances[3 * j] += this->getShearMagnitude() * distances[3 * j + 1];
         }

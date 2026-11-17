@@ -89,6 +89,8 @@ Universe::Universe(Universe&& other) noexcept
   , timestep(other.timestep)
   , NAtoms(other.NAtoms)
   , NBonds(other.NBonds)
+  , box(other.box)
+  , atomIdToVertexIdx(std::move(other.atomIdToVertexIdx))
   , angleFrom(std::move(other.angleFrom))
   , angleTo(std::move(other.angleTo))
   , angleVia(std::move(other.angleVia))
@@ -98,8 +100,6 @@ Universe::Universe(Universe&& other) noexcept
   , dihedralAngleVia2(std::move(other.dihedralAngleVia2))
   , dihedralAngleTo(std::move(other.dihedralAngleTo))
   , dihedralAngleType(std::move(other.dihedralAngleType))
-  , box(other.box)
-  , atomIdToVertexIdx(std::move(other.atomIdToVertexIdx))
   , massPerType(std::move(other.massPerType))
 {
   other.clearCaches();
@@ -3440,6 +3440,8 @@ namespace {
         return molType == MoleculeType::FREE_CHAIN;
       case StrandCategory::PRIMARY_LOOP:
         return molType == MoleculeType::PRIMARY_LOOP;
+      default:
+        return false;
     }
     return false;
   }

@@ -637,7 +637,8 @@ public:
     const Box& box,
     const std::vector<igraph_integer_t>& vertexIds) const
   {
-    if (vertexIds.size() * 3 != results.size()) {
+    if (static_cast<decltype(results.size())>(vertexIds.size() * 3) !=
+        results.size()) {
       throw std::invalid_argument(
         "The results must have size 3*the number of atoms to query.");
     }
@@ -662,7 +663,7 @@ public:
     results[0] = lastCoords[0];
     results[1] = lastCoords[1];
     results[2] = lastCoords[2];
-    for (int i = 0; i < distances.size(); i += 3) {
+    for (Eigen::Index i = 0; i < distances.size(); i += 3) {
       // TODO: rather than relying on the vertex ids to be subsequently
       // connected, it would be nice if we could support graph-like structures
       // as well (check if igraph_is_tree, then, start with root and do e.g.
@@ -672,9 +673,10 @@ public:
       // in order to compensate/ignore the image flags while still enabling
       // larger end-to-end distances than the box size
       lastCoords += distances.segment(i, 3);
-      results[i + 3] = lastCoords[0];
-      results[i + 4] = lastCoords[1];
-      results[i + 5] = lastCoords[2];
+      using ResIdx = decltype(results.size());
+      results[static_cast<ResIdx>(i + 3)] = lastCoords[0];
+      results[static_cast<ResIdx>(i + 4)] = lastCoords[1];
+      results[static_cast<ResIdx>(i + 5)] = lastCoords[2];
     }
 
     return results;

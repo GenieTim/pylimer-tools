@@ -110,7 +110,7 @@ namespace sim {
 
 #ifndef NDEBUG
     // validate bond lengths
-    for (size_t i = 1; i < nBeads; ++i) {
+    for (Eigen::Index i = 1; i < static_cast<Eigen::Index>(nBeads); ++i) {
       double bondLen2 =
         (coordinates.segment(3 * i, 3) - coordinates.segment(3 * (i - 1), 3))
           .squaredNorm();

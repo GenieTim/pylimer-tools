@@ -12,15 +12,21 @@ namespace utils {
     std::vector<int> counts = {};
 
   public:
-    explicit IndexCounter(const int size = 0) { this->counts.resize(size, 0); }
+    explicit IndexCounter(const int size = 0)
+    {
+      if (size > 0) {
+        this->counts.resize(static_cast<size_t>(size), 0);
+      }
+    }
 
     void increment(const int index)
     {
-      if (index >= this->counts.size()) {
-        this->counts.resize(index + 1, 0);
+      const size_t idx = static_cast<size_t>(index);
+      if (idx >= this->counts.size()) {
+        this->counts.resize(idx + 1, 0);
       }
 
-      this->counts[index] += 1;
+      this->counts[idx] += 1;
     }
 
     std::unordered_map<int, int> asMap() const
@@ -28,7 +34,7 @@ namespace utils {
       std::unordered_map<int, int> result;
       for (size_t i = 0; i < this->counts.size(); ++i) {
         if (this->counts[i] > 0) {
-          result[i] = this->counts[i];
+          result[static_cast<int>(i)] = this->counts[i];
         }
       }
       return result;
@@ -49,7 +55,12 @@ namespace utils {
     std::unordered_map<T, IntDefaultZero> counts;
 
   public:
-    explicit Counter(int size = 0) { this->counts.reserve(size); }
+    explicit Counter(int size = 0)
+    {
+      if (size > 0) {
+        this->counts.reserve(static_cast<size_t>(size));
+      }
+    }
 
     void increment(const T& value) { this->counts[value].i += 1; }
 

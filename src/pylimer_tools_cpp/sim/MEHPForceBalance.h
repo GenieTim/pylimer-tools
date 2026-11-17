@@ -338,12 +338,12 @@ public:
       for (size_t i = 0;
            i < fb.initialConfig.localToGlobalSpringIndex[springIdx].size();
            ++i) {
-        size_t partialSpringIdx =
+        size_t localPartialSpringIdx =
           fb.initialConfig.localToGlobalSpringIndex[springIdx][i];
         overallDistanceNow +=
           fb.evaluatePartialSpringDistance(fb.initialConfig,
                                            fb.currentDisplacements,
-                                           partialSpringIdx,
+                                           localPartialSpringIdx,
                                            fb.is2D,
                                            false);
       }
@@ -957,7 +957,10 @@ public:
     this->defaultBondLength = meanBondLength;
   }
 
-  void configSpringConstant(const double kappa = 1.0) { this->kappa = kappa; }
+  void configSpringConstant(const double newKappa = 1.0)
+  {
+    this->kappa = newKappa;
+  }
 
   void configEntanglementType(const int newEntanglementType = -1)
   {
@@ -1569,7 +1572,7 @@ public:
    */
   Eigen::VectorXd evaluateSpringVectors(const ForceBalanceNetwork& net,
                                         const Eigen::VectorXd& u,
-                                        const bool is2D,
+                                        const bool use2D,
                                         const bool assumeBoxLarge) const;
 
   Eigen::VectorXd evaluateSpringVectors(const ForceBalanceNetwork& net,
@@ -1588,7 +1591,7 @@ public:
    */
   Eigen::VectorXd evaluateSpringLengths(const ForceBalanceNetwork& net,
                                         const Eigen::VectorXd& u,
-                                        const bool is2D) const;
+                                        const bool use2D) const;
 
   /**
    * @brief Compute one spring length
@@ -1642,7 +1645,7 @@ public:
 
   Eigen::VectorXd evaluatePartialSpringVectors(const ForceBalanceNetwork& net,
                                                const Eigen::VectorXd& u,
-                                               const bool is2D,
+                                               const bool use2D,
                                                const bool assumeLarge) const;
 
   Eigen::VectorXd evaluatePartialSpringVectors(const ForceBalanceNetwork& net,
@@ -2339,8 +2342,8 @@ public:
     Eigen::VectorXd lens =
       Eigen::VectorXd::Zero(this->currentSpringVectors.size() / 3);
 
-    for (size_t i = 0; i < this->currentSpringVectors.size() / 3; ++i) {
-      const double b = lens.segment(3 * i, 3).norm();
+    for (Eigen::Index i = 0; i < this->currentSpringVectors.size() / 3; ++i) {
+      const double b = this->currentSpringVectors.segment(3 * i, 3).norm();
       lens[i] = b;
     }
 
@@ -2416,7 +2419,7 @@ protected:
    * @return false
    */
   bool ConvertNetwork(ForceBalanceNetwork& net,
-                      const int crossLinkerType,
+                      const int xlinkType,
                       bool remove2functionalCrosslinkers = false,
                       bool removeDanglingChains = false);
 
@@ -3081,8 +3084,9 @@ protected:
     const std::vector<size_t> fullSpringIndices =
       this->getAllFullSpringIndicesAlong(net, springIdx);
     std::vector<size_t> result;
-    for (const size_t springIdx : fullSpringIndices) {
-      for (size_t partialSpringIdx : net.localToGlobalSpringIndex[springIdx]) {
+    for (const size_t fullSpringIdx : fullSpringIndices) {
+      for (size_t partialSpringIdx :
+           net.localToGlobalSpringIndex[fullSpringIdx]) {
         result.push_back(partialSpringIdx);
       }
     }

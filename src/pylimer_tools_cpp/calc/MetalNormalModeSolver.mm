@@ -611,12 +611,13 @@ computeChebyshevMomentsKPMMetal(const Eigen::SparseMatrix<double>& mat,
     float w_val = static_cast<float>(w);
 
     // Convert sparse matrix to CSR format in float
+    const size_t nnz = static_cast<size_t>(mat.nonZeros());
     std::vector<uint32_t> row_ptrs(N + 1);
-    std::vector<uint32_t> col_indices(mat.nonZeros());
-    std::vector<float> values(mat.nonZeros());
+    std::vector<uint32_t> col_indices(nnz);
+    std::vector<float> values(nnz);
     for (uint32_t i = 0; i <= N; ++i)
       row_ptrs[i] = static_cast<uint32_t>(mat.outerIndexPtr()[i]);
-    for (int i = 0; i < mat.nonZeros(); ++i) {
+    for (size_t i = 0; i < nnz; ++i) {
       col_indices[i] = static_cast<uint32_t>(mat.innerIndexPtr()[i]);
       values[i] = static_cast<float>(mat.valuePtr()[i]);
     }
@@ -698,7 +699,7 @@ computeChebyshevMomentsKPMMetal(const Eigen::SparseMatrix<double>& mat,
       if (batchSize >= 8 && rem >= 8 && pStepFirstB8 && pStepRecB8 && pDotB8) {
         // Multi-RHS B=8 Block SpMM batch
         std::vector<float> v_b8(8 * N);
-        for (int b = 0; b < 8; ++b) {
+        for (uint32_t b = 0; b < 8; ++b) {
           for (uint32_t i = 0; i < N; ++i) {
             v_b8[8 * i + b] = static_cast<float>(coin(rng) ? scale : -scale);
           }
@@ -790,7 +791,7 @@ computeChebyshevMomentsKPMMetal(const Eigen::SparseMatrix<double>& mat,
         for (size_t m = 0; m < numMoments; ++m) {
           float sum = 0.0f;
           for (uint32_t tg = 0; tg < num_tgs; ++tg) {
-            for (int b = 0; b < 8; ++b) {
+            for (size_t b = 0; b < 8; ++b) {
               sum += parts[(m * num_tgs + tg) * 8 + b];
             }
           }
@@ -801,7 +802,7 @@ computeChebyshevMomentsKPMMetal(const Eigen::SparseMatrix<double>& mat,
       } else if (batchSize >= 4 && rem >= 4 && pStepFirstB4 && pStepRecB4 && pDotB4) {
         // Multi-RHS B=4 Block SpMM batch
         std::vector<float> v_b4(4 * N);
-        for (int b = 0; b < 4; ++b) {
+        for (uint32_t b = 0; b < 4; ++b) {
           for (uint32_t i = 0; i < N; ++i) {
             v_b4[4 * i + b] = static_cast<float>(coin(rng) ? scale : -scale);
           }
@@ -890,7 +891,7 @@ computeChebyshevMomentsKPMMetal(const Eigen::SparseMatrix<double>& mat,
         for (size_t m = 0; m < numMoments; ++m) {
           float sum = 0.0f;
           for (uint32_t tg = 0; tg < num_tgs; ++tg) {
-            for (int b = 0; b < 4; ++b) {
+            for (size_t b = 0; b < 4; ++b) {
               sum += parts[(m * num_tgs + tg) * 4 + b];
             }
           }

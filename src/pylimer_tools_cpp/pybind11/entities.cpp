@@ -30,7 +30,7 @@ struct MoleculeIterator
 
   Atom next()
   {
-    if (index == molecule.getLength()) {
+    if (index == static_cast<size_t>(molecule.getLength())) {
       throw py::stop_iteration();
     }
     return molecule[index++];
@@ -702,7 +702,8 @@ init_pylimer_bound_entities(py::module_& m)
     .def(
       "get_atom_by_id",
       [](const Molecule& molecule, const size_t id) {
-        return molecule.getAtomByVertexIdx(molecule.getIdxByAtomId(id));
+        return molecule.getAtomByVertexIdx(
+          molecule.getIdxByAtomId(static_cast<long>(id)));
       },
       R"pbdoc(
             Get an atom by its id.
@@ -899,7 +900,7 @@ init_pylimer_bound_entities(py::module_& m)
     .def(
       "__getitem__",
       [](const Molecule& molecule, const size_t index) {
-        if (index > molecule.getLength()) {
+        if (index > static_cast<size_t>(molecule.getLength())) {
           throw py::index_error();
         }
         return molecule[index];
@@ -2044,7 +2045,8 @@ init_pylimer_bound_entities(py::module_& m)
         if (index > u.getNrOfAtoms()) {
           throw py::index_error();
         }
-        return u.getAtom(u.getAtomIdByIdx(index));
+        return u.getAtom(
+          u.getAtomIdByIdx(static_cast<igraph_integer_t>(index)));
       },
       R"pbdoc(
        Access an atom by its vertex index.

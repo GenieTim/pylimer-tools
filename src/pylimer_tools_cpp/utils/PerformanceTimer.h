@@ -173,26 +173,25 @@ public:
     std::chrono::duration duration = end - this->startTime;
     long int us =
       (std::chrono::duration_cast<std::chrono::microseconds>(duration)).count();
+    const size_t secIdx = static_cast<size_t>(this->currentSection);
     const double numMeasurementsBefore =
-      static_cast<double>(this->sectionNumMeasurements[this->currentSection]);
-    this->sectionNumMeasurements[this->currentSection] += 1;
+      static_cast<double>(this->sectionNumMeasurements[secIdx]);
+    this->sectionNumMeasurements[secIdx] += 1;
     double denominator =
-      1. /
-      static_cast<double>(this->sectionNumMeasurements[this->currentSection]);
+      1. / static_cast<double>(this->sectionNumMeasurements[secIdx]);
     // record the new variance/standard deviation
     // see e.g.
     // https://math.stackexchange.com/questions/102978/incremental-computation-of-standard-deviation#comment241843_103025
-    this->sectionVariance_mus[this->currentSection] =
+    this->sectionVariance_mus[secIdx] =
       (numMeasurementsBefore > 0
          ? (((numMeasurementsBefore - 1) / (numMeasurementsBefore)) *
-            this->sectionVariance_mus[this->currentSection])
+            this->sectionVariance_mus[secIdx])
          : 0) +
-      denominator * SQUARE(us - this->sectionMean_mus[this->currentSection]);
+      denominator * SQUARE(us - this->sectionMean_mus[secIdx]);
 
     // record the new average microseconds
-    this->sectionMean_mus[this->currentSection] =
-      (this->sectionMean_mus[this->currentSection]) *
-        (numMeasurementsBefore * denominator) +
+    this->sectionMean_mus[secIdx] =
+      (this->sectionMean_mus[secIdx]) * (numMeasurementsBefore * denominator) +
       us * denominator;
 
     this->currentSection = -1;

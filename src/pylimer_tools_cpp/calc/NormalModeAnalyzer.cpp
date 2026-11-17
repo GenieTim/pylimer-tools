@@ -68,7 +68,8 @@ NormalModeAnalyzer::NormalModeAnalyzer(const std::vector<size_t>& springFrom,
   std::vector<Eigen::Triplet<double>> triplets;
   triplets.reserve(springFrom.size() * 2);
 
-  Eigen::VectorXd diagonal = Eigen::VectorXd::Zero(nRows);
+  Eigen::VectorXd diagonal =
+    Eigen::VectorXd::Zero(static_cast<Eigen::Index>(nRows));
   for (size_t i = 0; i < springFrom.size(); i++) {
     // some sanity checks
     assert(springFrom[i] < nRows);
@@ -91,7 +92,8 @@ NormalModeAnalyzer::NormalModeAnalyzer(const std::vector<size_t>& springFrom,
   }
 
   // finally, translate into the sparse matrix format
-  this->assembledConnectivityMatrix = Eigen::SparseMatrix<double>(nRows, nRows);
+  this->assembledConnectivityMatrix = Eigen::SparseMatrix<double>(
+    static_cast<Eigen::Index>(nRows), static_cast<Eigen::Index>(nRows));
   this->assembledConnectivityMatrix.setFromTriplets(triplets.begin(),
                                                     triplets.end());
 };
@@ -102,7 +104,7 @@ NormalModeAnalyzer::findSparseEigenvalues(const size_t nrOfEigenvalues,
 {
   INVALIDARG_EXP_IFN(nrOfEigenvalues > 0,
                      "nrOfEigenvalues must be greater than 0");
-  size_t n = this->assembledConnectivityMatrix.rows();
+  size_t n = static_cast<size_t>(this->assembledConnectivityMatrix.rows());
   INVALIDARG_EXP_IFN(nrOfEigenvalues < n,
                      "nrOfEigenvalues must be less than matrix size");
 
@@ -113,7 +115,10 @@ NormalModeAnalyzer::findSparseEigenvalues(const size_t nrOfEigenvalues,
       ncv = std::min(nrOfEigenvalues + 2, n);
     }
     Spectra::SymEigsShiftSolver<Spectra::SparseSymShiftSolve<double>> eigs(
-      op, nrOfEigenvalues, ncv, -1e-5);
+      op,
+      static_cast<Eigen::Index>(nrOfEigenvalues),
+      static_cast<Eigen::Index>(ncv),
+      -1e-5);
     eigs.init();
     eigs.compute(Spectra::SortRule::LargestMagn);
     if (eigs.info() == Spectra::CompInfo::Successful) {
@@ -135,7 +140,9 @@ NormalModeAnalyzer::findSparseEigenvalues(const size_t nrOfEigenvalues,
     ncv = std::min(nrOfEigenvalues + 2, n);
   }
   Spectra::SymEigsSolver<Spectra::SparseGenMatProd<double>> eigs(
-    op, nrOfEigenvalues, ncv);
+    op,
+    static_cast<Eigen::Index>(nrOfEigenvalues),
+    static_cast<Eigen::Index>(ncv));
   eigs.init();
   eigs.compute(Spectra::SortRule::SmallestAlge);
 
@@ -368,7 +375,10 @@ NormalModeAnalyzer::computeAllEigenvaluesSparseSlicing(
           ncv = std::min(nev + 2, static_cast<size_t>(n));
         }
         Spectra::SymEigsShiftSolver<Spectra::SparseSymShiftSolve<double>> eigs(
-          op, nev, ncv, sigma);
+          op,
+          static_cast<Eigen::Index>(nev),
+          static_cast<Eigen::Index>(ncv),
+          sigma);
         eigs.init();
         eigs.compute(Spectra::SortRule::LargestMagn);
         if (eigs.info() == Spectra::CompInfo::Successful) {
@@ -867,7 +877,7 @@ size_t
 NormalModeAnalyzer::countSolubleClusters() const
 {
   this->requireEigenvaluesComputation();
-  return (this->eigenvalues.array() == 0.0).count();
+  return static_cast<size_t>((this->eigenvalues.array() == 0.0).count());
 }
 
 size_t

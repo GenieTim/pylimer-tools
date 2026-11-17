@@ -176,7 +176,8 @@ DumpFileParser::readNGroups(const size_t start, const int N)
   }
 
   if (start >= this->getLength() ||
-      (N != -1 && ((static_cast<int>(start)) + N) > this->getLength())) {
+      (N != -1 &&
+       (N < 0 || (start + static_cast<size_t>(N)) > this->getLength()))) {
     throw std::invalid_argument(
       "Cannot read from outside the length of the "
       "dump file. Tried to read from " +
@@ -213,13 +214,13 @@ DumpFileParser::readNGroups(const size_t start, const int N)
       // std::cout << "Appending data: " << currentNrOfExpectedGroups << " to
       // "
       // << currentKey << std::endl;
-      dataItem[currentKey].push_back(
-        pylimer_tools::utils::CsvTokenizer(line, currentNrOfExpectedGroups));
+      dataItem[currentKey].push_back(pylimer_tools::utils::CsvTokenizer(
+        line, static_cast<size_t>(currentNrOfExpectedGroups)));
     }
 
     if (line == this->newGroupKey) {
       // new timestep
-      if ((N > 0 && (groupsRead + 1) >= N)) {
+      if (N > 0 && (groupsRead + 1) >= static_cast<size_t>(N)) {
         break;
       }
       this->data.insert_or_assign(start + groupsRead, dataItem);
@@ -233,7 +234,7 @@ DumpFileParser::readNGroups(const size_t start, const int N)
     this->data.insert_or_assign(start + groupsRead, dataItem);
     groupsRead += 1;
   }
-  if (groupsRead != N && N != -1) {
+  if (N != -1 && groupsRead != static_cast<size_t>(N)) {
     throw std::runtime_error("Failed to read " + std::to_string(N) + ", read " +
                              std::to_string(groupsRead) + " groups on " +
                              std::to_string(linesRead) +
@@ -262,7 +263,10 @@ DumpFileParser::readBoxes()
 constexpr unsigned int
 str2int(const char* str, const int h = 0)
 {
-  return !str[h] ? 5381 : (str2int(str, h + 1) * 33) ^ str[h];
+  return !str[h]
+           ? 5381
+           : (str2int(str, h + 1) * 33) ^
+               static_cast<unsigned int>(static_cast<unsigned char>(str[h]));
 }
 // constexpr
 unsigned int
@@ -344,9 +348,9 @@ DumpFileParser::readDumpFileSections(ReadableDumpFileSections sectionsToRead)
       bool isScaledX = false, isScaledY = false, isScaledZ = false;
       int id = 0, type = 1;
       std::vector<pylimer_tools::entities::Atom> localResults;
-      localResults.reserve(numAtoms);
+      localResults.reserve(static_cast<size_t>(numAtoms));
       std::unordered_map<std::string, std::vector<double>> localExtraAtomData;
-      for (size_t i = 0; i < numAtoms; ++i) {
+      for (int i = 0; i < numAtoms; ++i) {
         RUNTIME_EXP_IFN(std::getline(this->file, line),
                         "File ended before all atoms could be read");
         // special frequent case
@@ -547,7 +551,7 @@ DumpFileParser::openFile()
     }
   }
 
-  this->nrOfGroups = groupsFound + 1;
+  this->nrOfGroups = static_cast<size_t>(groupsFound + 1);
   // reset position to start of first group
   this->file.clear();
   this->file.seekg(this->groupPosMap.at(0));

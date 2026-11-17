@@ -189,7 +189,10 @@ public:
   }
 #endif
 
-  size_t getMatrixSize() const { return assembledConnectivityMatrix.rows(); }
+  size_t getMatrixSize() const
+  {
+    return static_cast<size_t>(assembledConnectivityMatrix.rows());
+  }
 
 protected:
   void requireEigenvaluesComputation() const;

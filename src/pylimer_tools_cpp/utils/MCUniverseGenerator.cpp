@@ -912,7 +912,6 @@ MCUniverseGenerator::linkStrandsToConversion(
   const long int targetNrOfAvailableCrosslinkSites =
     std::round((1.0 - targetCrossLinkerConversion) *
                static_cast<double>(this->originalNrOfAvailableCrosslinkSites));
-  const double timesNForR02 = this->meanSquaredBeadDistance * cInfinity;
 
   this->linkStrandsCallback(
     [targetNrOfAvailableCrosslinkSites](const MCUniverseGenerator& gen,
@@ -933,8 +932,6 @@ MCUniverseGenerator::linkStrandsToSolubleFraction(double targetSolubleFraction,
   INVALIDARG_EXP_IFN(APPROX_WITHIN(targetSolubleFraction, 0., 1., 1e-8),
                      "Soluble fraction must be between 0 and 1, got " +
                        std::to_string(targetSolubleFraction) + ".");
-
-  size_t nAtomsTotal = this->getCurrentNrOfAtoms();
 
   BackTrackStatus status = BackTrackStatus::TRACK_FORWARD;
   long int nSteps = 0;
@@ -1570,7 +1567,6 @@ MCUniverseGenerator::linkStrandToCrosslink(const size_t strandIdx,
       this->simplifiedUniverse.strandFrom[strandIdx] >= 0,
       "Strands are required to have the first end be connected first.");
     this->simplifiedUniverse.strandTo[strandIdx] = crosslinkIdx;
-    Eigen::VectorXd newCoordinates = this->getCrosslinkCoordinates();
   }
 }
 
@@ -2098,16 +2094,14 @@ MCUniverseGenerator::combineStrands(const size_t strandIdx1,
                        UNCONNECTED,
                      "Expect at least one end of strand 2 to be unconnected.");
 
-  bool strand2IsFrom =
-    this->simplifiedUniverse.strandFrom[strandIdx2] == UNCONNECTED;
-
   // Create a new combined strand
   int combinedBeads = this->simplifiedUniverse.beadsInStrand[strandIdx1] +
                       this->simplifiedUniverse.beadsInStrand[strandIdx2];
 
   // Determine the connections of the new combined strand
+  const long int xlinkFrom2 = this->simplifiedUniverse.strandFrom[strandIdx2];
   long int newFrom = this->simplifiedUniverse.strandFrom[strandIdx1];
-  long int newTo = this->simplifiedUniverse.strandFrom[strandIdx2];
+  long int newTo = xlinkFrom2;
 
   if (newFrom < 0) {
     std::swap(newFrom, newTo);
@@ -2120,13 +2114,16 @@ MCUniverseGenerator::combineStrands(const size_t strandIdx1,
   this->simplifiedUniverse.strandTo[strandIdx1] = newTo;
   this->simplifiedUniverse.beadsInStrand[strandIdx1] = combinedBeads;
 
-  if (newTo >= 0) {
-    auto& strandsOfXlink = this->simplifiedUniverse.strandsOfXlink[newTo];
-    auto it =
-      std::find(strandsOfXlink.begin(), strandsOfXlink.end(), strandIdx2);
+  if (xlinkFrom2 >= 0) {
+    std::vector<long int>& strandsOfXlink =
+      this->simplifiedUniverse.strandsOfXlink[static_cast<size_t>(xlinkFrom2)];
+    auto it = std::find(strandsOfXlink.begin(),
+                        strandsOfXlink.end(),
+                        static_cast<long int>(strandIdx2));
     if (it != strandsOfXlink.end()) {
-      *it = strandIdx1;
+      *it = static_cast<long int>(strandIdx1);
     }
+    this->simplifiedUniverse.strandFrom[strandIdx2] = UNCONNECTED;
   }
 
   // Remove the old strand
