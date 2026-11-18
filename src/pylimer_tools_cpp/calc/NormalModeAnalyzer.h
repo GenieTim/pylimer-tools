@@ -7,8 +7,14 @@
 #ifdef CEREALIZABLE
 #include <cereal/access.hpp>
 #endif
+#include <optional>
 #include <string>
+#include <utility>
 #include <vector>
+
+namespace pylimer_tools::entities {
+class Universe;
+}
 
 namespace pylimer_tools::calc {
 
@@ -17,10 +23,11 @@ namespace pylimer_tools::calc {
   X(DENSE_LAPACK, "Dense LAPACK")                                              \
   X(DENSE_EIGEN, "Dense Eigen")                                                \
   X(SPARSE_SLICING, "Sparse Slicing")                                          \
-  X(METAL, "Metal GPU")
+  X(METAL, "Metal GPU")                                                        \
+  X(CUDA, "CUDA GPU")
 
 /**
- * @brief Available eigenvalue solver algorithms for normal mode analysis.
+ * @brief Available exact eigenvalue solver algorithms for normal mode analysis.
  */
 enum class NormalModeSolver
 {
@@ -41,232 +48,255 @@ inline const NormalModeSolver allNormalModeSolvers[] = {
 #undef X
 };
 
-#define STOCHASTIC_SPECTRAL_METHODS                                            \
+#define COMPUTE_BACKENDS                                                       \
   X(AUTO, "Auto")                                                              \
-  X(SLQ, "SLQ")                                                                \
-  X(HYBRID, "Hybrid")                                                          \
-  X(KPM, "KPM")
+  X(CPU, "CPU")                                                                \
+  X(METAL, "Metal")                                                            \
+  X(CUDA, "CUDA")
 
 /**
- * @brief Available stochastic / approximate spectral methods for normal mode
- *        analysis on large networks.
+ * @brief Hardware compute backend for spectral approximations.
  */
-enum class StochasticSpectralMethod
+enum class ComputeBackend
 {
 #define X(e, s) e,
-  STOCHASTIC_SPECTRAL_METHODS
+  COMPUTE_BACKENDS
 #undef X
 };
 
-inline const std::string StochasticSpectralMethodNames[] = {
+inline const std::string ComputeBackendNames[] = {
 #define X(e, s) s,
-  STOCHASTIC_SPECTRAL_METHODS
+  COMPUTE_BACKENDS
 #undef X
 };
 
-inline const StochasticSpectralMethod allStochasticSpectralMethods[] = {
-#define X(e, s) StochasticSpectralMethod::e,
-  STOCHASTIC_SPECTRAL_METHODS
-#undef X
+/**
+ * @brief Configuration for Stochastic Lanczos Quadrature (SLQ).
+ */
+struct SLQConfig
+{
+  size_t numSteps = 200;
+  size_t numRandomVectors = 20;
+  ComputeBackend backend = ComputeBackend::AUTO;
 };
 
+/**
+ * @brief Configuration for Hybrid exact low-mode + deflated SLQ approximation.
+ */
+struct HybridConfig
+{
+  size_t numSteps = 200;
+  size_t numRandomVectors = 20;
+  size_t numExactLowModes = 100;
+  ComputeBackend backend = ComputeBackend::AUTO;
+};
+
+/**
+ * @brief Configuration for Kernel Polynomial Method (KPM) spectral
+ *        approximation.
+ */
+struct KPMConfig
+{
+  size_t numMoments = 1024;
+  size_t numRandomVectors = 20;
+  size_t numQuadraturePoints = 2048;
+  size_t batchSize = 4;
+  ComputeBackend backend = ComputeBackend::AUTO;
+};
+
+/**
+ * @brief Immutable value object representing a discrete or quadrature-weighted
+ *        normal mode spectrum $\{(\lambda_i, w_i)\}$ and optional eigenvectors.
+ *
+ * Evaluates viscoelastic observables ($G(t)$, $G'(\omega)$, $G''(\omega)$)
+ * uniformly across exact, sparse, SLQ, Hybrid, and KPM spectra.
+ */
+class NormalModeSpectrum
+{
+public:
+  /**
+   * @brief Construct a NormalModeSpectrum from eigenvalues, optional weights,
+   *        and optional eigenvectors.
+   *
+   * @param eigenvalues Vector of eigenvalues $\lambda_i$
+   * @param weights Optional quadrature weights $w_i$ (defaults to all 1.0)
+   * @param eigenvectors Optional eigenvector matrix (columns correspond to
+   * modes)
+   * @param isComplete Whether this represents the full spectrum of the system
+   */
+  explicit NormalModeSpectrum(
+    Eigen::VectorXd eigenvalues,
+    std::optional<Eigen::VectorXd> weights = std::nullopt,
+    std::optional<Eigen::MatrixXd> eigenvectors = std::nullopt,
+    bool isComplete = true);
+
+  const Eigen::VectorXd& getEigenvalues() const;
+  const Eigen::VectorXd& getWeights() const;
+  std::optional<Eigen::MatrixXd> getEigenvectors() const;
+  bool isComplete() const;
+  size_t getNumModes() const;
+  size_t getNumZeroModes() const;
+
+  /**
+   * @brief Evaluate stress autocorrelation $G(t) = \sum_i w_i e^{-2\lambda_i
+   * t}$.
+   */
+  Eigen::ArrayXd stressAutocorrelation(const Eigen::ArrayXd& t) const;
+
+  /**
+   * @brief Evaluate storage modulus $G'(\omega)$.
+   */
+  Eigen::ArrayXd storageModulus(const Eigen::ArrayXd& omega) const;
+
+  /**
+   * @brief Evaluate loss modulus $G''(\omega)$.
+   */
+  Eigen::ArrayXd lossModulus(const Eigen::ArrayXd& omega) const;
+
+  /**
+   * @brief Evaluate both storage and loss moduli $(G'(\omega), G''(\omega))$
+   *        in a single pass over the spectrum.
+   */
+  std::pair<Eigen::ArrayXd, Eigen::ArrayXd> moduli(
+    const Eigen::ArrayXd& omega) const;
+
+#ifdef CEREALIZABLE
+  static NormalModeSpectrum fromString(std::string in)
+  {
+    NormalModeSpectrum s;
+    pylimer_tools::utils::deserializeFromString(s, in);
+    return s;
+  }
+#endif
+
+private:
+  Eigen::VectorXd eigenvalues_;
+  Eigen::VectorXd weights_;
+  bool hasEigenvectors_ = false;
+  Eigen::MatrixXd eigenvectors_;
+  bool isComplete_ = true;
+
+  std::pair<Eigen::ArrayXd, Eigen::ArrayXd> evaluateModuli(
+    const Eigen::ArrayXd& omega,
+    bool computeStorage,
+    bool computeLoss) const;
+
+  NormalModeSpectrum() = default;
+#ifdef CEREALIZABLE
+  friend class cereal::access;
+  template<class Archive>
+  void serialize(Archive& ar)
+  {
+    ar(eigenvalues_, weights_, hasEigenvectors_, eigenvectors_, isComplete_);
+  }
+#endif
+};
+
+/**
+ * @brief Stateless graph Laplacian builder and normal mode solver entry point.
+ *
+ * Holds the assembled connectivity (Laplacian) matrix and dispatches exact or
+ * approximate spectral solvers that return immutable NormalModeSpectrum
+ * objects.
+ */
 class NormalModeAnalyzer
 {
 public:
-  NormalModeAnalyzer(const std::vector<size_t>& springFrom,
-                     const std::vector<size_t>& springTo,
-                     size_t nrOfNodes = 0);
-
-  void findSparseEigenvalues(const size_t nrOfEigenvalues,
-                             const bool includeEigenvectors = false);
+  /**
+   * @brief Construct from spring/bond edge lists and optional spring weights.
+   *
+   * @param springFrom Starting node indices for springs/bonds
+   * @param springTo Ending node indices for springs/bonds
+   * @param nrOfNodes Optional total number of nodes (to include isolated
+   * vertices)
+   * @param weights Optional per-spring weights (defaults to unit weight 1.0)
+   */
+  NormalModeAnalyzer(
+    const std::vector<size_t>& springFrom,
+    const std::vector<size_t>& springTo,
+    size_t nrOfNodes = 0,
+    const std::optional<std::vector<double>>& weights = std::nullopt);
 
   /**
-   * @brief Compute all eigenvalues using the specified solver.
-   *
-   * @param solver Eigenvalue solver method (AUTO, DENSE_LAPACK, DENSE_EIGEN,
-   * SPARSE_SLICING, or METAL)
-   * @param includeEigenvectors Whether to also compute and store eigenvectors
-   * @param decomposeComponents Whether to decompose the graph into connected
-   * components
+   * @brief Construct directly from a square sparse Laplacian / connectivity
+   * matrix.
    */
-  void computeAllEigenvalues(
-    const NormalModeSolver solver = NormalModeSolver::AUTO,
-    const bool includeEigenvectors = false,
-    const bool decomposeComponents = true);
+  static NormalModeAnalyzer fromMatrix(
+    const Eigen::SparseMatrix<double>& matrix);
 
-  void computeAllEigenvalues(const bool includeEigenvectors)
+  /**
+   * @brief Construct from a Universe's atom-bond graph.
+   */
+  static NormalModeAnalyzer fromUniverse(
+    const pylimer_tools::entities::Universe& universe);
+
+  size_t getSize() const
   {
-    computeAllEigenvalues(NormalModeSolver::AUTO, includeEigenvectors, true);
+    return static_cast<size_t>(assembledConnectivityMatrix_.rows());
   }
 
-  void computeAllEigenvaluesGPU(const bool includeEigenvectors = false);
-
-  const Eigen::VectorXd& getEigenvalues() const;
-  void setEigenvalues(const Eigen::VectorXd& e);
-
-  const Eigen::MatrixXd& getEigenvectors() const;
-  void setEigenvectors(const Eigen::MatrixXd& e);
-
-  const Eigen::SparseMatrix<double>& getAssembledConnectivityMatrix() const;
-
-  Eigen::ArrayXd evaluateStressAutocorrelation(const Eigen::ArrayXd& t) const;
-
-  Eigen::ArrayXd evaluateStorageModulus(const Eigen::ArrayXd& omega) const;
-
-  Eigen::ArrayXd evaluateLossModulus(const Eigen::ArrayXd& omega) const;
-
-  size_t getNrOfSolubleClusters() const;
-
-  // MARK: KPM (Kernel Polynomial Method) methods
+  const Eigen::SparseMatrix<double>& getMatrix() const
+  {
+    return assembledConnectivityMatrix_;
+  }
 
   /**
-   * @brief Compute Chebyshev moments using the Kernel Polynomial Method (KPM)
-   *        with Rademacher random vector trace estimation and Jackson damping
-   * kernel.
-   *
-   * @param numMoments Number of Chebyshev moments (default: 1024)
-   * @param numRandomVectors Number of random vectors for stochastic trace
-   * estimation (default: 20)
-   * @return Vector of damped Chebyshev moments
+   * @brief Count connected components (soluble clusters / zero modes) directly
+   *        from the connectivity matrix.
    */
-  Eigen::VectorXd computeChebyshevMomentsKPM(
-    size_t numMoments = 1024,
-    size_t numRandomVectors = 20) const;
+  size_t getNumSolubleClusters() const;
 
   /**
-   * @brief Compute Chebyshev moments using the Kernel Polynomial Method (KPM)
-   *        accelerated with Apple Silicon Metal compute kernels.
+   * @brief Compute exact eigenvalues (and optionally eigenvectors) and return
+   *        an immutable NormalModeSpectrum.
    *
-   * @param numMoments Number of Chebyshev moments (default: 1024)
-   * @param numRandomVectors Number of random vectors (default: 20)
-   * @param batchSize Batch size for multi-RHS block SpMM (default: 4)
-   * @return Vector of damped Chebyshev moments
+   * @param solver Exact solver algorithm (AUTO, DENSE_LAPACK, DENSE_EIGEN,
+   *               SPARSE_SLICING, METAL, or CUDA). Ignored when numModes <
+   *               matrix size.
+   * @param computeEigenvectors Whether to compute and store eigenvectors
+   * @param decomposeComponents Whether to decompose into connected components.
+   *                            Ignored when numModes < matrix size.
+   * @param numModes Optional number of smallest eigenvalues to compute via
+   *                 Spectra sparse solver (if omitted or equal to matrix size,
+   *                 computes full spectrum)
    */
-  Eigen::VectorXd computeChebyshevMomentsKPMMetal(size_t numMoments = 1024,
-                                                  size_t numRandomVectors = 20,
-                                                  size_t batchSize = 4) const;
+  NormalModeSpectrum solveExact(
+    NormalModeSolver solver = NormalModeSolver::AUTO,
+    bool computeEigenvectors = false,
+    bool decomposeComponents = true,
+    std::optional<size_t> numModes = std::nullopt) const;
 
   /**
-   * @brief Compute continuous density of states (DOS) using KPM.
-   *
-   * @param lambdaGrid Eigenvalue points at which to evaluate DOS
-   * @param numMoments Number of Chebyshev moments (default: 1024)
-   * @param numRandomVectors Number of random vectors (default: 20)
-   * @return Density of states values on lambdaGrid
+   * @brief Compute an approximate spectrum using automatic method selection
+   *        (Hybrid for n <= 30000, SLQ otherwise).
    */
-  Eigen::ArrayXd computeDensityOfStatesKPM(const Eigen::ArrayXd& lambdaGrid,
-                                           size_t numMoments = 1024,
-                                           size_t numRandomVectors = 20) const;
+  NormalModeSpectrum solveApprox() const;
 
   /**
-   * @brief Evaluate stress autocorrelation G(t) directly using KPM via
-   * Gauss-Chebyshev quadrature.
-   *
-   * @param t Time points at which to evaluate stress autocorrelation
-   * @param numMoments Number of Chebyshev moments (default: 1024)
-   * @param numRandomVectors Number of random vectors (default: 20)
-   * @param numQuadraturePoints Number of Gauss-Chebyshev quadrature points
-   * (default: 2048)
-   * @return Stress autocorrelation values
+   * @brief Compute an approximate spectrum using Stochastic Lanczos Quadrature.
    */
-  Eigen::ArrayXd evaluateStressAutocorrelationKPM(
-    const Eigen::ArrayXd& t,
-    size_t numMoments = 1024,
-    size_t numRandomVectors = 20,
-    size_t numQuadraturePoints = 2048) const;
+  NormalModeSpectrum solveApprox(const SLQConfig& config) const;
 
   /**
-   * @brief Evaluate storage modulus G'(omega) directly using KPM via
-   * Gauss-Chebyshev quadrature.
-   *
-   * @param omega Angular frequencies to evaluate
-   * @param numMoments Number of Chebyshev moments (default: 1024)
-   * @param numRandomVectors Number of random vectors (default: 20)
-   * @param numQuadraturePoints Number of Gauss-Chebyshev quadrature points
-   * (default: 2048)
-   * @return Storage modulus values
+   * @brief Compute an approximate spectrum using Hybrid exact low-modes + SLQ.
    */
-  Eigen::ArrayXd evaluateStorageModulusKPM(
-    const Eigen::ArrayXd& omega,
-    size_t numMoments = 1024,
-    size_t numRandomVectors = 20,
-    size_t numQuadraturePoints = 2048) const;
+  NormalModeSpectrum solveApprox(const HybridConfig& config) const;
 
   /**
-   * @brief Evaluate loss modulus G''(omega) directly using KPM via
-   * Gauss-Chebyshev quadrature.
-   *
-   * @param omega Angular frequencies to evaluate
-   * @param numMoments Number of Chebyshev moments (default: 1024)
-   * @param numRandomVectors Number of random vectors (default: 20)
-   * @param numQuadraturePoints Number of Gauss-Chebyshev quadrature points
-   * (default: 2048)
-   * @return Loss modulus values
+   * @brief Compute an approximate spectrum using the Kernel Polynomial Method.
    */
-  Eigen::ArrayXd evaluateLossModulusKPM(
-    const Eigen::ArrayXd& omega,
-    size_t numMoments = 1024,
-    size_t numRandomVectors = 20,
-    size_t numQuadraturePoints = 2048) const;
-
-  // MARK: Approximate / Stochastic Spectral Methods (SLQ, Hybrid, KPM)
+  NormalModeSpectrum solveApprox(const KPMConfig& config) const;
 
   /**
-   * @brief Evaluate stress autocorrelation G(t) using an approximate spectral
-   *        method (SLQ, Hybrid exact-low + SLQ, or KPM).
-   *
-   * @param t Time points at which to evaluate stress autocorrelation
-   * @param method Spectral approximation method (AUTO, SLQ, HYBRID, or KPM)
-   * @param numSteps Lanczos steps (SLQ/HYBRID) or Chebyshev moments (KPM)
-   * @param numRandomVectors Number of Rademacher random vectors (default: 20)
-   * @param numExactLowModes Number of exact lowest nonzero modes for HYBRID
-   * (default: 100)
-   * @return Stress autocorrelation values
+   * @brief Compute Jackson-damped Chebyshev moments using KPM.
    */
-  Eigen::ArrayXd evaluateStressAutocorrelationApprox(
-    const Eigen::ArrayXd& t,
-    StochasticSpectralMethod method = StochasticSpectralMethod::AUTO,
-    size_t numSteps = 200,
-    size_t numRandomVectors = 20,
-    size_t numExactLowModes = 100) const;
+  Eigen::VectorXd chebyshevMoments(const KPMConfig& config = KPMConfig{}) const;
 
   /**
-   * @brief Evaluate storage modulus G'(omega) using an approximate spectral
-   *        method (SLQ, Hybrid exact-low + SLQ, or KPM).
-   *
-   * @param omega Angular frequencies to evaluate
-   * @param method Spectral approximation method (AUTO, SLQ, HYBRID, or KPM)
-   * @param numSteps Lanczos steps (SLQ/HYBRID) or Chebyshev moments (KPM)
-   * @param numRandomVectors Number of Rademacher random vectors (default: 20)
-   * @param numExactLowModes Number of exact lowest nonzero modes for HYBRID
-   * (default: 100)
-   * @return Storage modulus values
+   * @brief Compute continuous density of states (DOS) on lambdaGrid using KPM.
    */
-  Eigen::ArrayXd evaluateStorageModulusApprox(
-    const Eigen::ArrayXd& omega,
-    StochasticSpectralMethod method = StochasticSpectralMethod::AUTO,
-    size_t numSteps = 200,
-    size_t numRandomVectors = 20,
-    size_t numExactLowModes = 100) const;
-
-  /**
-   * @brief Evaluate loss modulus G''(omega) using an approximate spectral
-   *        method (SLQ, Hybrid exact-low + SLQ, or KPM).
-   *
-   * @param omega Angular frequencies to evaluate
-   * @param method Spectral approximation method (AUTO, SLQ, HYBRID, or KPM)
-   * @param numSteps Lanczos steps (SLQ/HYBRID) or Chebyshev moments (KPM)
-   * @param numRandomVectors Number of Rademacher random vectors (default: 20)
-   * @param numExactLowModes Number of exact lowest nonzero modes for HYBRID
-   * (default: 100)
-   * @return Loss modulus values
-   */
-  Eigen::ArrayXd evaluateLossModulusApprox(
-    const Eigen::ArrayXd& omega,
-    StochasticSpectralMethod method = StochasticSpectralMethod::AUTO,
-    size_t numSteps = 200,
-    size_t numRandomVectors = 20,
-    size_t numExactLowModes = 100) const;
+  Eigen::ArrayXd densityOfStates(const Eigen::ArrayXd& lambdaGrid,
+                                 const KPMConfig& config = KPMConfig{}) const;
 
 #ifdef CEREALIZABLE
   static NormalModeAnalyzer fromString(std::string in)
@@ -277,68 +307,53 @@ public:
   }
 #endif
 
-  size_t getMatrixSize() const
-  {
-    return static_cast<size_t>(assembledConnectivityMatrix.rows());
-  }
-
-protected:
-  void requireEigenvaluesComputation() const;
-  void requireEigenvectorsComputation() const;
-  size_t countSolubleClusters() const;
-
 private:
-  Eigen::SparseMatrix<double> assembledConnectivityMatrix;
-  // computation state
-  bool isEigenvaluesComputed = false;
-  bool isEigenvectorsComputed = false;
-  size_t clusterCount = 0;
-  Eigen::VectorXd eigenvalues;
-  Eigen::MatrixXd eigenvectors;
-  mutable size_t cachedKPMMoments_{ 0 };
-  mutable size_t cachedKPMVectors_{ 0 };
-  mutable Eigen::VectorXd cachedMu_{};
+  Eigen::SparseMatrix<double> assembledConnectivityMatrix_;
 
-  mutable bool hasCachedApproxSpectrum_{ false };
-  mutable StochasticSpectralMethod cachedApproxMethod_{
-    StochasticSpectralMethod::AUTO
-  };
-  mutable size_t cachedApproxSteps_{ 0 };
-  mutable size_t cachedApproxVectors_{ 0 };
-  mutable size_t cachedApproxLowModes_{ 0 };
-  mutable std::vector<double> cachedApproxLambdaNodes_{};
-  mutable std::vector<double> cachedApproxDeltaN_{};
+  static void solveMatrix(const Eigen::SparseMatrix<double>& mat,
+                          NormalModeSolver solver,
+                          bool includeEigenvectors,
+                          Eigen::VectorXd& outEvals,
+                          Eigen::MatrixXd& outEvecs);
 
-  void solveMatrix(const Eigen::SparseMatrix<double>& mat,
-                   NormalModeSolver solver,
-                   bool includeEigenvectors,
-                   Eigen::VectorXd& outEvals,
-                   Eigen::MatrixXd& outEvecs);
+  static void computeAllEigenvaluesDense(const Eigen::SparseMatrix<double>& mat,
+                                         bool includeEigenvectors,
+                                         bool forceEigenSolver,
+                                         Eigen::VectorXd& outEvals,
+                                         Eigen::MatrixXd& outEvecs);
 
-  void computeAllEigenvaluesDense(const Eigen::SparseMatrix<double>& mat,
-                                  const bool includeEigenvectors,
-                                  const bool forceEigenSolver,
-                                  Eigen::VectorXd& outEvals,
-                                  Eigen::MatrixXd& outEvecs);
-
-  void computeAllEigenvaluesSparseSlicing(
+  static void computeAllEigenvaluesSparseSlicing(
     const Eigen::SparseMatrix<double>& mat,
-    const bool includeEigenvectors,
+    bool includeEigenvectors,
     Eigen::VectorXd& outEvals,
     Eigen::MatrixXd& outEvecs);
+
+  static void computeAllEigenvaluesCUDA(const Eigen::SparseMatrix<double>& mat,
+                                        bool includeEigenvectors,
+                                        Eigen::VectorXd& outEvals,
+                                        Eigen::MatrixXd& outEvecs);
+
+  void findSparseEigenvaluesImpl(size_t nrOfEigenvalues,
+                                 bool includeEigenvectors,
+                                 Eigen::VectorXd& outEvals,
+                                 Eigen::MatrixXd& outEvecs) const;
 
   std::pair<double, double> getSpectralScalingParameters(
     double eps = 0.01) const;
 
-  void computeEffectiveSpectrumKPM(size_t numMoments,
-                                   size_t numRandomVectors,
-                                   size_t numQuadraturePoints,
-                                   std::vector<double>& lambdaNodes,
-                                   std::vector<double>& deltaN) const;
+  Eigen::VectorXd computeChebyshevMomentsCPU(size_t numMoments,
+                                             size_t numRandomVectors) const;
 
   void computeConnectedComponents(size_t& numComponents,
                                   std::vector<size_t>& labels,
                                   std::vector<size_t>& counts) const;
+
+  Eigen::SparseMatrix<double> extractComponentSubmatrix(
+    const std::vector<size_t>& compNodes,
+    std::vector<Eigen::Index>& localIdxBuffer,
+    std::vector<size_t>* outLocalDeg = nullptr,
+    size_t* outNumInternalEdges = nullptr,
+    bool* outAllUnitWeights = nullptr) const;
 
   void runDeflatedSLQ(size_t numSteps,
                       size_t numRandomVectors,
@@ -355,44 +370,19 @@ private:
                                       std::vector<double>& lambdaNodes,
                                       std::vector<double>& deltaN) const;
 
-  void ensureApproxSpectrumCached(StochasticSpectralMethod method,
-                                  size_t numSteps,
-                                  size_t numRandomVectors,
-                                  size_t numExactLowModes) const;
-
-  static Eigen::ArrayXd evaluateStressAutocorrelationFromSpectrum(
-    const Eigen::ArrayXd& t,
-    const std::vector<double>& lambdaNodes,
-    const std::vector<double>& deltaN);
-
-  static Eigen::ArrayXd evaluateStorageModulusFromSpectrum(
-    const Eigen::ArrayXd& omega,
-    const std::vector<double>& lambdaNodes,
-    const std::vector<double>& deltaN);
-
-  static Eigen::ArrayXd evaluateLossModulusFromSpectrum(
-    const Eigen::ArrayXd& omega,
-    const std::vector<double>& lambdaNodes,
-    const std::vector<double>& deltaN);
-
   static Eigen::VectorXd computeJacksonKernel(size_t numMoments);
 
-  // MARK: serialization
   NormalModeAnalyzer() = default;
 #ifdef CEREALIZABLE
   friend class cereal::access;
   template<class Archive>
   void serialize(Archive& ar)
   {
-    ar(isEigenvaluesComputed,
-       isEigenvectorsComputed,
-       clusterCount,
-       eigenvalues,
-       eigenvectors,
-       assembledConnectivityMatrix);
+    ar(assembledConnectivityMatrix_);
   }
 #endif
 };
-}
+
+} // namespace pylimer_tools::calc
 
 #endif

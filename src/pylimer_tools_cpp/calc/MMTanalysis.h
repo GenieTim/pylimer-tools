@@ -34,11 +34,10 @@ Returns:
   - r (float): The stoichiometric inbalance
 */
 inline double
-computeStoichiometricInbalance(
-  const pylimer_tools::entities::Universe& network,
-  const int crossLinkerType,
-  const int strandLength,
-  const std::map<int, int>& functionalityPerType)
+computeStoichiometricInbalance(const pylimer_tools::entities::Universe& network,
+                               const int crossLinkerType,
+                               const int strandLength,
+                               const std::map<int, int>& functionalityPerType)
 {
   INVALIDARG_EXP_IFN(strandLength > 0, "strandLength must be greater than 0");
 
@@ -136,8 +135,8 @@ Returns:
 inline double
 predictGelationPoint(const double r, const int f, const int g = 2)
 {
-  return std::sqrt(
-    1.0 / (r * (static_cast<double>(f) - 1.0) * (static_cast<double>(g) - 1.0)));
+  return std::sqrt(1.0 / (r * (static_cast<double>(f) - 1.0) *
+                          (static_cast<double>(g) - 1.0)));
 }
 }
 

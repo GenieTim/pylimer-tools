@@ -154,79 +154,53 @@ def _evaluate_single_nma_task(
     scale = gamma_conv / vol
 
     t0_kpm = time.perf_counter()
-    gp_kpm = (
-        nma.evaluate_storage_modulus_kpm(
-            freqs,
+    spec_kpm = nma.solve_approx(
+        pt.KPMConfig(
             num_moments=num_moments,
             num_random_vectors=num_random_vectors,
             num_quadrature_points=num_quadrature_points,
         )
-        * scale
     )
-    gpp_kpm = (
-        nma.evaluate_loss_modulus_kpm(
-            freqs,
-            num_moments=num_moments,
-            num_random_vectors=num_random_vectors,
-            num_quadrature_points=num_quadrature_points,
-        )
-        * scale
-    )
+    gp_kpm, gpp_kpm = spec_kpm.moduli(freqs)
+    gp_kpm = gp_kpm * scale
+    gpp_kpm = gpp_kpm * scale
     t_kpm = time.perf_counter() - t0_kpm
 
     t0_slq = time.perf_counter()
-    gp_slq = (
-        nma.evaluate_storage_modulus_approx(
-            freqs,
-            method=pt.StochasticSpectralMethod.SLQ,
+    spec_slq = nma.solve_approx(
+        pt.SLQConfig(
             num_steps=num_lanczos_steps,
             num_random_vectors=num_random_vectors,
         )
-        * scale
     )
-    gpp_slq = (
-        nma.evaluate_loss_modulus_approx(
-            freqs,
-            method=pt.StochasticSpectralMethod.SLQ,
-            num_steps=num_lanczos_steps,
-            num_random_vectors=num_random_vectors,
-        )
-        * scale
-    )
+    gp_slq, gpp_slq = spec_slq.moduli(freqs)
+    gp_slq = gp_slq * scale
+    gpp_slq = gpp_slq * scale
     t_slq = time.perf_counter() - t0_slq
 
     t0_hybrid = time.perf_counter()
-    gp_hybrid = (
-        nma.evaluate_storage_modulus_approx(
-            freqs,
-            method=pt.StochasticSpectralMethod.HYBRID,
+    spec_hybrid = nma.solve_approx(
+        pt.HybridConfig(
             num_steps=num_lanczos_steps,
             num_random_vectors=num_random_vectors,
             num_exact_low_modes=num_exact_low_modes,
         )
-        * scale
     )
-    gpp_hybrid = (
-        nma.evaluate_loss_modulus_approx(
-            freqs,
-            method=pt.StochasticSpectralMethod.HYBRID,
-            num_steps=num_lanczos_steps,
-            num_random_vectors=num_random_vectors,
-            num_exact_low_modes=num_exact_low_modes,
-        )
-        * scale
-    )
+    gp_hybrid, gpp_hybrid = spec_hybrid.moduli(freqs)
+    gp_hybrid = gp_hybrid * scale
+    gpp_hybrid = gpp_hybrid * scale
     t_hybrid = time.perf_counter() - t0_hybrid
 
     if compute_exact:
         t0_ex = time.perf_counter()
-        nma.find_all_eigenvalues(
+        spec_ex = nma.solve_exact(
             solver=pt.NormalModeSolver.AUTO,
             compute_eigenvectors=False,
             decompose_components=True,
         )
-        gp_ex = nma.evaluate_storage_modulus(freqs) * scale
-        gpp_ex = nma.evaluate_loss_modulus(freqs) * scale
+        gp_ex, gpp_ex = spec_ex.moduli(freqs)
+        gp_ex = gp_ex * scale
+        gpp_ex = gpp_ex * scale
         t_ex = time.perf_counter() - t0_ex
     else:
         gp_ex = np.full_like(freqs, np.nan, dtype=float)

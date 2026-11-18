@@ -4,10 +4,16 @@ import unittest
 
 import numpy as np
 from pylimer_tools_cpp import (
+    ComputeBackend,
+    HybridConfig,
+    KPMConfig,
     NormalModeAnalyzer,
     NormalModeSolver,
-    StochasticSpectralMethod,
+    NormalModeSpectrum,
+    SLQConfig,
+    Universe,
 )
+from scipy import sparse
 
 
 class TestNormalModeAnalyzer(unittest.TestCase):
@@ -22,11 +28,48 @@ class TestNormalModeAnalyzer(unittest.TestCase):
         self.net_to = [1, 2, 3, 4, 6, 7, 5]
         self.nma_net = NormalModeAnalyzer(self.net_from, self.net_to)
 
-    def test_matrix_properties(self):
-        self.assertEqual(self.nma_ring.get_matrix_size(), 3)
-        mat = self.nma_ring.get_matrix().toarray()
+    def test_matrix_properties_and_factories(self):
+        self.assertEqual(self.nma_ring.size, 3)
+        mat = self.nma_ring.matrix.toarray()
         self.assertEqual(mat.shape, (3, 3))
         np.testing.assert_array_equal(np.diag(mat), [2.0, 2.0, 2.0])
+        self.assertEqual(self.nma_ring.num_soluble_clusters, 1)
+        self.assertEqual(self.nma_net.num_soluble_clusters, 2)
+
+        # from_matrix factory
+        nma_from_mat = NormalModeAnalyzer.from_matrix(self.nma_ring.matrix)
+        self.assertEqual(nma_from_mat.size, 3)
+        np.testing.assert_allclose(
+            nma_from_mat.solve_exact().eigenvalues,
+            self.nma_ring.solve_exact().eigenvalues,
+        )
+
+        # Weighted springs
+        nma_weighted = NormalModeAnalyzer([0], [1], 2, weights=[2.5])
+        evals_w = nma_weighted.solve_exact().eigenvalues
+        np.testing.assert_allclose(evals_w, [0.0, 5.0], atol=1e-9)
+
+        # from_universe factory
+        u = Universe(10.0, 10.0, 10.0)
+        u.add_atoms(
+            [1, 2, 3],
+            [1, 1, 1],
+            [0.0, 1.0, 2.0],
+            [0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0],
+            [0, 0, 0],
+            [0, 0, 0],
+            [0, 0, 0],
+        )
+        u.add_bonds([1, 2], [2, 3])
+        nma_u = NormalModeAnalyzer.from_universe(u)
+        self.assertEqual(nma_u.size, 3)
+        self.assertEqual(nma_u.num_soluble_clusters, 1)
+        self.assertEqual(nma_u.solve_exact().num_zero_modes, 1)
+
+        # Non-square matrix raises
+        with self.assertRaises(ValueError):
+            NormalModeAnalyzer.from_matrix(sparse.csc_matrix((2, 3)))
 
     def test_solvers_and_eigenvalues(self):
         solvers = [
@@ -37,101 +80,105 @@ class TestNormalModeAnalyzer(unittest.TestCase):
         ]
         for solver in solvers:
             with self.subTest(solver=solver):
-                nma = NormalModeAnalyzer(self.ring_from, self.ring_to)
-                nma.find_all_eigenvalues(solver=solver, decompose_components=False)
-                evals = nma.get_eigenvalues()
+                spec = self.nma_ring.solve_exact(
+                    solver=solver, decompose_components=False
+                )
+                self.assertTrue(spec.is_complete)
+                self.assertIsNone(spec.eigenvectors)
+                evals = spec.eigenvalues
                 self.assertEqual(len(evals), 3)
+                self.assertEqual(len(spec), 3)
                 self.assertAlmostEqual(evals[0], 0.0, places=5)
                 self.assertAlmostEqual(evals[1], 3.0, places=3)
                 self.assertAlmostEqual(evals[2], 3.0, places=3)
 
-    def test_legacy_boolean_signature_raises(self):
-        nma = NormalModeAnalyzer(self.ring_from, self.ring_to)
-        with self.assertRaises(TypeError):
-            nma.find_all_eigenvalues(True)
-
-    def test_auto_solver_eigenvectors(self):
-        nma = NormalModeAnalyzer(self.ring_from, self.ring_to)
-        nma.find_all_eigenvalues(
+    def test_auto_solver_eigenvectors_and_sparse_modes(self):
+        spec = self.nma_ring.solve_exact(
             solver=NormalModeSolver.AUTO, compute_eigenvectors=True
         )
-        evecs = nma.get_eigenvectors()
+        evecs = spec.eigenvectors
+        self.assertIsNotNone(evecs)
         self.assertEqual(evecs.shape, (3, 3))
         np.testing.assert_allclose(evecs.T @ evecs, np.eye(3), atol=1e-8)
 
+        # Partial spectrum via num_modes
+        sparse_spec = self.nma_net.solve_exact(num_modes=4)
+        self.assertFalse(sparse_spec.is_complete)
+        self.assertEqual(sparse_spec.num_modes, 4)
+
     def test_invalid_solver_argument(self):
-        nma = NormalModeAnalyzer(self.ring_from, self.ring_to)
         with self.assertRaises(TypeError):
-            nma.find_all_eigenvalues(solver="nonexistent_solver")
+            self.nma_ring.solve_exact(solver="nonexistent_solver")
         with self.assertRaises(TypeError):
-            nma.find_all_eigenvalues(solver=12345)
+            self.nma_ring.solve_exact(solver=12345)
         with self.assertRaises(TypeError):
-            nma.find_all_eigenvalues(solver=None)
+            self.nma_ring.solve_exact(solver=None)
 
     def test_component_decomposition(self):
-        nma_decomp = NormalModeAnalyzer(self.net_from, self.net_to)
-        nma_decomp.find_all_eigenvalues(decompose_components=True)
-        evals_decomp = nma_decomp.get_eigenvalues()
-
-        nma_dense = NormalModeAnalyzer(self.net_from, self.net_to)
-        nma_dense.find_all_eigenvalues(
+        spec_decomp = self.nma_net.solve_exact(decompose_components=True)
+        spec_dense = self.nma_net.solve_exact(
             solver=NormalModeSolver.DENSE_LAPACK, decompose_components=False
         )
-        evals_dense = nma_dense.get_eigenvalues()
+        np.testing.assert_allclose(
+            spec_decomp.eigenvalues, spec_dense.eigenvalues, atol=1e-5
+        )
+        self.assertEqual(spec_decomp.num_zero_modes, 2)
 
-        np.testing.assert_allclose(evals_decomp, evals_dense, atol=1e-5)
-        self.assertEqual(nma_decomp.get_nr_of_soluble_clusters(), 2)
-
-    def test_exact_moduli_and_stress_autocorrelation(self):
-        self.nma_ring.find_all_eigenvalues()
+    def test_spectrum_direct_construction_and_observables(self):
+        spec = self.nma_ring.solve_exact()
         omega = np.array([0.1, 1.0, 10.0])
-        g_prime = self.nma_ring.evaluate_storage_modulus(omega)
-        g_double_prime = self.nma_ring.evaluate_loss_modulus(omega)
+        g_prime = spec.storage_modulus(omega)
+        g_double_prime = spec.loss_modulus(omega)
+        gp_pair, gpp_pair = spec.moduli(omega)
+        np.testing.assert_allclose(gp_pair, g_prime)
+        np.testing.assert_allclose(gpp_pair, g_double_prime)
         self.assertEqual(len(g_prime), 3)
         self.assertEqual(len(g_double_prime), 3)
         self.assertTrue(g_prime[0] <= g_prime[1] <= g_prime[2])
 
         t = np.array([0.0, 1.0, 5.0])
-        gt = self.nma_ring.evaluate_stress_autocorrelation(t)
+        gt = spec.stress_autocorrelation(t)
         self.assertEqual(len(gt), 3)
         self.assertTrue(gt[0] >= gt[1] >= gt[2])
 
-    def test_kpm_methods(self):
-        nma = NormalModeAnalyzer(self.net_from, self.net_to)
+        # Direct construction from external solver eigenvalues
+        ext_spec = NormalModeSpectrum(spec.eigenvalues)
+        np.testing.assert_allclose(ext_spec.storage_modulus(omega), g_prime)
+        np.testing.assert_allclose(ext_spec.weights, np.ones(3))
 
-        # Chebyshev moments
-        moments = nma.compute_chebyshev_moments_kpm(
-            num_moments=64, num_random_vectors=10
+    def test_kpm_methods(self):
+        moments = self.nma_net.chebyshev_moments(
+            KPMConfig(num_moments=64, num_random_vectors=10)
         )
         self.assertEqual(len(moments), 64)
         self.assertAlmostEqual(moments[0], 1.0, delta=0.2)
 
-        # Density of states
         grid = np.linspace(0.5, 4.0, 10)
-        dos = nma.compute_density_of_states_kpm(
-            grid, num_moments=64, num_random_vectors=10
+        dos = self.nma_net.density_of_states(
+            grid, KPMConfig(num_moments=64, num_random_vectors=10)
         )
         self.assertEqual(len(dos), 10)
         self.assertTrue(np.all(dos >= 0.0))
 
-        # Moduli via KPM
+        kpm_spec = self.nma_net.solve_approx(
+            KPMConfig(
+                num_moments=128,
+                num_random_vectors=15,
+                num_quadrature_points=256,
+                backend=ComputeBackend.CPU,
+            )
+        )
+        self.assertFalse(kpm_spec.is_complete)
+
         omega = np.logspace(-1, 1, 5)
-        g_prime_kpm = nma.evaluate_storage_modulus_kpm(
-            omega, num_moments=128, num_random_vectors=15, num_quadrature_points=256
-        )
-        g_double_prime_kpm = nma.evaluate_loss_modulus_kpm(
-            omega, num_moments=128, num_random_vectors=15, num_quadrature_points=256
-        )
+        g_prime_kpm, g_double_prime_kpm = kpm_spec.moduli(omega)
         self.assertEqual(len(g_prime_kpm), 5)
         self.assertEqual(len(g_double_prime_kpm), 5)
         self.assertTrue(np.all(np.isfinite(g_prime_kpm)))
         self.assertTrue(np.all(np.isfinite(g_double_prime_kpm)))
 
-        # Stress autocorrelation via KPM
         t = np.array([0.0, 0.5, 2.0])
-        gt_kpm = nma.evaluate_stress_autocorrelation_kpm(
-            t, num_moments=128, num_random_vectors=15, num_quadrature_points=256
-        )
+        gt_kpm = kpm_spec.stress_autocorrelation(t)
         self.assertEqual(len(gt_kpm), 3)
         self.assertTrue(gt_kpm[0] >= gt_kpm[1] >= gt_kpm[2])
 
@@ -140,40 +187,23 @@ class TestNormalModeAnalyzer(unittest.TestCase):
         from_nodes = list(range(n - 1)) + list(range(0, 100, 10))
         to_nodes = list(range(1, n)) + list(range(20, 120, 10))
         nma = NormalModeAnalyzer(from_nodes, to_nodes, n + 2)
-        nma.find_all_eigenvalues()
+        exact_spec = nma.solve_exact()
 
         omega = np.logspace(-4, 2, 10)
-        gp_ex = nma.evaluate_storage_modulus(omega)
-        gpp_ex = nma.evaluate_loss_modulus(omega)
+        gp_ex, gpp_ex = exact_spec.moduli(omega)
         t = np.array([0.0, 0.5, 2.0])
-        gt_ex = nma.evaluate_stress_autocorrelation(t)
+        gt_ex = exact_spec.stress_autocorrelation(t)
 
-        for method in (
-            StochasticSpectralMethod.SLQ,
-            StochasticSpectralMethod.HYBRID,
-            StochasticSpectralMethod.AUTO,
+        for cfg in (
+            SLQConfig(num_steps=120, num_random_vectors=30),
+            HybridConfig(
+                num_steps=120, num_random_vectors=30, num_exact_low_modes=30
+            ),
+            None,
         ):
-            gp = nma.evaluate_storage_modulus_approx(
-                omega,
-                method=method,
-                num_steps=120,
-                num_random_vectors=30,
-                num_exact_low_modes=30,
-            )
-            gpp = nma.evaluate_loss_modulus_approx(
-                omega,
-                method=method,
-                num_steps=120,
-                num_random_vectors=30,
-                num_exact_low_modes=30,
-            )
-            gt = nma.evaluate_stress_autocorrelation_approx(
-                t,
-                method=method,
-                num_steps=120,
-                num_random_vectors=30,
-                num_exact_low_modes=30,
-            )
+            spec = nma.solve_approx(cfg)
+            gp, gpp = spec.moduli(omega)
+            gt = spec.stress_autocorrelation(t)
             self.assertEqual(len(gp), len(omega))
             self.assertEqual(len(gpp), len(omega))
             self.assertTrue(np.all(np.isfinite(gp)))
@@ -183,22 +213,37 @@ class TestNormalModeAnalyzer(unittest.TestCase):
             np.testing.assert_allclose(gp, gp_ex, rtol=0.25)
             np.testing.assert_allclose(gpp, gpp_ex, rtol=0.25)
 
-        gp_kpm = nma.evaluate_storage_modulus_approx(
-            omega,
-            method=StochasticSpectralMethod.KPM,
-            num_steps=256,
-            num_random_vectors=20,
+        kpm_spec = nma.solve_approx(
+            KPMConfig(num_moments=256, num_random_vectors=20)
         )
+        gp_kpm = kpm_spec.storage_modulus(omega)
         self.assertEqual(len(gp_kpm), len(omega))
         self.assertTrue(np.all(np.isfinite(gp_kpm)))
 
+        self.assertIn("backend=ComputeBackend.AUTO", repr(SLQConfig()))
+        self.assertIn("backend=ComputeBackend.AUTO", repr(HybridConfig()))
+        self.assertIn("backend=ComputeBackend.AUTO", repr(KPMConfig()))
+        with self.assertRaises(ValueError):
+            nma.solve_approx(SLQConfig(backend=ComputeBackend.METAL))
+        with self.assertRaises(ValueError):
+            nma.chebyshev_moments(KPMConfig(backend=ComputeBackend.CUDA))
+        with self.assertRaises(ValueError):
+            nma.chebyshev_moments(KPMConfig(batch_size=0))
+
     def test_serialization(self):
-        self.nma_ring.find_all_eigenvalues()
-        evals_before = self.nma_ring.get_eigenvalues()
-        pickled = pickle.dumps(self.nma_ring)
-        unpickled = pickle.loads(pickled)
-        evals_after = unpickled.get_eigenvalues()
-        np.testing.assert_array_equal(evals_before, evals_after)
+        spec = self.nma_ring.solve_exact(compute_eigenvectors=True)
+        unpickled_nma = pickle.loads(pickle.dumps(self.nma_ring))
+        self.assertEqual(unpickled_nma.size, self.nma_ring.size)
+
+        unpickled_spec = pickle.loads(pickle.dumps(spec))
+        np.testing.assert_array_equal(
+            spec.eigenvalues, unpickled_spec.eigenvalues
+        )
+        np.testing.assert_array_equal(spec.weights, unpickled_spec.weights)
+        np.testing.assert_array_equal(
+            spec.eigenvectors, unpickled_spec.eigenvectors
+        )
+        self.assertEqual(spec.is_complete, unpickled_spec.is_complete)
 
 
 if __name__ == "__main__":

@@ -2733,32 +2733,31 @@ A strand is a chain of connected links between two crosslinks.
            "Iterative Conjugate Gradient solver")
     .finalize();
 
-  py::class_<RouseSimulationResult, py::smart_holder>(
-    m,
-    "RouseSimulationResult",
-    R"pbdoc(
+  py::class_<RouseSimulationResult, py::smart_holder>(m,
+                                                      "RouseSimulationResult",
+                                                      R"pbdoc(
       Output container for Rouse dynamics simulation runs.
     )pbdoc")
-    .def_readonly("times",
-                  &RouseSimulationResult::times,
-                  "Sampled simulation times.")
+    .def_readonly(
+      "times", &RouseSimulationResult::times, "Sampled simulation times.")
     .def_readonly("msd",
                   &RouseSimulationResult::msd,
                   "Bead mean-squared displacement at sampled times.")
     .def_readonly("msd_center_of_mass",
                   &RouseSimulationResult::msdCenterOfMass,
                   "Center-of-mass mean-squared displacement at sampled times.")
-    .def_readonly("end_to_end_correlation",
-                  &RouseSimulationResult::endToEndCorrelation,
-                  "Normalized end-to-end vector autocorrelation at sampled times.")
-    .def_readonly("trajectory",
-                  &RouseSimulationResult::trajectory,
-                  "List of (N, 3) position matrices if save_trajectory was enabled.");
+    .def_readonly(
+      "end_to_end_correlation",
+      &RouseSimulationResult::endToEndCorrelation,
+      "Normalized end-to-end vector autocorrelation at sampled times.")
+    .def_readonly(
+      "trajectory",
+      &RouseSimulationResult::trajectory,
+      "List of (N, 3) position matrices if save_trajectory was enabled.");
 
-  py::class_<RouseBrownianSimulator, py::smart_holder>(
-    m,
-    "RouseBrownianSimulator",
-    R"pbdoc(
+  py::class_<RouseBrownianSimulator, py::smart_holder>(m,
+                                                       "RouseBrownianSimulator",
+                                                       R"pbdoc(
       Implicit time-stepping Rouse and Brownian dynamics simulator for polymer chains
       and general spring networks.
     )pbdoc")
@@ -2946,25 +2945,29 @@ A strand is a chain of connected links between two crosslinks.
     .def("get_laplacian",
          &RouseBrownianSimulator::getLaplacian,
          "Get the sparse graph Laplacian matrix L.")
-    .def("get_shifted_matrix",
-         &RouseBrownianSimulator::getShiftedMatrix,
-         "Get the shifted implicit stepping matrix A = I + dt * (k / gamma) * L.")
+    .def(
+      "get_shifted_matrix",
+      &RouseBrownianSimulator::getShiftedMatrix,
+      "Get the shifted implicit stepping matrix A = I + dt * (k / gamma) * L.")
     .def("step",
          &RouseBrownianSimulator::step,
          "Advance the simulation by num_steps implicit Brownian steps.",
          py::arg("num_steps") = 1)
     .def("step_with_external_forces",
          &RouseBrownianSimulator::stepWithExternalForces,
-         "Advance the simulation by num_steps under external forces and thermal noise.",
+         "Advance the simulation by num_steps under external forces and "
+         "thermal noise.",
          py::arg("forces"),
          py::arg("num_steps") = 1)
     .def("step_deterministic",
          &RouseBrownianSimulator::stepDeterministic,
-         "Advance the simulation by num_steps deterministic relaxation steps (without thermal noise).",
+         "Advance the simulation by num_steps deterministic relaxation steps "
+         "(without thermal noise).",
          py::arg("num_steps") = 1)
     .def("step_deterministic_with_external_forces",
          &RouseBrownianSimulator::stepDeterministicWithExternalForces,
-         "Advance the simulation by num_steps deterministic steps under external forces.",
+         "Advance the simulation by num_steps deterministic steps under "
+         "external forces.",
          py::arg("forces"),
          py::arg("num_steps") = 1)
     .def("get_center_of_mass",
@@ -2977,7 +2980,8 @@ A strand is a chain of connected links between two crosslinks.
           (node_b < 0) ? static_cast<size_t>(-1) : static_cast<size_t>(node_b);
         return self.getEndToEndVector(node_a, actual_b);
       },
-      "Compute the 3D vector from node_a to node_b (defaults to last node if node_b < 0).",
+      "Compute the 3D vector from node_a to node_b (defaults to last node if "
+      "node_b < 0).",
       py::arg("node_a") = 0,
       py::arg("node_b") = -1)
     .def(
@@ -2987,7 +2991,8 @@ A strand is a chain of connected links between two crosslinks.
           (node_b < 0) ? static_cast<size_t>(-1) : static_cast<size_t>(node_b);
         return self.getEndToEndDistance(node_a, actual_b);
       },
-      "Compute the Euclidean distance between node_a and node_b (defaults to last node if node_b < 0).",
+      "Compute the Euclidean distance between node_a and node_b (defaults to "
+      "last node if node_b < 0).",
       py::arg("node_a") = 0,
       py::arg("node_b") = -1)
     .def("get_radius_of_gyration",
@@ -2995,7 +3000,8 @@ A strand is a chain of connected links between two crosslinks.
          "Compute the radius of gyration of the current bead configuration.")
     .def("get_potential_energy",
          &RouseBrownianSimulator::getPotentialEnergy,
-         "Compute the harmonic spring potential energy of the current configuration.")
+         "Compute the harmonic spring potential energy of the current "
+         "configuration.")
     .def(
       "run",
       [](RouseBrownianSimulator& self,
@@ -3013,7 +3019,8 @@ A strand is a chain of connected links between two crosslinks.
                         end_to_end_node_a,
                         actual_b);
       },
-      "Run the simulation for total_steps and record dynamical observables every sample_interval steps.",
+      "Run the simulation for total_steps and record dynamical observables "
+      "every sample_interval steps.",
       py::arg("total_steps"),
       py::arg("sample_interval") = 1,
       py::arg("save_trajectory") = false,
@@ -3021,12 +3028,14 @@ A strand is a chain of connected links between two crosslinks.
       py::arg("end_to_end_node_b") = -1)
     .def_static("compute_msd",
                 &RouseBrownianSimulator::computeMSD,
-                "Compute bead mean-squared displacement from a trajectory of (N, 3) position matrices.",
+                "Compute bead mean-squared displacement from a trajectory of "
+                "(N, 3) position matrices.",
                 py::arg("trajectory"),
                 py::arg("time_averaged") = false)
     .def_static("compute_center_of_mass_msd",
                 &RouseBrownianSimulator::computeCenterOfMassMSD,
-                "Compute center-of-mass mean-squared displacement from a trajectory of (N, 3) position matrices.",
+                "Compute center-of-mass mean-squared displacement from a "
+                "trajectory of (N, 3) position matrices.",
                 py::arg("trajectory"),
                 py::arg("time_averaged") = false)
     .def_static(
@@ -3040,7 +3049,8 @@ A strand is a chain of connected links between two crosslinks.
         return RouseBrownianSimulator::computeEndToEndAutocorrelation(
           trajectory, node_a, actual_b, time_averaged);
       },
-      "Compute normalized end-to-end vector autocorrelation from a trajectory of (N, 3) position matrices.",
+      "Compute normalized end-to-end vector autocorrelation from a trajectory "
+      "of (N, 3) position matrices.",
       py::arg("trajectory"),
       py::arg("node_a") = 0,
       py::arg("node_b") = -1,

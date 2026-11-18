@@ -552,9 +552,9 @@ ResistanceDistanceAnalysis::computeTotalResistancePerNode() const
   const double traceX = diagX.sum();
   Eigen::VectorXd tot = Eigen::VectorXd::Zero(N);
   for (Eigen::Index i = 0; i < N; ++i) {
-    tot(i) = std::max(
-      0.0,
-      static_cast<double>(numNodes_) * diagX(i) + traceX - 2.0 * rowSumsX(i));
+    tot(i) = std::max(0.0,
+                      static_cast<double>(numNodes_) * diagX(i) + traceX -
+                        2.0 * rowSumsX(i));
   }
   return tot;
 }

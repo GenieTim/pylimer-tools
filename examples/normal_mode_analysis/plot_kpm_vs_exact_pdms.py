@@ -105,36 +105,24 @@ pairs = atom_pairs.pairs_of_atoms
 if pairs:
     universe.add_bonds([pair[0] for pair in pairs], [pair[1] for pair in pairs])
 
-edges = universe.get_edges()
-nma = pt.NormalModeAnalyzer(
-    edges["edge_from"], edges["edge_to"], universe.get_nr_of_atoms()
-)
+nma = pt.NormalModeAnalyzer.from_universe(universe)
 
 freqs_demo = np.logspace(-3, 2, 50)
 t0 = time.perf_counter()
-nma.find_all_eigenvalues(
+spec_exact_demo = nma.solve_exact(
     solver=pt.NormalModeSolver.AUTO,
     compute_eigenvectors=False,
     decompose_components=True,
 )
-gp_exact_demo = nma.evaluate_storage_modulus(freqs_demo) * gamma_conv / vol
+gp_exact_demo = spec_exact_demo.storage_modulus(freqs_demo) * gamma_conv / vol
 t_exact_demo = time.perf_counter() - t0
 
 demo_methods = [
-    (
-        "KPM",
-        pt.StochasticSpectralMethod.KPM,
-        {"num_steps": 1024, "num_random_vectors": 20},
-    ),
-    (
-        "SLQ",
-        pt.StochasticSpectralMethod.SLQ,
-        {"num_steps": 200, "num_random_vectors": 20},
-    ),
+    ("KPM", pt.KPMConfig(num_moments=1024, num_random_vectors=20)),
+    ("SLQ", pt.SLQConfig(num_steps=200, num_random_vectors=20)),
     (
         "Hybrid",
-        pt.StochasticSpectralMethod.HYBRID,
-        {"num_steps": 200, "num_random_vectors": 20, "num_exact_low_modes": 100},
+        pt.HybridConfig(num_steps=200, num_random_vectors=20, num_exact_low_modes=100),
     ),
 ]
 print(
@@ -146,12 +134,10 @@ print(
 )
 print("-" * 77)
 print(f"{'Exact':<8} | {t_exact_demo:8.3f} | {'1.0x':>8} | {'0.00':>21} | {'0.00':>20}")
-for name, method, kw in demo_methods:
+for name, cfg in demo_methods:
     t0 = time.perf_counter()
     gp_approx_demo = (
-        nma.evaluate_storage_modulus_approx(freqs_demo, method=method, **kw)
-        * gamma_conv
-        / vol
+        nma.solve_approx(cfg).storage_modulus(freqs_demo) * gamma_conv / vol
     )
     dt_demo = time.perf_counter() - t0
     rel_err = (
