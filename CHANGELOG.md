@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.7.0
+
+### Normal Mode Analysis Refactor, Approximate Spectral Methods & Zero-Copy Internals
+- **Approximate Spectral Methods & Typed Solver Configs (`NormalModeAnalyzer`, `NormalModeSpectrum`)**:
+  - Add Stochastic Lanczos Quadrature (`SLQConfig`), Hybrid exact low-mode + deflated SLQ (`HybridConfig`), and Kernel Polynomial Method (`KPMConfig`) approximate spectral methods to `NormalModeAnalyzer`, with `ComputeBackend` (`AUTO`, `CPU`, `METAL`, `CUDA`) dispatch.
+  - Refactor `NormalModeAnalyzer` to return `NormalModeSpectrum` objects and accept typed solver configuration structs instead of mutating internal eigenvalue/eigenvector state.
+  - Add `NormalModeSolver::CUDA` enum entry and update Python bindings (`calculations.cpp`, `simulations.cpp`) and type stubs (`src/pylimer_tools_cpp-stubs/__init__.pyi`).
+- **Zero-Copy C++ Internals & Direct Strand Discovery**:
+  - Refactor C++ internals across `AtomGraphParent`, `Universe`, `UniverseSequence`, `MEHPForceBalance`, `MEHPForceBalance2`, `MEHPNetworkBuilders`, `RouseBrownianSimulator`, `EntanglementDetector`, `ResistanceDistanceAnalysis`, `NormalModeAnalyzer`, and I/O parsers (`AveFileReader`, `DataFileParser`, `DumpFileParser`) for zero-copy views, direct strand discovery, and cleaner indexing.
+  - Reduce compiler warnings across C++ sources.
+- **Solver Robustness, Build System & Examples**:
+  - Robustify `gradientDescentHeavyBallBarzilaiBorwein` in `ExtraEigenSolvers.h` with adaptive sign-preserving BB step sizes (supporting negative-definite systems), adaptive momentum restart, blow-up backtracking, and cached residual norms.
+  - Set default hidden symbol visibility in CMake, forward `PYLIMER_WASM_*_FLAGS` for Pyodide/WASM builds, and honor `CMAKE_BUILD_TYPE` in `setup.py`.
+  - Add KPM vs. exact normal mode analysis example (`examples/normal_mode_analysis/plot_kpm_vs_exact_pdms.py`), rename NMA example helper modules to avoid Sphinx-Gallery `sys.modules` collisions, record device/CPU/RAM metadata in example caches (`examples/_example_cache.py`), and configure `sphinx_llm` in `docs/conf.py`.
+
 ## v0.6.0
 
 ### Unified Entanglement Sampling, Performance & Robustness Improvements
