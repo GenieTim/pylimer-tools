@@ -97,11 +97,11 @@ writer.write_to_file("generated_structures/multi_component_polymer_network.data"
 ```
 
 ```none
-Starting network generation at 2026-11-17 17:19:18.348522
+Starting network generation at 2026-11-18 05:49:42.131907
 Adding crosslinkers...
 Adding solvent chains...
 Adding and linking polymer strands...
-Network generation completed at 2026-11-17 17:19:18.349974
+Network generation completed at 2026-11-18 05:49:42.133756
 ```
 
 <!-- GENERATED FROM PYTHON SOURCE LINES 89-92 -->
@@ -151,7 +151,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.083 seconds)
+**Total running time of the script:** (0 minutes 0.135 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-multi-component-system-py"></a>
 

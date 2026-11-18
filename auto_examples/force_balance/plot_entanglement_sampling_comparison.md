@@ -41,7 +41,7 @@ two complementary sampling methods:
 Both methods support **topological leaf peeling** (`filtering_mode=EntanglementFilteringMode.OMIT_INACTIVE`
 or `PRUNE_UPFRONT`), discarding candidate links involving dangling chains or soluble molecules.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 34-57 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 34-61 -->
 ```Python
 from pathlib import Path
 import sys
@@ -53,7 +53,11 @@ if "__file__" in globals():
         if _p not in sys.path:
             sys.path.insert(0, _p)
 
-from _example_cache import get_example_cache_path, load_or_compute_cache  # noqa: E402
+from _example_cache import (  # noqa: E402
+    format_benchmark_footnote,
+    get_example_cache_path,
+    load_or_compute_cache,
+)
 from _plotting import (  # noqa: E402
     plot_sampling_conversion_sweep,
     plot_sampling_distributions,
@@ -66,7 +70,7 @@ from _study_runners import run_all_benchmarks  # noqa: E402
 import pylimer_tools_cpp as pt  # noqa: E402
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 58-68 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 62-72 -->
 
 ## Minimal Usage: On-Demand vs. Discrete Sampling
 
@@ -79,7 +83,7 @@ Multi-seed scaling and ensemble plots in the following sections load precomputed
 benchmark data (recomputable via `--recompute` or
 `PYLIMER_RECOMPUTE_CACHE=1`).
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 68-106 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 72-110 -->
 ```Python
 gen = pt.MCUniverseGenerator(18.0, 18.0, 18.0)
 gen.set_seed(42)
@@ -124,7 +128,7 @@ On-demand links: 226, Discrete links: 234
 Loading cached example data from entanglement_sampling_comparison_cache.npz...
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 107-112 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 111-116 -->
 
 ## Memory Footprint & Runtime Scaling
 
@@ -132,13 +136,13 @@ Explicit bead generation inflates peak resident memory (RSS) due to bead coordin
 neighbor search structures, and igraph graphs. On-demand bounding-box sampling keeps memory
 nearly flat while also running faster on large networks.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 112-116 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 116-120 -->
 ```Python
 plot_sampling_memory_scaling(data)
 plot_sampling_runtime_scaling(data)
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 117-123 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 121-127 -->
 
 ## Strand-Length Scaling & Phase Breakdown
 
@@ -147,13 +151,13 @@ between $O(N_{\text{strands}})$ and $O(N_{\text{atoms}})$ work. The phase breakd
 isolates where discrete sampling spends its time (`get_universe`,
 sampling, and graph build).
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 123-127 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 127-131 -->
 ```Python
 plot_sampling_strand_length_scaling(data)
 plot_sampling_phase_breakdown(data)
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 128-133 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 132-137 -->
 
 ## Conformational Distributions ($\alpha$ and $r$)
 
@@ -161,12 +165,12 @@ Because on-demand sampling regenerates exact discrete bead paths inside candidat
 both contour positions $\alpha$ (uniform) and spatial pair separations $r$
 ($\propto r^2$) match discrete sampling.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 133-136 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 137-140 -->
 ```Python
 plot_sampling_distributions(data)
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 137-148 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 141-152 -->
 
 ## Defective Networks Across Conversion ($p \in [0.75, 1.00]$)
 
@@ -180,12 +184,29 @@ Below full conversion, dangling chains and sol fractions must be handled consist
   effective entanglement density when nominal $N_{\text{ent}}$ is
   fixed per total volume).
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 148-150 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 152-155 -->
 ```Python
 plot_sampling_conversion_sweep(data)
 ```
 
-**Total running time of the script:** (0 minutes 1.025 seconds)
+<!-- GENERATED FROM PYTHON SOURCE LINES 156-161 -->
+
+## Benchmark Hardware
+
+#### NOTE
+The cached memory and runtime benchmarks above were recorded on the
+hardware reported below.
+
+<!-- GENERATED FROM PYTHON SOURCE LINES 161-162 -->
+```Python
+print(format_benchmark_footnote(data))
+```
+
+```none
+Measured on: Apple M3 Pro (12 cores), 36 GB RAM, Mac15,7, macOS 27.2.1 (arm64), Python 3.13.18 (cached 2026-11-17).
+```
+
+**Total running time of the script:** (0 minutes 1.744 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-entanglement-sampling-comparison-py"></a>
 

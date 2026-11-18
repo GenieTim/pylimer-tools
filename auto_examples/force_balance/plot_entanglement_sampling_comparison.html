@@ -461,7 +461,11 @@ or <code class="docutils literal notranslate"><span class="pre">PRUNE_UPFRONT</s
 </span>        <span class="k">if</span> <span class="n">_p</span> <span class="ow">not</span> <span class="ow">in</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="list"><span class="n">sys</span><span class="o">.</span><span class="n">path</span></a><span class="p">:</span><span class="w">
 </span>            <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="list"><span class="n">sys</span><span class="o">.</span><span class="n">path</span></a><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">_p</span><span class="p">)</span><span class="w">
 </span><span class="w">
-</span><span class="kn">from</span><span class="w"> </span><span class="nn">_example_cache</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_example_cache_path</span><span class="p">,</span> <span class="n">load_or_compute_cache</span>  <span class="c1"># noqa: E402</span><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">_example_cache</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>  <span class="c1"># noqa: E402</span><span class="w">
+</span>    <span class="n">format_benchmark_footnote</span><span class="p">,</span><span class="w">
+</span>    <span class="n">get_example_cache_path</span><span class="p">,</span><span class="w">
+</span>    <span class="n">load_or_compute_cache</span><span class="p">,</span><span class="w">
+</span><span class="p">)</span><span class="w">
 </span><span class="kn">from</span><span class="w"> </span><span class="nn">_plotting</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>  <span class="c1"># noqa: E402</span><span class="w">
 </span>    <span class="n">plot_sampling_conversion_sweep</span><span class="p">,</span><span class="w">
 </span>    <span class="n">plot_sampling_distributions</span><span class="p">,</span><span class="w">
@@ -573,7 +577,20 @@ fixed per total volume).</p></li>
 </ul>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">plot_sampling_conversion_sweep</span><span class="p">(</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="dict"><span class="n">data</span></a><span class="p">)</span><span class="w">
 </span></pre></div></div>
-<img src="../../_images/sphx_glr_plot_entanglement_sampling_comparison_006.png" srcset="../../_images/sphx_glr_plot_entanglement_sampling_comparison_006.png" alt="Shear Modulus vs. Conversion, Active Entanglements After Simplification, Network Activity & Entanglement Retention" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.025 seconds)</p>
+<img src="../../_images/sphx_glr_plot_entanglement_sampling_comparison_006.png" srcset="../../_images/sphx_glr_plot_entanglement_sampling_comparison_006.png" alt="Shear Modulus vs. Conversion, Active Entanglements After Simplification, Network Activity & Entanglement Retention" class = "sphx-glr-single-img"/></section>
+<section id="benchmark-hardware">
+<h2>Benchmark Hardware<a class="headerlink" href="#benchmark-hardware" title="Link to this heading">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The cached memory and runtime benchmarks above were recorded on the
+hardware reported below.</p>
+</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="nb">print</span><span class="p">(</span><span class="n">format_benchmark_footnote</span><span class="p">(</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="dict"><span class="n">data</span></a><span class="p">)</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Measured on: Apple M3 Pro (12 cores), 36 GB RAM, Mac15,7, macOS 27.2.1 (arm64), Python 3.13.18 (cached 2026-11-17).
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.744 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-force-balance-plot-entanglement-sampling-comparison-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/e982b60b86203b0d7ad5e3e99407fe20/plot_entanglement_sampling_comparison.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_entanglement_sampling_comparison.ipynb</span></code></a></p>
@@ -650,6 +667,7 @@ fixed per total volume).</p></li>
 <li><a class="reference internal" href="#strand-length-scaling-phase-breakdown">Strand-Length Scaling &amp; Phase Breakdown</a></li>
 <li><a class="reference internal" href="#conformational-distributions-alpha-and-r">Conformational Distributions (<span class="math notranslate nohighlight">\(\alpha\)</span> and <span class="math notranslate nohighlight">\(r\)</span>)</a></li>
 <li><a class="reference internal" href="#defective-networks-across-conversion-p-in-0-75-1-00">Defective Networks Across Conversion (<span class="math notranslate nohighlight">\(p \in [0.75, 1.00]\)</span>)</a></li>
+<li><a class="reference internal" href="#benchmark-hardware">Benchmark Hardware</a></li>
 </ul>
 </li>
 </ul>

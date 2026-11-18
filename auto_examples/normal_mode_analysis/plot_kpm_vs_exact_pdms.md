@@ -37,7 +37,7 @@ We examine:
 3. **Stoichiometric imbalance** $r = f N_{\text{xlinks}} / (2 N_{\text{strands}})$, and
 4. **Representative volume, sample count, and computational scaling**.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 31-60 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 31-64 -->
 ```Python
 from pathlib import Path
 import sys
@@ -52,7 +52,11 @@ if "__file__" in globals():
         if _p not in sys.path:
             sys.path.insert(0, _p)
 
-from _example_cache import get_example_cache_path, load_or_compute_cache  # noqa: E402
+from _example_cache import (  # noqa: E402
+    format_benchmark_footnote,
+    get_example_cache_path,
+    load_or_compute_cache,
+)
 from _nma_plotting import (  # noqa: E402
     plot_kpm_vs_exact_chain_length,
     plot_kpm_vs_exact_conversion,
@@ -68,7 +72,7 @@ from pylimer_tools.io.bead_spring_parameter_provider import (  # noqa: E402
 import pylimer_tools_cpp as pt  # noqa: E402
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 61-68 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 65-72 -->
 
 ## Single PDMS Realization with On-Demand Entanglement Sampling
 
@@ -78,7 +82,7 @@ network, sample entanglements on demand, add the entanglement springs as bonds
 in the generated [`Universe`](../../api/pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe), and compare exact vs.
 KPM moduli.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 68-168 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 72-172 -->
 ```Python
 params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
 assert isinstance(params, Parameters)
@@ -184,14 +188,14 @@ data = load_or_compute_cache(cache_path, run_kpm_vs_exact_pdms_study)
 Demo PDMS box (L=12 nm, N_atoms=3819, N_ent=84):
 Method   | Time [s] |  Speedup | Mean Rel. Err. G' [%] | Max Rel. Err. G' [%]
 -----------------------------------------------------------------------------
-Exact    |    9.857 |     1.0x |                  0.00 |                 0.00
-KPM      |    0.115 |    85.4x |                  2.69 |                 9.99
-SLQ      |    0.039 |   252.6x |                  0.68 |                 4.79
-Hybrid   |    0.177 |    55.6x |                  0.64 |                 1.80
+Exact    |    7.418 |     1.0x |                  0.00 |                 0.00
+KPM      |    0.146 |    50.7x |                  2.69 |                 9.99
+SLQ      |    0.047 |   157.2x |                  0.68 |                 4.79
+Hybrid   |    0.140 |    53.0x |                  0.64 |                 1.80
 Loading cached example data from kpm_vs_exact_pdms_cache.npz...
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 169-180 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 173-184 -->
 
 ## Effect of Chain Length ($N$)
 
@@ -205,12 +209,12 @@ and $G''(\omega)$ accurately across the transition and Rouse regimes
 deviations only in the lowest-frequency tail where very few eigenvalues
 reside.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 180-183 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 184-187 -->
 ```Python
 plot_kpm_vs_exact_chain_length(data)
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 184-194 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 188-198 -->
 
 ## Effect of Cross-link Conversion ($p$)
 
@@ -223,12 +227,12 @@ frequencies while leaving the high-frequency segmental Rouse response
 ($\omega\tau_0 \gtrsim 0.1$) largely unchanged. KPM captures this
 conversion-dependent softening faithfully without computing any eigenvalues.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 194-197 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 198-201 -->
 ```Python
 plot_kpm_vs_exact_conversion(data)
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 198-209 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 202-213 -->
 
 ## Effect of Stoichiometric Imbalance ($r$)
 
@@ -242,12 +246,12 @@ regime, whereas excess cross-linker ($r = 1.25$) maintains a higher
 strand conversion and modulus closer to the stoichiometric reference
 ($r = 1.00$). Across all $r$, KPM tracks the exact spectra closely.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 209-212 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 213-216 -->
 ```Python
 plot_kpm_vs_exact_stoichiometry(data)
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 213-227 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 217-231 -->
 
 ## Representative Volume, Sample Count, and Computational Scaling
 
@@ -264,7 +268,7 @@ in $\sim 9.8\,\text{s}$. Larger boxes also suppress finite-size scatter,
 reducing the number of realizations $n_{\text{samples}}$ required for a
 target 95% confidence interval.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 227-276 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 231-281 -->
 ```Python
 print(
     "\nAccuracy comparison across parameter sweeps (mean / max rel. error vs. Exact [%]):"
@@ -323,26 +327,43 @@ Method   | Study         | Mean Err G' [%] | Max Err G' [%] | Mean Err G'' [%] |
 KPM      | Chain Length  |           21.84 |         410.09 |             2.91 |           26.84
 KPM      | Conversion    |           10.95 |          81.63 |             3.97 |           39.65
 KPM      | Stoichiometry |           10.51 |          81.34 |             4.14 |           39.08
-SLQ      | Chain Length  |            1.91 |          47.50 |             0.51 |            5.12
-SLQ      | Conversion    |            2.16 |          41.91 |             0.54 |            3.81
+SLQ      | Chain Length  |            1.91 |          47.49 |             0.51 |            5.12
+SLQ      | Conversion    |            2.16 |          41.90 |             0.54 |            3.81
 SLQ      | Stoichiometry |            1.93 |          38.16 |             0.61 |           10.84
 Hybrid   | Chain Length  |            0.15 |           0.68 |             0.19 |            0.74
-Hybrid   | Conversion    |            0.21 |           0.73 |             0.26 |            0.64
-Hybrid   | Stoichiometry |            0.16 |           0.66 |             0.21 |            0.67
+Hybrid   | Conversion    |            0.20 |           0.73 |             0.25 |            0.64
+Hybrid   | Stoichiometry |            0.17 |           0.68 |             0.22 |            0.67
 
 Runtime comparison per network (single-threaded worker, mean over repeats):
  L [nm] |  N_atoms |  N_ent |  Exact [s] |   KPM [s] |   SLQ [s] | Hybrid [s]
 -------------------------------------------------------------------------
-     10 |     2211 |     50 |     12.86s |    0.483s |    1.000s |     2.008s
-     12 |     3819 |     86 |     59.83s |    0.552s |    1.216s |     4.014s
-     14 |     6130 |    130 |    117.04s |    0.518s |    1.212s |     5.986s
-     16 |     9146 |    213 |    231.42s |    0.522s |    1.239s |     6.433s
-     20 |    17788 |    383 |   1046.24s |    0.632s |    1.772s |    13.060s
-     28 |    48843 |   1095 |    skipped |    1.301s |    9.916s |    52.878s
-     36 |   103816 |   2324 |    skipped |    3.526s |   29.958s |   120.455s
+     10 |     2211 |     50 |      1.94s |    0.091s |    0.153s |     0.230s
+     12 |     3819 |     86 |     13.09s |    0.097s |    0.195s |     0.452s
+     14 |     6130 |    130 |     13.44s |    0.096s |    0.284s |     0.868s
+     16 |     9146 |    213 |     42.71s |    0.094s |    0.333s |     1.126s
+     20 |    17788 |    383 |    259.44s |    0.100s |    0.580s |     2.704s
+     28 |    48843 |   1095 |    skipped |    0.154s |    2.333s |    11.314s
+     36 |   103816 |   2324 |    skipped |    0.547s |    6.324s |    26.636s
 ```
 
-**Total running time of the script:** (0 minutes 12.969 seconds)
+<!-- GENERATED FROM PYTHON SOURCE LINES 282-287 -->
+
+## Benchmark Hardware
+
+#### NOTE
+The cached runtime scaling benchmarks above were recorded on the
+hardware reported below.
+
+<!-- GENERATED FROM PYTHON SOURCE LINES 287-288 -->
+```Python
+print(format_benchmark_footnote(data))
+```
+
+```none
+Measured on: Apple M3 Pro (12 cores), 36 GB RAM, Mac15,7, macOS 27.2.1 (arm64), Python 3.13.18 (cached 2026-11-17).
+```
+
+**Total running time of the script:** (0 minutes 11.350 seconds)
 
 <a id="sphx-glr-download-auto-examples-normal-mode-analysis-plot-kpm-vs-exact-pdms-py"></a>
 

@@ -42,7 +42,11 @@ if "__file__" in globals():
         if _p not in sys.path:
             sys.path.insert(0, _p)
 
-from _example_cache import get_example_cache_path, load_or_compute_cache  # noqa: E402
+from _example_cache import (  # noqa: E402
+    format_benchmark_footnote,
+    get_example_cache_path,
+    load_or_compute_cache,
+)
 from _plotting import (  # noqa: E402
     plot_sampling_conversion_sweep,
     plot_sampling_distributions,
@@ -147,3 +151,11 @@ plot_sampling_distributions(data)
 #   fixed per total volume).
 
 plot_sampling_conversion_sweep(data)
+
+# %%
+# Benchmark Hardware
+# ------------------
+# .. note::
+#    The cached memory and runtime benchmarks above were recorded on the
+#    hardware reported below.
+print(format_benchmark_footnote(data))

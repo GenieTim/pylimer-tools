@@ -46,7 +46,7 @@ We examine:
 3. **Stoichiometric imbalance** :math:`r = f N_{\text{xlinks}} / (2 N_{\text{strands}})`, and
 4. **Representative volume, sample count, and computational scaling**.
 
-.. GENERATED FROM PYTHON SOURCE LINES 31-60
+.. GENERATED FROM PYTHON SOURCE LINES 31-64
 
 .. code-block:: Python
 
@@ -64,7 +64,11 @@ We examine:
             if _p not in sys.path:
                 sys.path.insert(0, _p)
 
-    from _example_cache import get_example_cache_path, load_or_compute_cache  # noqa: E402
+    from _example_cache import (  # noqa: E402
+        format_benchmark_footnote,
+        get_example_cache_path,
+        load_or_compute_cache,
+    )
     from _nma_plotting import (  # noqa: E402
         plot_kpm_vs_exact_chain_length,
         plot_kpm_vs_exact_conversion,
@@ -86,7 +90,7 @@ We examine:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 61-68
+.. GENERATED FROM PYTHON SOURCE LINES 65-72
 
 Single PDMS Realization with On-Demand Entanglement Sampling
 ------------------------------------------------------------
@@ -96,7 +100,7 @@ network, sample entanglements on demand, add the entanglement springs as bonds
 in the generated :class:`~pylimer_tools_cpp.Universe`, and compare exact vs.
 KPM moduli.
 
-.. GENERATED FROM PYTHON SOURCE LINES 68-168
+.. GENERATED FROM PYTHON SOURCE LINES 72-172
 
 .. code-block:: Python
 
@@ -211,16 +215,16 @@ KPM moduli.
     Demo PDMS box (L=12 nm, N_atoms=3819, N_ent=84):
     Method   | Time [s] |  Speedup | Mean Rel. Err. G' [%] | Max Rel. Err. G' [%]
     -----------------------------------------------------------------------------
-    Exact    |    9.857 |     1.0x |                  0.00 |                 0.00
-    KPM      |    0.115 |    85.4x |                  2.69 |                 9.99
-    SLQ      |    0.039 |   252.6x |                  0.68 |                 4.79
-    Hybrid   |    0.177 |    55.6x |                  0.64 |                 1.80
+    Exact    |    7.418 |     1.0x |                  0.00 |                 0.00
+    KPM      |    0.146 |    50.7x |                  2.69 |                 9.99
+    SLQ      |    0.047 |   157.2x |                  0.68 |                 4.79
+    Hybrid   |    0.140 |    53.0x |                  0.64 |                 1.80
     Loading cached example data from kpm_vs_exact_pdms_cache.npz...
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 169-180
+.. GENERATED FROM PYTHON SOURCE LINES 173-184
 
 Effect of Chain Length (:math:`N`)
 ----------------------------------
@@ -234,7 +238,7 @@ and :math:`G''(\omega)` accurately across the transition and Rouse regimes
 deviations only in the lowest-frequency tail where very few eigenvalues
 reside.
 
-.. GENERATED FROM PYTHON SOURCE LINES 180-183
+.. GENERATED FROM PYTHON SOURCE LINES 184-187
 
 .. code-block:: Python
 
@@ -253,7 +257,7 @@ reside.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 184-194
+.. GENERATED FROM PYTHON SOURCE LINES 188-198
 
 Effect of Cross-link Conversion (:math:`p`)
 -------------------------------------------
@@ -266,7 +270,7 @@ frequencies while leaving the high-frequency segmental Rouse response
 (:math:`\omega\tau_0 \gtrsim 0.1`) largely unchanged. KPM captures this
 conversion-dependent softening faithfully without computing any eigenvalues.
 
-.. GENERATED FROM PYTHON SOURCE LINES 194-197
+.. GENERATED FROM PYTHON SOURCE LINES 198-201
 
 .. code-block:: Python
 
@@ -285,7 +289,7 @@ conversion-dependent softening faithfully without computing any eigenvalues.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 198-209
+.. GENERATED FROM PYTHON SOURCE LINES 202-213
 
 Effect of Stoichiometric Imbalance (:math:`r`)
 ----------------------------------------------
@@ -299,7 +303,7 @@ regime, whereas excess cross-linker (:math:`r = 1.25`) maintains a higher
 strand conversion and modulus closer to the stoichiometric reference
 (:math:`r = 1.00`). Across all :math:`r`, KPM tracks the exact spectra closely.
 
-.. GENERATED FROM PYTHON SOURCE LINES 209-212
+.. GENERATED FROM PYTHON SOURCE LINES 213-216
 
 .. code-block:: Python
 
@@ -318,7 +322,7 @@ strand conversion and modulus closer to the stoichiometric reference
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 213-227
+.. GENERATED FROM PYTHON SOURCE LINES 217-231
 
 Representative Volume, Sample Count, and Computational Scaling
 --------------------------------------------------------------
@@ -335,7 +339,7 @@ in :math:`\sim 9.8\,\text{s}`. Larger boxes also suppress finite-size scatter,
 reducing the number of realizations :math:`n_{\text{samples}}` required for a
 target 95% confidence interval.
 
-.. GENERATED FROM PYTHON SOURCE LINES 227-276
+.. GENERATED FROM PYTHON SOURCE LINES 231-281
 
 .. code-block:: Python
 
@@ -391,6 +395,7 @@ target 95% confidence interval.
 
 
 
+
 .. image-sg:: /auto_examples/normal_mode_analysis/images/sphx_glr_plot_kpm_vs_exact_pdms_004.png
    :alt: RVE Convergence (Solid: Exact, Dashed: KPM), Ensemble Precision vs. Sample Count, Computational Scaling: Exact vs. Approx.
    :srcset: /auto_examples/normal_mode_analysis/images/sphx_glr_plot_kpm_vs_exact_pdms_004.png
@@ -408,23 +413,49 @@ target 95% confidence interval.
     KPM      | Chain Length  |           21.84 |         410.09 |             2.91 |           26.84
     KPM      | Conversion    |           10.95 |          81.63 |             3.97 |           39.65
     KPM      | Stoichiometry |           10.51 |          81.34 |             4.14 |           39.08
-    SLQ      | Chain Length  |            1.91 |          47.50 |             0.51 |            5.12
-    SLQ      | Conversion    |            2.16 |          41.91 |             0.54 |            3.81
+    SLQ      | Chain Length  |            1.91 |          47.49 |             0.51 |            5.12
+    SLQ      | Conversion    |            2.16 |          41.90 |             0.54 |            3.81
     SLQ      | Stoichiometry |            1.93 |          38.16 |             0.61 |           10.84
     Hybrid   | Chain Length  |            0.15 |           0.68 |             0.19 |            0.74
-    Hybrid   | Conversion    |            0.21 |           0.73 |             0.26 |            0.64
-    Hybrid   | Stoichiometry |            0.16 |           0.66 |             0.21 |            0.67
+    Hybrid   | Conversion    |            0.20 |           0.73 |             0.25 |            0.64
+    Hybrid   | Stoichiometry |            0.17 |           0.68 |             0.22 |            0.67
 
     Runtime comparison per network (single-threaded worker, mean over repeats):
      L [nm] |  N_atoms |  N_ent |  Exact [s] |   KPM [s] |   SLQ [s] | Hybrid [s]
     -------------------------------------------------------------------------
-         10 |     2211 |     50 |     12.86s |    0.483s |    1.000s |     2.008s
-         12 |     3819 |     86 |     59.83s |    0.552s |    1.216s |     4.014s
-         14 |     6130 |    130 |    117.04s |    0.518s |    1.212s |     5.986s
-         16 |     9146 |    213 |    231.42s |    0.522s |    1.239s |     6.433s
-         20 |    17788 |    383 |   1046.24s |    0.632s |    1.772s |    13.060s
-         28 |    48843 |   1095 |    skipped |    1.301s |    9.916s |    52.878s
-         36 |   103816 |   2324 |    skipped |    3.526s |   29.958s |   120.455s
+         10 |     2211 |     50 |      1.94s |    0.091s |    0.153s |     0.230s
+         12 |     3819 |     86 |     13.09s |    0.097s |    0.195s |     0.452s
+         14 |     6130 |    130 |     13.44s |    0.096s |    0.284s |     0.868s
+         16 |     9146 |    213 |     42.71s |    0.094s |    0.333s |     1.126s
+         20 |    17788 |    383 |    259.44s |    0.100s |    0.580s |     2.704s
+         28 |    48843 |   1095 |    skipped |    0.154s |    2.333s |    11.314s
+         36 |   103816 |   2324 |    skipped |    0.547s |    6.324s |    26.636s
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 282-287
+
+Benchmark Hardware
+------------------
+.. note::
+   The cached runtime scaling benchmarks above were recorded on the
+   hardware reported below.
+
+.. GENERATED FROM PYTHON SOURCE LINES 287-288
+
+.. code-block:: Python
+
+    print(format_benchmark_footnote(data))
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    Measured on: Apple M3 Pro (12 cores), 36 GB RAM, Mac15,7, macOS 27.2.1 (arm64), Python 3.13.18 (cached 2026-11-17).
 
 
 
@@ -432,7 +463,7 @@ target 95% confidence interval.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 12.969 seconds)
+   **Total running time of the script:** (0 minutes 11.350 seconds)
 
 
 .. _sphx_glr_download_auto_examples_normal_mode_analysis_plot_kpm_vs_exact_pdms.py:

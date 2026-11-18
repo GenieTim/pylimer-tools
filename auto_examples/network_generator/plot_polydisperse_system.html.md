@@ -101,7 +101,7 @@ plt.title("Distribution of Strand Lengths in Polydisperse Network")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.266 seconds)
+**Total running time of the script:** (0 minutes 0.425 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-polydisperse-system-py"></a>
 

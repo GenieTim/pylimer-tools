@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:07.876** total execution time for 11 files **from auto_examples/force_balance**:
+**00:13.044** total execution time for 11 files **from auto_examples/force_balance**:
 
 .. container::
 
@@ -33,35 +33,35 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_relaxation.py` (``plot_force_relaxation.py``)
-     - 00:02.255
+     - 00:03.877
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_representative_volume_pdms.py` (``plot_representative_volume_pdms.py``)
-     - 00:01.900
+     - 00:03.064
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_entanglement_sampling_comparison.py` (``plot_entanglement_sampling_comparison.py``)
-     - 00:01.025
+     - 00:01.744
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_sampling_cutoff_effect.py` (``plot_sampling_cutoff_effect.py``)
-     - 00:00.547
+     - 00:00.942
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_inactive_removal_and_sampling.py` (``plot_inactive_removal_and_sampling.py``)
-     - 00:00.530
+     - 00:00.868
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_balance.py` (``plot_force_balance.py``)
-     - 00:00.336
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_force_balance_plot_slipping_vs_fixed_links.py` (``plot_slipping_vs_fixed_links.py``)
-     - 00:00.303
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_force_balance_plot_entanglement_link_vs_spring.py` (``plot_entanglement_link_vs_spring.py``)
-     - 00:00.293
+     - 00:00.535
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_balance_2.py` (``plot_force_balance_2.py``)
-     - 00:00.286
+     - 00:00.483
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_force_balance_plot_slipping_vs_fixed_links.py` (``plot_slipping_vs_fixed_links.py``)
+     - 00:00.449
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_force_balance_plot_entanglement_link_vs_spring.py` (``plot_entanglement_link_vs_spring.py``)
+     - 00:00.399
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_polydispersity_study.py` (``plot_polydispersity_study.py``)
-     - 00:00.229
+     - 00:00.393
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_fb_deformation_exp.py` (``plot_fb_deformation_exp.py``)
-     - 00:00.173
+     - 00:00.290
      - 0.0

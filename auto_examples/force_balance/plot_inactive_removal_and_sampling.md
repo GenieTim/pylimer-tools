@@ -123,7 +123,7 @@ plot_inactive_topological_fractions(data)
 plot_inactive_solver_complexity(data)
 ```
 
-**Total running time of the script:** (0 minutes 0.530 seconds)
+**Total running time of the script:** (0 minutes 0.868 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-inactive-removal-and-sampling-py"></a>
 
