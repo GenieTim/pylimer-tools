@@ -326,6 +326,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.BackTrackStatus.html">BackTrackStatus</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.BondLengthStats.html">BondLengthStats</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.Box.html">Box</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.ComputeBackend.html">ComputeBackend</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.ComputedDoubleValues.html">ComputedDoubleValues</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.ComputedIntValues.html">ComputedIntValues</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.CrosslinkerUniverse.html">CrosslinkerUniverse</a></li>
@@ -336,6 +337,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.EndToEndStats.html">EndToEndStats</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.EntanglementFilteringMode.html">EntanglementFilteringMode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.ExitReason.html">ExitReason</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.HybridConfig.html">HybridConfig</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.KPMConfig.html">KPMConfig</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.LazyUniverseSequenceIterator.html">LazyUniverseSequenceIterator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.LinearMaxDistanceProvider.html">LinearMaxDistanceProvider</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.LinkSwappingMode.html">LinkSwappingMode</a></li>
@@ -352,17 +355,18 @@
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html">NonGaussianSpringForceEvaluator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.NormalModeAnalyzer.html">NormalModeAnalyzer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.NormalModeSolver.html">NormalModeSolver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.NormalModeSpectrum.html">NormalModeSpectrum</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.OutputConfiguration.html">OutputConfiguration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.ResistanceDistanceAnalysis.html">ResistanceDistanceAnalysis</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.RouseBrownianSimulator.html">RouseBrownianSimulator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.RouseSimulationResult.html">RouseSimulationResult</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.RouseSolverType.html">RouseSolverType</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.SLESolver.html">SLESolver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.SLQConfig.html">SLQConfig</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html">SimpleSpringMEHPForceEvaluator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.SimplifiedBalance2Network.html">SimplifiedBalance2Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.SimplifiedBalanceNetwork.html">SimplifiedBalanceNetwork</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.SimplifiedNetwork.html">SimplifiedNetwork</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.StochasticSpectralMethod.html">StochasticSpectralMethod</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.StrandCategory.html">StrandCategory</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.StrandPairEntanglements.html">StrandPairEntanglements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.StructureSimplificationMode.html">StructureSimplificationMode</a></li>
@@ -427,7 +431,7 @@ The corresponding class is <a class="reference internal" href="../../api/pylimer
 <p>See <a class="reference internal" href="plot_kpm_vs_exact_pdms.html"><span class="doc">KPM vs. Full Eigenvalue Normal Mode Analysis for PDMS Networks</span></a> for a large-scale comparison of the Kernel Polynomial Method (KPM)
 against full eigenvalue decomposition on realistic PDMS networks generated via Monte Carlo with
 on-demand entanglement sampling.</p>
-<div id='sg-tag-list' class='sphx-glr-tag-list'></div><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the NormalModeAnalyzer in pylimer-tools to predict the loss and storage modulus of polymer networks using exact eigenvalue solvers or approximate spectral methods (~pylimer_tools_cpp.StochasticSpectralMethod: Kernel Polynomial Method KPM, Stochastic Lanczos Quadrature SLQ, and HYBRID)."><img alt="" src="../../_images/sphx_glr_plot_normal_mode_analysis_thumb.png" />
+<div id='sg-tag-list' class='sphx-glr-tag-list'></div><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the NormalModeAnalyzer in pylimer-tools to predict the loss and storage modulus of polymer networks using exact eigenvalue solvers or approximate spectral methods (~pylimer_tools_cpp.KPMConfig, SLQConfig, and HybridConfig)."><img alt="" src="../../_images/sphx_glr_plot_normal_mode_analysis_thumb.png" />
 <p><a class="reference internal" href="plot_normal_mode_analysis.html"><span class="doc">Normal Mode Analysis (NMA)</span></a></p>
   <div class="sphx-glr-thumbnail-title">Normal Mode Analysis (NMA)</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="Normal Mode Analysis (NMA) in NormalModeAnalyzer predicts the linear viscoelastic storage modulus G&#x27;(\omega) and loss modulus G&#x27;&#x27;(\omega) of entangled polymer networks from their bead-spring connectivity graph (gusev_molecular_2024). Computing the full eigenvalue spectrum scales as \mathcal{O}(N_{\text{atoms}}^3), which quickly becomes prohibitive for realistic representative volume elements (RVEs). The Kernel Polynomial Method (KPM) approximates the spectral density using Chebyshev moments and stochastic trace estimation in \mathcal{O}(N_{\text{atoms}}) time."><img alt="" src="../../_images/sphx_glr_plot_kpm_vs_exact_pdms_thumb.png" />

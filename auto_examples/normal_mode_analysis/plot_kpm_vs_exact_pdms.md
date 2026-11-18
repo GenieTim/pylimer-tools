@@ -82,7 +82,7 @@ network, sample entanglements on demand, add the entanglement springs as bonds
 in the generated [`Universe`](../../api/pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe), and compare exact vs.
 KPM moduli.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 72-172 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 72-158 -->
 ```Python
 params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
 assert isinstance(params, Parameters)
@@ -119,36 +119,24 @@ pairs = atom_pairs.pairs_of_atoms
 if pairs:
     universe.add_bonds([pair[0] for pair in pairs], [pair[1] for pair in pairs])
 
-edges = universe.get_edges()
-nma = pt.NormalModeAnalyzer(
-    edges["edge_from"], edges["edge_to"], universe.get_nr_of_atoms()
-)
+nma = pt.NormalModeAnalyzer.from_universe(universe)
 
 freqs_demo = np.logspace(-3, 2, 50)
 t0 = time.perf_counter()
-nma.find_all_eigenvalues(
+spec_exact_demo = nma.solve_exact(
     solver=pt.NormalModeSolver.AUTO,
     compute_eigenvectors=False,
     decompose_components=True,
 )
-gp_exact_demo = nma.evaluate_storage_modulus(freqs_demo) * gamma_conv / vol
+gp_exact_demo = spec_exact_demo.storage_modulus(freqs_demo) * gamma_conv / vol
 t_exact_demo = time.perf_counter() - t0
 
 demo_methods = [
-    (
-        "KPM",
-        pt.StochasticSpectralMethod.KPM,
-        {"num_steps": 1024, "num_random_vectors": 20},
-    ),
-    (
-        "SLQ",
-        pt.StochasticSpectralMethod.SLQ,
-        {"num_steps": 200, "num_random_vectors": 20},
-    ),
+    ("KPM", pt.KPMConfig(num_moments=1024, num_random_vectors=20)),
+    ("SLQ", pt.SLQConfig(num_steps=200, num_random_vectors=20)),
     (
         "Hybrid",
-        pt.StochasticSpectralMethod.HYBRID,
-        {"num_steps": 200, "num_random_vectors": 20, "num_exact_low_modes": 100},
+        pt.HybridConfig(num_steps=200, num_random_vectors=20, num_exact_low_modes=100),
     ),
 ]
 print(
@@ -160,12 +148,10 @@ print(
 )
 print("-" * 77)
 print(f"{'Exact':<8} | {t_exact_demo:8.3f} | {'1.0x':>8} | {'0.00':>21} | {'0.00':>20}")
-for name, method, kw in demo_methods:
+for name, cfg in demo_methods:
     t0 = time.perf_counter()
     gp_approx_demo = (
-        nma.evaluate_storage_modulus_approx(freqs_demo, method=method, **kw)
-        * gamma_conv
-        / vol
+        nma.solve_approx(cfg).storage_modulus(freqs_demo) * gamma_conv / vol
     )
     dt_demo = time.perf_counter() - t0
     rel_err = (
@@ -188,14 +174,14 @@ data = load_or_compute_cache(cache_path, run_kpm_vs_exact_pdms_study)
 Demo PDMS box (L=12 nm, N_atoms=3819, N_ent=84):
 Method   | Time [s] |  Speedup | Mean Rel. Err. G' [%] | Max Rel. Err. G' [%]
 -----------------------------------------------------------------------------
-Exact    |    7.418 |     1.0x |                  0.00 |                 0.00
-KPM      |    0.146 |    50.7x |                  2.69 |                 9.99
-SLQ      |    0.047 |   157.2x |                  0.68 |                 4.79
-Hybrid   |    0.140 |    53.0x |                  0.64 |                 1.80
+Exact    |    6.693 |     1.0x |                  0.00 |                 0.00
+KPM      |    0.101 |    66.1x |                  2.69 |                 9.99
+SLQ      |    0.037 |   179.3x |                  0.68 |                 4.79
+Hybrid   |    0.174 |    38.5x |                  0.64 |                 1.80
 Loading cached example data from kpm_vs_exact_pdms_cache.npz...
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 173-184 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 159-170 -->
 
 ## Effect of Chain Length ($N$)
 
@@ -209,12 +195,12 @@ and $G''(\omega)$ accurately across the transition and Rouse regimes
 deviations only in the lowest-frequency tail where very few eigenvalues
 reside.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 184-187 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 170-173 -->
 ```Python
 plot_kpm_vs_exact_chain_length(data)
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 188-198 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 174-184 -->
 
 ## Effect of Cross-link Conversion ($p$)
 
@@ -227,12 +213,12 @@ frequencies while leaving the high-frequency segmental Rouse response
 ($\omega\tau_0 \gtrsim 0.1$) largely unchanged. KPM captures this
 conversion-dependent softening faithfully without computing any eigenvalues.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 198-201 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 184-187 -->
 ```Python
 plot_kpm_vs_exact_conversion(data)
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 202-213 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 188-199 -->
 
 ## Effect of Stoichiometric Imbalance ($r$)
 
@@ -246,12 +232,12 @@ regime, whereas excess cross-linker ($r = 1.25$) maintains a higher
 strand conversion and modulus closer to the stoichiometric reference
 ($r = 1.00$). Across all $r$, KPM tracks the exact spectra closely.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 213-216 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 199-202 -->
 ```Python
 plot_kpm_vs_exact_stoichiometry(data)
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 217-231 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 203-217 -->
 
 ## Representative Volume, Sample Count, and Computational Scaling
 
@@ -268,7 +254,7 @@ in $\sim 9.8\,\text{s}$. Larger boxes also suppress finite-size scatter,
 reducing the number of realizations $n_{\text{samples}}$ required for a
 target 95% confidence interval.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 231-281 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 217-267 -->
 ```Python
 print(
     "\nAccuracy comparison across parameter sweeps (mean / max rel. error vs. Exact [%]):"
@@ -346,7 +332,7 @@ Runtime comparison per network (single-threaded worker, mean over repeats):
      36 |   103816 |   2324 |    skipped |    0.547s |    6.324s |    26.636s
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 282-287 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 268-273 -->
 
 ## Benchmark Hardware
 
@@ -354,7 +340,7 @@ Runtime comparison per network (single-threaded worker, mean over repeats):
 The cached runtime scaling benchmarks above were recorded on the
 hardware reported below.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 287-288 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 273-274 -->
 ```Python
 print(format_benchmark_footnote(data))
 ```
@@ -363,7 +349,7 @@ print(format_benchmark_footnote(data))
 Measured on: Apple M3 Pro (12 cores), 36 GB RAM, Mac15,7, macOS 27.2.1 (arm64), Python 3.13.18 (cached 2026-11-17).
 ```
 
-**Total running time of the script:** (0 minutes 11.350 seconds)
+**Total running time of the script:** (0 minutes 9.676 seconds)
 
 <a id="sphx-glr-download-auto-examples-normal-mode-analysis-plot-kpm-vs-exact-pdms-py"></a>
 

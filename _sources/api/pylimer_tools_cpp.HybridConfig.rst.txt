@@ -1,0 +1,23 @@
+HybridConfig
+============
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: HybridConfig
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~HybridConfig.backend
+      ~HybridConfig.num_exact_low_modes
+      ~HybridConfig.num_random_vectors
+      ~HybridConfig.num_steps
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: backend
+   .. autoattribute:: num_exact_low_modes
+   .. autoattribute:: num_random_vectors
+   .. autoattribute:: num_steps

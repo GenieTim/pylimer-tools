@@ -1,0 +1,43 @@
+NormalModeSpectrum
+==================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: NormalModeSpectrum
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~NormalModeSpectrum.eigenvalues
+      ~NormalModeSpectrum.eigenvectors
+      ~NormalModeSpectrum.is_complete
+      ~NormalModeSpectrum.num_modes
+      ~NormalModeSpectrum.num_zero_modes
+      ~NormalModeSpectrum.weights
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~NormalModeSpectrum.loss_modulus
+      ~NormalModeSpectrum.moduli
+      ~NormalModeSpectrum.storage_modulus
+      ~NormalModeSpectrum.stress_autocorrelation
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: eigenvalues
+   .. autoattribute:: eigenvectors
+   .. autoattribute:: is_complete
+   .. autoattribute:: num_modes
+   .. autoattribute:: num_zero_modes
+   .. autoattribute:: weights
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: loss_modulus
+   .. automethod:: moduli
+   .. automethod:: storage_modulus
+   .. automethod:: stress_autocorrelation

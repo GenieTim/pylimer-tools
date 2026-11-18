@@ -11,6 +11,7 @@ NormalModeSolver
    .. autosummary::
 
       ~NormalModeSolver.AUTO
+      ~NormalModeSolver.CUDA
       ~NormalModeSolver.DENSE_EIGEN
       ~NormalModeSolver.DENSE_LAPACK
       ~NormalModeSolver.METAL
@@ -19,6 +20,7 @@ NormalModeSolver
    .. rubric:: Attributes Documentation
 
    .. autoattribute:: AUTO
+   .. autoattribute:: CUDA
    .. autoattribute:: DENSE_EIGEN
    .. autoattribute:: DENSE_LAPACK
    .. autoattribute:: METAL

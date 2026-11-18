@@ -20,7 +20,7 @@
 <link rel="manifest" href="/_static/favicon/site.webmanifest" />
 
 <link rel="alternate" type="text/markdown" href="pylimer_tools_cpp.NormalModeSolver.html.md">
-<link rel="describedby" href="llms.txt"><link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="OutputConfiguration" href="pylimer_tools_cpp.OutputConfiguration.html"><link rel="prev" title="NormalModeAnalyzer" href="pylimer_tools_cpp.NormalModeAnalyzer.html">
+<link rel="describedby" href="llms.txt"><link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="NormalModeSpectrum" href="pylimer_tools_cpp.NormalModeSpectrum.html"><link rel="prev" title="NormalModeAnalyzer" href="pylimer_tools_cpp.NormalModeAnalyzer.html">
 
     <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
         <title>NormalModeSolver - pylimer-tools</title>
@@ -324,6 +324,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.BackTrackStatus.html">BackTrackStatus</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.BondLengthStats.html">BondLengthStats</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.Box.html">Box</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.ComputeBackend.html">ComputeBackend</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.ComputedDoubleValues.html">ComputedDoubleValues</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.ComputedIntValues.html">ComputedIntValues</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.CrosslinkerUniverse.html">CrosslinkerUniverse</a></li>
@@ -334,6 +335,8 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.EndToEndStats.html">EndToEndStats</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.EntanglementFilteringMode.html">EntanglementFilteringMode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.ExitReason.html">ExitReason</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.HybridConfig.html">HybridConfig</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.KPMConfig.html">KPMConfig</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.LazyUniverseSequenceIterator.html">LazyUniverseSequenceIterator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.LinearMaxDistanceProvider.html">LinearMaxDistanceProvider</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.LinkSwappingMode.html">LinkSwappingMode</a></li>
@@ -350,17 +353,18 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html">NonGaussianSpringForceEvaluator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.NormalModeAnalyzer.html">NormalModeAnalyzer</a></li>
 <li class="toctree-l3 current current-page"><a class="current reference internal" href="#">NormalModeSolver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.NormalModeSpectrum.html">NormalModeSpectrum</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.OutputConfiguration.html">OutputConfiguration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.ResistanceDistanceAnalysis.html">ResistanceDistanceAnalysis</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.RouseBrownianSimulator.html">RouseBrownianSimulator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.RouseSimulationResult.html">RouseSimulationResult</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.RouseSolverType.html">RouseSolverType</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SLESolver.html">SLESolver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SLQConfig.html">SLQConfig</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html">SimpleSpringMEHPForceEvaluator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedBalance2Network.html">SimplifiedBalance2Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedBalanceNetwork.html">SimplifiedBalanceNetwork</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedNetwork.html">SimplifiedNetwork</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.StochasticSpectralMethod.html">StochasticSpectralMethod</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.StrandCategory.html">StrandCategory</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.StrandPairEntanglements.html">StrandPairEntanglements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.StructureSimplificationMode.html">StructureSimplificationMode</a></li>
@@ -422,7 +426,7 @@
 <dt class="sig sig-object py" id="pylimer_tools_cpp.NormalModeSolver">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">NormalModeSolver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.NormalModeSolver" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
-<p>Solver algorithms for normal mode analysis</p>
+<p>Exact eigenvalue solver algorithms for normal mode analysis</p>
 <p class="rubric">Attributes Summary</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
@@ -430,16 +434,19 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeSolver.AUTO" title="pylimer_tools_cpp.NormalModeSolver.AUTO"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AUTO</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeSolver.DENSE_EIGEN" title="pylimer_tools_cpp.NormalModeSolver.DENSE_EIGEN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DENSE_EIGEN</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeSolver.CUDA" title="pylimer_tools_cpp.NormalModeSolver.CUDA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CUDA</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeSolver.DENSE_LAPACK" title="pylimer_tools_cpp.NormalModeSolver.DENSE_LAPACK"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DENSE_LAPACK</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeSolver.DENSE_EIGEN" title="pylimer_tools_cpp.NormalModeSolver.DENSE_EIGEN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DENSE_EIGEN</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeSolver.METAL" title="pylimer_tools_cpp.NormalModeSolver.METAL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">METAL</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeSolver.DENSE_LAPACK" title="pylimer_tools_cpp.NormalModeSolver.DENSE_LAPACK"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DENSE_LAPACK</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeSolver.SPARSE_SLICING" title="pylimer_tools_cpp.NormalModeSolver.SPARSE_SLICING"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SPARSE_SLICING</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeSolver.METAL" title="pylimer_tools_cpp.NormalModeSolver.METAL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">METAL</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeSolver.SPARSE_SLICING" title="pylimer_tools_cpp.NormalModeSolver.SPARSE_SLICING"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SPARSE_SLICING</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -449,6 +456,11 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.NormalModeSolver.AUTO">
 <span class="sig-name descname"><span class="pre">AUTO</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></span><a class="headerlink" href="#pylimer_tools_cpp.NormalModeSolver.AUTO" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.NormalModeSolver.CUDA">
+<span class="sig-name descname"><span class="pre">CUDA</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></span><a class="headerlink" href="#pylimer_tools_cpp.NormalModeSolver.CUDA" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -480,12 +492,12 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="pylimer_tools_cpp.OutputConfiguration.html">
+          <a class="next-page" href="pylimer_tools_cpp.NormalModeSpectrum.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">OutputConfiguration</div>
+                <div class="title">NormalModeSpectrum</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -533,6 +545,7 @@
 <li><a class="reference internal" href="#">NormalModeSolver</a><ul>
 <li><a class="reference internal" href="#pylimer_tools_cpp.NormalModeSolver"><code class="docutils literal notranslate"><span class="pre">NormalModeSolver</span></code></a><ul>
 <li><a class="reference internal" href="#pylimer_tools_cpp.NormalModeSolver.AUTO"><code class="docutils literal notranslate"><span class="pre">NormalModeSolver.AUTO</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.NormalModeSolver.CUDA"><code class="docutils literal notranslate"><span class="pre">NormalModeSolver.CUDA</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.NormalModeSolver.DENSE_EIGEN"><code class="docutils literal notranslate"><span class="pre">NormalModeSolver.DENSE_EIGEN</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.NormalModeSolver.DENSE_LAPACK"><code class="docutils literal notranslate"><span class="pre">NormalModeSolver.DENSE_LAPACK</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.NormalModeSolver.METAL"><code class="docutils literal notranslate"><span class="pre">NormalModeSolver.METAL</span></code></a></li>

@@ -4,12 +4,13 @@
 
 Bases: [`Enum`](https://docs.python.org/3/library/enum.html#enum.Enum)
 
-Solver algorithms for normal mode analysis
+Exact eigenvalue solver algorithms for normal mode analysis
 
 ### Attributes Summary
 
 | [`AUTO`](#pylimer_tools_cpp.NormalModeSolver.AUTO)           |    |
 |-----------------------------------------------------------------|----|
+| [`CUDA`](#pylimer_tools_cpp.NormalModeSolver.CUDA)           |    |
 | [`DENSE_EIGEN`](#pylimer_tools_cpp.NormalModeSolver.DENSE_EIGEN)    |    |
 | [`DENSE_LAPACK`](#pylimer_tools_cpp.NormalModeSolver.DENSE_LAPACK)   |    |
 | [`METAL`](#pylimer_tools_cpp.NormalModeSolver.METAL)          |    |
@@ -18,6 +19,8 @@ Solver algorithms for normal mode analysis
 ### Attributes Documentation
 
 #### AUTO *= 0*
+
+#### CUDA *= 5*
 
 #### DENSE_EIGEN *= 2*
 

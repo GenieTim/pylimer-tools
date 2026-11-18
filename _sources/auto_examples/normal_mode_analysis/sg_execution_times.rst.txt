@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:25.637** total execution time for 2 files **from auto_examples/normal_mode_analysis**:
+**00:24.823** total execution time for 2 files **from auto_examples/normal_mode_analysis**:
 
 .. container::
 
@@ -33,8 +33,8 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_normal_mode_analysis_plot_normal_mode_analysis.py` (``plot_normal_mode_analysis.py``)
-     - 00:14.287
+     - 00:15.146
      - 0.0
    * - :ref:`sphx_glr_auto_examples_normal_mode_analysis_plot_kpm_vs_exact_pdms.py` (``plot_kpm_vs_exact_pdms.py``)
-     - 00:11.350
+     - 00:09.676
      - 0.0

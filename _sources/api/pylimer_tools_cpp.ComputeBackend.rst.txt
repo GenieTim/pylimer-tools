@@ -1,0 +1,23 @@
+ComputeBackend
+==============
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: ComputeBackend
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~ComputeBackend.AUTO
+      ~ComputeBackend.CPU
+      ~ComputeBackend.CUDA
+      ~ComputeBackend.METAL
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: AUTO
+   .. autoattribute:: CPU
+   .. autoattribute:: CUDA
+   .. autoattribute:: METAL

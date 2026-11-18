@@ -12,7 +12,7 @@ against full eigenvalue decomposition on realistic PDMS networks generated via M
 on-demand entanglement sampling.
 
 <div id='sg-tag-list' class='sphx-glr-tag-list'></div><div class="sphx-glr-thumbnails">
-<!-- thumbnail-parent-div-open --><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the NormalModeAnalyzer in pylimer-tools to predict the loss and storage modulus of polymer networks using exact eigenvalue solvers or approximate spectral methods (~pylimer_tools_cpp.StochasticSpectralMethod: Kernel Polynomial Method KPM, Stochastic Lanczos Quadrature SLQ, and HYBRID).">![](auto_examples/normal_mode_analysis/images/thumb/sphx_glr_plot_normal_mode_analysis_thumb.png)
+<!-- thumbnail-parent-div-open --><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the NormalModeAnalyzer in pylimer-tools to predict the loss and storage modulus of polymer networks using exact eigenvalue solvers or approximate spectral methods (~pylimer_tools_cpp.KPMConfig, SLQConfig, and HybridConfig).">![](auto_examples/normal_mode_analysis/images/thumb/sphx_glr_plot_normal_mode_analysis_thumb.png)
 
 [Normal Mode Analysis (NMA)](plot_normal_mode_analysis.html.md)
 

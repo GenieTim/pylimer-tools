@@ -326,6 +326,7 @@
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.BackTrackStatus.html">BackTrackStatus</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.BondLengthStats.html">BondLengthStats</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.Box.html">Box</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.ComputeBackend.html">ComputeBackend</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.ComputedDoubleValues.html">ComputedDoubleValues</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.ComputedIntValues.html">ComputedIntValues</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.CrosslinkerUniverse.html">CrosslinkerUniverse</a></li>
@@ -336,6 +337,8 @@
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.EndToEndStats.html">EndToEndStats</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.EntanglementFilteringMode.html">EntanglementFilteringMode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.ExitReason.html">ExitReason</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.HybridConfig.html">HybridConfig</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.KPMConfig.html">KPMConfig</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.LazyUniverseSequenceIterator.html">LazyUniverseSequenceIterator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.LinearMaxDistanceProvider.html">LinearMaxDistanceProvider</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.LinkSwappingMode.html">LinkSwappingMode</a></li>
@@ -352,17 +355,18 @@
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html">NonGaussianSpringForceEvaluator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.NormalModeAnalyzer.html">NormalModeAnalyzer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.NormalModeSolver.html">NormalModeSolver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.NormalModeSpectrum.html">NormalModeSpectrum</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.OutputConfiguration.html">OutputConfiguration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.ResistanceDistanceAnalysis.html">ResistanceDistanceAnalysis</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.RouseBrownianSimulator.html">RouseBrownianSimulator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.RouseSimulationResult.html">RouseSimulationResult</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.RouseSolverType.html">RouseSolverType</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.SLESolver.html">SLESolver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.SLQConfig.html">SLQConfig</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html">SimpleSpringMEHPForceEvaluator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.SimplifiedBalance2Network.html">SimplifiedBalance2Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.SimplifiedBalanceNetwork.html">SimplifiedBalanceNetwork</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.SimplifiedNetwork.html">SimplifiedNetwork</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.StochasticSpectralMethod.html">StochasticSpectralMethod</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.StrandCategory.html">StrandCategory</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.StrandPairEntanglements.html">StrandPairEntanglements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.StructureSimplificationMode.html">StructureSimplificationMode</a></li>
@@ -446,7 +450,7 @@ You must specify either –target-p (crosslinker conversion) or –target-wsol
 <dd><p>Name of the polymer to generate the network for</p>
 <dl class="field-list simple">
 <dt class="field-odd">Options<span class="colon">:</span></dt>
-<dd class="field-odd"><p>sbr | apams | aps | apoa | p6n | app | pe | pi50 | pi20 | apmma | app348 | apva | apea | pbd98 | pet | apma | ptfe | pi7 | cispi | pc | pdms | pi75 | pi34 | pib | pom | cispbd | app413 | pib413 | pbd20 | pe413 | aphma | peo | ipp | app463 | spp | ips</p>
+<dd class="field-odd"><p>pi50 | pi75 | pib413 | peo | pib | pdms | app463 | pc | app413 | apva | sbr | apea | pi20 | pi34 | pi7 | aps | ips | apoa | ptfe | pe413 | apams | spp | aphma | pom | apmma | cispi | app | app348 | pbd20 | p6n | apma | pe | ipp | cispbd | pet | pbd98</p>
 </dd>
 </dl>
 </dd></dl>
@@ -606,7 +610,7 @@ You must specify either –target-p (crosslinker conversion) or –target-wsol
 <dd><p>Name of the polymer to use for parameter retrieval.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Options<span class="colon">:</span></dt>
-<dd class="field-odd"><p>sbr | apams | aps | apoa | p6n | app | pe | pi50 | pi20 | apmma | app348 | apva | apea | pbd98 | pet | apma | ptfe | pi7 | cispi | pc | pdms | pi75 | pi34 | pib | pom | cispbd | app413 | pib413 | pbd20 | pe413 | aphma | peo | ipp | app463 | spp | ips</p>
+<dd class="field-odd"><p>pi50 | pi75 | pib413 | peo | pib | pdms | app463 | pc | app413 | apva | sbr | apea | pi20 | pi34 | pi7 | aps | ips | apoa | ptfe | pe413 | apams | spp | aphma | pom | apmma | cispi | app | app348 | pbd20 | p6n | apma | pe | ipp | cispbd | pet | pbd98</p>
 </dd>
 </dl>
 </dd></dl>

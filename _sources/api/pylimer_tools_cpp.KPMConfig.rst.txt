@@ -1,0 +1,25 @@
+KPMConfig
+=========
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: KPMConfig
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~KPMConfig.backend
+      ~KPMConfig.batch_size
+      ~KPMConfig.num_moments
+      ~KPMConfig.num_quadrature_points
+      ~KPMConfig.num_random_vectors
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: backend
+   .. autoattribute:: batch_size
+   .. autoattribute:: num_moments
+   .. autoattribute:: num_quadrature_points
+   .. autoattribute:: num_random_vectors

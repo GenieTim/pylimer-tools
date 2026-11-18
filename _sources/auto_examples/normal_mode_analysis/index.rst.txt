@@ -28,7 +28,7 @@ on-demand entanglement sampling.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the NormalModeAnalyzer in pylimer-tools to predict the loss and storage modulus of polymer networks using exact eigenvalue solvers or approximate spectral methods (~pylimer_tools_cpp.StochasticSpectralMethod: Kernel Polynomial Method KPM, Stochastic Lanczos Quadrature SLQ, and HYBRID).">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the NormalModeAnalyzer in pylimer-tools to predict the loss and storage modulus of polymer networks using exact eigenvalue solvers or approximate spectral methods (~pylimer_tools_cpp.KPMConfig, SLQConfig, and HybridConfig).">
 
 .. only:: html
 

@@ -2,7 +2,7 @@
 
 # Computation times
 
-**06:14.808** total execution time for 41 files **from all galleries**:
+**06:13.994** total execution time for 41 files **from all galleries**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -22,8 +22,8 @@ $(document).ready( function () {
 | [Trajectory Analysis](auto_examples/trajectory_analysis/plot_trajectory_analysis.md#sphx-glr-auto-examples-trajectory-analysis-plot-trajectory-analysis-py) (`../examples/trajectory_analysis/plot_trajectory_analysis.py`)                                          | 04:23.384 |          0 |
 | [Monte Carlo Configuration](auto_examples/network_generator/plot_monte_carlo_configuration.md#sphx-glr-auto-examples-network-generator-plot-monte-carlo-configuration-py) (`../examples/network_generator/plot_monte_carlo_configuration.py`)                            | 00:37.968 |          0 |
 | [Generate Vulcanized Networks](auto_examples/network_generator/plot_vulcanized_network.md#sphx-glr-auto-examples-network-generator-plot-vulcanized-network-py) (`../examples/network_generator/plot_vulcanized_network.py`)                                       | 00:22.302 |          0 |
-| [Normal Mode Analysis (NMA)](auto_examples/normal_mode_analysis/plot_normal_mode_analysis.md#sphx-glr-auto-examples-normal-mode-analysis-plot-normal-mode-analysis-py) (`../examples/normal_mode_analysis/plot_normal_mode_analysis.py`)                               | 00:14.287 |          0 |
-| [KPM vs. Full Eigenvalue Normal Mode Analysis for PDMS Networks](auto_examples/normal_mode_analysis/plot_kpm_vs_exact_pdms.md#sphx-glr-auto-examples-normal-mode-analysis-plot-kpm-vs-exact-pdms-py) (`../examples/normal_mode_analysis/plot_kpm_vs_exact_pdms.py`) | 00:11.350 |          0 |
+| [Normal Mode Analysis (NMA)](auto_examples/normal_mode_analysis/plot_normal_mode_analysis.md#sphx-glr-auto-examples-normal-mode-analysis-plot-normal-mode-analysis-py) (`../examples/normal_mode_analysis/plot_normal_mode_analysis.py`)                               | 00:15.146 |          0 |
+| [KPM vs. Full Eigenvalue Normal Mode Analysis for PDMS Networks](auto_examples/normal_mode_analysis/plot_kpm_vs_exact_pdms.md#sphx-glr-auto-examples-normal-mode-analysis-plot-kpm-vs-exact-pdms-py) (`../examples/normal_mode_analysis/plot_kpm_vs_exact_pdms.py`) | 00:09.676 |          0 |
 | [DPD Simulations](auto_examples/dpd_simulations/plot_dpd_simulation.md#sphx-glr-auto-examples-dpd-simulations-plot-dpd-simulation-py) (`../examples/dpd_simulations/plot_dpd_simulation.py`)                                                                | 00:04.975 |          0 |
 | [MEHP Force Relaxation](auto_examples/force_balance/plot_force_relaxation.md#sphx-glr-auto-examples-force-balance-plot-force-relaxation-py) (`../examples/force_balance/plot_force_relaxation.py`)                                                          | 00:03.877 |          0 |
 | [Streaming Dump File Reader](auto_examples/readers_writers/plot_memory_efficient_dump_file_reading.md#sphx-glr-auto-examples-readers-writers-plot-memory-efficient-dump-file-reading-py) (`../examples/readers_writers/plot_memory_efficient_dump_file_reading.py`)             | 00:03.562 |          0 |

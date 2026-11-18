@@ -14,12 +14,12 @@ to download the full example code.
 
 This example demonstrates how to use the NormalModeAnalyzer in pylimer-tools
 to predict the loss and storage modulus of polymer networks using exact eigenvalue
-solvers or approximate spectral methods ([`StochasticSpectralMethod`](../../api/pylimer_tools_cpp.StochasticSpectralMethod.md#pylimer_tools_cpp.StochasticSpectralMethod):
-Kernel Polynomial Method `KPM`, Stochastic Lanczos Quadrature `SLQ`, and `HYBRID`).
+solvers or approximate spectral methods ([`KPMConfig`](../../api/pylimer_tools_cpp.KPMConfig.md#pylimer_tools_cpp.KPMConfig),
+[`SLQConfig`](../../api/pylimer_tools_cpp.SLQConfig.md#pylimer_tools_cpp.SLQConfig), and [`HybridConfig`](../../api/pylimer_tools_cpp.HybridConfig.md#pylimer_tools_cpp.HybridConfig)).
 
 Reference: Gusev and Bernhard [[GB24](../../acknowledgements.md#id7)]
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 12-127 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 12-115 -->
 ```Python
 from pathlib import Path
 import time
@@ -30,9 +30,11 @@ import pandas as pd
 
 from pylimer_tools.io.read_lammps_output_file import read_data_file
 from pylimer_tools_cpp import (
+    HybridConfig,
+    KPMConfig,
     NormalModeAnalyzer,
     NormalModeSolver,
-    StochasticSpectralMethod,
+    SLQConfig,
 )
 
 
@@ -51,37 +53,31 @@ def _find_fixtures_dir() -> Path:
 _fixtures_dir = _find_fixtures_dir()
 filePath = str(_fixtures_dir / "structure/network_100_a_46.structure.out")
 universe = read_data_file(filePath)
-edges = universe.get_edges()
 
 # Create the normal mode analyzer
-nma = NormalModeAnalyzer(
-    edges["edge_from"],
-    edges["edge_to"],
-)
+nma = NormalModeAnalyzer.from_universe(universe)
 
 # 1. Exact analysis with connected component decomposition and
 # dense/sparse solver
 frequencies = np.logspace(-4, 3, num=int(1e3))
 
 t0 = time.perf_counter()
-nma.find_all_eigenvalues(
+exact_spectrum = nma.solve_exact(
     solver=NormalModeSolver.AUTO,
     compute_eigenvectors=False,
     decompose_components=True,
 )
-storage_modulus_exact = nma.evaluate_storage_modulus(omega=frequencies)
-loss_modulus_exact = nma.evaluate_loss_modulus(omega=frequencies)
+storage_modulus_exact, loss_modulus_exact = exact_spectrum.moduli(frequencies)
 t_exact = time.perf_counter() - t0
 
 # 2. Approximate spectral methods without computing full eigenvalues
 # These methods scale linearly O(N) for large networks.
-approx_configs: list[tuple[str, StochasticSpectralMethod, dict[str, int]]] = [
-    ("KPM", StochasticSpectralMethod.KPM, {"num_steps": 512, "num_random_vectors": 20}),
-    ("SLQ", StochasticSpectralMethod.SLQ, {"num_steps": 200, "num_random_vectors": 20}),
+approx_configs: list[tuple[str, KPMConfig | SLQConfig | HybridConfig]] = [
+    ("KPM", KPMConfig(num_moments=512, num_random_vectors=20)),
+    ("SLQ", SLQConfig(num_steps=200, num_random_vectors=20)),
     (
         "Hybrid",
-        StochasticSpectralMethod.HYBRID,
-        {"num_steps": 200, "num_random_vectors": 20, "num_exact_low_modes": 100},
+        HybridConfig(num_steps=200, num_random_vectors=20, num_exact_low_modes=100),
     ),
 ]
 
@@ -98,18 +94,10 @@ summary_rows: list[dict[str, object]] = [
     }
 ]
 
-for name, method, kwargs in approx_configs:
+for name, cfg in approx_configs:
     t0 = time.perf_counter()
-    gp_approx = nma.evaluate_storage_modulus_approx(
-        omega=frequencies,
-        method=method,
-        **kwargs,
-    )
-    gpp_approx = nma.evaluate_loss_modulus_approx(
-        omega=frequencies,
-        method=method,
-        **kwargs,
-    )
+    approx_spectrum = nma.solve_approx(cfg)
+    gp_approx, gpp_approx = approx_spectrum.moduli(frequencies)
     dt = time.perf_counter() - t0
     approx_results[name] = (gp_approx, gpp_approx)
 
@@ -136,13 +124,13 @@ for name, method, kwargs in approx_configs:
     )
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 128-131 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 116-119 -->
 
 ## Summary Table
 
 Compare runtime, speedup, and relative error against exact diagonalization.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 131-135 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 119-123 -->
 ```Python
 summary_df = pd.DataFrame(summary_rows)
 print(summary_df.to_string(index=False))
@@ -150,13 +138,13 @@ print(summary_df.to_string(index=False))
 
 ```none
 Method Time [s] Speedup Mean Rel. Err. G' [%] Max Rel. Err. G' [%] Mean Rel. Err. G'' [%] Max Rel. Err. G'' [%]
- Exact   12.899    1.0x                  0.00                 0.00                   0.00                  0.00
-   KPM    0.081  159.5x                 22.84                97.14                   8.78                 66.62
-   SLQ    0.058  222.8x                  2.06                41.07                   1.03                  6.64
-Hybrid    0.252   51.3x                  0.44                 1.38                   0.49                  1.41
+ Exact   14.117    1.0x                  0.00                 0.00                   0.00                  0.00
+   KPM    0.063  222.9x                 20.36                87.70                   8.35                 54.80
+   SLQ    0.045  316.3x                  2.06                41.07                   1.03                  6.64
+Hybrid    0.350   40.3x                  0.44                 1.38                   0.49                  1.41
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 136-143 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 124-131 -->
 <!-- todo:
 Apply conversion factors where necessary -->
 
@@ -165,7 +153,7 @@ Apply conversion factors where necessary -->
 Each panel compares Exact against a single approximate method so the curves
 remain easy to read.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 143-167 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 131-155 -->
 ```Python
 fig, axes = plt.subplots(
     1,
@@ -175,7 +163,7 @@ fig, axes = plt.subplots(
     sharey=True,
 )
 
-for ax, (name, _, _) in zip(axes, approx_configs):
+for ax, (name, _) in zip(axes, approx_configs):
     gp_approx, gpp_approx = approx_results[name]
     ax.loglog(frequencies, storage_modulus_exact, "b-", label="G' (Exact)")
     ax.loglog(frequencies, loss_modulus_exact, "r-", label="G'' (Exact)")
@@ -192,7 +180,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 14.287 seconds)
+**Total running time of the script:** (0 minutes 15.146 seconds)
 
 <a id="sphx-glr-download-auto-examples-normal-mode-analysis-plot-normal-mode-analysis-py"></a>
 

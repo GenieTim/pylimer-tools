@@ -803,6 +803,35 @@ Check whether the passed offset is a valid one in this box.
   True if the offset is valid, False otherwise
 
 
+# api/pylimer_tools_cpp.ComputeBackend.html.md
+
+# ComputeBackend
+
+### *class* pylimer_tools_cpp.ComputeBackend(\*values)
+
+Bases: [`Enum`](https://docs.python.org/3/library/enum.html#enum.Enum)
+
+Hardware compute backend for approximate spectral methods
+
+### Attributes Summary
+
+| [`AUTO`](api/pylimer_tools_cpp.ComputeBackend.html.md#pylimer_tools_cpp.ComputeBackend.AUTO)   |    |
+|---------------------------------------------------------|----|
+| [`CPU`](api/pylimer_tools_cpp.ComputeBackend.html.md#pylimer_tools_cpp.ComputeBackend.CPU)    |    |
+| [`CUDA`](api/pylimer_tools_cpp.ComputeBackend.html.md#pylimer_tools_cpp.ComputeBackend.CUDA)   |    |
+| [`METAL`](api/pylimer_tools_cpp.ComputeBackend.html.md#pylimer_tools_cpp.ComputeBackend.METAL)  |    |
+
+### Attributes Documentation
+
+#### AUTO *= 0*
+
+#### CPU *= 1*
+
+#### CUDA *= 3*
+
+#### METAL *= 2*
+
+
 # api/pylimer_tools_cpp.ComputedDoubleValues.html.md
 
 # ComputedDoubleValues
@@ -2531,6 +2560,67 @@ signed
 : Determines whether two’s complement is used to represent the integer.
   If signed is False and a negative integer is given, an OverflowError
   is raised.
+
+
+# api/pylimer_tools_cpp.HybridConfig.html.md
+
+# HybridConfig
+
+### *class* pylimer_tools_cpp.HybridConfig(self: [pylimer_tools_cpp.HybridConfig](api/pylimer_tools_cpp.HybridConfig.html.md#pylimer_tools_cpp.HybridConfig), num_steps: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 200, num_random_vectors: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 20, num_exact_low_modes: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 100, backend: [pylimer_tools_cpp.ComputeBackend](api/pylimer_tools_cpp.ComputeBackend.html.md#pylimer_tools_cpp.ComputeBackend) = ComputeBackend.AUTO)
+
+Bases: `pybind11_object`
+
+Configuration for Hybrid exact low-modes + deflated SLQ.
+
+### Attributes Summary
+
+| [`backend`](api/pylimer_tools_cpp.HybridConfig.html.md#pylimer_tools_cpp.HybridConfig.backend)             |    |
+|----------------------------------------------------------------------|----|
+| [`num_exact_low_modes`](api/pylimer_tools_cpp.HybridConfig.html.md#pylimer_tools_cpp.HybridConfig.num_exact_low_modes) |    |
+| [`num_random_vectors`](api/pylimer_tools_cpp.HybridConfig.html.md#pylimer_tools_cpp.HybridConfig.num_random_vectors)  |    |
+| [`num_steps`](api/pylimer_tools_cpp.HybridConfig.html.md#pylimer_tools_cpp.HybridConfig.num_steps)           |    |
+
+### Attributes Documentation
+
+#### backend
+
+#### num_exact_low_modes
+
+#### num_random_vectors
+
+#### num_steps
+
+
+# api/pylimer_tools_cpp.KPMConfig.html.md
+
+# KPMConfig
+
+### *class* pylimer_tools_cpp.KPMConfig(self: [pylimer_tools_cpp.KPMConfig](api/pylimer_tools_cpp.KPMConfig.html.md#pylimer_tools_cpp.KPMConfig), num_moments: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1024, num_random_vectors: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 20, num_quadrature_points: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2048, batch_size: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 4, backend: [pylimer_tools_cpp.ComputeBackend](api/pylimer_tools_cpp.ComputeBackend.html.md#pylimer_tools_cpp.ComputeBackend) = ComputeBackend.AUTO)
+
+Bases: `pybind11_object`
+
+Configuration for Kernel Polynomial Method (KPM) spectral approximation.
+
+### Attributes Summary
+
+| [`backend`](api/pylimer_tools_cpp.KPMConfig.html.md#pylimer_tools_cpp.KPMConfig.backend)               |    |
+|------------------------------------------------------------------------|----|
+| [`batch_size`](api/pylimer_tools_cpp.KPMConfig.html.md#pylimer_tools_cpp.KPMConfig.batch_size)            |    |
+| [`num_moments`](api/pylimer_tools_cpp.KPMConfig.html.md#pylimer_tools_cpp.KPMConfig.num_moments)           |    |
+| [`num_quadrature_points`](api/pylimer_tools_cpp.KPMConfig.html.md#pylimer_tools_cpp.KPMConfig.num_quadrature_points) |    |
+| [`num_random_vectors`](api/pylimer_tools_cpp.KPMConfig.html.md#pylimer_tools_cpp.KPMConfig.num_random_vectors)    |    |
+
+### Attributes Documentation
+
+#### backend
+
+#### batch_size
+
+#### num_moments
+
+#### num_quadrature_points
+
+#### num_random_vectors
 
 
 # api/pylimer_tools_cpp.LazyUniverseSequenceIterator.html.md
@@ -5425,250 +5515,112 @@ allowing for any necessary setup or precomputation.
 
 # NormalModeAnalyzer
 
-### *class* pylimer_tools_cpp.NormalModeAnalyzer(self: [pylimer_tools_cpp.NormalModeAnalyzer](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer), spring_from: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], spring_to: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], nr_of_nodes: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0)
+### *class* pylimer_tools_cpp.NormalModeAnalyzer(self: [pylimer_tools_cpp.NormalModeAnalyzer](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer), spring_from: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], spring_to: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], nr_of_nodes: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0, weights: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)] | [None](https://docs.python.org/3/builtins/constants.html#None) = None)
 
 Bases: `pybind11_object`
 
-Compute the normal modes and predict the loss/storage moduli.
+Stateless graph Laplacian builder and normal mode solver.
 
 Please cite Gusev and Bernhard [[GB24](acknowledgements.html.md#id7)] if you use this method in your work.
 
-Initialize the NormalModeAnalyzer with the bonds (edges).
-
-Constructs the connectivity matrix from the given edges.
+Initialize the NormalModeAnalyzer from bond/spring edge lists.
 
 * **Parameters:**
-  * **spring_from** – Vector of starting node indices for springs/bonds
-  * **spring_to** – Vector of ending node indices for springs/bonds
-  * **nr_of_nodes** – Optional total number of nodes (to include isolated vertices with index > max)
+  * **spring_from** – Starting node indices for springs/bonds
+  * **spring_to** – Ending node indices for springs/bonds
+  * **nr_of_nodes** – Optional total number of nodes (to include isolated vertices)
+  * **weights** – Optional per-spring weights (defaults to unit weight 1.0)
+
+### Attributes Summary
+
+| [`matrix`](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer.matrix)               | Assembled sparse connectivity matrix.                           |
+|-----------------------------------------------------------------------|-----------------------------------------------------------------|
+| [`num_soluble_clusters`](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer.num_soluble_clusters) | Number of connected components (soluble clusters / zero modes). |
+| [`size`](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer.size)                 | Dimension of the connectivity matrix.                           |
 
 ### Methods Summary
 
-| [`compute_chebyshev_moments_kpm`](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer.compute_chebyshev_moments_kpm)(self[, ...])        | Compute Chebyshev moments using the Kernel Polynomial Method (KPM).                                                                                    |
-|----------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`compute_chebyshev_moments_kpm_metal`](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer.compute_chebyshev_moments_kpm_metal)(self[, ...])  | Compute Chebyshev moments using the Kernel Polynomial Method (KPM) accelerated with Apple Silicon Metal compute kernels with multi-RHS block batching. |
-| [`compute_density_of_states_kpm`](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer.compute_density_of_states_kpm)(self, lambda_grid)  | Compute continuous density of states (DOS) using KPM.                                                                                                  |
-| [`evaluate_loss_modulus`](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus)(self, omega)                | Evaluate the loss modulus $G''(\omega)$.                                                                                                               |
-| [`evaluate_loss_modulus_approx`](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_approx)(self, omega, ...)    | Evaluate loss modulus G'' using an approximate spectral method.                                                                                        |
-| [`evaluate_loss_modulus_kpm`](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_kpm)(self, omega[, ...])     | Evaluate loss modulus G'' directly using KPM without computing eigenvalues.                                                                            |
-| [`evaluate_storage_modulus`](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus)(self, omega)             | Evaluate the storage modulus $G'(\omega)$.                                                                                                             |
-| [`evaluate_storage_modulus_approx`](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus_approx)(self, omega, ...) | Evaluate storage modulus G' using an approximate spectral method.                                                                                      |
-| [`evaluate_storage_modulus_kpm`](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus_kpm)(self, omega[, ...])  | Evaluate storage modulus G' directly using KPM without computing eigenvalues.                                                                          |
-| [`evaluate_stress_autocorrelation`](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation)(self, t)          | Evaluate stress autocorrelation $C(t)$.                                                                                                                |
-| [`evaluate_stress_autocorrelation_approx`](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_approx)(self, ...) | Evaluate stress autocorrelation G(t) using an approximate spectral method.                                                                             |
-| [`evaluate_stress_autocorrelation_kpm`](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_kpm)(self, t)      | Evaluate stress autocorrelation directly using KPM without computing eigenvalues.                                                                      |
-| [`find_all_eigenvalues`](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer.find_all_eigenvalues)(self[, solver, ...])         | Find all eigenvalues using the specified solver.                                                                                                       |
-| [`find_sparse_eigenvalues`](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer.find_sparse_eigenvalues)(self, nr_of_eigenvalues)  | Find the k smallest eigenvalues using a sparse solver.                                                                                                 |
-| [`get_eigenvalues`](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer.get_eigenvalues)(self)                             | Get the eigenvalues.                                                                                                                                   |
-| [`get_eigenvectors`](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer.get_eigenvectors)(self)                            | Get eigenvectors.                                                                                                                                      |
-| [`get_matrix`](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer.get_matrix)(self)                                  | Get the assembled connectivity matrix.                                                                                                                 |
-| [`get_matrix_size`](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer.get_matrix_size)(self)                             | Get the size of the matrix (the maximum number of eigenvalues that could be queried).                                                                  |
-| [`get_nr_of_soluble_clusters`](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer.get_nr_of_soluble_clusters)(self)                  | Get the number of soluble clusters (eigenvalues = 0).                                                                                                  |
-| [`set_eigenvalues`](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvalues)(self, eigenvalues)                | Set the eigenvalues, e.g. if you use an external solver.                                                                                               |
-| [`set_eigenvectors`](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvectors)(self, eigenvectors)              | Set eigenvectors, e.g. if you use an external solver.                                                                                                  |
+| [`chebyshev_moments`](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer.chebyshev_moments)(self[, config])              | Compute Jackson-damped Chebyshev moments using KPM.                                  |
+|-------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------|
+| [`density_of_states`](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer.density_of_states)(self, lambda_grid[, config]) | Compute continuous density of states (DOS) on lambda_grid using KPM.                 |
+| [`from_matrix`](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer.from_matrix)(matrix)                            | Construct a NormalModeAnalyzer directly from a sparse Laplacian/connectivity matrix. |
+| [`from_universe`](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer.from_universe)(universe)                        | Construct a NormalModeAnalyzer from a Universe's atom-bond graph.                    |
+| [`solve_approx`](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer.solve_approx)(self[, config])                   | Compute an approximate / stochastic normal mode spectrum.                            |
+| [`solve_exact`](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer.solve_exact)(self[, solver, ...])               | Compute exact eigenvalues (and optionally eigenvectors).                             |
+
+### Attributes Documentation
+
+#### matrix
+
+Assembled sparse connectivity matrix.
+
+#### num_soluble_clusters
+
+Number of connected components (soluble clusters / zero modes).
+
+#### size
+
+Dimension of the connectivity matrix.
 
 ### Methods Documentation
 
-#### compute_chebyshev_moments_kpm(self: [pylimer_tools_cpp.NormalModeAnalyzer](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer), num_moments: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1024, num_random_vectors: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 20) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
+#### chebyshev_moments(self: [pylimer_tools_cpp.NormalModeAnalyzer](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer), config: [pylimer_tools_cpp.KPMConfig](api/pylimer_tools_cpp.KPMConfig.html.md#pylimer_tools_cpp.KPMConfig) = KPMConfig()) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
 
-Compute Chebyshev moments using the Kernel Polynomial Method (KPM).
+Compute Jackson-damped Chebyshev moments using KPM.
 
 * **Parameters:**
-  * **num_moments** – Number of moments to compute (default: 1024)
-  * **num_random_vectors** – Number of random Rademacher vectors for trace estimation (default: 20)
+  **config** – KPMConfig instance
 * **Returns:**
   Vector of damped Chebyshev moments
 
-#### compute_chebyshev_moments_kpm_metal(self: [pylimer_tools_cpp.NormalModeAnalyzer](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer), num_moments: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1024, num_random_vectors: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 20, batch_size: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 4) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
+#### density_of_states(self: [pylimer_tools_cpp.NormalModeAnalyzer](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer), lambda_grid: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], config: [pylimer_tools_cpp.KPMConfig](api/pylimer_tools_cpp.KPMConfig.html.md#pylimer_tools_cpp.KPMConfig) = KPMConfig()) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
 
-Compute Chebyshev moments using the Kernel Polynomial Method (KPM)
-accelerated with Apple Silicon Metal compute kernels with multi-RHS block batching.
-
-* **Parameters:**
-  * **num_moments** – Number of moments to compute (default: 1024)
-  * **num_random_vectors** – Number of random Rademacher vectors for trace estimation (default: 20)
-  * **batch_size** – Number of RHS vectors batched into each Block-SpMM (default: 4)
-* **Returns:**
-  Vector of damped Chebyshev moments
-
-#### compute_density_of_states_kpm(self: [pylimer_tools_cpp.NormalModeAnalyzer](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer), lambda_grid: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], num_moments: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1024, num_random_vectors: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 20) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
-
-Compute continuous density of states (DOS) using KPM.
+Compute continuous density of states (DOS) on lambda_grid using KPM.
 
 * **Parameters:**
   * **lambda_grid** – Eigenvalue points at which to evaluate DOS
-  * **num_moments** – Number of Chebyshev moments (default: 1024)
-  * **num_random_vectors** – Number of random vectors (default: 20)
+  * **config** – KPMConfig instance
 * **Returns:**
   Density of states values on the grid
 
-#### evaluate_loss_modulus(self: [pylimer_tools_cpp.NormalModeAnalyzer](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer), omega: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]']) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
+#### *static* from_matrix(matrix: [scipy.sparse.csc_matrix](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csc_matrix.html#scipy.sparse.csc_matrix)[numpy.float64]) → [pylimer_tools_cpp.NormalModeAnalyzer](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer)
 
-Evaluate the loss modulus $G''(\omega)$. Yet misses the conversion factor.
+Construct a NormalModeAnalyzer directly from a sparse Laplacian/connectivity matrix.
 
 * **Parameters:**
-  **omega** – Angular frequencies
+  **matrix** – Square sparse connectivity matrix
 * **Returns:**
-  Loss modulus values
+  NormalModeAnalyzer instance
 
-#### evaluate_loss_modulus_approx(self: pylimer_tools_cpp.NormalModeAnalyzer, omega: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], method: pylimer_tools_cpp.StochasticSpectralMethod = <StochasticSpectralMethod.AUTO: 0>, num_steps: typing.SupportsInt | typing.SupportsIndex = 200, num_random_vectors: typing.SupportsInt | typing.SupportsIndex = 20, num_exact_low_modes: typing.SupportsInt | typing.SupportsIndex = 100) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
+#### *static* from_universe(universe: [pylimer_tools_cpp.Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe)) → [pylimer_tools_cpp.NormalModeAnalyzer](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer)
 
-Evaluate loss modulus G’’ using an approximate spectral method.
+Construct a NormalModeAnalyzer from a Universe’s atom-bond graph.
 
 * **Parameters:**
-  * **omega** – Angular frequencies to evaluate
-  * **method** – StochasticSpectralMethod (AUTO, SLQ, HYBRID, or KPM)
-  * **num_steps** – Lanczos steps (SLQ/HYBRID) or Chebyshev moments (KPM)
-  * **num_random_vectors** – Number of Rademacher random vectors (default: 20)
-  * **num_exact_low_modes** – Exact lowest nonzero modes for HYBRID (default: 100)
+  **universe** – Universe instance
 * **Returns:**
-  Loss modulus values
+  NormalModeAnalyzer instance
 
-#### evaluate_loss_modulus_kpm(self: [pylimer_tools_cpp.NormalModeAnalyzer](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer), omega: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], num_moments: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1024, num_random_vectors: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 20, num_quadrature_points: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2048) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
+#### solve_approx(self: [pylimer_tools_cpp.NormalModeAnalyzer](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer), config: [pylimer_tools_cpp.SLQConfig](api/pylimer_tools_cpp.SLQConfig.html.md#pylimer_tools_cpp.SLQConfig) | [pylimer_tools_cpp.HybridConfig](api/pylimer_tools_cpp.HybridConfig.html.md#pylimer_tools_cpp.HybridConfig) | [pylimer_tools_cpp.KPMConfig](api/pylimer_tools_cpp.KPMConfig.html.md#pylimer_tools_cpp.KPMConfig) | [None](https://docs.python.org/3/builtins/constants.html#None) = None) → [pylimer_tools_cpp.NormalModeSpectrum](api/pylimer_tools_cpp.NormalModeSpectrum.html.md#pylimer_tools_cpp.NormalModeSpectrum)
 
-Evaluate loss modulus G’’ directly using KPM without computing eigenvalues.
+Compute an approximate / stochastic normal mode spectrum.
 
 * **Parameters:**
-  * **omega** – Angular frequencies to evaluate
-  * **num_moments** – Number of Chebyshev moments (default: 1024)
-  * **num_random_vectors** – Number of random vectors (default: 20)
-  * **num_quadrature_points** – Number of Gauss-Chebyshev quadrature points (default: 2048)
+  **config** – SLQConfig, HybridConfig, KPMConfig, or None for AUTO
 * **Returns:**
-  Loss modulus values
+  NormalModeSpectrum instance
 
-#### evaluate_storage_modulus(self: [pylimer_tools_cpp.NormalModeAnalyzer](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer), omega: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]']) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
+#### solve_exact(self: [pylimer_tools_cpp.NormalModeAnalyzer](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer), solver: [pylimer_tools_cpp.NormalModeSolver](api/pylimer_tools_cpp.NormalModeSolver.html.md#pylimer_tools_cpp.NormalModeSolver) = NormalModeSolver.AUTO, compute_eigenvectors: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False, decompose_components: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True, num_modes: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) | [None](https://docs.python.org/3/builtins/constants.html#None) = None) → [pylimer_tools_cpp.NormalModeSpectrum](api/pylimer_tools_cpp.NormalModeSpectrum.html.md#pylimer_tools_cpp.NormalModeSpectrum)
 
-Evaluate the storage modulus $G'(\omega)$. Yet misses the conversion factor.
-
-* **Parameters:**
-  **omega** – Angular frequencies
-* **Returns:**
-  Storage modulus values
-
-#### evaluate_storage_modulus_approx(self: pylimer_tools_cpp.NormalModeAnalyzer, omega: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], method: pylimer_tools_cpp.StochasticSpectralMethod = <StochasticSpectralMethod.AUTO: 0>, num_steps: typing.SupportsInt | typing.SupportsIndex = 200, num_random_vectors: typing.SupportsInt | typing.SupportsIndex = 20, num_exact_low_modes: typing.SupportsInt | typing.SupportsIndex = 100) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
-
-Evaluate storage modulus G’ using an approximate spectral method.
+Compute exact eigenvalues (and optionally eigenvectors).
 
 * **Parameters:**
-  * **omega** – Angular frequencies to evaluate
-  * **method** – StochasticSpectralMethod (AUTO, SLQ, HYBRID, or KPM)
-  * **num_steps** – Lanczos steps (SLQ/HYBRID) or Chebyshev moments (KPM)
-  * **num_random_vectors** – Number of Rademacher random vectors (default: 20)
-  * **num_exact_low_modes** – Exact lowest nonzero modes for HYBRID (default: 100)
-* **Returns:**
-  Storage modulus values
-
-#### evaluate_storage_modulus_kpm(self: [pylimer_tools_cpp.NormalModeAnalyzer](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer), omega: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], num_moments: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1024, num_random_vectors: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 20, num_quadrature_points: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2048) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
-
-Evaluate storage modulus G’ directly using KPM without computing eigenvalues.
-
-* **Parameters:**
-  * **omega** – Angular frequencies to evaluate
-  * **num_moments** – Number of Chebyshev moments (default: 1024)
-  * **num_random_vectors** – Number of random vectors (default: 20)
-  * **num_quadrature_points** – Number of Gauss-Chebyshev quadrature points (default: 2048)
-* **Returns:**
-  Storage modulus values
-
-#### evaluate_stress_autocorrelation(self: [pylimer_tools_cpp.NormalModeAnalyzer](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer), t: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]']) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
-
-Evaluate stress autocorrelation $C(t)$.
-
-* **Parameters:**
-  **t** – The time at which to evaluate the stress autocorrelation
-* **Returns:**
-  Stress autocorrelation values
-
-#### evaluate_stress_autocorrelation_approx(self: pylimer_tools_cpp.NormalModeAnalyzer, t: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], method: pylimer_tools_cpp.StochasticSpectralMethod = <StochasticSpectralMethod.AUTO: 0>, num_steps: typing.SupportsInt | typing.SupportsIndex = 200, num_random_vectors: typing.SupportsInt | typing.SupportsIndex = 20, num_exact_low_modes: typing.SupportsInt | typing.SupportsIndex = 100) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
-
-Evaluate stress autocorrelation G(t) using an approximate spectral method.
-
-* **Parameters:**
-  * **t** – Time points to evaluate
-  * **method** – StochasticSpectralMethod (AUTO, SLQ, HYBRID, or KPM)
-  * **num_steps** – Lanczos steps (SLQ/HYBRID) or Chebyshev moments (KPM)
-  * **num_random_vectors** – Number of Rademacher random vectors (default: 20)
-  * **num_exact_low_modes** – Exact lowest nonzero modes for HYBRID (default: 100)
-* **Returns:**
-  Stress autocorrelation values
-
-#### evaluate_stress_autocorrelation_kpm(self: [pylimer_tools_cpp.NormalModeAnalyzer](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer), t: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], num_moments: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1024, num_random_vectors: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 20, num_quadrature_points: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2048) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
-
-Evaluate stress autocorrelation directly using KPM without computing eigenvalues.
-
-* **Parameters:**
-  * **t** – Time points to evaluate
-  * **num_moments** – Number of Chebyshev moments (default: 1024)
-  * **num_random_vectors** – Number of random vectors (default: 20)
-  * **num_quadrature_points** – Number of Gauss-Chebyshev quadrature points (default: 2048)
-* **Returns:**
-  Stress autocorrelation values
-
-#### find_all_eigenvalues(self: [pylimer_tools_cpp.NormalModeAnalyzer](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer), solver: [pylimer_tools_cpp.NormalModeSolver](api/pylimer_tools_cpp.NormalModeSolver.html.md#pylimer_tools_cpp.NormalModeSolver) = NormalModeSolver.AUTO, compute_eigenvectors: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False, decompose_components: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [None](https://docs.python.org/3/builtins/constants.html#None)
-
-Find all eigenvalues using the specified solver.
-
-* **Parameters:**
-  * **solver** – Solver method to use (NormalModeSolver enum; default: NormalModeSolver.AUTO)
+  * **solver** – Solver algorithm (NormalModeSolver enum; default: NormalModeSolver.AUTO). Ignored when `num_modes < size`.
   * **compute_eigenvectors** – Whether to also compute eigenvectors (default: False)
-  * **decompose_components** – Whether to decompose the graph into connected components (default: True)
-
-#### find_sparse_eigenvalues(self: [pylimer_tools_cpp.NormalModeAnalyzer](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer), nr_of_eigenvalues: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), compute_eigenvectors: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [None](https://docs.python.org/3/builtins/constants.html#None)
-
-Find the k smallest eigenvalues using a sparse solver.
-
-* **Parameters:**
-  * **nr_of_eigenvalues** – Number of smallest eigenvalues to find
-  * **compute_eigenvectors** – Whether to also compute eigenvectors (default: False)
-
-#### get_eigenvalues(self: [pylimer_tools_cpp.NormalModeAnalyzer](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
-
-Get the eigenvalues.
-
+  * **decompose_components** – Whether to decompose into connected components (default: True). Ignored when `num_modes < size`.
+  * **num_modes** – Optional number of smallest modes to compute via Spectra sparse solver
 * **Returns:**
-  Vector of eigenvalues
-
-#### get_eigenvectors(self: [pylimer_tools_cpp.NormalModeAnalyzer](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, n]']
-
-Get eigenvectors.
-
-* **Returns:**
-  Matrix of eigenvectors
-
-#### get_matrix(self: [pylimer_tools_cpp.NormalModeAnalyzer](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer)) → [scipy.sparse.csc_matrix](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csc_matrix.html#scipy.sparse.csc_matrix)[numpy.float64]
-
-Get the assembled connectivity matrix.
-
-* **Returns:**
-  The connectivity matrix
-
-#### get_matrix_size(self: [pylimer_tools_cpp.NormalModeAnalyzer](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer)) → [int](https://docs.python.org/3/builtins/functions.html#int)
-
-Get the size of the matrix (the maximum number of eigenvalues that could be queried).
-
-* **Returns:**
-  Size of the connectivity matrix
-
-#### get_nr_of_soluble_clusters(self: [pylimer_tools_cpp.NormalModeAnalyzer](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer)) → [int](https://docs.python.org/3/builtins/functions.html#int)
-
-Get the number of soluble clusters (eigenvalues = 0).
-
-* **Returns:**
-  Number of soluble clusters
-
-#### set_eigenvalues(self: [pylimer_tools_cpp.NormalModeAnalyzer](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer), eigenvalues: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]']) → [None](https://docs.python.org/3/builtins/constants.html#None)
-
-Set the eigenvalues, e.g. if you use an external solver.
-
-* **Parameters:**
-  **eigenvalues** – Vector of eigenvalues to set
-
-#### set_eigenvectors(self: [pylimer_tools_cpp.NormalModeAnalyzer](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer), eigenvectors: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, n]']) → [None](https://docs.python.org/3/builtins/constants.html#None)
-
-Set eigenvectors, e.g. if you use an external solver.
-
-* **Parameters:**
-  **eigenvectors** – Matrix of eigenvectors to set
+  NormalModeSpectrum instance
 
 
 # api/pylimer_tools_cpp.NormalModeSolver.html.md
@@ -5679,12 +5631,13 @@ Set eigenvectors, e.g. if you use an external solver.
 
 Bases: [`Enum`](https://docs.python.org/3/library/enum.html#enum.Enum)
 
-Solver algorithms for normal mode analysis
+Exact eigenvalue solver algorithms for normal mode analysis
 
 ### Attributes Summary
 
 | [`AUTO`](api/pylimer_tools_cpp.NormalModeSolver.html.md#pylimer_tools_cpp.NormalModeSolver.AUTO)           |    |
 |-----------------------------------------------------------------|----|
+| [`CUDA`](api/pylimer_tools_cpp.NormalModeSolver.html.md#pylimer_tools_cpp.NormalModeSolver.CUDA)           |    |
 | [`DENSE_EIGEN`](api/pylimer_tools_cpp.NormalModeSolver.html.md#pylimer_tools_cpp.NormalModeSolver.DENSE_EIGEN)    |    |
 | [`DENSE_LAPACK`](api/pylimer_tools_cpp.NormalModeSolver.html.md#pylimer_tools_cpp.NormalModeSolver.DENSE_LAPACK)   |    |
 | [`METAL`](api/pylimer_tools_cpp.NormalModeSolver.html.md#pylimer_tools_cpp.NormalModeSolver.METAL)          |    |
@@ -5694,6 +5647,8 @@ Solver algorithms for normal mode analysis
 
 #### AUTO *= 0*
 
+#### CUDA *= 5*
+
 #### DENSE_EIGEN *= 2*
 
 #### DENSE_LAPACK *= 1*
@@ -5701,6 +5656,110 @@ Solver algorithms for normal mode analysis
 #### METAL *= 4*
 
 #### SPARSE_SLICING *= 3*
+
+
+# api/pylimer_tools_cpp.NormalModeSpectrum.html.md
+
+# NormalModeSpectrum
+
+### *class* pylimer_tools_cpp.NormalModeSpectrum(self: [pylimer_tools_cpp.NormalModeSpectrum](api/pylimer_tools_cpp.NormalModeSpectrum.html.md#pylimer_tools_cpp.NormalModeSpectrum), eigenvalues: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], weights: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'] | [None](https://docs.python.org/3/builtins/constants.html#None) = None, eigenvectors: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, n]'] | [None](https://docs.python.org/3/builtins/constants.html#None) = None, is_complete: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True)
+
+Bases: `pybind11_object`
+
+Immutable normal mode spectrum and viscoelastic observable evaluator.
+
+Represents any discrete or quadrature-weighted spectrum $\{(\lambda_i, w_i)\}$.
+
+Construct a NormalModeSpectrum from eigenvalues and optional weights/eigenvectors.
+
+* **Parameters:**
+  * **eigenvalues** – 1D array of eigenvalues
+  * **weights** – Optional 1D array of quadrature weights (defaults to all 1.0)
+  * **eigenvectors** – Optional 2D array of eigenvectors (columns correspond to modes)
+  * **is_complete** – Whether this spectrum covers all modes of the system
+
+### Attributes Summary
+
+| [`eigenvalues`](api/pylimer_tools_cpp.NormalModeSpectrum.html.md#pylimer_tools_cpp.NormalModeSpectrum.eigenvalues)    | Eigenvalues of the spectrum.                                      |
+|-----------------------------------------------------------------|-------------------------------------------------------------------|
+| [`eigenvectors`](api/pylimer_tools_cpp.NormalModeSpectrum.html.md#pylimer_tools_cpp.NormalModeSpectrum.eigenvectors)   | Eigenvectors matrix (columns are modes), or None if not computed. |
+| [`is_complete`](api/pylimer_tools_cpp.NormalModeSpectrum.html.md#pylimer_tools_cpp.NormalModeSpectrum.is_complete)    | Whether this spectrum is complete.                                |
+| [`num_modes`](api/pylimer_tools_cpp.NormalModeSpectrum.html.md#pylimer_tools_cpp.NormalModeSpectrum.num_modes)      | Number of modes/quadrature nodes in the spectrum.                 |
+| [`num_zero_modes`](api/pylimer_tools_cpp.NormalModeSpectrum.html.md#pylimer_tools_cpp.NormalModeSpectrum.num_zero_modes) | Number of zero modes in the spectrum.                             |
+| [`weights`](api/pylimer_tools_cpp.NormalModeSpectrum.html.md#pylimer_tools_cpp.NormalModeSpectrum.weights)        | Quadrature weights of the spectrum.                               |
+
+### Methods Summary
+
+| [`loss_modulus`](api/pylimer_tools_cpp.NormalModeSpectrum.html.md#pylimer_tools_cpp.NormalModeSpectrum.loss_modulus)(self, omega)       | Evaluate the loss modulus $G''(\omega)$ (without prefactor).                        |
+|----------------------------------------------------------------------------------|-------------------------------------------------------------------------------------|
+| [`moduli`](api/pylimer_tools_cpp.NormalModeSpectrum.html.md#pylimer_tools_cpp.NormalModeSpectrum.moduli)(self, omega)             | Evaluate both storage and loss moduli $(G'(\omega), G''(\omega))$ in a single pass. |
+| [`storage_modulus`](api/pylimer_tools_cpp.NormalModeSpectrum.html.md#pylimer_tools_cpp.NormalModeSpectrum.storage_modulus)(self, omega)    | Evaluate the storage modulus $G'(\omega)$ (without prefactor).                      |
+| [`stress_autocorrelation`](api/pylimer_tools_cpp.NormalModeSpectrum.html.md#pylimer_tools_cpp.NormalModeSpectrum.stress_autocorrelation)(self, t) | Evaluate stress autocorrelation $G(t)$.                                             |
+
+### Attributes Documentation
+
+#### eigenvalues
+
+Eigenvalues of the spectrum.
+
+#### eigenvectors
+
+Eigenvectors matrix (columns are modes), or None if not computed.
+
+#### is_complete
+
+Whether this spectrum is complete.
+
+#### num_modes
+
+Number of modes/quadrature nodes in the spectrum.
+
+#### num_zero_modes
+
+Number of zero modes in the spectrum.
+
+#### weights
+
+Quadrature weights of the spectrum.
+
+### Methods Documentation
+
+#### loss_modulus(self: [pylimer_tools_cpp.NormalModeSpectrum](api/pylimer_tools_cpp.NormalModeSpectrum.html.md#pylimer_tools_cpp.NormalModeSpectrum), omega: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]']) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
+
+Evaluate the loss modulus $G''(\omega)$ (without prefactor).
+
+* **Parameters:**
+  **omega** – Angular frequencies
+* **Returns:**
+  Loss modulus values
+
+#### moduli(self: [pylimer_tools_cpp.NormalModeSpectrum](api/pylimer_tools_cpp.NormalModeSpectrum.html.md#pylimer_tools_cpp.NormalModeSpectrum), omega: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]']) → [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]'], [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']]
+
+Evaluate both storage and loss moduli $(G'(\omega), G''(\omega))$
+in a single pass.
+
+* **Parameters:**
+  **omega** – Angular frequencies
+* **Returns:**
+  Tuple of (storage_modulus, loss_modulus)
+
+#### storage_modulus(self: [pylimer_tools_cpp.NormalModeSpectrum](api/pylimer_tools_cpp.NormalModeSpectrum.html.md#pylimer_tools_cpp.NormalModeSpectrum), omega: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]']) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
+
+Evaluate the storage modulus $G'(\omega)$ (without prefactor).
+
+* **Parameters:**
+  **omega** – Angular frequencies
+* **Returns:**
+  Storage modulus values
+
+#### stress_autocorrelation(self: [pylimer_tools_cpp.NormalModeSpectrum](api/pylimer_tools_cpp.NormalModeSpectrum.html.md#pylimer_tools_cpp.NormalModeSpectrum), t: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]']) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
+
+Evaluate stress autocorrelation $G(t)$.
+
+* **Parameters:**
+  **t** – Time points at which to evaluate
+* **Returns:**
+  Stress autocorrelation values
 
 
 # api/pylimer_tools_cpp.OutputConfiguration.html.md
@@ -6548,6 +6607,32 @@ Solver for sparse linear equation systems
 #### SPARSE_QR *= 5*
 
 
+# api/pylimer_tools_cpp.SLQConfig.html.md
+
+# SLQConfig
+
+### *class* pylimer_tools_cpp.SLQConfig(self: [pylimer_tools_cpp.SLQConfig](api/pylimer_tools_cpp.SLQConfig.html.md#pylimer_tools_cpp.SLQConfig), num_steps: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 200, num_random_vectors: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 20, backend: [pylimer_tools_cpp.ComputeBackend](api/pylimer_tools_cpp.ComputeBackend.html.md#pylimer_tools_cpp.ComputeBackend) = ComputeBackend.AUTO)
+
+Bases: `pybind11_object`
+
+Configuration for Stochastic Lanczos Quadrature (SLQ).
+
+### Attributes Summary
+
+| [`backend`](api/pylimer_tools_cpp.SLQConfig.html.md#pylimer_tools_cpp.SLQConfig.backend)            |    |
+|---------------------------------------------------------------------|----|
+| [`num_random_vectors`](api/pylimer_tools_cpp.SLQConfig.html.md#pylimer_tools_cpp.SLQConfig.num_random_vectors) |    |
+| [`num_steps`](api/pylimer_tools_cpp.SLQConfig.html.md#pylimer_tools_cpp.SLQConfig.num_steps)          |    |
+
+### Attributes Documentation
+
+#### backend
+
+#### num_random_vectors
+
+#### num_steps
+
+
 # api/pylimer_tools_cpp.STOP.html.md
 
 # STOP
@@ -6893,35 +6978,6 @@ Consists usually only of the crosslinkers.
 #### spring_index_b
 
 #### volume
-
-
-# api/pylimer_tools_cpp.StochasticSpectralMethod.html.md
-
-# StochasticSpectralMethod
-
-### *class* pylimer_tools_cpp.StochasticSpectralMethod(\*values)
-
-Bases: [`Enum`](https://docs.python.org/3/library/enum.html#enum.Enum)
-
-Approximate spectral methods for large-scale normal mode analysis
-
-### Attributes Summary
-
-| [`AUTO`](api/pylimer_tools_cpp.StochasticSpectralMethod.html.md#pylimer_tools_cpp.StochasticSpectralMethod.AUTO)   |    |
-|---------------------------------------------------------|----|
-| [`HYBRID`](api/pylimer_tools_cpp.StochasticSpectralMethod.html.md#pylimer_tools_cpp.StochasticSpectralMethod.HYBRID) |    |
-| [`KPM`](api/pylimer_tools_cpp.StochasticSpectralMethod.html.md#pylimer_tools_cpp.StochasticSpectralMethod.KPM)    |    |
-| [`SLQ`](api/pylimer_tools_cpp.StochasticSpectralMethod.html.md#pylimer_tools_cpp.StochasticSpectralMethod.SLQ)    |    |
-
-### Attributes Documentation
-
-#### AUTO *= 0*
-
-#### HYBRID *= 2*
-
-#### KPM *= 3*
-
-#### SLQ *= 1*
 
 
 # api/pylimer_tools_cpp.StrandCategory.html.md
@@ -11142,7 +11198,7 @@ against full eigenvalue decomposition on realistic PDMS networks generated via M
 on-demand entanglement sampling.
 
 <div id='sg-tag-list' class='sphx-glr-tag-list'></div><div class="sphx-glr-thumbnails">
-<!-- thumbnail-parent-div-open --><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the NormalModeAnalyzer in pylimer-tools to predict the loss and storage modulus of polymer networks using exact eigenvalue solvers or approximate spectral methods (~pylimer_tools_cpp.StochasticSpectralMethod: Kernel Polynomial Method KPM, Stochastic Lanczos Quadrature SLQ, and HYBRID).">![](auto_examples/normal_mode_analysis/images/thumb/sphx_glr_plot_normal_mode_analysis_thumb.png)
+<!-- thumbnail-parent-div-open --><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the NormalModeAnalyzer in pylimer-tools to predict the loss and storage modulus of polymer networks using exact eigenvalue solvers or approximate spectral methods (~pylimer_tools_cpp.KPMConfig, SLQConfig, and HybridConfig).">![](auto_examples/normal_mode_analysis/images/thumb/sphx_glr_plot_normal_mode_analysis_thumb.png)
 
 [Normal Mode Analysis (NMA)](auto_examples/normal_mode_analysis/plot_normal_mode_analysis.html.md)
 
@@ -12825,7 +12881,7 @@ against full eigenvalue decomposition on realistic PDMS networks generated via M
 on-demand entanglement sampling.
 
 <div id='sg-tag-list' class='sphx-glr-tag-list'></div><div class="sphx-glr-thumbnails">
-<!-- thumbnail-parent-div-open --><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the NormalModeAnalyzer in pylimer-tools to predict the loss and storage modulus of polymer networks using exact eigenvalue solvers or approximate spectral methods (~pylimer_tools_cpp.StochasticSpectralMethod: Kernel Polynomial Method KPM, Stochastic Lanczos Quadrature SLQ, and HYBRID).">![](auto_examples/normal_mode_analysis/images/thumb/sphx_glr_plot_normal_mode_analysis_thumb.png)
+<!-- thumbnail-parent-div-open --><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the NormalModeAnalyzer in pylimer-tools to predict the loss and storage modulus of polymer networks using exact eigenvalue solvers or approximate spectral methods (~pylimer_tools_cpp.KPMConfig, SLQConfig, and HybridConfig).">![](auto_examples/normal_mode_analysis/images/thumb/sphx_glr_plot_normal_mode_analysis_thumb.png)
 
 [Normal Mode Analysis (NMA)](auto_examples/normal_mode_analysis/plot_normal_mode_analysis.html.md)
 
@@ -12925,7 +12981,7 @@ network, sample entanglements on demand, add the entanglement springs as bonds
 in the generated [`Universe`](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe), and compare exact vs.
 KPM moduli.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 72-172 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 72-158 -->
 ```Python
 params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
 assert isinstance(params, Parameters)
@@ -12962,36 +13018,24 @@ pairs = atom_pairs.pairs_of_atoms
 if pairs:
     universe.add_bonds([pair[0] for pair in pairs], [pair[1] for pair in pairs])
 
-edges = universe.get_edges()
-nma = pt.NormalModeAnalyzer(
-    edges["edge_from"], edges["edge_to"], universe.get_nr_of_atoms()
-)
+nma = pt.NormalModeAnalyzer.from_universe(universe)
 
 freqs_demo = np.logspace(-3, 2, 50)
 t0 = time.perf_counter()
-nma.find_all_eigenvalues(
+spec_exact_demo = nma.solve_exact(
     solver=pt.NormalModeSolver.AUTO,
     compute_eigenvectors=False,
     decompose_components=True,
 )
-gp_exact_demo = nma.evaluate_storage_modulus(freqs_demo) * gamma_conv / vol
+gp_exact_demo = spec_exact_demo.storage_modulus(freqs_demo) * gamma_conv / vol
 t_exact_demo = time.perf_counter() - t0
 
 demo_methods = [
-    (
-        "KPM",
-        pt.StochasticSpectralMethod.KPM,
-        {"num_steps": 1024, "num_random_vectors": 20},
-    ),
-    (
-        "SLQ",
-        pt.StochasticSpectralMethod.SLQ,
-        {"num_steps": 200, "num_random_vectors": 20},
-    ),
+    ("KPM", pt.KPMConfig(num_moments=1024, num_random_vectors=20)),
+    ("SLQ", pt.SLQConfig(num_steps=200, num_random_vectors=20)),
     (
         "Hybrid",
-        pt.StochasticSpectralMethod.HYBRID,
-        {"num_steps": 200, "num_random_vectors": 20, "num_exact_low_modes": 100},
+        pt.HybridConfig(num_steps=200, num_random_vectors=20, num_exact_low_modes=100),
     ),
 ]
 print(
@@ -13003,12 +13047,10 @@ print(
 )
 print("-" * 77)
 print(f"{'Exact':<8} | {t_exact_demo:8.3f} | {'1.0x':>8} | {'0.00':>21} | {'0.00':>20}")
-for name, method, kw in demo_methods:
+for name, cfg in demo_methods:
     t0 = time.perf_counter()
     gp_approx_demo = (
-        nma.evaluate_storage_modulus_approx(freqs_demo, method=method, **kw)
-        * gamma_conv
-        / vol
+        nma.solve_approx(cfg).storage_modulus(freqs_demo) * gamma_conv / vol
     )
     dt_demo = time.perf_counter() - t0
     rel_err = (
@@ -13031,14 +13073,14 @@ data = load_or_compute_cache(cache_path, run_kpm_vs_exact_pdms_study)
 Demo PDMS box (L=12 nm, N_atoms=3819, N_ent=84):
 Method   | Time [s] |  Speedup | Mean Rel. Err. G' [%] | Max Rel. Err. G' [%]
 -----------------------------------------------------------------------------
-Exact    |    7.418 |     1.0x |                  0.00 |                 0.00
-KPM      |    0.146 |    50.7x |                  2.69 |                 9.99
-SLQ      |    0.047 |   157.2x |                  0.68 |                 4.79
-Hybrid   |    0.140 |    53.0x |                  0.64 |                 1.80
+Exact    |    6.693 |     1.0x |                  0.00 |                 0.00
+KPM      |    0.101 |    66.1x |                  2.69 |                 9.99
+SLQ      |    0.037 |   179.3x |                  0.68 |                 4.79
+Hybrid   |    0.174 |    38.5x |                  0.64 |                 1.80
 Loading cached example data from kpm_vs_exact_pdms_cache.npz...
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 173-184 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 159-170 -->
 
 ## Effect of Chain Length ($N$)
 
@@ -13052,12 +13094,12 @@ and $G''(\omega)$ accurately across the transition and Rouse regimes
 deviations only in the lowest-frequency tail where very few eigenvalues
 reside.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 184-187 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 170-173 -->
 ```Python
 plot_kpm_vs_exact_chain_length(data)
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 188-198 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 174-184 -->
 
 ## Effect of Cross-link Conversion ($p$)
 
@@ -13070,12 +13112,12 @@ frequencies while leaving the high-frequency segmental Rouse response
 ($\omega\tau_0 \gtrsim 0.1$) largely unchanged. KPM captures this
 conversion-dependent softening faithfully without computing any eigenvalues.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 198-201 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 184-187 -->
 ```Python
 plot_kpm_vs_exact_conversion(data)
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 202-213 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 188-199 -->
 
 ## Effect of Stoichiometric Imbalance ($r$)
 
@@ -13089,12 +13131,12 @@ regime, whereas excess cross-linker ($r = 1.25$) maintains a higher
 strand conversion and modulus closer to the stoichiometric reference
 ($r = 1.00$). Across all $r$, KPM tracks the exact spectra closely.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 213-216 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 199-202 -->
 ```Python
 plot_kpm_vs_exact_stoichiometry(data)
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 217-231 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 203-217 -->
 
 ## Representative Volume, Sample Count, and Computational Scaling
 
@@ -13111,7 +13153,7 @@ in $\sim 9.8\,\text{s}$. Larger boxes also suppress finite-size scatter,
 reducing the number of realizations $n_{\text{samples}}$ required for a
 target 95% confidence interval.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 231-281 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 217-267 -->
 ```Python
 print(
     "\nAccuracy comparison across parameter sweeps (mean / max rel. error vs. Exact [%]):"
@@ -13189,7 +13231,7 @@ Runtime comparison per network (single-threaded worker, mean over repeats):
      36 |   103816 |   2324 |    skipped |    0.547s |    6.324s |    26.636s
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 282-287 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 268-273 -->
 
 ## Benchmark Hardware
 
@@ -13197,7 +13239,7 @@ Runtime comparison per network (single-threaded worker, mean over repeats):
 The cached runtime scaling benchmarks above were recorded on the
 hardware reported below.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 287-288 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 273-274 -->
 ```Python
 print(format_benchmark_footnote(data))
 ```
@@ -13206,7 +13248,7 @@ print(format_benchmark_footnote(data))
 Measured on: Apple M3 Pro (12 cores), 36 GB RAM, Mac15,7, macOS 27.2.1 (arm64), Python 3.13.18 (cached 2026-11-17).
 ```
 
-**Total running time of the script:** (0 minutes 11.350 seconds)
+**Total running time of the script:** (0 minutes 9.676 seconds)
 
 <a id="sphx-glr-download-auto-examples-normal-mode-analysis-plot-kpm-vs-exact-pdms-py"></a>
 
@@ -13237,12 +13279,12 @@ to download the full example code.
 
 This example demonstrates how to use the NormalModeAnalyzer in pylimer-tools
 to predict the loss and storage modulus of polymer networks using exact eigenvalue
-solvers or approximate spectral methods ([`StochasticSpectralMethod`](api/pylimer_tools_cpp.StochasticSpectralMethod.html.md#pylimer_tools_cpp.StochasticSpectralMethod):
-Kernel Polynomial Method `KPM`, Stochastic Lanczos Quadrature `SLQ`, and `HYBRID`).
+solvers or approximate spectral methods ([`KPMConfig`](api/pylimer_tools_cpp.KPMConfig.html.md#pylimer_tools_cpp.KPMConfig),
+[`SLQConfig`](api/pylimer_tools_cpp.SLQConfig.html.md#pylimer_tools_cpp.SLQConfig), and [`HybridConfig`](api/pylimer_tools_cpp.HybridConfig.html.md#pylimer_tools_cpp.HybridConfig)).
 
 Reference: Gusev and Bernhard [[GB24](acknowledgements.html.md#id7)]
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 12-127 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 12-115 -->
 ```Python
 from pathlib import Path
 import time
@@ -13253,9 +13295,11 @@ import pandas as pd
 
 from pylimer_tools.io.read_lammps_output_file import read_data_file
 from pylimer_tools_cpp import (
+    HybridConfig,
+    KPMConfig,
     NormalModeAnalyzer,
     NormalModeSolver,
-    StochasticSpectralMethod,
+    SLQConfig,
 )
 
 
@@ -13274,37 +13318,31 @@ def _find_fixtures_dir() -> Path:
 _fixtures_dir = _find_fixtures_dir()
 filePath = str(_fixtures_dir / "structure/network_100_a_46.structure.out")
 universe = read_data_file(filePath)
-edges = universe.get_edges()
 
 # Create the normal mode analyzer
-nma = NormalModeAnalyzer(
-    edges["edge_from"],
-    edges["edge_to"],
-)
+nma = NormalModeAnalyzer.from_universe(universe)
 
 # 1. Exact analysis with connected component decomposition and
 # dense/sparse solver
 frequencies = np.logspace(-4, 3, num=int(1e3))
 
 t0 = time.perf_counter()
-nma.find_all_eigenvalues(
+exact_spectrum = nma.solve_exact(
     solver=NormalModeSolver.AUTO,
     compute_eigenvectors=False,
     decompose_components=True,
 )
-storage_modulus_exact = nma.evaluate_storage_modulus(omega=frequencies)
-loss_modulus_exact = nma.evaluate_loss_modulus(omega=frequencies)
+storage_modulus_exact, loss_modulus_exact = exact_spectrum.moduli(frequencies)
 t_exact = time.perf_counter() - t0
 
 # 2. Approximate spectral methods without computing full eigenvalues
 # These methods scale linearly O(N) for large networks.
-approx_configs: list[tuple[str, StochasticSpectralMethod, dict[str, int]]] = [
-    ("KPM", StochasticSpectralMethod.KPM, {"num_steps": 512, "num_random_vectors": 20}),
-    ("SLQ", StochasticSpectralMethod.SLQ, {"num_steps": 200, "num_random_vectors": 20}),
+approx_configs: list[tuple[str, KPMConfig | SLQConfig | HybridConfig]] = [
+    ("KPM", KPMConfig(num_moments=512, num_random_vectors=20)),
+    ("SLQ", SLQConfig(num_steps=200, num_random_vectors=20)),
     (
         "Hybrid",
-        StochasticSpectralMethod.HYBRID,
-        {"num_steps": 200, "num_random_vectors": 20, "num_exact_low_modes": 100},
+        HybridConfig(num_steps=200, num_random_vectors=20, num_exact_low_modes=100),
     ),
 ]
 
@@ -13321,18 +13359,10 @@ summary_rows: list[dict[str, object]] = [
     }
 ]
 
-for name, method, kwargs in approx_configs:
+for name, cfg in approx_configs:
     t0 = time.perf_counter()
-    gp_approx = nma.evaluate_storage_modulus_approx(
-        omega=frequencies,
-        method=method,
-        **kwargs,
-    )
-    gpp_approx = nma.evaluate_loss_modulus_approx(
-        omega=frequencies,
-        method=method,
-        **kwargs,
-    )
+    approx_spectrum = nma.solve_approx(cfg)
+    gp_approx, gpp_approx = approx_spectrum.moduli(frequencies)
     dt = time.perf_counter() - t0
     approx_results[name] = (gp_approx, gpp_approx)
 
@@ -13359,13 +13389,13 @@ for name, method, kwargs in approx_configs:
     )
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 128-131 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 116-119 -->
 
 ## Summary Table
 
 Compare runtime, speedup, and relative error against exact diagonalization.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 131-135 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 119-123 -->
 ```Python
 summary_df = pd.DataFrame(summary_rows)
 print(summary_df.to_string(index=False))
@@ -13373,13 +13403,13 @@ print(summary_df.to_string(index=False))
 
 ```none
 Method Time [s] Speedup Mean Rel. Err. G' [%] Max Rel. Err. G' [%] Mean Rel. Err. G'' [%] Max Rel. Err. G'' [%]
- Exact   12.899    1.0x                  0.00                 0.00                   0.00                  0.00
-   KPM    0.081  159.5x                 22.84                97.14                   8.78                 66.62
-   SLQ    0.058  222.8x                  2.06                41.07                   1.03                  6.64
-Hybrid    0.252   51.3x                  0.44                 1.38                   0.49                  1.41
+ Exact   14.117    1.0x                  0.00                 0.00                   0.00                  0.00
+   KPM    0.063  222.9x                 20.36                87.70                   8.35                 54.80
+   SLQ    0.045  316.3x                  2.06                41.07                   1.03                  6.64
+Hybrid    0.350   40.3x                  0.44                 1.38                   0.49                  1.41
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 136-143 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 124-131 -->
 <!-- todo:
 Apply conversion factors where necessary -->
 
@@ -13388,7 +13418,7 @@ Apply conversion factors where necessary -->
 Each panel compares Exact against a single approximate method so the curves
 remain easy to read.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 143-167 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 131-155 -->
 ```Python
 fig, axes = plt.subplots(
     1,
@@ -13398,7 +13428,7 @@ fig, axes = plt.subplots(
     sharey=True,
 )
 
-for ax, (name, _, _) in zip(axes, approx_configs):
+for ax, (name, _) in zip(axes, approx_configs):
     gp_approx, gpp_approx = approx_results[name]
     ax.loglog(frequencies, storage_modulus_exact, "b-", label="G' (Exact)")
     ax.loglog(frequencies, loss_modulus_exact, "r-", label="G'' (Exact)")
@@ -13415,7 +13445,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 14.287 seconds)
+**Total running time of the script:** (0 minutes 15.146 seconds)
 
 <a id="sphx-glr-download-auto-examples-normal-mode-analysis-plot-normal-mode-analysis-py"></a>
 
@@ -13434,7 +13464,7 @@ plt.show()
 
 # Computation times
 
-**00:25.637** total execution time for 2 files **from auto_examples/normal_mode_analysis**:
+**00:24.823** total execution time for 2 files **from auto_examples/normal_mode_analysis**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -13451,8 +13481,8 @@ $(document).ready( function () {
 
 | Example                                                                                                                                                                                                           | Time      |   Mem (MB) |
 |-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [Normal Mode Analysis (NMA)](auto_examples/normal_mode_analysis/plot_normal_mode_analysis.html.md#sphx-glr-auto-examples-normal-mode-analysis-plot-normal-mode-analysis-py) (`plot_normal_mode_analysis.py`)                               | 00:14.287 |          0 |
-| [KPM vs. Full Eigenvalue Normal Mode Analysis for PDMS Networks](auto_examples/normal_mode_analysis/plot_kpm_vs_exact_pdms.html.md#sphx-glr-auto-examples-normal-mode-analysis-plot-kpm-vs-exact-pdms-py) (`plot_kpm_vs_exact_pdms.py`) | 00:11.350 |          0 |
+| [Normal Mode Analysis (NMA)](auto_examples/normal_mode_analysis/plot_normal_mode_analysis.html.md#sphx-glr-auto-examples-normal-mode-analysis-plot-normal-mode-analysis-py) (`plot_normal_mode_analysis.py`)                               | 00:15.146 |          0 |
+| [KPM vs. Full Eigenvalue Normal Mode Analysis for PDMS Networks](auto_examples/normal_mode_analysis/plot_kpm_vs_exact_pdms.html.md#sphx-glr-auto-examples-normal-mode-analysis-plot-kpm-vs-exact-pdms-py) (`plot_kpm_vs_exact_pdms.py`) | 00:09.676 |          0 |
 
 
 # auto_examples/readers_writers/index.html.md
@@ -23104,7 +23134,7 @@ pylimer-generate-network [OPTIONS]
 Name of the polymer to generate the network for
 
 * **Options:**
-  sbr | pe413 | apma | app348 | p6n | peo | pi50 | apams | pbd20 | spp | ipp | app463 | apoa | apea | pe | pc | pib | pet | app | pi7 | pi20 | apmma | apva | pib413 | aps | pi75 | cispbd | pom | pi34 | pdms | pbd98 | ips | aphma | cispi | ptfe | app413
+  cispbd | aps | pib | pet | pib413 | ips | apma | app413 | pi7 | pbd20 | pi20 | app | pom | apva | pi34 | cispi | pi75 | pc | pi50 | sbr | spp | p6n | apoa | app348 | pdms | peo | pe413 | pe | apea | apmma | ipp | apams | pbd98 | ptfe | aphma | app463
 
 ### --parameter-type <parameter_type>
 
@@ -23215,7 +23245,7 @@ pylimer-analyse-networks [OPTIONS] [FILES]...
 Name of the polymer to use for parameter retrieval.
 
 * **Options:**
-  sbr | pe413 | apma | app348 | p6n | peo | pi50 | apams | pbd20 | spp | ipp | app463 | apoa | apea | pe | pc | pib | pet | app | pi7 | pi20 | apmma | apva | pib413 | aps | pi75 | cispbd | pom | pi34 | pdms | pbd98 | ips | aphma | cispi | ptfe | app413
+  cispbd | aps | pib | pet | pib413 | ips | apma | app413 | pi7 | pbd20 | pi20 | app | pom | apva | pi34 | cispi | pi75 | pc | pi50 | sbr | spp | p6n | apoa | app348 | pdms | peo | pe413 | pe | apea | apmma | ipp | apams | pbd98 | ptfe | aphma | app463
 
 ### Arguments
 
@@ -23570,6 +23600,8 @@ pip install pylimer-tools
         * [`BondLengthStats`](api/pylimer_tools_cpp.BondLengthStats.html.md#pylimer_tools_cpp.BondLengthStats)
       * [Box](api/pylimer_tools_cpp.Box.html.md)
         * [`Box`](api/pylimer_tools_cpp.Box.html.md#pylimer_tools_cpp.Box)
+      * [ComputeBackend](api/pylimer_tools_cpp.ComputeBackend.html.md)
+        * [`ComputeBackend`](api/pylimer_tools_cpp.ComputeBackend.html.md#pylimer_tools_cpp.ComputeBackend)
       * [ComputedDoubleValues](api/pylimer_tools_cpp.ComputedDoubleValues.html.md)
         * [`ComputedDoubleValues`](api/pylimer_tools_cpp.ComputedDoubleValues.html.md#pylimer_tools_cpp.ComputedDoubleValues)
       * [ComputedIntValues](api/pylimer_tools_cpp.ComputedIntValues.html.md)
@@ -23590,6 +23622,10 @@ pip install pylimer-tools
         * [`EntanglementFilteringMode`](api/pylimer_tools_cpp.EntanglementFilteringMode.html.md#pylimer_tools_cpp.EntanglementFilteringMode)
       * [ExitReason](api/pylimer_tools_cpp.ExitReason.html.md)
         * [`ExitReason`](api/pylimer_tools_cpp.ExitReason.html.md#pylimer_tools_cpp.ExitReason)
+      * [HybridConfig](api/pylimer_tools_cpp.HybridConfig.html.md)
+        * [`HybridConfig`](api/pylimer_tools_cpp.HybridConfig.html.md#pylimer_tools_cpp.HybridConfig)
+      * [KPMConfig](api/pylimer_tools_cpp.KPMConfig.html.md)
+        * [`KPMConfig`](api/pylimer_tools_cpp.KPMConfig.html.md#pylimer_tools_cpp.KPMConfig)
       * [LazyUniverseSequenceIterator](api/pylimer_tools_cpp.LazyUniverseSequenceIterator.html.md)
         * [`LazyUniverseSequenceIterator`](api/pylimer_tools_cpp.LazyUniverseSequenceIterator.html.md#pylimer_tools_cpp.LazyUniverseSequenceIterator)
       * [LinearMaxDistanceProvider](api/pylimer_tools_cpp.LinearMaxDistanceProvider.html.md)
@@ -23622,6 +23658,8 @@ pip install pylimer-tools
         * [`NormalModeAnalyzer`](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer)
       * [NormalModeSolver](api/pylimer_tools_cpp.NormalModeSolver.html.md)
         * [`NormalModeSolver`](api/pylimer_tools_cpp.NormalModeSolver.html.md#pylimer_tools_cpp.NormalModeSolver)
+      * [NormalModeSpectrum](api/pylimer_tools_cpp.NormalModeSpectrum.html.md)
+        * [`NormalModeSpectrum`](api/pylimer_tools_cpp.NormalModeSpectrum.html.md#pylimer_tools_cpp.NormalModeSpectrum)
       * [OutputConfiguration](api/pylimer_tools_cpp.OutputConfiguration.html.md)
         * [`OutputConfiguration`](api/pylimer_tools_cpp.OutputConfiguration.html.md#pylimer_tools_cpp.OutputConfiguration)
       * [ResistanceDistanceAnalysis](api/pylimer_tools_cpp.ResistanceDistanceAnalysis.html.md)
@@ -23634,6 +23672,8 @@ pip install pylimer-tools
         * [`RouseSolverType`](api/pylimer_tools_cpp.RouseSolverType.html.md#pylimer_tools_cpp.RouseSolverType)
       * [SLESolver](api/pylimer_tools_cpp.SLESolver.html.md)
         * [`SLESolver`](api/pylimer_tools_cpp.SLESolver.html.md#pylimer_tools_cpp.SLESolver)
+      * [SLQConfig](api/pylimer_tools_cpp.SLQConfig.html.md)
+        * [`SLQConfig`](api/pylimer_tools_cpp.SLQConfig.html.md#pylimer_tools_cpp.SLQConfig)
       * [SimpleSpringMEHPForceEvaluator](api/pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html.md)
         * [`SimpleSpringMEHPForceEvaluator`](api/pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html.md#pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator)
       * [SimplifiedBalance2Network](api/pylimer_tools_cpp.SimplifiedBalance2Network.html.md)
@@ -23642,8 +23682,6 @@ pip install pylimer-tools
         * [`SimplifiedBalanceNetwork`](api/pylimer_tools_cpp.SimplifiedBalanceNetwork.html.md#pylimer_tools_cpp.SimplifiedBalanceNetwork)
       * [SimplifiedNetwork](api/pylimer_tools_cpp.SimplifiedNetwork.html.md)
         * [`SimplifiedNetwork`](api/pylimer_tools_cpp.SimplifiedNetwork.html.md#pylimer_tools_cpp.SimplifiedNetwork)
-      * [StochasticSpectralMethod](api/pylimer_tools_cpp.StochasticSpectralMethod.html.md)
-        * [`StochasticSpectralMethod`](api/pylimer_tools_cpp.StochasticSpectralMethod.html.md#pylimer_tools_cpp.StochasticSpectralMethod)
       * [StrandCategory](api/pylimer_tools_cpp.StrandCategory.html.md)
         * [`StrandCategory`](api/pylimer_tools_cpp.StrandCategory.html.md#pylimer_tools_cpp.StrandCategory)
       * [StrandPairEntanglements](api/pylimer_tools_cpp.StrandPairEntanglements.html.md)
@@ -25663,6 +25701,7 @@ A collection of utility python functions for handling LAMMPS output and polymers
 | [`BackTrackStatus`](api/pylimer_tools_cpp.BackTrackStatus.html.md#pylimer_tools_cpp.BackTrackStatus)(\*values)                                    | Enum for controlling the strand linking process in linkStrandsCallback.                                                                                                                                                                                                                                                             |
 | [`BondLengthStats`](api/pylimer_tools_cpp.BondLengthStats.html.md#pylimer_tools_cpp.BondLengthStats)(self)                                        | Summary statistics for realized bond lengths.                                                                                                                                                                                                                                                                                       |
 | [`Box`](api/pylimer_tools_cpp.Box.html.md#pylimer_tools_cpp.Box)(\*args, \*\*kwargs)                                                  | The box that the simulation is run in.                                                                                                                                                                                                                                                                                              |
+| [`ComputeBackend`](api/pylimer_tools_cpp.ComputeBackend.html.md#pylimer_tools_cpp.ComputeBackend)(\*values)                                      | Hardware compute backend for approximate spectral methods                                                                                                                                                                                                                                                                           |
 | [`ComputedDoubleValues`](api/pylimer_tools_cpp.ComputedDoubleValues.html.md#pylimer_tools_cpp.ComputedDoubleValues)(\*values)                          | Floating point output quantities                                                                                                                                                                                                                                                                                                    |
 | [`ComputedIntValues`](api/pylimer_tools_cpp.ComputedIntValues.html.md#pylimer_tools_cpp.ComputedIntValues)(\*values)                                | Integer output quantities                                                                                                                                                                                                                                                                                                           |
 | [`CrosslinkerUniverse`](api/pylimer_tools_cpp.CrosslinkerUniverse.html.md#pylimer_tools_cpp.CrosslinkerUniverse)(self)                                | A struct representing the topological and spatial state of crosslinkers and strands without explicitly instantiating all individual strand beads.                                                                                                                                                                                   |
@@ -25673,6 +25712,8 @@ A collection of utility python functions for handling LAMMPS output and polymers
 | [`EndToEndStats`](api/pylimer_tools_cpp.EndToEndStats.html.md#pylimer_tools_cpp.EndToEndStats)(self)                                            | Summary statistics for realized end-to-end distances.                                                                                                                                                                                                                                                                               |
 | [`EntanglementFilteringMode`](api/pylimer_tools_cpp.EntanglementFilteringMode.html.md#pylimer_tools_cpp.EntanglementFilteringMode)(\*values)                | Enum representing the filtering mode for entanglement sampling.                                                                                                                                                                                                                                                                     |
 | [`ExitReason`](api/pylimer_tools_cpp.ExitReason.html.md#pylimer_tools_cpp.ExitReason)(\*values)                                              | An enum representing the reason for exiting the simulation or optimization procedure.                                                                                                                                                                                                                                               |
+| [`HybridConfig`](api/pylimer_tools_cpp.HybridConfig.html.md#pylimer_tools_cpp.HybridConfig)(self[, num_steps, ...])                            | Configuration for Hybrid exact low-modes + deflated SLQ.                                                                                                                                                                                                                                                                            |
+| [`KPMConfig`](api/pylimer_tools_cpp.KPMConfig.html.md#pylimer_tools_cpp.KPMConfig)(self[, num_moments, ...])                                | Configuration for Kernel Polynomial Method (KPM) spectral approximation.                                                                                                                                                                                                                                                            |
 | [`LazyUniverseSequenceIterator`](api/pylimer_tools_cpp.LazyUniverseSequenceIterator.html.md#pylimer_tools_cpp.LazyUniverseSequenceIterator)                    | An iterator to iterate throught the universes in [`UniverseSequence`](api/pylimer_tools_cpp.UniverseSequence.html.md#pylimer_tools_cpp.UniverseSequence).                                                                                                                                                                              |
 | [`LinearMaxDistanceProvider`](api/pylimer_tools_cpp.LinearMaxDistanceProvider.html.md#pylimer_tools_cpp.LinearMaxDistanceProvider)(self, ...)               | For MC generation, converts the $N$ to a maximum distance within which to sample.                                                                                                                                                                                                                                                   |
 | [`LinkSwappingMode`](api/pylimer_tools_cpp.LinkSwappingMode.html.md#pylimer_tools_cpp.LinkSwappingMode)(\*values)                                  | How slip-links may act when they reach each-other or even a crosslink.                                                                                                                                                                                                                                                              |
@@ -25687,19 +25728,20 @@ A collection of utility python functions for handling LAMMPS output and polymers
 | [`MoleculeType`](api/pylimer_tools_cpp.MoleculeType.html.md#pylimer_tools_cpp.MoleculeType)(\*values)                                          | An enum representing the type of molecule/chain/strand.                                                                                                                                                                                                                                                                             |
 | [`NoMaxDistanceProvider`](api/pylimer_tools_cpp.NoMaxDistanceProvider.html.md#pylimer_tools_cpp.NoMaxDistanceProvider)(self)                            | For MC generation, to disable the neighbour list usage.                                                                                                                                                                                                                                                                             |
 | [`NonGaussianSpringForceEvaluator`](api/pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html.md#pylimer_tools_cpp.NonGaussianSpringForceEvaluator)(self[, ...]) | This is equal to a spring evaluator for Langevin chains.                                                                                                                                                                                                                                                                            |
-| [`NormalModeAnalyzer`](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer)(self, spring_from, spring_to)          | Compute the normal modes and predict the loss/storage moduli.                                                                                                                                                                                                                                                                       |
-| [`NormalModeSolver`](api/pylimer_tools_cpp.NormalModeSolver.html.md#pylimer_tools_cpp.NormalModeSolver)(\*values)                                  | Solver algorithms for normal mode analysis                                                                                                                                                                                                                                                                                          |
+| [`NormalModeAnalyzer`](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer)(self, spring_from, spring_to)          | Stateless graph Laplacian builder and normal mode solver.                                                                                                                                                                                                                                                                           |
+| [`NormalModeSolver`](api/pylimer_tools_cpp.NormalModeSolver.html.md#pylimer_tools_cpp.NormalModeSolver)(\*values)                                  | Exact eigenvalue solver algorithms for normal mode analysis                                                                                                                                                                                                                                                                         |
+| [`NormalModeSpectrum`](api/pylimer_tools_cpp.NormalModeSpectrum.html.md#pylimer_tools_cpp.NormalModeSpectrum)(self, eigenvalues[, ...])              | Immutable normal mode spectrum and viscoelastic observable evaluator.                                                                                                                                                                                                                                                               |
 | [`OutputConfiguration`](api/pylimer_tools_cpp.OutputConfiguration.html.md#pylimer_tools_cpp.OutputConfiguration)(self)                                | A configuration object to configure the output values and frequency for simulation classes in this package.                                                                                                                                                                                                                         |
 | [`ResistanceDistanceAnalysis`](api/pylimer_tools_cpp.ResistanceDistanceAnalysis.html.md#pylimer_tools_cpp.ResistanceDistanceAnalysis)(\*args, \*\*kwargs)    | Analysis of topological resistance distances, Kirchhoff index, and random-walk commute times on graph Laplacians.                                                                                                                                                                                                                   |
 | [`RouseBrownianSimulator`](api/pylimer_tools_cpp.RouseBrownianSimulator.html.md#pylimer_tools_cpp.RouseBrownianSimulator)(\*args, \*\*kwargs)            | Implicit time-stepping Rouse and Brownian dynamics simulator for polymer chains and general spring networks.                                                                                                                                                                                                                        |
 | [`RouseSimulationResult`](api/pylimer_tools_cpp.RouseSimulationResult.html.md#pylimer_tools_cpp.RouseSimulationResult)                                  | Output container for Rouse dynamics simulation runs.                                                                                                                                                                                                                                                                                |
 | [`RouseSolverType`](api/pylimer_tools_cpp.RouseSolverType.html.md#pylimer_tools_cpp.RouseSolverType)(\*values)                                    | Linear solver algorithm for implicit Rouse/Brownian time-stepping.                                                                                                                                                                                                                                                                  |
 | [`SLESolver`](api/pylimer_tools_cpp.SLESolver.html.md#pylimer_tools_cpp.SLESolver)(\*values)                                                | Solver for sparse linear equation systems                                                                                                                                                                                                                                                                                           |
+| [`SLQConfig`](api/pylimer_tools_cpp.SLQConfig.html.md#pylimer_tools_cpp.SLQConfig)(self[, num_steps, ...])                                  | Configuration for Stochastic Lanczos Quadrature (SLQ).                                                                                                                                                                                                                                                                              |
 | [`SimpleSpringMEHPForceEvaluator`](api/pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html.md#pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator)(self[, kappa]) | This is equal to a spring evaluator for Gaussian chains.                                                                                                                                                                                                                                                                            |
 | [`SimplifiedBalance2Network`](api/pylimer_tools_cpp.SimplifiedBalance2Network.html.md#pylimer_tools_cpp.SimplifiedBalance2Network)                          | A more efficient structure of the network for use in [`MEHPForceBalance2`](api/pylimer_tools_cpp.MEHPForceBalance2.html.md#pylimer_tools_cpp.MEHPForceBalance2).                                                                                                                                                                        |
 | [`SimplifiedBalanceNetwork`](api/pylimer_tools_cpp.SimplifiedBalanceNetwork.html.md#pylimer_tools_cpp.SimplifiedBalanceNetwork)                            | A more efficient structure of the network for use in MEHP force balance, namely [`MEHPForceBalance`](api/pylimer_tools_cpp.MEHPForceBalance.html.md#pylimer_tools_cpp.MEHPForceBalance), though also passable to namely [`MEHPForceBalance2`](api/pylimer_tools_cpp.MEHPForceBalance2.html.md#pylimer_tools_cpp.MEHPForceBalance2).        |
 | [`SimplifiedNetwork`](api/pylimer_tools_cpp.SimplifiedNetwork.html.md#pylimer_tools_cpp.SimplifiedNetwork)                                          | A more efficient structure of the network for use in MEHP, namely [`MEHPForceRelaxation`](api/pylimer_tools_cpp.MEHPForceRelaxation.html.md#pylimer_tools_cpp.MEHPForceRelaxation).                                                                                                                                                       |
-| [`StochasticSpectralMethod`](api/pylimer_tools_cpp.StochasticSpectralMethod.html.md#pylimer_tools_cpp.StochasticSpectralMethod)(\*values)                  | Approximate spectral methods for large-scale normal mode analysis                                                                                                                                                                                                                                                                   |
 | [`StrandCategory`](api/pylimer_tools_cpp.StrandCategory.html.md#pylimer_tools_cpp.StrandCategory)(\*values)                                      | Topological category of a strand in a CrosslinkerUniverse.                                                                                                                                                                                                                                                                          |
 | [`StrandPairEntanglements`](api/pylimer_tools_cpp.StrandPairEntanglements.html.md#pylimer_tools_cpp.StrandPairEntanglements)(self)                        | A struct to store sampled entanglements on strands (without requiring an explicit Universe of all beads).                                                                                                                                                                                                                           |
 | [`StructureSimplificationMode`](api/pylimer_tools_cpp.StructureSimplificationMode.html.md#pylimer_tools_cpp.StructureSimplificationMode)(\*values)            | How the structure shall be simplified during the optimization in order to remove non-trapped entanglement links.                                                                                                                                                                                                                    |

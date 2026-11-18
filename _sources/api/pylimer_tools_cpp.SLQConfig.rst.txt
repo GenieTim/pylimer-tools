@@ -1,0 +1,21 @@
+SLQConfig
+=========
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: SLQConfig
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~SLQConfig.backend
+      ~SLQConfig.num_random_vectors
+      ~SLQConfig.num_steps
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: backend
+   .. autoattribute:: num_random_vectors
+   .. autoattribute:: num_steps

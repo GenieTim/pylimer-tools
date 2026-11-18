@@ -59,7 +59,7 @@
 - [Computation times](dpd_simulations/sg_execution_times.html.md): &#42;&#42;00:04.975&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/dpd_simulations&#42;&#42;:
 - [Computation times](force_balance/sg_execution_times.html.md): &#42;&#42;00:13.044&#42;&#42; total execution time for 11 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
 - [Computation times](network_generator/sg_execution_times.html.md): &#42;&#42;01:01.813&#42;&#42; total execution time for 9 files &#42;&#42;from auto_examples/network_generator&#42;&#42;:
-- [Computation times](normal_mode_analysis/sg_execution_times.html.md): &#42;&#42;00:25.637&#42;&#42; total execution time for 2 files &#42;&#42;from auto_examples/normal_mode_analysis&#42;&#42;:
+- [Computation times](normal_mode_analysis/sg_execution_times.html.md): &#42;&#42;00:24.823&#42;&#42; total execution time for 2 files &#42;&#42;from auto_examples/normal_mode_analysis&#42;&#42;:
 - [Computation times](readers_writers/sg_execution_times.html.md): &#42;&#42;00:05.583&#42;&#42; total execution time for 13 files &#42;&#42;from auto_examples/readers_writers&#42;&#42;:
 - [Computation times](sg_execution_times.html.md): &#42;&#42;00:00.000&#42;&#42; total execution time for 0 files &#42;&#42;from auto_examples&#42;&#42;:
 - [Computation times](structure_analysis/sg_execution_times.html.md): &#42;&#42;00:00.372&#42;&#42; total execution time for 4 files &#42;&#42;from auto_examples/structure_analysis&#42;&#42;:

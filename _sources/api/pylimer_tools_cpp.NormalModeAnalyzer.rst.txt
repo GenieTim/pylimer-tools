@@ -6,52 +6,36 @@ NormalModeAnalyzer
 .. autoclass:: NormalModeAnalyzer
    :show-inheritance:
 
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~NormalModeAnalyzer.matrix
+      ~NormalModeAnalyzer.num_soluble_clusters
+      ~NormalModeAnalyzer.size
+
    .. rubric:: Methods Summary
 
    .. autosummary::
 
-      ~NormalModeAnalyzer.compute_chebyshev_moments_kpm
-      ~NormalModeAnalyzer.compute_chebyshev_moments_kpm_metal
-      ~NormalModeAnalyzer.compute_density_of_states_kpm
-      ~NormalModeAnalyzer.evaluate_loss_modulus
-      ~NormalModeAnalyzer.evaluate_loss_modulus_approx
-      ~NormalModeAnalyzer.evaluate_loss_modulus_kpm
-      ~NormalModeAnalyzer.evaluate_storage_modulus
-      ~NormalModeAnalyzer.evaluate_storage_modulus_approx
-      ~NormalModeAnalyzer.evaluate_storage_modulus_kpm
-      ~NormalModeAnalyzer.evaluate_stress_autocorrelation
-      ~NormalModeAnalyzer.evaluate_stress_autocorrelation_approx
-      ~NormalModeAnalyzer.evaluate_stress_autocorrelation_kpm
-      ~NormalModeAnalyzer.find_all_eigenvalues
-      ~NormalModeAnalyzer.find_sparse_eigenvalues
-      ~NormalModeAnalyzer.get_eigenvalues
-      ~NormalModeAnalyzer.get_eigenvectors
-      ~NormalModeAnalyzer.get_matrix
-      ~NormalModeAnalyzer.get_matrix_size
-      ~NormalModeAnalyzer.get_nr_of_soluble_clusters
-      ~NormalModeAnalyzer.set_eigenvalues
-      ~NormalModeAnalyzer.set_eigenvectors
+      ~NormalModeAnalyzer.chebyshev_moments
+      ~NormalModeAnalyzer.density_of_states
+      ~NormalModeAnalyzer.from_matrix
+      ~NormalModeAnalyzer.from_universe
+      ~NormalModeAnalyzer.solve_approx
+      ~NormalModeAnalyzer.solve_exact
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: matrix
+   .. autoattribute:: num_soluble_clusters
+   .. autoattribute:: size
 
    .. rubric:: Methods Documentation
 
-   .. automethod:: compute_chebyshev_moments_kpm
-   .. automethod:: compute_chebyshev_moments_kpm_metal
-   .. automethod:: compute_density_of_states_kpm
-   .. automethod:: evaluate_loss_modulus
-   .. automethod:: evaluate_loss_modulus_approx
-   .. automethod:: evaluate_loss_modulus_kpm
-   .. automethod:: evaluate_storage_modulus
-   .. automethod:: evaluate_storage_modulus_approx
-   .. automethod:: evaluate_storage_modulus_kpm
-   .. automethod:: evaluate_stress_autocorrelation
-   .. automethod:: evaluate_stress_autocorrelation_approx
-   .. automethod:: evaluate_stress_autocorrelation_kpm
-   .. automethod:: find_all_eigenvalues
-   .. automethod:: find_sparse_eigenvalues
-   .. automethod:: get_eigenvalues
-   .. automethod:: get_eigenvectors
-   .. automethod:: get_matrix
-   .. automethod:: get_matrix_size
-   .. automethod:: get_nr_of_soluble_clusters
-   .. automethod:: set_eigenvalues
-   .. automethod:: set_eigenvectors
+   .. automethod:: chebyshev_moments
+   .. automethod:: density_of_states
+   .. automethod:: from_matrix
+   .. automethod:: from_universe
+   .. automethod:: solve_approx
+   .. automethod:: solve_exact

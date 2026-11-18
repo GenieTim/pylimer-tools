@@ -4,8 +4,8 @@ Normal Mode Analysis (NMA)
 
 This example demonstrates how to use the NormalModeAnalyzer in pylimer-tools
 to predict the loss and storage modulus of polymer networks using exact eigenvalue
-solvers or approximate spectral methods (:class:`~pylimer_tools_cpp.StochasticSpectralMethod`:
-Kernel Polynomial Method ``KPM``, Stochastic Lanczos Quadrature ``SLQ``, and ``HYBRID``).
+solvers or approximate spectral methods (:class:`~pylimer_tools_cpp.KPMConfig`,
+:class:`~pylimer_tools_cpp.SLQConfig`, and :class:`~pylimer_tools_cpp.HybridConfig`).
 
 Reference: :cite:t:`gusev_molecular_2024`
 """
@@ -19,9 +19,11 @@ import pandas as pd
 
 from pylimer_tools.io.read_lammps_output_file import read_data_file
 from pylimer_tools_cpp import (
+    HybridConfig,
+    KPMConfig,
     NormalModeAnalyzer,
     NormalModeSolver,
-    StochasticSpectralMethod,
+    SLQConfig,
 )
 
 
@@ -40,37 +42,31 @@ def _find_fixtures_dir() -> Path:
 _fixtures_dir = _find_fixtures_dir()
 filePath = str(_fixtures_dir / "structure/network_100_a_46.structure.out")
 universe = read_data_file(filePath)
-edges = universe.get_edges()
 
 # Create the normal mode analyzer
-nma = NormalModeAnalyzer(
-    edges["edge_from"],
-    edges["edge_to"],
-)
+nma = NormalModeAnalyzer.from_universe(universe)
 
 # 1. Exact analysis with connected component decomposition and
 # dense/sparse solver
 frequencies = np.logspace(-4, 3, num=int(1e3))
 
 t0 = time.perf_counter()
-nma.find_all_eigenvalues(
+exact_spectrum = nma.solve_exact(
     solver=NormalModeSolver.AUTO,
     compute_eigenvectors=False,
     decompose_components=True,
 )
-storage_modulus_exact = nma.evaluate_storage_modulus(omega=frequencies)
-loss_modulus_exact = nma.evaluate_loss_modulus(omega=frequencies)
+storage_modulus_exact, loss_modulus_exact = exact_spectrum.moduli(frequencies)
 t_exact = time.perf_counter() - t0
 
 # 2. Approximate spectral methods without computing full eigenvalues
 # These methods scale linearly O(N) for large networks.
-approx_configs: list[tuple[str, StochasticSpectralMethod, dict[str, int]]] = [
-    ("KPM", StochasticSpectralMethod.KPM, {"num_steps": 512, "num_random_vectors": 20}),
-    ("SLQ", StochasticSpectralMethod.SLQ, {"num_steps": 200, "num_random_vectors": 20}),
+approx_configs: list[tuple[str, KPMConfig | SLQConfig | HybridConfig]] = [
+    ("KPM", KPMConfig(num_moments=512, num_random_vectors=20)),
+    ("SLQ", SLQConfig(num_steps=200, num_random_vectors=20)),
     (
         "Hybrid",
-        StochasticSpectralMethod.HYBRID,
-        {"num_steps": 200, "num_random_vectors": 20, "num_exact_low_modes": 100},
+        HybridConfig(num_steps=200, num_random_vectors=20, num_exact_low_modes=100),
     ),
 ]
 
@@ -87,18 +83,10 @@ summary_rows: list[dict[str, object]] = [
     }
 ]
 
-for name, method, kwargs in approx_configs:
+for name, cfg in approx_configs:
     t0 = time.perf_counter()
-    gp_approx = nma.evaluate_storage_modulus_approx(
-        omega=frequencies,
-        method=method,
-        **kwargs,
-    )
-    gpp_approx = nma.evaluate_loss_modulus_approx(
-        omega=frequencies,
-        method=method,
-        **kwargs,
-    )
+    approx_spectrum = nma.solve_approx(cfg)
+    gp_approx, gpp_approx = approx_spectrum.moduli(frequencies)
     dt = time.perf_counter() - t0
     approx_results[name] = (gp_approx, gpp_approx)
 
@@ -149,7 +137,7 @@ fig, axes = plt.subplots(
     sharey=True,
 )
 
-for ax, (name, _, _) in zip(axes, approx_configs):
+for ax, (name, _) in zip(axes, approx_configs):
     gp_approx, gpp_approx = approx_results[name]
     ax.loglog(frequencies, storage_modulus_exact, "b-", label="G' (Exact)")
     ax.loglog(frequencies, loss_modulus_exact, "r-", label="G'' (Exact)")
