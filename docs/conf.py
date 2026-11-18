@@ -65,6 +65,7 @@ nitpick_ignore = [
     ("py:class", "pybind11_builtins.pybind11_object"),
     ("py:class", "pd.DataFrame"),
     ("py:class", "pd.Series"),
+    ("py:class", "pandas.core.frame.DataFrame"),
     ("py:class", "igraph_t"),
     ("py:class", "UnitRegistry"),
     ("py:obj", "pd.DataFrame"),
@@ -73,7 +74,7 @@ nitpick_ignore = [
 ]
 
 nitpick_ignore_regex = [
-    (r"py:.*", r"numpy\.typing\..*"),
+    (r"py:.*", r"numpy\..*"),
     (r"py:.*", r"pybind11_builtins\..*"),
     (r".*", r"igraph_t"),
 ]

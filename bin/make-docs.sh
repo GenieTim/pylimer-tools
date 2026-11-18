@@ -45,6 +45,7 @@ python ./docs/generate-thumbnails.py || {
 # and the template:
 # pip install furo
 print_info "Generating Sphinx API documentation..."
+rm -rf ./docs/api ./docs/_autosummary
 sphinx-apidoc -o ./docs ./src || {
   print_error "Failed to generate Sphinx API documentation. Please check the output above."
   exit 8
