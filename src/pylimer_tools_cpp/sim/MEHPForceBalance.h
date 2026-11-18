@@ -292,9 +292,9 @@ public:
               fb.initialConfig.springIndicesOfLinks[thisLinkIdx], springIdx);
             // set the mean x,y,z of the two involved atoms
             pylimer_tools::entities::Atom a1 =
-              universe.getAtom(pairsOfAtoms[pairIdxU].first);
+              universe.getAtom(static_cast<int>(pairsOfAtoms[pairIdxU].first));
             pylimer_tools::entities::Atom a2 =
-              universe.getAtom(pairsOfAtoms[pairIdxU].second);
+              universe.getAtom(static_cast<int>(pairsOfAtoms[pairIdxU].second));
             RUNTIME_EXP_IFN(
               pairOfAtom[static_cast<size_t>(
                 universe.getIdxByAtomId(a1.getId()))] == pairIdx,
@@ -353,7 +353,8 @@ public:
       fb.initialConfig.springsContourLength[springIdxE] =
         static_cast<double>(chain.getNrOfBonds());
       auto bondTypes = chain.getBonds()["bond_type"];
-      fb.initialConfig.springsType[springIdxE] = MEAN(bondTypes);
+      fb.initialConfig.springsType[springIdxE] =
+        static_cast<int>(MEAN(bondTypes));
 
 #ifndef NDEBUG
       Eigen::Vector3d overallDistanceNow = Eigen::Vector3d::Zero();
@@ -840,7 +841,7 @@ public:
     this->box = newBox;
     this->universe.setBox(newBox, true);
     for (size_t i = 0; i < 3; ++i) {
-      this->initialConfig.L[i] = this->box.getL(i);
+      this->initialConfig.L[i] = this->box.getL(static_cast<int>(i));
       this->initialConfig.boxHalfs[i] = 0.5 * this->initialConfig.L[i];
     }
     this->initialConfig.vol = this->box.getVolume();
@@ -925,9 +926,15 @@ public:
 
   double getVolume() override { return this->initialConfig.vol; }
 
-  int getNrOfNodes() const { return this->initialConfig.nrOfNodes; }
+  int getNrOfNodes() const
+  {
+    return static_cast<int>(this->initialConfig.nrOfNodes);
+  }
 
-  int getNrOfLinks() const { return this->initialConfig.nrOfLinks; }
+  int getNrOfLinks() const
+  {
+    return static_cast<int>(this->initialConfig.nrOfLinks);
+  }
 
   size_t getNumBonds() override
   {
@@ -948,11 +955,14 @@ public:
     return static_cast<size_t>(this->getNrOfLinks() - this->getNrOfNodes());
   }
 
-  int getNrOfSprings() const { return this->initialConfig.nrOfSprings; }
+  int getNrOfSprings() const
+  {
+    return static_cast<int>(this->initialConfig.nrOfSprings);
+  }
 
   int getNrOfPartialSprings() const
   {
-    return this->initialConfig.nrOfPartialSprings;
+    return static_cast<int>(this->initialConfig.nrOfPartialSprings);
   }
 
   int getNumIntraChainSlipLinks() const;
@@ -1020,7 +1030,7 @@ public:
    */
   int getNrOfActiveNodes(const double tolerance = 1e-3) const
   {
-    return this->findActiveNodes(tolerance).count();
+    return static_cast<int>(this->findActiveNodes(tolerance).count());
   }
 
   /**
@@ -1154,7 +1164,7 @@ public:
     // find all active springs
     const Eigen::ArrayXb activeSprings =
       this->findActiveSprings(net, u, springPartitions, tolerance);
-    const double nActiveSprings = activeSprings.count();
+    const double nActiveSprings = static_cast<double>(activeSprings.count());
     if (nActiveSprings == 0) {
       return 0.;
     }
@@ -1289,7 +1299,7 @@ public:
     double nClusteredAtoms = 0.;
     for (size_t i = 0; i < clusters.size(); ++i) {
       if (clusterIsActive[i]) {
-        nClusteredAtoms += clusters[i].getNrOfAtoms();
+        nClusteredAtoms += static_cast<double>(clusters[i].getNrOfAtoms());
       }
     }
 
@@ -2646,24 +2656,27 @@ protected:
                              const Eigen::VectorXd& springPartitions,
                              const double tolerance = 1e-3) const
   {
-    return (this->findActiveSprings(net, u, springPartitions, tolerance))
-      .count();
+    return static_cast<int>(
+      (this->findActiveSprings(net, u, springPartitions, tolerance)).count());
   }
 
   int countNrOfActiveSprings(const double tolerance = 1e-3) const
   {
-    return (this->findActiveSprings(tolerance) == true).count();
+    return static_cast<int>(
+      (this->findActiveSprings(tolerance) == true).count());
   }
 
   int countNrOfActiveSpringsInDir(const int dir,
                                   const double tolerance = 1e-3) const
   {
-    return (this->findActiveSpringsInDir(dir, tolerance) == true).count();
+    return static_cast<int>(
+      (this->findActiveSpringsInDir(dir, tolerance) == true).count());
   }
 
   int countNrOfActivePartialSprings(const double tolerance = 1e-3) const
   {
-    return (this->findActivePartialSprings(tolerance) == true).count();
+    return static_cast<int>(
+      (this->findActivePartialSprings(tolerance) == true).count());
   }
 
   /**
@@ -2884,7 +2897,7 @@ protected:
     net.coordinates.segment(3 * linkIdxE, 3) = coords;
     net.linkIsSliplink[linkIdxE] = atomType != this->crossLinkerType;
     if (!net.linkIsSliplink[linkIdxE]) {
-      net.oldAtomIds[linkIdxE] = atom.getId();
+      net.oldAtomIds[linkIdxE] = static_cast<int>(atom.getId());
       net.oldAtomTypes[linkIdxE] = atom.getType();
     }
   }
@@ -2928,13 +2941,14 @@ protected:
     const size_t partialSpringIdx) const
   {
     assert(atom1Idx < atom2Idx);
+    const size_t nrOfAtoms = static_cast<size_t>(chain.getNrOfAtoms());
     if (chain.getType() ==
         pylimer_tools::entities::MoleculeType::PRIMARY_LOOP) {
-      assert(APPROX_WITHIN(atom1Idx, 0, chain.getNrOfAtoms() - 1, 1e-2));
-      assert(APPROX_WITHIN(atom2Idx, 1, chain.getNrOfAtoms(), 1e-2));
+      assert(atom1Idx <= nrOfAtoms - 1);
+      assert(atom2Idx >= 1 && atom2Idx <= nrOfAtoms);
     } else {
-      assert(APPROX_WITHIN(atom1Idx, 0, chain.getNrOfAtoms() - 2, 1e-2));
-      assert(APPROX_WITHIN(atom2Idx, 1, chain.getNrOfAtoms() - 1, 1e-2));
+      assert(atom1Idx <= nrOfAtoms - 2);
+      assert(atom2Idx >= 1 && atom2Idx <= nrOfAtoms - 1);
     }
 
     // set the partition, remember the partial spring mapping
@@ -3453,7 +3467,9 @@ protected:
                 1. / oneOverSpringPartitionUpperLimit)
         : 1e-9;
     if (minAlpha *
-          (net.localToGlobalSpringIndex[targetFullSpringIdx].size() + 1.) >
+          (static_cast<double>(
+             net.localToGlobalSpringIndex[targetFullSpringIdx].size()) +
+           1.) >
         1.) {
       //
       return -1;

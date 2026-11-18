@@ -182,17 +182,18 @@ public:
     // record the new variance/standard deviation
     // see e.g.
     // https://math.stackexchange.com/questions/102978/incremental-computation-of-standard-deviation#comment241843_103025
+    const double usD = static_cast<double>(us);
     this->sectionVariance_mus[secIdx] =
       (numMeasurementsBefore > 0
          ? (((numMeasurementsBefore - 1) / (numMeasurementsBefore)) *
             this->sectionVariance_mus[secIdx])
          : 0) +
-      denominator * SQUARE(us - this->sectionMean_mus[secIdx]);
+      denominator * SQUARE(usD - this->sectionMean_mus[secIdx]);
 
     // record the new average microseconds
     this->sectionMean_mus[secIdx] =
       (this->sectionMean_mus[secIdx]) * (numMeasurementsBefore * denominator) +
-      us * denominator;
+      usD * denominator;
 
     this->currentSection = -1;
   }
@@ -226,7 +227,7 @@ public:
       numMeasurements += this->sectionNumMeasurements[i];
     }
 
-    for (size_t i = 0; i < S; ++i) {
+    for (unsigned int i = 0; i < S; ++i) {
       this->printSection(i, total);
     }
     this->printLine();

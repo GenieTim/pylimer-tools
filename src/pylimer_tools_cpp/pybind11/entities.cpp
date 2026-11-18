@@ -2045,8 +2045,8 @@ init_pylimer_bound_entities(py::module_& m)
         if (index > u.getNrOfAtoms()) {
           throw py::index_error();
         }
-        return u.getAtom(
-          u.getAtomIdByIdx(static_cast<igraph_integer_t>(index)));
+        return u.getAtom(static_cast<int>(
+          u.getAtomIdByIdx(static_cast<igraph_integer_t>(index))));
       },
       R"pbdoc(
        Access an atom by its vertex index.

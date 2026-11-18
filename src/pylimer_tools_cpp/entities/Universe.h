@@ -218,7 +218,10 @@ public:
     long int atomId) const;
 
   // operators
-  Atom operator[](const size_t index) const { return this->getAtom(index); }
+  Atom operator[](const size_t index) const
+  {
+    return this->getAtom(static_cast<int>(index));
+  }
 
   // computations
   [[nodiscard]] std::map<std::string, std::vector<long int>> detectAngles()

@@ -142,7 +142,7 @@ public:
                    removeDanglingChains);
     // this->defaultR0Squared =
     //   universe.computeMeanSquareEndToEndDistance(crossLinkerType);
-    this->defaultNrOfChains = net.springsContourLength.size();
+    this->defaultNrOfChains = static_cast<int>(net.springsContourLength.size());
     if (this->defaultNrOfChains > 0) {
       this->defaultR0Squared = net.springsContourLength.mean() *
                                universe.computeMeanSquaredBondLength();
@@ -346,10 +346,11 @@ public:
                          const int minimumNrOfActiveConnections = 2,
                          const int maximumNrOfActiveConnections = -1) const
   {
-    return this
-      ->getIdsOfActiveNodes(
-        tolerance, minimumNrOfActiveConnections, maximumNrOfActiveConnections)
-      .size();
+    return static_cast<int>(
+      this
+        ->getIdsOfActiveNodes(
+          tolerance, minimumNrOfActiveConnections, maximumNrOfActiveConnections)
+        .size());
   }
 
   /**
@@ -856,7 +857,8 @@ protected:
   int countNrOfActiveSprings(const Network* net,
                              const double tolerance = 1e-3) const
   {
-    return (this->findActiveSprings(net, tolerance) == true).count();
+    return static_cast<int>(
+      (this->findActiveSprings(net, tolerance) == true).count());
   }
 
   /**
@@ -959,7 +961,8 @@ protected:
 
     double nAtoms = net->assumeComplete
                       ? static_cast<double>(net->nrOfNodes) +
-                          net->springsContourLength.sum() - net->nrOfSprings
+                          net->springsContourLength.sum() -
+                          static_cast<double>(net->nrOfSprings)
                       : static_cast<double>(this->universe.getNrOfAtoms());
     // finally, normalize by the number of atoms.
     // NOTE: currently, the weight of the atoms is ignored

@@ -1311,7 +1311,8 @@ MEHPForceBalance::addSliplinksBasedOnCycles(const int maxLoopLength)
   for (size_t i = 0; i < loops.size(); ++i) {
     // reserve enough space
     size_t estimateNrOfSliplinks =
-      loops.size() * loops.size() * this->initialConfig.meanSpringContourLength;
+      static_cast<size_t>(static_cast<double>(loops.size() * loops.size()) *
+                          this->initialConfig.meanSpringContourLength);
     if (i > 0) {
       estimateNrOfSliplinks =
         std::max(estimateNrOfSliplinks,
@@ -1573,32 +1574,35 @@ MEHPForceBalance::removeSpring(ForceBalanceNetwork& net,
                                 springIdxDiff);
   net.linkIndicesOfSprings.erase(net.linkIndicesOfSprings.begin() +
                                  springIdxDiff);
-  pylimer_tools::utils::removeRow(net.springsContourLength, springIdx);
-  pylimer_tools::utils::removeRow(net.springsType, springIdx);
-  pylimer_tools::utils::removeRow(net.springIndexA, springIdx);
+  const unsigned int springIdxU = static_cast<unsigned int>(springIdx);
+  pylimer_tools::utils::removeRow(net.springsContourLength, springIdxU);
+  pylimer_tools::utils::removeRow(net.springsType, springIdxU);
+  pylimer_tools::utils::removeRow(net.springIndexA, springIdxU);
   pylimer_tools::utils::removeRows(
-    net.springCoordinateIndexA, springIdx * 3, 3);
-  pylimer_tools::utils::removeRow(net.springIndexB, springIdx);
+    net.springCoordinateIndexA, springIdxU * 3, 3);
+  pylimer_tools::utils::removeRow(net.springIndexB, springIdxU);
   pylimer_tools::utils::removeRows(
-    net.springCoordinateIndexB, springIdx * 3, 3);
-  pylimer_tools::utils::removeRow(net.springIsActive, springIdx);
+    net.springCoordinateIndexB, springIdxU * 3, 3);
+  pylimer_tools::utils::removeRow(net.springIsActive, springIdxU);
 
   // need to remove descending
   std::ranges::sort(affectedPartialSprings, std::greater<size_t>());
   for (const size_t partialSpringIdx : affectedPartialSprings) {
-    pylimer_tools::utils::removeRow(net.springPartIndexA, partialSpringIdx);
+    const unsigned int partialSpringIdxU =
+      static_cast<unsigned int>(partialSpringIdx);
+    pylimer_tools::utils::removeRow(net.springPartIndexA, partialSpringIdxU);
     pylimer_tools::utils::removeRows(
-      net.springPartCoordinateIndexA, 3 * partialSpringIdx, 3);
-    pylimer_tools::utils::removeRow(net.springPartIndexB, partialSpringIdx);
+      net.springPartCoordinateIndexA, 3 * partialSpringIdxU, 3);
+    pylimer_tools::utils::removeRow(net.springPartIndexB, partialSpringIdxU);
     pylimer_tools::utils::removeRows(
-      net.springPartCoordinateIndexB, 3 * partialSpringIdx, 3);
+      net.springPartCoordinateIndexB, 3 * partialSpringIdxU, 3);
     pylimer_tools::utils::removeRows(
-      net.springPartBoxOffset, 3 * partialSpringIdx, 3);
+      net.springPartBoxOffset, 3 * partialSpringIdxU, 3);
     pylimer_tools::utils::removeRow(net.partialToFullSpringIndex,
-                                    partialSpringIdx);
+                                    partialSpringIdxU);
     pylimer_tools::utils::removeRow(net.partialSpringIsPartial,
-                                    partialSpringIdx);
-    pylimer_tools::utils::removeRow(springPartitions, partialSpringIdx);
+                                    partialSpringIdxU);
+    pylimer_tools::utils::removeRow(springPartitions, partialSpringIdxU);
   }
   assert(springPartitions.size() ==
          static_cast<Eigen::Index>(net.nrOfPartialSprings));
@@ -1629,9 +1633,10 @@ MEHPForceBalance::removeSpring(ForceBalanceNetwork& net,
 
   // then, update the partial springs
   // decrease by one if larger then springIdx
-  assert((net.partialToFullSpringIndex != springIdx).all());
+  const int springIdxI = static_cast<int>(springIdx);
+  assert((net.partialToFullSpringIndex != springIdxI).all());
   net.partialToFullSpringIndex -=
-    (net.partialToFullSpringIndex > springIdx).cast<int>();
+    (net.partialToFullSpringIndex > springIdxI).cast<int>();
 
   assert(net.localToGlobalSpringIndex.size() == net.nrOfSprings);
   for (size_t loopingSpringIdx = 0; loopingSpringIdx < net.nrOfSprings;
@@ -1879,8 +1884,9 @@ MEHPForceBalance::removeLink(ForceBalanceNetwork& net,
   std::cout << "Removing link " << linkIdx << std::endl;
 #endif
 
-  pylimer_tools::utils::removeRows(net.coordinates, linkIdx * 3, 3);
-  pylimer_tools::utils::removeRows(displacements, linkIdx * 3, 3);
+  const unsigned int linkIdxU = static_cast<unsigned int>(linkIdx);
+  pylimer_tools::utils::removeRows(net.coordinates, linkIdxU * 3, 3);
+  pylimer_tools::utils::removeRows(displacements, linkIdxU * 3, 3);
 
   const Eigen::Index linkIdxE = static_cast<Eigen::Index>(linkIdx);
   const std::ptrdiff_t linkIdxD = static_cast<std::ptrdiff_t>(linkIdx);
@@ -1888,17 +1894,18 @@ MEHPForceBalance::removeLink(ForceBalanceNetwork& net,
     net.nrOfNodes -= 1;
     net.oldAtomIdToSpringIndex.erase(
       static_cast<size_t>(net.oldAtomIds[linkIdxE]));
-    pylimer_tools::utils::removeRow(net.oldAtomIds, linkIdx);
-    pylimer_tools::utils::removeRow(net.oldAtomTypes, linkIdx);
+    pylimer_tools::utils::removeRow(net.oldAtomIds, linkIdxU);
+    pylimer_tools::utils::removeRow(net.oldAtomTypes, linkIdxU);
   } else {
-    pylimer_tools::utils::removeRow(net.nrOfCrosslinkSwapsEndured,
-                                    linkIdx - net.nrOfNodes);
+    pylimer_tools::utils::removeRow(
+      net.nrOfCrosslinkSwapsEndured,
+      static_cast<unsigned int>(linkIdx - net.nrOfNodes));
     if (net.loopsOfSliplink.size() > 0) {
       net.loopsOfSliplink.erase(net.loopsOfSliplink.begin() + linkIdxD);
     }
   }
   net.nrOfLinks -= 1;
-  pylimer_tools::utils::removeRow(net.linkIsSliplink, linkIdx);
+  pylimer_tools::utils::removeRow(net.linkIsSliplink, linkIdxU);
   net.springIndicesOfLinks.erase(net.springIndicesOfLinks.begin() + linkIdxD);
 
   // renumber the remaining links
@@ -1952,15 +1959,15 @@ MEHPForceBalance::removeLink(ForceBalanceNetwork& net,
   }
   // some validation of current state
   assert(net.springIndexA.size() == net.springIndexB.size());
-  assert((net.springIndexA != linkIdx).all());
-  assert((net.springIndexB != linkIdx).all());
+  assert((net.springIndexA != linkIdxI).all());
+  assert((net.springIndexB != linkIdxI).all());
   // renumber springs
-  net.springIndexA -= (net.springIndexA > linkIdx).cast<int>();
+  net.springIndexA -= (net.springIndexA > linkIdxI).cast<int>();
   net.springCoordinateIndexA -=
-    3 * (net.springCoordinateIndexA > 3 * linkIdx).cast<int>();
-  net.springIndexB -= (net.springIndexB > linkIdx).cast<int>();
+    3 * (net.springCoordinateIndexA > 3 * linkIdxI).cast<int>();
+  net.springIndexB -= (net.springIndexB > linkIdxI).cast<int>();
   net.springCoordinateIndexB -=
-    3 * (net.springCoordinateIndexB > 3 * linkIdx).cast<int>();
+    3 * (net.springCoordinateIndexB > 3 * linkIdxI).cast<int>();
 }
 
 /**
@@ -2049,7 +2056,8 @@ MEHPForceBalance::mergePartialSprings(ForceBalanceNetwork& net,
   // as it might be removed earlier already
   // It is anyway the case, that this function does not necessarily
   // keep the network valid
-  int found = std::erase(net.springIndicesOfLinks[linkToReduce], fullSpringIdx);
+  size_t found =
+    std::erase(net.springIndicesOfLinks[linkToReduce], fullSpringIdx);
   // TODO: check the origin of this assertion
   // assert(found == 1 || found == 0);
   RUNTIME_EXP_IFN(
@@ -2120,26 +2128,28 @@ MEHPForceBalance::mergePartialSprings(ForceBalanceNetwork& net,
   net.partialSpringIsPartial[keptPartialSpringIdxE] =
     net.linkIndicesOfSprings[fullSpringIdx].size() > 2;
   // actually remove the rows
+  const unsigned int removedPartialSpringIdxU =
+    static_cast<unsigned int>(removedPartialSpringIdx);
   pylimer_tools::utils::removeRow(
-    net.partialSpringIsPartial, removedPartialSpringIdx, skipEigenResize);
+    net.partialSpringIsPartial, removedPartialSpringIdxU, skipEigenResize);
   pylimer_tools::utils::removeRow(
-    net.partialToFullSpringIndex, removedPartialSpringIdx, skipEigenResize);
+    net.partialToFullSpringIndex, removedPartialSpringIdxU, skipEigenResize);
   pylimer_tools::utils::removeRow(
-    springPartitions, removedPartialSpringIdx, skipEigenResize);
+    springPartitions, removedPartialSpringIdxU, skipEigenResize);
   pylimer_tools::utils::removeRow(
-    net.springPartIndexA, removedPartialSpringIdx, skipEigenResize);
+    net.springPartIndexA, removedPartialSpringIdxU, skipEigenResize);
   pylimer_tools::utils::removeRow(
-    net.springPartIndexB, removedPartialSpringIdx, skipEigenResize);
+    net.springPartIndexB, removedPartialSpringIdxU, skipEigenResize);
   pylimer_tools::utils::removeRows(net.springPartCoordinateIndexA,
-                                   3 * removedPartialSpringIdx,
+                                   3 * removedPartialSpringIdxU,
                                    3,
                                    skipEigenResize);
   pylimer_tools::utils::removeRows(net.springPartCoordinateIndexB,
-                                   3 * removedPartialSpringIdx,
+                                   3 * removedPartialSpringIdxU,
                                    3,
                                    skipEigenResize);
   pylimer_tools::utils::removeRows(
-    net.springPartBoxOffset, 3 * removedPartialSpringIdx, 3, skipEigenResize);
+    net.springPartBoxOffset, 3 * removedPartialSpringIdxU, 3, skipEigenResize);
   // renumber stuff
   for (size_t loopSpringIdx = 0;
        loopSpringIdx < net.localToGlobalSpringIndex.size();
@@ -2457,8 +2467,10 @@ MEHPForceBalance::mergeSprings(ForceBalanceNetwork& net,
   if (net.partialSpringIsPartial[removedPartialSpringIdxE]) {
     net.partialSpringIsPartial[remainingPartialSpringIdxE] = true;
   }
+  const unsigned int removedPartialSpringIdxU =
+    static_cast<unsigned int>(removedPartialSpringIdx);
   pylimer_tools::utils::removeRow(net.partialSpringIsPartial,
-                                  removedPartialSpringIdx);
+                                  removedPartialSpringIdxU);
 
   const bool removedIsA =
     net.springPartIndexA[removedPartialSpringIdxE] == linkToReduceI;
@@ -2488,15 +2500,15 @@ MEHPForceBalance::mergeSprings(ForceBalanceNetwork& net,
     offsetMultiplier *
     net.springPartBoxOffset.segment(3 * removedPartialSpringIdxE, 3);
   pylimer_tools::utils::removeRow(net.springPartIndexA,
-                                  removedPartialSpringIdx);
+                                  removedPartialSpringIdxU);
   pylimer_tools::utils::removeRow(net.springPartIndexB,
-                                  removedPartialSpringIdx);
+                                  removedPartialSpringIdxU);
   pylimer_tools::utils::removeRows(
-    net.springPartCoordinateIndexA, 3 * removedPartialSpringIdx, 3);
+    net.springPartCoordinateIndexA, 3 * removedPartialSpringIdxU, 3);
   pylimer_tools::utils::removeRows(
-    net.springPartCoordinateIndexB, 3 * removedPartialSpringIdx, 3);
+    net.springPartCoordinateIndexB, 3 * removedPartialSpringIdxU, 3);
   pylimer_tools::utils::removeRows(
-    net.springPartBoxOffset, 3 * removedPartialSpringIdx, 3);
+    net.springPartBoxOffset, 3 * removedPartialSpringIdxU, 3);
 
   // spring indices & coordinates
   if (net.springIndexA[removedSpringIdxE] == linkToReduceI) {
@@ -2523,20 +2535,22 @@ MEHPForceBalance::mergeSprings(ForceBalanceNetwork& net,
         net.springCoordinateIndexA.segment(3 * removedSpringIdxE, 3);
     }
   }
-  pylimer_tools::utils::removeRow(net.springIndexA, removedSpringIdx);
-  pylimer_tools::utils::removeRow(net.springIndexB, removedSpringIdx);
+  const unsigned int removedSpringIdxU =
+    static_cast<unsigned int>(removedSpringIdx);
+  pylimer_tools::utils::removeRow(net.springIndexA, removedSpringIdxU);
+  pylimer_tools::utils::removeRow(net.springIndexB, removedSpringIdxU);
   pylimer_tools::utils::removeRows(
-    net.springCoordinateIndexA, 3 * removedSpringIdx, 3);
+    net.springCoordinateIndexA, 3 * removedSpringIdxU, 3);
   pylimer_tools::utils::removeRows(
-    net.springCoordinateIndexB, 3 * removedSpringIdx, 3);
-  pylimer_tools::utils::removeRow(net.springIsActive, removedSpringIdx);
+    net.springCoordinateIndexB, 3 * removedSpringIdxU, 3);
+  pylimer_tools::utils::removeRow(net.springIsActive, removedSpringIdxU);
   net.springToMoleculeIds.erase(net.springToMoleculeIds.begin() +
                                 static_cast<std::ptrdiff_t>(removedSpringIdx));
   net.oldAtomIdToSpringIndex.erase(
     static_cast<size_t>(net.oldAtomIds[linkToReduceE]));
 
   pylimer_tools::utils::removeRow(net.partialToFullSpringIndex,
-                                  removedPartialSpringIdx);
+                                  removedPartialSpringIdxU);
   net.localToGlobalSpringIndex.erase(
     net.localToGlobalSpringIndex.begin() +
     static_cast<std::ptrdiff_t>(removedSpringIdx));
@@ -2588,8 +2602,8 @@ MEHPForceBalance::mergeSprings(ForceBalanceNetwork& net,
   // handle contour lengths
   net.springsContourLength[keptSpringIdxE] +=
     net.springsContourLength[removedSpringIdxE];
-  pylimer_tools::utils::removeRow(net.springsContourLength, removedSpringIdx);
-  pylimer_tools::utils::removeRow(net.springsType, removedSpringIdx);
+  pylimer_tools::utils::removeRow(net.springsContourLength, removedSpringIdxU);
+  pylimer_tools::utils::removeRow(net.springsType, removedSpringIdxU);
   RUNTIME_EXP_IFN(net.springsContourLength.size() ==
                     static_cast<Eigen::Index>(net.nrOfSprings),
                   "");
@@ -2597,7 +2611,7 @@ MEHPForceBalance::mergeSprings(ForceBalanceNetwork& net,
   springPartitions[remainingPartialSpringIdxE] +=
     springPartitions[removedPartialSpringIdxE];
 
-  pylimer_tools::utils::removeRow(springPartitions, removedPartialSpringIdx);
+  pylimer_tools::utils::removeRow(springPartitions, removedPartialSpringIdxU);
   RUNTIME_EXP_IFN(springPartitions.size() ==
                     static_cast<Eigen::Index>(net.nrOfPartialSprings),
                   "");
@@ -2785,7 +2799,10 @@ MEHPForceBalance::addSlipLinkToPartialSpring(
   INVALIDARG_EXP_IFN(APPROX_WITHIN(minAlpha, 0.0, 1.0, 1e-12),
                      "minAlpha must be within 0. and 1.");
   RUNTIME_EXP_IFN(
-    minAlpha * (net.localToGlobalSpringIndex[relevantSpring].size() + 1.) <= 1.,
+    minAlpha * (static_cast<double>(
+                  net.localToGlobalSpringIndex[relevantSpring].size()) +
+                1.) <=
+      1.,
     "With this minimum alpha, the slip-link cannot be placed on this "
     "partial spring.");
 
@@ -3353,16 +3370,17 @@ MEHPForceBalance::moveSlipLinkToItsBestBranch(
          ++linkI) {
       if (net.linkIndicesOfSprings[springIdx][linkI] == slipLinkIdx) {
         // found index of this slip-link.
-        const double partitionBeforeIdx =
+        const size_t partitionBeforeIdx =
           net.localToGlobalSpringIndex[springIdx][linkI - 1];
-        const double partitionAfterIdx =
+        const size_t partitionAfterIdx =
           net.localToGlobalSpringIndex[springIdx][linkI];
         assert(this->isPartOfSpring(net, slipLinkIdx, partitionBeforeIdx));
         assert(this->isPartOfSpring(net, slipLinkIdx, partitionAfterIdx));
-        double didSwap = false;
+        bool didSwap = false;
         // check whether swap is needed in either direction
         // swap if yes
-        if (springPartitions[partitionBeforeIdx] <= swappableCutoff) {
+        if (springPartitions[static_cast<Eigen::Index>(partitionBeforeIdx)] <=
+            swappableCutoff) {
           didSwap =
             this->swapSlipLinkReversibly(net,
                                          u,
@@ -3373,7 +3391,8 @@ MEHPForceBalance::moveSlipLinkToItsBestBranch(
                                          respectLoops,
                                          moveAttempt);
         }
-        if (springPartitions[partitionAfterIdx] <= swappableCutoff &&
+        if (springPartitions[static_cast<Eigen::Index>(partitionAfterIdx)] <=
+              swappableCutoff &&
             !didSwap) {
           didSwap =
             this->swapSlipLinkReversibly(net,
@@ -4271,7 +4290,7 @@ MEHPForceBalance::rotateSlipLinkAroundCrosslink(
     (oneOverSpringPartitionUpperLimit > 0.)
       ? 1. / (N - 1. / oneOverSpringPartitionUpperLimit)
       : 1e-9;
-  const int maxNrOfSliplinksOnSpring = 1.0 / swappableCutoff;
+  const int maxNrOfSliplinksOnSpring = static_cast<int>(1.0 / swappableCutoff);
   const size_t partialIdx =
     net.localToGlobalSpringIndex[springIdx][0] == partialSpringIdx
       ? 0
@@ -4462,9 +4481,11 @@ MEHPForceBalance::swapSlipLinks(ForceBalanceNetwork& net,
   net.springPartIndexB[otherPartialOfLinkIdx1E] = static_cast<int>(linkIdx2);
   net.springPartIndexA[otherPartialOfLinkIdx2E] = static_cast<int>(linkIdx1);
   net.springPartCoordinateIndexB.segment(3 * otherPartialOfLinkIdx1E, 3) =
-    Eigen::ArrayXi::LinSpaced(3, 3 * linkIdx2, 3 * linkIdx2 + 2);
+    Eigen::ArrayXi::LinSpaced(
+      3, static_cast<int>(3 * linkIdx2), static_cast<int>(3 * linkIdx2 + 2));
   net.springPartCoordinateIndexA.segment(3 * otherPartialOfLinkIdx2E, 3) =
-    Eigen::ArrayXi::LinSpaced(3, 3 * linkIdx1, 3 * linkIdx1 + 2);
+    Eigen::ArrayXi::LinSpaced(
+      3, static_cast<int>(3 * linkIdx1), static_cast<int>(3 * linkIdx1 + 2));
 
   // update box offset
   net.springPartBoxOffset.segment(3 * otherPartialOfLinkIdx1E, 3) +=
@@ -5457,7 +5478,7 @@ MEHPForceBalance::getAverageSpringLength() const
     }
     r2 += sqrt(r2local);
   }
-  return r2 / this->initialConfig.nrOfSprings;
+  return r2 / static_cast<double>(this->initialConfig.nrOfSprings);
 }
 
 /**
@@ -6634,7 +6655,9 @@ MEHPForceBalance::validateNetwork(const ForceBalanceNetwork& net,
   RUNTIME_EXP_IFN(net.partialSpringIsPartial.size() ==
                     static_cast<Eigen::Index>(net.nrOfPartialSprings),
                   "Invalid size of partialSpringIsPartial");
-  RUNTIME_EXP_IFN(APPROX_EQUAL(springPartitions.sum(), net.nrOfSprings, 1e-3),
+  RUNTIME_EXP_IFN(APPROX_EQUAL(springPartitions.sum(),
+                               static_cast<double>(net.nrOfSprings),
+                               1e-3),
                   "Spring partitions should sum to 1 per spring, got " +
                     std::to_string(springPartitions.sum()) + " for " +
                     std::to_string(net.nrOfSprings) + " springs.");

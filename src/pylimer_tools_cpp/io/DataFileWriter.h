@@ -319,7 +319,7 @@ namespace utils {
     {
       long int atomId = this->reindexAtoms ? nAtomsOutput : atom.getId();
       const pylimer_tools::entities::Box box = this->universe.getBox();
-      this->oldNewAtomIdMap[atom.getId()] = atomId;
+      this->oldNewAtomIdMap[atom.getId()] = static_cast<int>(atomId);
       auto [x, nx] = this->conditionallyMoveCoordinateIntoBox(
         atom.getX(), atom.getNX(), box.getLowX(), box.getHighX());
       auto [y, ny] = this->conditionallyMoveCoordinateIntoBox(
@@ -588,11 +588,11 @@ namespace utils {
             continue;
           }
           nAtomsOutput += 1;
-          const int ip1 = i + 1;
-          int swappableMoleculeIdx =
-            (i >= (atoms.size() * 0.5)) ? (atoms.size() - i) : ip1;
+          const size_t ip1 = i + 1;
+          const size_t swappableMoleculeIdx =
+            (2 * i >= atoms.size()) ? (atoms.size() - i) : ip1;
           const int moleculeIdx = this->moleculeIdxSwappable
-                                    ? swappableMoleculeIdx
+                                    ? static_cast<int>(swappableMoleculeIdx)
                                     : nMoleculesOutput;
 
           this->writeAtom(file, atom, moleculeIdx, nAtomsOutput);

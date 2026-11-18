@@ -206,7 +206,7 @@ public:
                                                                   ...) const
   {
     unsigned long long hash = 0;
-    int numVerticesTotal = this->getNrOfVertices() + 1;
+    const igraph_integer_t numVerticesTotal = this->getNrOfVertices() + 1;
     // bits used: log(pow(numVerticesTotal, count))/log(2)
     // -> possible overflow?!?
     if (std::log(std::pow(r, count)) / std::log(2) >=
@@ -488,7 +488,8 @@ public:
   OUT getPropertyValue(const char* propertyName,
                        const igraph_integer_t vertexIdx) const
   {
-    return igraph_cattribute_VAN(&this->graph, propertyName, vertexIdx);
+    return static_cast<OUT>(
+      igraph_cattribute_VAN(&this->graph, propertyName, vertexIdx));
   }
 
   /**
@@ -503,7 +504,8 @@ public:
   OUT getEdgePropertyValue(const char* propertyName,
                            const long int vertexIdx) const
   {
-    return igraph_cattribute_EAN(&this->graph, propertyName, vertexIdx);
+    return static_cast<OUT>(
+      igraph_cattribute_EAN(&this->graph, propertyName, vertexIdx));
   }
 
   /**

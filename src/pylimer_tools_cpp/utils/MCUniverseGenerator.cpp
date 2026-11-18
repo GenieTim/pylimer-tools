@@ -165,7 +165,7 @@ MCUniverseGenerator::getUniverse() const
           this->simplifiedUniverse,
           strandI,
           this->simplifiedUniverse.strandSeeds[strandI],
-          this->nMcSteps);
+          static_cast<int>(this->nMcSteps));
       RUNTIME_EXP_IFN(coordinates.size() == 3 * nBeadsInStrand,
                       "Inconsistent coordinate size");
       RUNTIME_EXP_IFN(!coordinates.array().isNaN().any(),
@@ -320,15 +320,15 @@ MCUniverseGenerator::addFunctionalizedStrandsImpl(
 
   for (size_t strandI = 0; strandI < static_cast<size_t>(nrOfStrands);
        ++strandI) {
-    long int lastSampledBead = -1;
-    for (long int i = 0; i < beadsPerStrand[strandI]; ++i) {
-      auto [convertThisBead, functionality] =
-        crosslinkSelector(strandI, i, beadsPerStrand[strandI]);
+    int lastSampledBead = -1;
+    for (int i = 0; i < beadsPerStrand[strandI]; ++i) {
+      auto [convertThisBead, functionality] = crosslinkSelector(
+        static_cast<int>(strandI), i, beadsPerStrand[strandI]);
 
       if (convertThisBead) {
         // yes, we want to replace this bead `i` with a crosslink
         const size_t currentSpringIdx = nStrandsBefore + nEffectiveStrands;
-        const long int lengthToPrevious =
+        const int lengthToPrevious =
           i - (lastSampledBead >= 0 ? (lastSampledBead + 1) : 0);
         if (i > 0) {
           this->addStrand(lengthToPrevious,
@@ -349,7 +349,8 @@ MCUniverseGenerator::addFunctionalizedStrandsImpl(
             currentSpringIdx, nCrosslinksBefore + nCrosslinks, true);
         }
 
-        strandIdOfCrosslink.push_back(nCrosslinksBefore + strandI);
+        strandIdOfCrosslink.push_back(
+          static_cast<int>(nCrosslinksBefore + strandI));
         newCrosslinkFunctionality.push_back(functionality);
         nCrosslinks += 1;
         lastSampledBead = i;
@@ -362,7 +363,7 @@ MCUniverseGenerator::addFunctionalizedStrandsImpl(
       const size_t currentSpringIdx = nStrandsBefore + nEffectiveStrands;
       assert(this->simplifiedUniverse.strandTo.size() == currentSpringIdx);
 
-      const long int remainingLength =
+      const int remainingLength =
         beadsPerStrand[strandI] -
         (lastSampledBead >= 0 ? (lastSampledBead + 1) : 0);
       this->addStrand(remainingLength,
@@ -384,7 +385,7 @@ MCUniverseGenerator::addFunctionalizedStrandsImpl(
                   "Did not register the expected number of crosslinks.");
   RUNTIME_EXP_IFN(nCrosslinks == newCrosslinkFunctionality.size(),
                   "Did not register the expected number of crosslinks.");
-  this->addCrosslinkers(nCrosslinks,
+  this->addCrosslinkers(static_cast<int>(nCrosslinks),
                         defaultCrosslinkFunctionality,
                         crosslinkerAtomType,
                         whiteNoise);
@@ -554,7 +555,7 @@ MCUniverseGenerator::addCrosslinkStrands(const int nrOfCrosslinkStrands,
       this->simplifiedUniverse.xlinkY[from] + delta[1];
     this->simplifiedUniverse.xlinkZ[to] =
       this->simplifiedUniverse.xlinkZ[from] + delta[2];
-    this->simplifiedUniverse.xlinkChainId[to] = from;
+    this->simplifiedUniverse.xlinkChainId[to] = static_cast<int>(from);
   }
 
   this->updateNeighbourListCoordinates();
@@ -912,7 +913,8 @@ MCUniverseGenerator::linkStrandsToConversion(
       potentialNewBonds += 1;
     }
   }
-  if (currentCrosslinkerConversion + potentialNewBonds * conversionPerBond <
+  if (currentCrosslinkerConversion +
+        static_cast<double>(potentialNewBonds) * conversionPerBond <
       targetCrossLinkerConversion) {
     throw std::invalid_argument(
       "A crosslinker conversion of " +
@@ -924,13 +926,14 @@ MCUniverseGenerator::linkStrandsToConversion(
       std::to_string(currentCrosslinkerConversion) +
       ". Maximum possible p is " +
       std::to_string(currentCrosslinkerConversion +
-                     potentialNewBonds * conversionPerBond) +
+                     static_cast<double>(potentialNewBonds) *
+                       conversionPerBond) +
       ".");
   }
 
   const long int targetNrOfAvailableCrosslinkSites =
-    std::round((1.0 - targetCrossLinkerConversion) *
-               static_cast<double>(this->originalNrOfAvailableCrosslinkSites));
+    std::lround((1.0 - targetCrossLinkerConversion) *
+                static_cast<double>(this->originalNrOfAvailableCrosslinkSites));
 
   this->linkStrandsCallback(
     [targetNrOfAvailableCrosslinkSites](const MCUniverseGenerator& gen,
@@ -1231,7 +1234,8 @@ MCUniverseGenerator::convertToForceBalanceNetwork() const
     pylimer_tools::sim::mehp::buildForceBalanceNetwork(
       this->box, this->simplifiedUniverse);
 
-  assert(forceBalanceNetwork.springsContourLength.sum() -
+  assert(static_cast<size_t>(
+           std::lround(forceBalanceNetwork.springsContourLength.sum())) -
            forceBalanceNetwork.nrOfSprings + forceBalanceNetwork.nrOfLinks ==
          this->getCurrentNrOfAtoms());
 
@@ -1287,7 +1291,7 @@ MCUniverseGenerator::sampleEntanglements(
                                       sameStrandCutoff,
                                       effectiveSeed,
                                       filteringMode,
-                                      this->nMcSteps);
+                                      static_cast<int>(this->nMcSteps));
 }
 
 pylimer_tools::sim::mehp::ForceBalanceNetwork
@@ -1496,8 +1500,8 @@ MCUniverseGenerator::getCurrentStrandsConversion() const
     std::ranges::count_if(this->simplifiedUniverse.strandTo,
                           [](const long int to) { return to == UNCONNECTED; }));
   const size_t nFreeEnds = nFreeEndsFrom + nFreeEndsTo;
-  return 1. -
-         (static_cast<double>(nFreeEnds) / static_cast<double>(nStrands * 2.));
+  return 1. - (static_cast<double>(nFreeEnds) /
+               (static_cast<double>(nStrands) * 2.0));
 }
 
 void

@@ -550,7 +550,10 @@ namespace dpd {
       return this->currentTime;
     }
 
-    int getCurrentTimestep() const { return this->currentStep; }
+    int getCurrentTimestep() const
+    {
+      return static_cast<int>(this->currentStep);
+    }
 
     /**
      * @brief Get access to the current stress tensor
@@ -567,7 +570,7 @@ namespace dpd {
      *
      * @return Number of shifts performed
      */
-    int getNumShifts() override { return this->numShifts; }
+    int getNumShifts() override { return static_cast<int>(this->numShifts); }
 
     /**
      * @brief Get the number of successful slip-spring relocation moves
@@ -575,7 +578,10 @@ namespace dpd {
      *
      * @return Number of relocations performed
      */
-    int getNumRelocations() override { return this->numRelocations; }
+    int getNumRelocations() override
+    {
+      return static_cast<int>(this->numRelocations);
+    }
 
     /**
      * @brief Get the total number of particles in the system

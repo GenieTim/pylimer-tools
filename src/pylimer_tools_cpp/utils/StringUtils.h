@@ -318,7 +318,7 @@ CsvTokenizer::get<std::string>(const size_t index) const
                                this->source + "'");                            \
     }                                                                          \
     try {                                                                      \
-      return METHOD(this->results[index]);                                     \
+      return static_cast<TYPE>(METHOD(this->results[index]));                  \
     } catch (std::invalid_argument & e) {                                      \
       throw std::runtime_error("Failed to convert string '" +                  \
                                this->results[index] + "' to " #TYPE);          \

@@ -63,7 +63,7 @@ OutputSupportingSimulation::openFilesOutputHeader(
       // (`this->validateAndTruncateOutputFiles`)
       this->outputStreams.push_back(std::make_shared<std::ofstream>(
         oc.filename, std::ios::out | std::ios::app));
-      this->outputFileStreams.push_back(streamIdx);
+      this->outputFileStreams.push_back(static_cast<int>(streamIdx));
     } else {
       this->outputStreams.push_back(
         std::shared_ptr<std::ostream>(&std::cout, [](void*) {}));
@@ -102,7 +102,7 @@ OutputSupportingSimulation::openFilesOutputHeader(
     streamIdx += 1;
     thisFileOutputBuffer.clear();
   }
-  return numComputes;
+  return static_cast<int>(numComputes);
 }
 void
 OutputSupportingSimulation::handleOutput(const long int currentStep)
@@ -156,7 +156,7 @@ OutputSupportingSimulation::handleOutput(const long int currentStep)
   const std::array<double, NUM_COMPUTABLE_DOUBLE_VALUES> doublevalues = {
     { this->getTimestep(),
       this->requiresDEvaluation(ComputedDoubleValues::TIME, currentStep)
-        ? this->getCurrentTime(currentStep)
+        ? this->getCurrentTime(static_cast<double>(currentStep))
         : 0.,
       this->requiresDEvaluation(ComputedDoubleValues::VOLUME, currentStep)
         ? this->getVolume()
@@ -225,8 +225,9 @@ OutputSupportingSimulation::handleOutput(const long int currentStep)
                   (this->msdOrigins[msdIdx] -
                    getCoordinates()(this->msdMeasuredIndices[msdIdx]))
                     .squaredNorm() /
-                  (static_cast<double>(this->msdMeasuredIndices[msdIdx].size() /
-                                       3.));
+                  (static_cast<double>(
+                     this->msdMeasuredIndices[msdIdx].size()) /
+                   3.);
                 runningAverages[averagesIdx + msdIdx] += result * multiplier;
               }
               averagesIdx += msdIdx;
@@ -363,7 +364,7 @@ OutputSupportingSimulation::doOutputValues(
                  nIndices.maxCoeff() < relCoords.size());
           const double result =
             (this->msdOrigins[msdIdx] - relCoords(nIndices)).squaredNorm() /
-            (static_cast<double>(this->msdMeasuredIndices[msdIdx].size() / 3.));
+            (static_cast<double>(this->msdMeasuredIndices[msdIdx].size()) / 3.);
           outputBuffer += std::to_string(result) + "\t";
         }
         break;

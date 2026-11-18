@@ -139,8 +139,8 @@ ResistanceDistanceAnalysis::findComponentsAndSetupPinnedSystem()
   std::vector<std::vector<size_t>> adj(numNodes_);
   for (int k = 0; k < L_.outerSize(); ++k) {
     for (Eigen::SparseMatrix<double>::InnerIterator it(L_, k); it; ++it) {
-      int r = it.row();
-      int c = it.col();
+      const Eigen::Index r = it.row();
+      const Eigen::Index c = it.col();
       if (r != c && std::abs(it.value()) > 1e-14) {
         adj[static_cast<size_t>(r)].push_back(static_cast<size_t>(c));
       }

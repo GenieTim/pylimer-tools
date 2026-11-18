@@ -728,13 +728,13 @@ DataFileParser::readAtomGeneric(const std::string& line,
           this->atomTypes.push_back(static_cast<int>(arg));
           break;
         case FT::X:
-          this->atomX.push_back(arg);
+          this->atomX.push_back(static_cast<double>(arg));
           break;
         case FT::Y:
-          this->atomY.push_back(arg);
+          this->atomY.push_back(static_cast<double>(arg));
           break;
         case FT::Z:
-          this->atomZ.push_back(arg);
+          this->atomZ.push_back(static_cast<double>(arg));
           break;
         case FT::NX:
           if (resFound >= static_cast<int>(descriptor.fields.size()) - 3)
@@ -749,136 +749,155 @@ DataFileParser::readAtomGeneric(const std::string& line,
             this->atomNz.push_back(static_cast<int>(arg));
           break;
         case FT::ATOM_CHARGE:
-          this->additionalAtomData["charge"].push_back(arg);
+          this->additionalAtomData["charge"].push_back(
+            static_cast<double>(arg));
           break;
         case FT::MUX:
-          this->additionalAtomData["mux"].push_back(arg);
+          this->additionalAtomData["mux"].push_back(static_cast<double>(arg));
           break;
         case FT::MUY:
-          this->additionalAtomData["muy"].push_back(arg);
+          this->additionalAtomData["muy"].push_back(static_cast<double>(arg));
           break;
         case FT::MUZ:
-          this->additionalAtomData["muz"].push_back(arg);
+          this->additionalAtomData["muz"].push_back(static_cast<double>(arg));
           break;
         case FT::ATOM_EDPD:
-          this->additionalAtomData["edpd"].push_back(arg);
+          this->additionalAtomData["edpd"].push_back(static_cast<double>(arg));
           break;
         case FT::THETA:
-          this->additionalAtomData["theta"].push_back(arg);
+          this->additionalAtomData["theta"].push_back(static_cast<double>(arg));
           break;
         case FT::RHO:
-          this->additionalAtomData["rho"].push_back(arg);
+          this->additionalAtomData["rho"].push_back(static_cast<double>(arg));
           break;
         case FT::DIAMETER:
-          this->additionalAtomData["diameter"].push_back(arg);
+          this->additionalAtomData["diameter"].push_back(
+            static_cast<double>(arg));
           break;
         case FT::DENSITY:
-          this->additionalAtomData["density"].push_back(arg);
+          this->additionalAtomData["density"].push_back(
+            static_cast<double>(arg));
           break;
         case FT::EDPD_TEMP:
-          this->additionalAtomData["edpd_temp"].push_back(arg);
+          this->additionalAtomData["edpd_temp"].push_back(
+            static_cast<double>(arg));
           break;
         case FT::EDPD_CV:
-          this->additionalAtomData["edpd_cv"].push_back(arg);
+          this->additionalAtomData["edpd_cv"].push_back(
+            static_cast<double>(arg));
           break;
         case FT::ESPH:
-          this->additionalAtomData["esph"].push_back(arg);
+          this->additionalAtomData["esph"].push_back(static_cast<double>(arg));
           break;
         case FT::CV:
-          this->additionalAtomData["cv"].push_back(arg);
+          this->additionalAtomData["cv"].push_back(static_cast<double>(arg));
           break;
         case FT::ENERGY:
-          this->additionalAtomData["energy"].push_back(arg);
+          this->additionalAtomData["energy"].push_back(
+            static_cast<double>(arg));
           break;
         case FT::BODYFLAG:
-          this->additionalAtomData["bodyflag"].push_back(arg);
+          this->additionalAtomData["bodyflag"].push_back(
+            static_cast<double>(arg));
           break;
         case FT::ELLIPSOIDFLAG:
-          this->additionalAtomData["ellipsoidflag"].push_back(arg);
+          this->additionalAtomData["ellipsoidflag"].push_back(
+            static_cast<double>(arg));
           break;
         case FT::LINEFLAG:
-          this->additionalAtomData["lineflag"].push_back(arg);
+          this->additionalAtomData["lineflag"].push_back(
+            static_cast<double>(arg));
           break;
         case FT::TRIANGLEFLAG:
-          this->additionalAtomData["triangleflag"].push_back(arg);
+          this->additionalAtomData["triangleflag"].push_back(
+            static_cast<double>(arg));
           break;
         case FT::STATUS:
-          this->additionalAtomData["status"].push_back(arg);
+          this->additionalAtomData["status"].push_back(
+            static_cast<double>(arg));
           break;
         case FT::KRADIUS:
-          this->additionalAtomData["kradius"].push_back(arg);
+          this->additionalAtomData["kradius"].push_back(
+            static_cast<double>(arg));
           break;
         case FT::CRADIUS:
-          this->additionalAtomData["cradius"].push_back(arg);
+          this->additionalAtomData["cradius"].push_back(
+            static_cast<double>(arg));
           break;
         case FT::ERADIUS:
-          this->additionalAtomData["eradius"].push_back(arg);
+          this->additionalAtomData["eradius"].push_back(
+            static_cast<double>(arg));
           break;
         case FT::MASS:
-          this->additionalAtomData["mass"].push_back(arg);
+          this->additionalAtomData["mass"].push_back(static_cast<double>(arg));
           break;
         case FT::VOLUME:
-          this->additionalAtomData["volume"].push_back(arg);
+          this->additionalAtomData["volume"].push_back(
+            static_cast<double>(arg));
           break;
         case FT::X0:
-          this->additionalAtomData["x0"].push_back(arg);
+          this->additionalAtomData["x0"].push_back(static_cast<double>(arg));
           break;
         case FT::Y0:
-          this->additionalAtomData["y0"].push_back(arg);
+          this->additionalAtomData["y0"].push_back(static_cast<double>(arg));
           break;
         case FT::Z0:
-          this->additionalAtomData["z0"].push_back(arg);
+          this->additionalAtomData["z0"].push_back(static_cast<double>(arg));
           break;
         case FT::SPX:
-          this->additionalAtomData["spx"].push_back(arg);
+          this->additionalAtomData["spx"].push_back(static_cast<double>(arg));
           break;
         case FT::SPY:
-          this->additionalAtomData["spy"].push_back(arg);
+          this->additionalAtomData["spy"].push_back(static_cast<double>(arg));
           break;
         case FT::SPZ:
-          this->additionalAtomData["spz"].push_back(arg);
+          this->additionalAtomData["spz"].push_back(static_cast<double>(arg));
           break;
         case FT::SP:
-          this->additionalAtomData["sp"].push_back(arg);
+          this->additionalAtomData["sp"].push_back(static_cast<double>(arg));
           break;
         case FT::ESPIN:
-          this->additionalAtomData["espin"].push_back(arg);
+          this->additionalAtomData["espin"].push_back(static_cast<double>(arg));
           break;
         case FT::AREA:
-          this->additionalAtomData["area"].push_back(arg);
+          this->additionalAtomData["area"].push_back(static_cast<double>(arg));
           break;
         case FT::ED:
-          this->additionalAtomData["ed"].push_back(arg);
+          this->additionalAtomData["ed"].push_back(static_cast<double>(arg));
           break;
         case FT::EM:
-          this->additionalAtomData["em"].push_back(arg);
+          this->additionalAtomData["em"].push_back(static_cast<double>(arg));
           break;
         case FT::EPSILON:
-          this->additionalAtomData["epsilon"].push_back(arg);
+          this->additionalAtomData["epsilon"].push_back(
+            static_cast<double>(arg));
           break;
         case FT::CURVATURE:
-          this->additionalAtomData["curvature"].push_back(arg);
+          this->additionalAtomData["curvature"].push_back(
+            static_cast<double>(arg));
           break;
         case FT::TEMPLATE_INDEX:
-          this->additionalAtomData["template_index"].push_back(arg);
+          this->additionalAtomData["template_index"].push_back(
+            static_cast<double>(arg));
           break;
         case FT::TEMPLATE_ATOM:
-          this->additionalAtomData["template_atom"].push_back(arg);
+          this->additionalAtomData["template_atom"].push_back(
+            static_cast<double>(arg));
           break;
         case FT::ETAG:
-          this->additionalAtomData["etag"].push_back(arg);
+          this->additionalAtomData["etag"].push_back(static_cast<double>(arg));
           break;
         case FT::CS_RE:
-          this->additionalAtomData["cs_re"].push_back(arg);
+          this->additionalAtomData["cs_re"].push_back(static_cast<double>(arg));
           break;
         case FT::CS_IM:
-          this->additionalAtomData["cs_im"].push_back(arg);
+          this->additionalAtomData["cs_im"].push_back(static_cast<double>(arg));
           break;
         case FT::CC1:
-          this->additionalAtomData["cc1"].push_back(arg);
+          this->additionalAtomData["cc1"].push_back(static_cast<double>(arg));
           break;
         case FT::CC2:
-          this->additionalAtomData["cc2"].push_back(arg);
+          this->additionalAtomData["cc2"].push_back(static_cast<double>(arg));
           break;
         default:
           throw std::invalid_argument(

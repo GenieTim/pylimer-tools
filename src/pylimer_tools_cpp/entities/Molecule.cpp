@@ -40,7 +40,7 @@ Molecule::initializeFromGraph(const igraph_t* inGraph)
   auto mutator = this->getMutableGraph();
   igraph_destroy(mutator);
   igraph_copy(mutator, inGraph);
-  this->size = igraph_vcount(mutator);
+  this->size = static_cast<int>(igraph_vcount(mutator));
   // construct a key for this molecule: a concatenation of all ids in this
   // molecule
   if (!igraph_cattribute_has_attr(mutator, IGRAPH_ATTRIBUTE_VERTEX, "id")) {
@@ -240,7 +240,7 @@ Molecule::computeTotalMass()
 long int
 Molecule::getAtomIdByIdx(const igraph_integer_t vertexId) const
 {
-  return VAN(&this->getGraph(), "id", vertexId);
+  return static_cast<long int>(VAN(&this->getGraph(), "id", vertexId));
 };
 
 igraph_integer_t

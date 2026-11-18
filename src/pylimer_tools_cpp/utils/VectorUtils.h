@@ -368,7 +368,7 @@ removeRow(Eigen::PlainObjectBase<Derived>& vec,
                      "Cannot remove row " + std::to_string(rowToRemove) +
                        " from vector with size " + std::to_string(vec.size()) +
                        "!");
-  unsigned int numRows = vec.size() - 1;
+  const Eigen::Index numRows = vec.size() - 1;
   vec.segment(rowToRemove, numRows - rowToRemove) =
     vec.segment(rowToRemove + 1, numRows - rowToRemove);
   if (!noResize) {
@@ -394,7 +394,8 @@ removeRows(Eigen::PlainObjectBase<Derived>& vec,
     "Cannot remove rows " + std::to_string(nrOfRowsToRemove) + " from " +
       std::to_string(rowToStartRemove) + " from vector with size " +
       std::to_string(vec.size()) + "!");
-  unsigned int numRows = vec.size() - nrOfRowsToRemove;
+  const Eigen::Index numRows =
+    vec.size() - static_cast<Eigen::Index>(nrOfRowsToRemove);
   vec.segment(rowToStartRemove, numRows - rowToStartRemove) = vec.segment(
     rowToStartRemove + nrOfRowsToRemove, numRows - rowToStartRemove);
   if (!noResize) {
@@ -877,19 +878,20 @@ eraseIndices(std::vector<IN> from, std::vector<long int>& indices)
   }
 }
 
-#define MAKE_CONVERSION_FROM_STD_VEC_TO_IGRAPH(IGRAPH_VEC)                     \
+#define MAKE_CONVERSION_FROM_STD_VEC_TO_IGRAPH(IGRAPH_VEC, ELEM_TYPE)          \
   template<typename IN1>                                                       \
   static inline void StdVectorToIgraphVectorT(IN1& vectR, IGRAPH_VEC##_t* v)   \
   {                                                                            \
     igraph_integer_t n = static_cast<igraph_integer_t>(vectR.size());          \
     IGRAPH_VEC##_resize(v, n);                                                 \
     for (igraph_integer_t i = 0; i < n; ++i) {                                 \
-      IGRAPH_VEC##_set(v, i, vectR[static_cast<size_t>(i)]);                   \
+      IGRAPH_VEC##_set(                                                        \
+        v, i, static_cast<ELEM_TYPE>(vectR[static_cast<size_t>(i)]));          \
     }                                                                          \
   }
 
-MAKE_CONVERSION_FROM_STD_VEC_TO_IGRAPH(igraph_vector);
-MAKE_CONVERSION_FROM_STD_VEC_TO_IGRAPH(igraph_vector_int);
+MAKE_CONVERSION_FROM_STD_VEC_TO_IGRAPH(igraph_vector, igraph_real_t);
+MAKE_CONVERSION_FROM_STD_VEC_TO_IGRAPH(igraph_vector_int, igraph_integer_t);
 
 static inline void
 StdVectorToIgraphVectorT(std::vector<std::string>& vectR, igraph_strvector_t* v)
@@ -916,7 +918,7 @@ StdVectorToIgraphVectorT(std::vector<std::string>& vectR, igraph_strvector_t* v)
                                                                                \
     /* Copy all the items */                                                   \
     for (igraph_integer_t i = 0; i < n; ++i) {                                 \
-      vectL.push_back(IGRAPH_VEC##_get(v, i));                                 \
+      vectL.push_back(static_cast<IN>(IGRAPH_VEC##_get(v, i)));                \
     }                                                                          \
   }
 

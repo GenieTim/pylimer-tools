@@ -141,8 +141,8 @@ namespace entities {
       this->neighbourBuckets.push_back(vectorToPlace);
       // assemble the neighbouring buckets with the default cut-off
       std::vector<bucket_idx_t> neighbouringBuckets;
-      int lowerLim = scalingFactor * -1;
-      int upperLim = scalingFactor * 1;
+      int lowerLim = static_cast<int>(this->scalingFactor * -1);
+      int upperLim = static_cast<int>(this->scalingFactor * 1);
       neighbouringBuckets.reserve(static_cast<size_t>(
         (upperLim - lowerLim) * (upperLim - lowerLim) * (upperLim - lowerLim)));
       for (int dx = lowerLim; dx <= upperLim; ++dx) {
@@ -251,11 +251,12 @@ namespace entities {
     }
     Eigen::Array3li baseTriplet =
       this->getBucketTripletForCoordinates(sourceCoords);
-    int baseBucketIndex = this->getBucketIndexForTriplet(baseTriplet);
+    bucket_idx_t baseBucketIndex = this->getBucketIndexForTriplet(baseTriplet);
 
     Eigen::Array3li targetTriplet =
       this->getBucketTripletForCoordinates(targetCoords);
-    int targetBucketIndex = this->getBucketIndexForTriplet(targetTriplet);
+    bucket_idx_t targetBucketIndex =
+      this->getBucketIndexForTriplet(targetTriplet);
 
     bool foundSource = false;
     bool foundTarget = false;
@@ -418,7 +419,7 @@ namespace entities {
         static_cast<Eigen::Index>(this->neighbourBucketSizes.sum());
       result =
         Eigen::ArrayXi::LinSpaced(nResults, 0, static_cast<int>(nResults - 1));
-      return result.size();
+      return static_cast<int>(result.size());
     }
 
 #ifndef NDEBUG
@@ -452,7 +453,7 @@ namespace entities {
           coordinate_idx_t atomIndex =
             this->neighbourBuckets[static_cast<size_t>(bucketIndex)]
                                   [static_cast<size_t>(indexInBucket)];
-          result[results_idx] = atomIndex;
+          result[results_idx] = static_cast<int>(atomIndex);
           results_idx += 1;
         }
       }
@@ -501,7 +502,7 @@ namespace entities {
                 coordinate_idx_t atomIndex =
                   this->neighbourBuckets[static_cast<size_t>(bucketIndex)]
                                         [static_cast<size_t>(indexInBucket)];
-                result[results_idx] = atomIndex;
+                result[results_idx] = static_cast<int>(atomIndex);
                 results_idx += 1;
 
                 if (results_idx >= result.size()) {
@@ -543,7 +544,7 @@ namespace entities {
     Eigen::Array3li verifyCoeffs =
       this->getBucketTripletForCoordinates(results);
     this->normalizeTriplet(verifyCoeffs);
-    int verifyBucketIdx = this->getBucketIndexForTriplet(coeffs);
+    bucket_idx_t verifyBucketIdx = this->getBucketIndexForTriplet(coeffs);
     assert(verifyBucketIdx == bucketIndex);
     assert(verifyCoeffs.isApprox(coeffs));
 #endif
@@ -565,11 +566,11 @@ namespace entities {
     std::set<bucket_idx_t> result;
     Eigen::Array3li indexTriplet;
     // now, do permutations of all these
-    for (int i = minIndices[0]; i <= maxIndices[0]; ++i) {
+    for (long int i = minIndices[0]; i <= maxIndices[0]; ++i) {
       indexTriplet[0] = i;
-      for (int j = minIndices[1]; j <= maxIndices[1]; ++j) {
+      for (long int j = minIndices[1]; j <= maxIndices[1]; ++j) {
         indexTriplet[1] = j;
-        for (int k = minIndices[2]; k <= maxIndices[2]; ++k) {
+        for (long int k = minIndices[2]; k <= maxIndices[2]; ++k) {
           indexTriplet[2] = k;
           result.insert(this->getBucketIndexForTriplet(indexTriplet));
         }
@@ -618,10 +619,10 @@ namespace entities {
     const bucket_idx_t index) const
   {
     bucket_idx_t bucketIndexZ =
-      std::floor(index / (this->nrOfBuckets[0] * this->nrOfBuckets[1]));
-    bucket_idx_t bucketIndexY = std::floor(
+      index / (this->nrOfBuckets[0] * this->nrOfBuckets[1]);
+    bucket_idx_t bucketIndexY =
       (index - bucketIndexZ * (this->nrOfBuckets[0] * this->nrOfBuckets[1])) /
-      (this->nrOfBuckets[0]));
+      (this->nrOfBuckets[0]);
     bucket_idx_t bucketIndexX =
       index - bucketIndexZ * (this->nrOfBuckets[0] * this->nrOfBuckets[1]) -
       bucketIndexY * this->nrOfBuckets[0];

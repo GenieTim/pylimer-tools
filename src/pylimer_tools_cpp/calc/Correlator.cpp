@@ -143,14 +143,15 @@ Correlator::evaluate(const bool norm)
 
   double aux = 0.;
   if (norm) {
-    aux = (accval / ncorrelation(0, 0)) * (accval / ncorrelation(0, 0));
+    const double n0 = static_cast<double>(ncorrelation(0, 0));
+    aux = (accval / n0) * (accval / n0);
   }
 
   // First correlator
   for (unsigned int i = 0; i < p; ++i) {
     if (ncorrelation(0, i) > 0) {
       t[im] = i;
-      f[im] = correlation(0, i) / ncorrelation(0, i) - aux;
+      f[im] = correlation(0, i) / static_cast<double>(ncorrelation(0, i)) - aux;
       ++im;
     }
   }
@@ -160,7 +161,8 @@ Correlator::evaluate(const bool norm)
     for (unsigned int i = dmin; i < p; ++i) {
       if (ncorrelation(k, i) > 0) {
         t[im] = i * pow(static_cast<double>(m), static_cast<int>(k));
-        f[im] = correlation(k, i) / ncorrelation(k, i) - aux;
+        f[im] =
+          correlation(k, i) / static_cast<double>(ncorrelation(k, i)) - aux;
         ++im;
       }
     }

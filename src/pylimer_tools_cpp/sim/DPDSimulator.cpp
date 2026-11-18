@@ -49,9 +49,11 @@ DPDSimulator::DPDSimulator(const pylimer_tools::entities::Universe& u,
   // so, first add "normal" bonds
   for (size_t i = 0; i < edges["edge_from"].size(); i++) {
     if (edges["edge_type"][i] != slipspringBondType) {
-      this->bondPartnersA(this->numBonds) = edges["edge_from"][i];
-      this->bondPartnersB(this->numBonds) = edges["edge_to"][i];
-      this->bondTypes(this->numBonds) = edges["edge_type"][i];
+      this->bondPartnersA(this->numBonds) =
+        static_cast<int>(edges["edge_from"][i]);
+      this->bondPartnersB(this->numBonds) =
+        static_cast<int>(edges["edge_to"][i]);
+      this->bondTypes(this->numBonds) = static_cast<int>(edges["edge_type"][i]);
       this->numBonds += 1;
     }
   }
@@ -59,18 +61,18 @@ DPDSimulator::DPDSimulator(const pylimer_tools::entities::Universe& u,
   for (size_t i = 0; i < edges["edge_from"].size(); i++) {
     if (edges["edge_type"][i] == slipspringBondType) {
       this->bondPartnersA(this->numBonds + this->numSlipSprings) =
-        edges["edge_from"][i];
+        static_cast<int>(edges["edge_from"][i]);
       this->bondPartnersB(this->numBonds + this->numSlipSprings) =
-        edges["edge_to"][i];
+        static_cast<int>(edges["edge_to"][i]);
       this->bondTypes(this->numBonds + this->numSlipSprings) =
-        edges["edge_type"][i];
+        static_cast<int>(edges["edge_type"][i]);
       this->numSlipSprings += 1;
     }
   }
 
   this->neighbourlist =
     pylimer_tools::entities::EigenNeighbourList(coordinates, this->box, 1.0);
-  this->numAtoms = this->coordinates.size() / 3;
+  this->numAtoms = static_cast<int>(this->coordinates.size() / 3);
   this->idxFunctionalities = Eigen::ArrayXi::Zero(this->numAtoms);
   this->atomTypes = u.getPropertyValues<int>("type");
   this->atomIds = u.getPropertyValues<long int>("id");
@@ -625,7 +627,8 @@ DPDSimulator::computeTemperature(const Eigen::VectorXd& velocities)
 
   const double KE = 0.5 * m * velocities.squaredNorm();
 
-  return KE / ((dim / 2.) * (velocities.size() / dim) * kb);
+  return KE /
+         ((dim / 2.) * (static_cast<double>(velocities.size()) / dim) * kb);
 }
 
 /**
@@ -751,7 +754,7 @@ DPDSimulator::computeForces(
     for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(this->numAtoms - 1);
          ++i) {
       const int numNeighbors = this->neighbourlist.getHigherIndicesWithinCutoff(
-        neighbors, coords, static_cast<size_t>(i), cutoff);
+        neighbors, coords, static_cast<int>(i), cutoff);
 
       // pair forces
       // Eigen::ArrayXi neighbourCoordIndices =
@@ -1113,7 +1116,8 @@ DPDSimulator::relocateSlipSprings(const double kbT)
         springIdx, partnerB, candidatePartnerIndex);
       nAccept++;
       RUNTIME_EXP_IFN(
-        this->computeBondLength(springIdx) <= this->highCutoff,
+        this->computeBondLength(static_cast<int>(springIdx)) <=
+          this->highCutoff,
         "By relocation, newly created bonds should not be too long.");
     }
   }
@@ -1213,7 +1217,8 @@ DPDSimulator::shiftSlipSprings(const double kbT)
         static_cast<size_t>(this->bondPartnersB[springEigenIdx]),
         secondPartner);
       RUNTIME_EXP_IFN(
-        this->computeBondLength(springIdx) <= this->highCutoff,
+        this->computeBondLength(static_cast<int>(springIdx)) <=
+          this->highCutoff,
         "By shifting, newly created bonds should not be too long.");
     }
   }
@@ -1381,13 +1386,14 @@ DPDSimulator::attemptSlipSpringShift(const size_t springIdx, const double kbT)
        this->bondBoxOffsets.segment(
          3 * static_cast<Eigen::Index>(selectedRailBondB), 3));
 #ifndef NDEBUG
-    if (!((this->computeBondDistance(springIdx).cwiseAbs() -
+    if (!((this->computeBondDistance(static_cast<int>(springIdx)).cwiseAbs() -
            bondDistanceNew.cwiseAbs())
             .maxCoeff() < 1e-10)) {
       std::cerr << "Expected bond distance " << bondDistanceNew << " based on "
                 << bondDistanceNow << ", " << bondDistanceRailA << ", "
                 << bondDistanceRailB << std::endl;
-      std::cerr << "Instead, got " << this->computeBondDistance(springIdx)
+      std::cerr << "Instead, got "
+                << this->computeBondDistance(static_cast<int>(springIdx))
                 << std::endl;
       std::cerr << "Involved coordinates: "
                 << this->coordinates.segment(partnerAEigen * 3, 3) << ", "
@@ -1411,12 +1417,14 @@ DPDSimulator::attemptSlipSpringShift(const size_t springIdx, const double kbT)
                 << std::endl;
     }
 #endif
-    if (this->computeBondLength(springIdx) > this->maxBondLen) {
+    if (this->computeBondLength(static_cast<int>(springIdx)) >
+        this->maxBondLen) {
       std::cerr << "After shifting, managed to get too long bond with bond "
                    "energy before "
                 << bondEnergyNow << " and now " << bondEnergyNew << " for bond "
                 << springIdx << std::endl;
-      std::cerr << "Bond length is " << this->computeBondLength(springIdx)
+      std::cerr << "Bond length is "
+                << this->computeBondLength(static_cast<int>(springIdx))
                 << " (original: " << bondDistanceNow.norm()
                 << ", now supposedly: " << bondDistanceNew.norm() << ")"
                 << std::endl;
@@ -1546,12 +1554,13 @@ DPDSimulator::attemptSlipSpringShift(const size_t springIdx,
       (shiftEndIsFirstOnRailBond ? 1. : -1.) *
         this->bondBoxOffsets.segment(3 * selectedRailBondEigen, 3);
 #ifndef NDEBUG
-    if (!((this->computeBondDistance(springIdx).cwiseAbs() -
+    if (!((this->computeBondDistance(static_cast<int>(springIdx)).cwiseAbs() -
            bondDistanceNew.cwiseAbs())
             .maxCoeff() < 1e-10)) {
       std::cerr << "Expected bond distance " << bondDistanceNew << " based on "
                 << bondDistanceNow << ", " << railDistance << "." << std::endl;
-      std::cerr << "Instead, got " << this->computeBondDistance(springIdx)
+      std::cerr << "Instead, got "
+                << this->computeBondDistance(static_cast<int>(springIdx))
                 << std::endl;
       std::cerr << "Involved coordinates: "
                 << this->coordinates.segment(partnerAEigen * 3, 3) << ", "

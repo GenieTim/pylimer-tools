@@ -520,14 +520,20 @@ public:
    *
    * @return int the number of nodes
    */
-  int getNrOfNodes() const { return this->initialConfig.nrOfNodes; }
+  int getNrOfNodes() const
+  {
+    return static_cast<int>(this->initialConfig.nrOfNodes);
+  }
 
   /**
    * @brief Get the number of links in the network
    *
    * @return int the number of links
    */
-  int getNrOfLinks() const { return this->initialConfig.nrOfLinks; }
+  int getNrOfLinks() const
+  {
+    return static_cast<int>(this->initialConfig.nrOfLinks);
+  }
 
   size_t getNumBonds() override
   {
@@ -557,14 +563,20 @@ public:
    *
    * @return int the number of strands
    */
-  int getNrOfStrands() const { return this->initialConfig.nrOfStrands; }
+  int getNrOfStrands() const
+  {
+    return static_cast<int>(this->initialConfig.nrOfStrands);
+  }
 
   /**
    * @brief Get the number of springs in the network
    *
    * @return int the number of springs
    */
-  int getNrOfSprings() const { return this->initialConfig.nrOfSprings; }
+  int getNrOfSprings() const
+  {
+    return static_cast<int>(this->initialConfig.nrOfSprings);
+  }
 
   /**
    * @brief Get the number of intra-chain slip links
@@ -712,7 +724,7 @@ public:
       return 0;
     }
     const Eigen::ArrayXb activeNodes = this->findActiveNodes(tolerance);
-    return activeNodes.count();
+    return static_cast<int>(activeNodes.count());
   }
 
   /**
@@ -1624,24 +1636,28 @@ protected:
                                            const Eigen::VectorXd& u,
                                            const double tolerance = 1e-3) const
   {
-    return (this->findActiveStrands(net, u, tolerance)).count();
+    return static_cast<int>(
+      (this->findActiveStrands(net, u, tolerance)).count());
   }
 
   [[nodiscard]] int countNrOfActiveStrands(const double tolerance = 1e-3) const
   {
-    return (this->findActiveStrands(tolerance) == true).count();
+    return static_cast<int>(
+      (this->findActiveStrands(tolerance) == true).count());
   }
 
   [[nodiscard]] int countNrOfActiveStrandsInDir(
     const int dir,
     const double tolerance = 1e-3) const
   {
-    return (this->findActiveStrandsInDir(dir, tolerance) == true).count();
+    return static_cast<int>(
+      (this->findActiveStrandsInDir(dir, tolerance) == true).count());
   }
 
   [[nodiscard]] int countNrOfActiveSprings(const double tolerance = 1e-3) const
   {
-    return (this->findActiveSprings(tolerance) == true).count();
+    return static_cast<int>(
+      (this->findActiveSprings(tolerance) == true).count());
   }
 
   /**

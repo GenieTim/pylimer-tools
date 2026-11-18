@@ -526,10 +526,10 @@ MEHPForceBalance2::MEHPForceBalance2(
 
   // convert the springs
   for (size_t i = 0; i < this->initialConfig.nrOfSprings; ++i) {
-    assert(APPROX_WITHIN(
-      oldVertexIdToNewLinkId[springFromVertexIdx[i]], 0, nextLinkIdx - 1, 0.2));
-    assert(APPROX_WITHIN(
-      oldVertexIdToNewLinkId[springToVertexIdx[i]], 0, nextLinkIdx - 1, 0.2));
+    assert(oldVertexIdToNewLinkId[springFromVertexIdx[i]] >= 0 &&
+           oldVertexIdToNewLinkId[springFromVertexIdx[i]] <= nextLinkIdx - 1);
+    assert(oldVertexIdToNewLinkId[springToVertexIdx[i]] >= 0 &&
+           oldVertexIdToNewLinkId[springToVertexIdx[i]] <= nextLinkIdx - 1);
     const Eigen::Index sIdx = static_cast<Eigen::Index>(i);
     this->initialConfig.springIndexA(sIdx) =
       static_cast<int>(oldVertexIdToNewLinkId[springFromVertexIdx[i]]);
@@ -2690,7 +2690,7 @@ MEHPForceBalance2::deformTo(const pylimer_tools::entities::Box& newBox)
   this->box.adjustCoordinatesTo(this->initialConfig.springBoxOffset, newBox);
   this->box = newBox;
   for (size_t i = 0; i < 3; ++i) {
-    this->initialConfig.L[i] = this->box.getL(i);
+    this->initialConfig.L[i] = this->box.getL(static_cast<int>(i));
     this->initialConfig.boxHalfs[i] = 0.5 * this->initialConfig.L[i];
   }
 }

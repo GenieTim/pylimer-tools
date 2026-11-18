@@ -44,7 +44,7 @@ MEHPForceRelaxation::runForceRelaxation(const char* algorithm,
     pylimer_tools::utils::initializeWithValue(3 * net.nrOfNodes, 0.0);
 
   /* force relaxation */
-  nlopt::opt opt(algorithm, 3 * net.nrOfNodes);
+  nlopt::opt opt(algorithm, static_cast<unsigned int>(3 * net.nrOfNodes));
 
   const nlopt::func objectiveF = [](const unsigned n,
                                     const double* x,
@@ -72,7 +72,7 @@ MEHPForceRelaxation::runForceRelaxation(const char* algorithm,
   opt.set_xtol_rel(xtol);
   opt.set_ftol_rel(ftol);
   opt.set_ftol_abs(0.0);
-  opt.set_maxeval(maxNrOfSteps);
+  opt.set_maxeval(static_cast<int>(maxNrOfSteps));
   // opt.set_param("verbosity", 1.0);
   // start/set/run minimization
   double minf;
@@ -256,7 +256,7 @@ MEHPForceRelaxation::getAverageSpringLength() const
     }
     r2 += sqrt(r2local);
   }
-  return r2 / this->forceRelaxationNetwork.nrOfSprings;
+  return r2 / static_cast<double>(this->forceRelaxationNetwork.nrOfSprings);
 }
 
 Eigen::ArrayXb
@@ -376,7 +376,8 @@ MEHPForceRelaxation::ConvertNetwork(Network* net,
   for (size_t i = 0; i < springEndAtoms.size(); ++i) {
     pylimer_tools::entities::Atom atom = springEndAtoms[i];
     atomIdToNode[atom.getId()] = static_cast<long int>(i);
-    net->oldAtomIds[static_cast<Eigen::Index>(i)] = atom.getId();
+    net->oldAtomIds[static_cast<Eigen::Index>(i)] =
+      static_cast<int>(atom.getId());
     net->coordinates[3 * static_cast<Eigen::Index>(i) + 0] = atom.getX();
     net->coordinates[3 * static_cast<Eigen::Index>(i) + 1] = atom.getY();
     net->coordinates[3 * static_cast<Eigen::Index>(i) + 2] = atom.getZ();
@@ -444,8 +445,8 @@ MEHPForceRelaxation::ConvertNetwork(Network* net,
           spring_idx);
       }
 
-      net->springIndexA[springEigenIdx] = nodeIdxFrom;
-      net->springIndexB[springEigenIdx] = nodeIdxTo;
+      net->springIndexA[springEigenIdx] = static_cast<int>(nodeIdxFrom);
+      net->springIndexB[springEigenIdx] = static_cast<int>(nodeIdxTo);
       for (size_t j = 0; j < 3; j++) {
         net->springCoordinateIndexA[3 * springEigenIdx +
                                     static_cast<Eigen::Index>(j)] =
@@ -598,7 +599,7 @@ MEHPForceRelaxation::countActiveClusteredAtoms(Network* net,
       activeSprings.cast<double>() *
       (net->springsContourLength.array() -
        Eigen::ArrayXd::Ones(static_cast<Eigen::Index>(net->nrOfSprings)));
-    const double activeNodes = nodeIsActive.count();
+    const double activeNodes = static_cast<double>(nodeIsActive.count());
     return ((allActiveAtomsPerChains).matrix().sum() + activeNodes);
   }
 
@@ -636,7 +637,7 @@ MEHPForceRelaxation::countActiveClusteredAtoms(Network* net,
   double nClusteredAtoms = 0.;
   for (size_t i = 0; i < clusters.size(); ++i) {
     if (clusterIsActive[i]) {
-      nClusteredAtoms += clusters[i].getNrOfAtoms();
+      nClusteredAtoms += static_cast<double>(clusters[i].getNrOfAtoms());
     }
   }
 
@@ -654,8 +655,8 @@ MEHPForceRelaxation::getIndicesOfActiveNodes(const Network* net,
   Eigen::ArrayXb strandIsActive = this->findActiveSprings(net, tolerance);
 
   for (size_t i = 0; i < net->nrOfNodes; i++) {
-    for (const int springIdx : net->springIndicesOfLinks[i]) {
-      if (strandIsActive[springIdx]) {
+    for (const size_t springIdx : net->springIndicesOfLinks[i]) {
+      if (strandIsActive[static_cast<Eigen::Index>(springIdx)]) {
         results.push_back(static_cast<int>(i));
         break; // no need to check further springs
       }
@@ -846,7 +847,7 @@ MEHPForceRelaxation::getGammaFactor(double b02, int nrOfChains) const
           this->forceRelaxationNetwork.springsContourLength.mean();
   }
   if (nrOfChains < 1) {
-    nrOfChains = this->currentSpringDistances.size() / 3.;
+    nrOfChains = static_cast<int>(this->currentSpringDistances.size() / 3);
   }
 
   return this->evaluateGammaFactor(

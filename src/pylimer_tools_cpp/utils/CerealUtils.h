@@ -434,7 +434,7 @@ CEREAL_LOAD_FUNCTION_NAME(Archive& ar,
   const igraph_integer_t numVertexAttributes = igraph_vector_int_size(&vtypes);
   for (igraph_integer_t i = 0; i < numVertexAttributes; ++i) {
     std::string attributeName = std::string(igraph_strvector_get(&vnames, i));
-    const int attributeType = igraph_vector_int_get(&vtypes, i);
+    const igraph_int_t attributeType = igraph_vector_int_get(&vtypes, i);
     switch (attributeType) {
       // case IGRAPH_ATTRIBUTE_DEFAULT:
       case IGRAPH_ATTRIBUTE_NUMERIC: {
@@ -473,8 +473,7 @@ CEREAL_LOAD_FUNCTION_NAME(Archive& ar,
   const igraph_integer_t numEdgeAttributes = igraph_vector_int_size(&etypes);
   for (igraph_integer_t i = 0; i < numEdgeAttributes; ++i) {
     std::string attributeName = std::string(igraph_strvector_get(&enames, i));
-    ;
-    const int attributeType = igraph_vector_int_get(&etypes, i);
+    const igraph_int_t attributeType = igraph_vector_int_get(&etypes, i);
     switch (attributeType) {
       // case IGRAPH_ATTRIBUTE_DEFAULT:
       case IGRAPH_ATTRIBUTE_NUMERIC: {

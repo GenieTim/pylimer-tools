@@ -1457,33 +1457,38 @@ public:
     return pipeEvalSprings;
   }
 
+  static size_t growCapacity(const size_t required, const size_t current)
+  {
+    return std::max(required, current + (current / 2));
+  }
+
   // Persistent Buffer Pooling: Matrix buffers
   void ensureMatrixBuffers(size_t numRows, size_t nnz)
   {
     size_t reqRowPtr = numRows + 1;
     if (!bufRowPtr || capRowPtr < reqRowPtr) {
-      size_t newCap = std::max(reqRowPtr, static_cast<size_t>(capRowPtr * 1.5));
+      size_t newCap = growCapacity(reqRowPtr, capRowPtr);
       bufRowPtr = [device newBufferWithLength:newCap * sizeof(uint32_t)
                                       options:MTLResourceStorageModeShared];
       capRowPtr = newCap;
     }
 
     if (!bufColIdx || capColIdx < nnz) {
-      size_t newCap = std::max(nnz, static_cast<size_t>(capColIdx * 1.5));
+      size_t newCap = growCapacity(nnz, capColIdx);
       bufColIdx = [device newBufferWithLength:newCap * sizeof(uint32_t)
                                       options:MTLResourceStorageModeShared];
       capColIdx = newCap;
     }
 
     if (!bufValues || capValues < nnz) {
-      size_t newCap = std::max(nnz, static_cast<size_t>(capValues * 1.5));
+      size_t newCap = growCapacity(nnz, capValues);
       bufValues = [device newBufferWithLength:newCap * sizeof(float)
                                       options:MTLResourceStorageModeShared];
       capValues = newCap;
     }
 
     if (!bufInvDiag || capInvDiag < numRows) {
-      size_t newCap = std::max(numRows, static_cast<size_t>(capInvDiag * 1.5));
+      size_t newCap = growCapacity(numRows, capInvDiag);
       bufInvDiag = [device newBufferWithLength:newCap * sizeof(float)
                                        options:MTLResourceStorageModeShared];
       capInvDiag = newCap;
@@ -1493,7 +1498,7 @@ public:
   void ensureCommonVectorBuffers(size_t N)
   {
     if (!bufB || capN < N) {
-      size_t newCap = std::max(N, static_cast<size_t>(capN * 1.5));
+      size_t newCap = growCapacity(N, capN);
       bufB = [device newBufferWithLength:newCap * sizeof(float)
                                  options:MTLResourceStorageModeShared];
       bufX = [device newBufferWithLength:newCap * sizeof(float)
@@ -1506,7 +1511,7 @@ public:
   {
     ensureCommonVectorBuffers(N);
     if (!bufR || capCgVectors < N) {
-      size_t newCap = std::max(N, static_cast<size_t>(capCgVectors * 1.5));
+      size_t newCap = growCapacity(N, capCgVectors);
       bufR = [device newBufferWithLength:newCap * sizeof(float)
                                  options:MTLResourceStorageModeShared];
       bufP = [device newBufferWithLength:newCap * sizeof(float)
@@ -1519,7 +1524,7 @@ public:
     }
 
     if (!bufPartial || capPartial < numTgs) {
-      size_t newCap = std::max(numTgs, static_cast<size_t>(capPartial * 1.5));
+      size_t newCap = growCapacity(numTgs, capPartial);
       bufPartial = [device newBufferWithLength:newCap * sizeof(float)
                                        options:MTLResourceStorageModeShared];
       capPartial = newCap;
@@ -1535,7 +1540,7 @@ public:
   {
     ensureCommonVectorBuffers(N);
     if (!bufNextX || capBbVectors < N) {
-      size_t newCap = std::max(N, static_cast<size_t>(capBbVectors * 1.5));
+      size_t newCap = growCapacity(N, capBbVectors);
       bufNextX = [device newBufferWithLength:newCap * sizeof(float)
                                      options:MTLResourceStorageModeShared];
       bufG = [device newBufferWithLength:newCap * sizeof(float)
@@ -1550,8 +1555,7 @@ public:
     }
 
     if (!bufQuadPartial || capQuadPartial < numTgs) {
-      size_t newCap =
-        std::max(numTgs, static_cast<size_t>(capQuadPartial * 1.5));
+      size_t newCap = growCapacity(numTgs, capQuadPartial);
       bufQuadPartial =
         [device newBufferWithLength:newCap * sizeof(simd_float4)
                             options:MTLResourceStorageModeShared];
@@ -1559,7 +1563,7 @@ public:
     }
 
     if (!bufPartial || capPartial < numTgs) {
-      size_t newCap = std::max(numTgs, static_cast<size_t>(capPartial * 1.5));
+      size_t newCap = growCapacity(numTgs, capPartial);
       bufPartial = [device newBufferWithLength:newCap * sizeof(float)
                                        options:MTLResourceStorageModeShared];
       capPartial = newCap;
@@ -1576,8 +1580,7 @@ public:
     (void)numItems;
     (void)is3D;
     if (!bufComPartial || capComPartial < numTgs) {
-      size_t newCap =
-        std::max(numTgs, static_cast<size_t>(capComPartial * 1.5));
+      size_t newCap = growCapacity(numTgs, capComPartial);
       bufComPartial = [device newBufferWithLength:newCap * sizeof(simd_float3)
                                           options:MTLResourceStorageModeShared];
       capComPartial = newCap;
@@ -1591,8 +1594,7 @@ public:
   void ensureSpringBuffers(size_t numSprings)
   {
     if (!bufSpringIndexA || capSprings < numSprings) {
-      size_t newCap =
-        std::max(numSprings, static_cast<size_t>(capSprings * 1.5));
+      size_t newCap = growCapacity(numSprings, capSprings);
       bufSpringIndexA =
         [device newBufferWithLength:newCap * sizeof(uint32_t)
                             options:MTLResourceStorageModeShared];
@@ -1727,7 +1729,7 @@ public:
   void ensureHybridBuffers(size_t numRows)
   {
     if (!bufLowDegreeRows || capHybridRows < numRows) {
-      size_t newCap = std::max(numRows, static_cast<size_t>(capHybridRows * 1.5));
+      size_t newCap = growCapacity(numRows, capHybridRows);
       bufLowDegreeRows = [device newBufferWithLength:newCap * sizeof(uint32_t)
                                              options:MTLResourceStorageModeShared];
       bufHighDegreeRows = [device newBufferWithLength:newCap * sizeof(uint32_t)

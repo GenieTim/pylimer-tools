@@ -124,7 +124,7 @@ AveFileReader::getColumnNames()
 int
 AveFileReader::getNrOfColumns()
 {
-  return this->getColumnNames().size();
+  return static_cast<int>(this->getColumnNames().size());
 }
 
 /**

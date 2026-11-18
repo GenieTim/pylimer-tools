@@ -244,7 +244,8 @@ UniverseSequence::readDumpFileAtIndex(size_t universeIndex)
         // std::cout << "Inferring type from data file for " << j << " atom id
         // "
         // << atomIds[j] << std::endl;
-        atomTypes.push_back(dataFileUniverse.getAtom(atomIds[j]).getType());
+        atomTypes.push_back(
+          dataFileUniverse.getAtom(static_cast<int>(atomIds[j])).getType());
       }
     } else {
       for (long int j = 0; j < nAtoms; ++j) {
@@ -1011,11 +1012,11 @@ UniverseSequence::computeMsdForAtomsFromDataFiles(
                                 initialUniverse.getIdxByAtomId(atomId));
   }
   pylimer_tools::entities::Box box = initialUniverse.getBox();
-  std::unordered_map<int, std::vector<double>> results;
+  std::unordered_map<long int, std::vector<double>> results;
   results.reserve(this->getLength());
   std::vector<Eigen::VectorXd> coordinates;
   coordinates.reserve(this->getLength());
-  std::vector<int> timeSteps;
+  std::vector<long int> timeSteps;
   timeSteps.reserve(this->getLength());
 
   // initial loop to reserve everything
@@ -1027,7 +1028,7 @@ UniverseSequence::computeMsdForAtomsFromDataFiles(
       current_universe.getUnwrappedVertexCoordinates(vertex_ids, box);
     coordinates.push_back(current_coordinates);
     timeSteps.push_back(current_universe.getTimestep());
-    int delta_t =
+    long int delta_t =
       (current_universe.getTimestep() - initialUniverse.getTimestep());
     std::vector<double> resultsVec;
     resultsVec.reserve(atomIds.size() * this->getLength() *
@@ -1055,7 +1056,8 @@ UniverseSequence::computeMsdForAtomsFromDataFiles(
          universe_idx < this->getLength();
          ++universe_idx) {
 
-      int delta_t = (timeSteps[universe_idx] - timeSteps[parent_universe_idx]);
+      long int delta_t =
+        (timeSteps[universe_idx] - timeSteps[parent_universe_idx]);
 
       // Skip if delta_t exceeds max_tau for better statistics
       if (delta_t > max_tau && max_tau >= 0) {

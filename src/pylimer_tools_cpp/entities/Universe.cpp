@@ -39,7 +39,7 @@ count_found_cycle(const igraph_vector_int_t* vertices,
 {
   pylimer_tools::utils::Counter<int>* loopLengths =
     static_cast<pylimer_tools::utils::Counter<int>*>(arg);
-  loopLengths->increment(igraph_vector_int_size(vertices));
+  loopLengths->increment(static_cast<int>(igraph_vector_int_size(vertices)));
   return IGRAPH_SUCCESS;
 };
 
@@ -336,7 +336,8 @@ Universe::addAtoms(
     for (size_t i = 0; i < NNewAtoms; ++i) {
       const igraph_int_t vertexIdx =
         static_cast<igraph_int_t>(this->NAtoms + i);
-      igraph_cattribute_VAN_set(mutator, "id", vertexIdx, newIds[i]);
+      igraph_cattribute_VAN_set(
+        mutator, "id", vertexIdx, static_cast<double>(newIds[i]));
       igraph_cattribute_VAN_set(mutator, "x", vertexIdx, newX[i]);
       igraph_cattribute_VAN_set(mutator, "y", vertexIdx, newY[i]);
       igraph_cattribute_VAN_set(mutator, "z", vertexIdx, newZ[i]);
@@ -1178,7 +1179,7 @@ Universe::getChainsWithCrosslinker(const int crossLinkerType) const
     // loop the chains to add the crossLinkers back
     igraph_t* chain =
       igraph_graph_list_get_ptr(&components, static_cast<igraph_int_t>(i));
-    int moleculeLengthBefore = igraph_vcount(chain);
+    const igraph_integer_t moleculeLengthBefore = igraph_vcount(chain);
     // also select ones of degree 0 for dangling atoms
     std::vector<long int> endNodeIndices =
       this->getVerticesWithDegree(chain, { { 0, 1 } });
@@ -1277,7 +1278,7 @@ Universe::getChainsWithCrosslinker(const int crossLinkerType) const
       }
     } // if molecule length
     // decide on molecule type
-    int newMoleculeLength = igraph_vcount(chain);
+    const igraph_integer_t newMoleculeLength = igraph_vcount(chain);
     if (newMoleculeLength == moleculeLengthBefore) {
       molType = MoleculeType::FREE_CHAIN;
     } else if (newMoleculeLength == moleculeLengthBefore + 1) {
@@ -1727,7 +1728,7 @@ Universe::identifyObviouslyDanglingAtoms(const bool distinguishFree) const
     vertexVisited =
       pylimer_tools::utils::initializeWithValue(this->getNrOfAtoms(), false);
     std::vector<igraph_integer_t> verticesOfCluster;
-    verticesOfCluster.reserve(0.01 * this->getNrOfAtoms());
+    verticesOfCluster.reserve(this->getNrOfAtoms() / 100);
 
     for (igraph_integer_t startingVertexIdx = 0;
          startingVertexIdx <
@@ -2215,8 +2216,8 @@ Universe::determineEffectiveFunctionalityPerType() const
     igraph_vit_create(&this->getGraph(), allVertexIds, &vit));
   while (!IGRAPH_VIT_END(vit)) {
     const size_t vertexId = static_cast<size_t>(IGRAPH_VIT_GET(vit));
-    result[types[vertexId]] +=
-      igraph_vector_int_get(&degrees, static_cast<igraph_int_t>(vertexId));
+    result[types[vertexId]] += static_cast<double>(
+      igraph_vector_int_get(&degrees, static_cast<igraph_int_t>(vertexId)));
     IGRAPH_VIT_NEXT(vit);
   }
   igraph_vit_destroy(&vit);
@@ -2251,7 +2252,8 @@ Universe::computeWeightFractions() const
   if (this->massPerType.empty()) {
     // Cast the int_map to double_map
     for (const auto& [key, value] : numberPerType) {
-      partialMasses[key] = static_cast<double>(value) / this->getNrOfAtoms();
+      partialMasses[key] =
+        static_cast<double>(value) / static_cast<double>(this->getNrOfAtoms());
     }
     return partialMasses;
   }
@@ -2382,7 +2384,7 @@ bool
 Universe::containsAtom(const Atom& atom) const
 {
   return this->containsAtomWithId(atom.getId()) &&
-         (this->getAtom(atom.getId()) == atom);
+         (this->getAtom(static_cast<int>(atom.getId())) == atom);
 }
 
 /**
@@ -2462,11 +2464,13 @@ Universe::computeAngles() const
   results.reserve(this->getNrOfAngles());
   for (size_t i = 0; i < this->angleFrom.size(); ++i) {
     Eigen::Vector3d vec1 =
-      this->getAtom(this->angleVia[i])
-        .vectorTo(this->getAtom(this->angleTo[i]), this->getBox());
+      this->getAtom(static_cast<int>(this->angleVia[i]))
+        .vectorTo(this->getAtom(static_cast<int>(this->angleTo[i])),
+                  this->getBox());
     Eigen::Vector3d vec2 =
-      this->getAtom(this->angleVia[i])
-        .vectorTo(this->getAtom(this->angleFrom[i]), this->getBox());
+      this->getAtom(static_cast<int>(this->angleVia[i]))
+        .vectorTo(this->getAtom(static_cast<int>(this->angleFrom[i])),
+                  this->getBox());
     results.push_back(std::acos(vec1.dot(vec2) / (vec1.norm() * vec2.norm())));
   }
   return results;
@@ -2589,7 +2593,7 @@ Universe::detectDihedralAngles() const
                                                        5,
                                                        IGRAPH_UNLIMITED));
 
-    std::vector<std::vector<int>> dihedral_sets;
+    std::vector<std::vector<igraph_int_t>> dihedral_sets;
     // std::cout << "Found paths: " <<
     // igraph_vector_int_size(&dihedral_paths_v)
     //           << std::endl;
@@ -2603,7 +2607,7 @@ Universe::detectDihedralAngles() const
       if (igraph_vector_int_size(current_path) != 4) {
         continue;
       }
-      std::vector<int> current_path_vec;
+      std::vector<igraph_int_t> current_path_vec;
       current_path_vec.reserve(4);
       for (igraph_int_t j = 0; j < igraph_vector_int_size(current_path); j++) {
         current_path_vec.push_back(igraph_vector_int_get(current_path, j));
@@ -2616,7 +2620,7 @@ Universe::detectDihedralAngles() const
     // std::cout << "Found dihedral paths: " << dihedral_sets.size() <<
     // std::endl;
 
-    for (std::vector<int> dihedral_path : dihedral_sets) {
+    for (const std::vector<igraph_int_t>& dihedral_path : dihedral_sets) {
       RUNTIME_EXP_IFN(dihedral_path.size() == 4,
                       "Expected 4 neighbors, got " +
                         std::to_string(dihedral_path.size()) +
@@ -2728,7 +2732,7 @@ Universe::getNetworkOfCrosslinker(const int crossLinkerType) const
   // for example, that there are not more than 1 self-loops per crosslink
   // in the beginning
   std::vector<size_t> indicesToRemove;
-  std::map<int, int> nrOfSelfLoops;
+  std::map<long int, int> nrOfSelfLoops;
   for (size_t i = 0; i < bondTo.size(); ++i) {
     if (bondTo[i] == bondFrom[i]) {
       if (!pylimer_tools::utils::map_has_key(nrOfSelfLoops, bondTo[i])) {
@@ -3025,19 +3029,19 @@ Universe::findLoopEntanglements(
       results.reserve(results.size() * (results.size() - 1));
     }
     Eigen::Vector3d vertex0 =
-      this->getPositionVectorForVertex(vertexIndicesLoop1[i]);
+      this->getPositionVectorForVertex(static_cast<int>(vertexIndicesLoop1[i]));
     const size_t vertex1Index =
       (i == 0) ? (vertexIndicesLoop1.size() - 1) : (i - 1);
-    Eigen::Vector3d vertex1 =
-      this->getPositionVectorForVertex(vertexIndicesLoop1[vertex1Index]);
+    Eigen::Vector3d vertex1 = this->getPositionVectorForVertex(
+      static_cast<int>(vertexIndicesLoop1[vertex1Index]));
     // the triangle is now spawned by vertex0, vertex1 and the helperNode
     for (size_t j = 0; j < vertexIndicesLoop2.size(); ++j) {
-      Eigen::Vector3d rayOrigin =
-        this->getPositionVectorForVertex(vertexIndicesLoop2[j]);
+      Eigen::Vector3d rayOrigin = this->getPositionVectorForVertex(
+        static_cast<int>(vertexIndicesLoop2[j]));
       const size_t directionIdx =
         (j == 0) ? (vertexIndicesLoop2.size() - 1) : (j - 1);
-      Eigen::Vector3d rayTarget =
-        this->getPositionVectorForVertex(vertexIndicesLoop2[directionIdx]);
+      Eigen::Vector3d rayTarget = this->getPositionVectorForVertex(
+        static_cast<int>(vertexIndicesLoop2[directionIdx]));
       Eigen::Vector3d intersectionPoint;
       if (pylimer_tools::topo::segmentIntersectsTriangle(
             rayOrigin,
@@ -3276,8 +3280,8 @@ Universe::computeTemperature(const int dimensions, const double kb) const
       0.5 * this->massPerType.at(atom.getType()) * velocity.squaredNorm();
   }
 
-  return kineticEnergy /
-         ((static_cast<double>(dimensions) / 2.) * (atoms.size()) * kb);
+  return kineticEnergy / ((static_cast<double>(dimensions) / 2.) *
+                          static_cast<double>(atoms.size()) * kb);
 }
 
 /**
@@ -3436,8 +3440,10 @@ Universe::computeBondLengthStats() const
   while (!IGRAPH_EIT_END(bondIterator)) {
     const long int edgeId = static_cast<long int>(IGRAPH_EIT_GET(bondIterator));
     Eigen::Vector3d distance =
-      this->getPositionVectorForVertex(IGRAPH_TO(&this->getGraph(), edgeId)) -
-      this->getPositionVectorForVertex(IGRAPH_FROM(&this->getGraph(), edgeId));
+      this->getPositionVectorForVertex(
+        static_cast<int>(IGRAPH_TO(&this->getGraph(), edgeId))) -
+      this->getPositionVectorForVertex(
+        static_cast<int>(IGRAPH_FROM(&this->getGraph(), edgeId)));
     this->box.handlePBC(distance);
     const double len = distance.norm();
     if (stats.nrOfBonds == 0) {

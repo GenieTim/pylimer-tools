@@ -203,7 +203,7 @@ AtomGraphParent::getPathLength(const long int vertexIdxFrom,
         return IGRAPH_STOP;
       }
       if (vid == vertexIdxTo) {
-        foundAtDepth = dist;
+        foundAtDepth = static_cast<int>(dist);
         return IGRAPH_STOP;
       }
       return IGRAPH_SUCCESS;
@@ -307,7 +307,7 @@ AtomGraphParent::getNrOfVertices() const
 int
 AtomGraphParent::getNrOfEdges() const
 {
-  return igraph_ecount(&this->graph);
+  return static_cast<int>(igraph_ecount(&this->graph));
 }
 
 /**
@@ -688,8 +688,10 @@ AtomGraphParent::computeBondLengths(const Box& box) const
   while (!IGRAPH_EIT_END(bondIterator)) {
     long int edgeId = static_cast<long int>(IGRAPH_EIT_GET(bondIterator));
     Eigen::Vector3d distance =
-      this->getPositionVectorForVertex(IGRAPH_TO(&this->graph, edgeId)) -
-      this->getPositionVectorForVertex(IGRAPH_FROM(&this->graph, edgeId));
+      this->getPositionVectorForVertex(
+        static_cast<int>(IGRAPH_TO(&this->graph, edgeId))) -
+      this->getPositionVectorForVertex(
+        static_cast<int>(IGRAPH_FROM(&this->graph, edgeId)));
     box.handlePBC(distance);
     lengths.push_back(distance.norm());
     IGRAPH_EIT_NEXT(bondIterator);
@@ -722,8 +724,10 @@ AtomGraphParent::computeBondVectors(const Box& box) const
   while (!IGRAPH_EIT_END(bondIterator)) {
     long int edgeId = static_cast<long int>(IGRAPH_EIT_GET(bondIterator));
     Eigen::Vector3d distance =
-      this->getPositionVectorForVertex(IGRAPH_TO(&this->graph, edgeId)) -
-      this->getPositionVectorForVertex(IGRAPH_FROM(&this->graph, edgeId));
+      this->getPositionVectorForVertex(
+        static_cast<int>(IGRAPH_TO(&this->graph, edgeId))) -
+      this->getPositionVectorForVertex(
+        static_cast<int>(IGRAPH_FROM(&this->graph, edgeId)));
     lengths.push_back(distance);
     IGRAPH_EIT_NEXT(bondIterator);
   }
@@ -747,8 +751,10 @@ AtomGraphParent::computeMeanSquaredBondLength(const Box& box) const
   while (!IGRAPH_EIT_END(bondIterator)) {
     long int edgeId = static_cast<long int>(IGRAPH_EIT_GET(bondIterator));
     Eigen::Vector3d distance =
-      this->getPositionVectorForVertex(IGRAPH_TO(&this->graph, edgeId)) -
-      this->getPositionVectorForVertex(IGRAPH_FROM(&this->graph, edgeId));
+      this->getPositionVectorForVertex(
+        static_cast<int>(IGRAPH_TO(&this->graph, edgeId))) -
+      this->getPositionVectorForVertex(
+        static_cast<int>(IGRAPH_FROM(&this->graph, edgeId)));
     box.handlePBC(distance);
     result += distance.squaredNorm() /
               static_cast<double>(IGRAPH_EIT_SIZE(bondIterator));
@@ -773,7 +779,7 @@ AtomGraphParent::computeFunctionalityForVertex(const long int vertexId) const
         &this->graph, &degree, vertexId, IGRAPH_ALL, IGRAPH_LOOPS_TWICE)) {
     throw std::runtime_error("Failed to determine degree of vertex");
   }
-  return degree;
+  return static_cast<int>(degree);
 }
 
 int
@@ -935,7 +941,7 @@ AtomGraphParent::getBonds() const
 std::vector<int>
 AtomGraphParent::getVertexDegrees() const
 {
-  int graphSize = igraph_vcount(&this->graph);
+  const igraph_integer_t graphSize = igraph_vcount(&this->graph);
   igraph_vector_int_t degrees;
   if (igraph_vector_int_init(&degrees, graphSize)) {
     throw std::runtime_error("Failed to instantiate result vector.");
@@ -960,7 +966,7 @@ std::vector<long int>
 AtomGraphParent::getVerticesWithDegree(const igraph_t* someGraph,
                                        std::function<bool(int)> selector) const
 {
-  int graphSize = igraph_vcount(someGraph);
+  const igraph_integer_t graphSize = igraph_vcount(someGraph);
   igraph_vector_int_t degrees;
   if (igraph_vector_int_init(&degrees, graphSize)) {
     throw std::runtime_error("Failed to instantiate result vector.");
@@ -980,7 +986,8 @@ AtomGraphParent::getVerticesWithDegree(const igraph_t* someGraph,
   igraph_vit_create(someGraph, allVertexIds, &vit);
   while (!IGRAPH_VIT_END(vit)) {
     igraph_integer_t vertexId = IGRAPH_VIT_GET(vit);
-    int currentDegree = igraph_vector_int_get(&degrees, vertexId);
+    const int currentDegree =
+      static_cast<int>(igraph_vector_int_get(&degrees, vertexId));
     if (selector(currentDegree)) {
       toSelect.push_back(static_cast<long int>(vertexId));
     }

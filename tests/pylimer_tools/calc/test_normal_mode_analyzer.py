@@ -196,9 +196,7 @@ class TestNormalModeAnalyzer(unittest.TestCase):
 
         for cfg in (
             SLQConfig(num_steps=120, num_random_vectors=30),
-            HybridConfig(
-                num_steps=120, num_random_vectors=30, num_exact_low_modes=30
-            ),
+            HybridConfig(num_steps=120, num_random_vectors=30, num_exact_low_modes=30),
             None,
         ):
             spec = nma.solve_approx(cfg)
@@ -213,9 +211,7 @@ class TestNormalModeAnalyzer(unittest.TestCase):
             np.testing.assert_allclose(gp, gp_ex, rtol=0.25)
             np.testing.assert_allclose(gpp, gpp_ex, rtol=0.25)
 
-        kpm_spec = nma.solve_approx(
-            KPMConfig(num_moments=256, num_random_vectors=20)
-        )
+        kpm_spec = nma.solve_approx(KPMConfig(num_moments=256, num_random_vectors=20))
         gp_kpm = kpm_spec.storage_modulus(omega)
         self.assertEqual(len(gp_kpm), len(omega))
         self.assertTrue(np.all(np.isfinite(gp_kpm)))
@@ -236,13 +232,9 @@ class TestNormalModeAnalyzer(unittest.TestCase):
         self.assertEqual(unpickled_nma.size, self.nma_ring.size)
 
         unpickled_spec = pickle.loads(pickle.dumps(spec))
-        np.testing.assert_array_equal(
-            spec.eigenvalues, unpickled_spec.eigenvalues
-        )
+        np.testing.assert_array_equal(spec.eigenvalues, unpickled_spec.eigenvalues)
         np.testing.assert_array_equal(spec.weights, unpickled_spec.weights)
-        np.testing.assert_array_equal(
-            spec.eigenvectors, unpickled_spec.eigenvectors
-        )
+        np.testing.assert_array_equal(spec.eigenvectors, unpickled_spec.eigenvectors)
         self.assertEqual(spec.is_complete, unpickled_spec.is_complete)
 
 
