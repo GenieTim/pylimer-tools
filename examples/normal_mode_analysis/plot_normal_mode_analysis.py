@@ -137,7 +137,7 @@ fig, axes = plt.subplots(
     sharey=True,
 )
 
-for ax, (name, _, _) in zip(axes, approx_configs):
+for ax, (name, _) in zip(axes, approx_configs):
     gp_approx, gpp_approx = approx_results[name]
     ax.loglog(frequencies, storage_modulus_exact, "b-", label="G' (Exact)")
     ax.loglog(frequencies, loss_modulus_exact, "r-", label="G'' (Exact)")
