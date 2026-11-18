@@ -139,7 +139,7 @@ plot_sampling_distributions(data)
 
 # %%
 # Defective Networks Across Conversion (:math:`p \in [0.75, 1.00]`)
-# ----------------------------------------------------------------
+# ------------------------------------------------------------------
 # Below full conversion, dangling chains and sol fractions must be handled consistently:
 #
 # - ``EntanglementFilteringMode.OMIT_INACTIVE`` discards candidate pairs on dangling/soluble

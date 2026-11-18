@@ -8859,7 +8859,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 4.975 seconds)
+**Total running time of the script:** (0 minutes 3.364 seconds)
 
 <a id="sphx-glr-download-auto-examples-dpd-simulations-plot-dpd-simulation-py"></a>
 
@@ -8878,7 +8878,7 @@ plt.show()
 
 # Computation times
 
-**00:04.975** total execution time for 1 file **from auto_examples/dpd_simulations**:
+**00:03.364** total execution time for 1 file **from auto_examples/dpd_simulations**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -8895,7 +8895,7 @@ $(document).ready( function () {
 
 | Example                                                                                                                                                 | Time      |   Mem (MB) |
 |---------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [DPD Simulations](auto_examples/dpd_simulations/plot_dpd_simulation.html.md#sphx-glr-auto-examples-dpd-simulations-plot-dpd-simulation-py) (`plot_dpd_simulation.py`) | 00:04.975 |          0 |
+| [DPD Simulations](auto_examples/dpd_simulations/plot_dpd_simulation.html.md#sphx-glr-auto-examples-dpd-simulations-plot-dpd-simulation-py) (`plot_dpd_simulation.py`) | 00:03.364 |          0 |
 
 
 # auto_examples/force_balance/index.html.md
@@ -9101,7 +9101,7 @@ plot_link_vs_spring_modulus(data)
 plot_link_vs_spring_dof(data)
 ```
 
-**Total running time of the script:** (0 minutes 0.399 seconds)
+**Total running time of the script:** (0 minutes 0.233 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-entanglement-link-vs-spring-py"></a>
 
@@ -9324,7 +9324,7 @@ print(format_benchmark_footnote(data))
 Measured on: Apple M3 Pro (12 cores), 36 GB RAM, Mac15,7, macOS 27.2.1 (arm64), Python 3.13.18 (cached 2026-11-17).
 ```
 
-**Total running time of the script:** (0 minutes 1.744 seconds)
+**Total running time of the script:** (0 minutes 0.952 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-entanglement-sampling-comparison-py"></a>
 
@@ -9488,8 +9488,8 @@ plt.show()
 ```
 
 ```none
-Final residual (should be close to 0): 1.8739604289721373e-08
-Shear Modulus from Equilibrium [MPa]:  0.0740981559267219
+Final residual (should be close to 0): 1.4764965440735079e-08
+Shear Modulus from Equilibrium [MPa]:  0.04584942324624697
 ```
 
 <!-- GENERATED FROM PYTHON SOURCE LINES 138-141 -->
@@ -9498,7 +9498,7 @@ Rather than using the nominal stress, you can also use the
 stress tensor directly to compute the shear modulus.
 Therewith, you could try to investigate e.g. the Mooney-Rivlin behaviour.
 
-**Total running time of the script:** (0 minutes 0.290 seconds)
+**Total running time of the script:** (0 minutes 0.151 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-fb-deformation-exp-py"></a>
 
@@ -9614,8 +9614,8 @@ gz = (
 ```
 
 ```none
-Final residual (should be close to 0): 1.1086469762147612e-06
-Shear Modulus [MPa]: 0.0347
+Final residual (should be close to 0): 1.0091464797552233e-07
+Shear Modulus [MPa]: 0.0361
 ```
 
 <!-- GENERATED FROM PYTHON SOURCE LINES 91-96 -->
@@ -9697,7 +9697,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.535 seconds)
+**Total running time of the script:** (0 minutes 0.324 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-force-balance-py"></a>
 
@@ -9988,7 +9988,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.483 seconds)
+**Total running time of the script:** (0 minutes 0.264 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-force-balance-2-py"></a>
 
@@ -10199,7 +10199,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 3.877 seconds)
+**Total running time of the script:** (0 minutes 2.223 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-force-relaxation-py"></a>
 
@@ -10339,7 +10339,7 @@ plot_inactive_topological_fractions(data)
 plot_inactive_solver_complexity(data)
 ```
 
-**Total running time of the script:** (0 minutes 0.868 seconds)
+**Total running time of the script:** (0 minutes 0.510 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-inactive-removal-and-sampling-py"></a>
 
@@ -10466,7 +10466,7 @@ plot_polydispersity_modulus(data)
 plot_polydispersity_fractions(data)
 ```
 
-**Total running time of the script:** (0 minutes 0.393 seconds)
+**Total running time of the script:** (0 minutes 0.221 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-polydispersity-study-py"></a>
 
@@ -10674,7 +10674,7 @@ uncertainty below 1–2%.
 plot_rve_sample_count_study(data)
 ```
 
-**Total running time of the script:** (0 minutes 3.064 seconds)
+**Total running time of the script:** (0 minutes 1.906 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-representative-volume-pdms-py"></a>
 
@@ -10819,7 +10819,7 @@ plot_cutoff_pair_distance_distribution(data)
 plot_cutoff_solver_iterations(data)
 ```
 
-**Total running time of the script:** (0 minutes 0.942 seconds)
+**Total running time of the script:** (0 minutes 0.514 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-sampling-cutoff-effect-py"></a>
 
@@ -10935,7 +10935,7 @@ plot_slipping_vs_fixed_modulus(data)
 plot_slipping_vs_fixed_iterations(data)
 ```
 
-**Total running time of the script:** (0 minutes 0.449 seconds)
+**Total running time of the script:** (0 minutes 0.275 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-slipping-vs-fixed-links-py"></a>
 
@@ -10954,7 +10954,7 @@ plot_slipping_vs_fixed_iterations(data)
 
 # Computation times
 
-**00:13.044** total execution time for 11 files **from auto_examples/force_balance**:
+**00:07.572** total execution time for 11 files **from auto_examples/force_balance**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -10971,17 +10971,17 @@ $(document).ready( function () {
 
 | Example                                                                                                                                                                                                     | Time      |   Mem (MB) |
 |-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [MEHP Force Relaxation](auto_examples/force_balance/plot_force_relaxation.html.md#sphx-glr-auto-examples-force-balance-plot-force-relaxation-py) (`plot_force_relaxation.py`)                                             | 00:03.877 |          0 |
-| [Representative Volume Study for PDMS Networks](auto_examples/force_balance/plot_representative_volume_pdms.html.md#sphx-glr-auto-examples-force-balance-plot-representative-volume-pdms-py) (`plot_representative_volume_pdms.py`) | 00:03.064 |          0 |
-| [Entanglement Sampling Methods](auto_examples/force_balance/plot_entanglement_sampling_comparison.html.md#sphx-glr-auto-examples-force-balance-plot-entanglement-sampling-comparison-py) (`plot_entanglement_sampling_comparison.py`)     | 00:01.744 |          0 |
-| [Sampling Cut-Off Effect](auto_examples/force_balance/plot_sampling_cutoff_effect.html.md#sphx-glr-auto-examples-force-balance-plot-sampling-cutoff-effect-py) (`plot_sampling_cutoff_effect.py`)                               | 00:00.942 |          0 |
-| [Inactive Removal & Sampling](auto_examples/force_balance/plot_inactive_removal_and_sampling.html.md#sphx-glr-auto-examples-force-balance-plot-inactive-removal-and-sampling-py) (`plot_inactive_removal_and_sampling.py`)             | 00:00.868 |          0 |
-| [Force Balance](auto_examples/force_balance/plot_force_balance.html.md#sphx-glr-auto-examples-force-balance-plot-force-balance-py) (`plot_force_balance.py`)                                                           | 00:00.535 |          0 |
-| [Force Balance 2](auto_examples/force_balance/plot_force_balance_2.html.md#sphx-glr-auto-examples-force-balance-plot-force-balance-2-py) (`plot_force_balance_2.py`)                                                     | 00:00.483 |          0 |
-| [Slipping vs. Fixed Entanglement Links](auto_examples/force_balance/plot_slipping_vs_fixed_links.html.md#sphx-glr-auto-examples-force-balance-plot-slipping-vs-fixed-links-py) (`plot_slipping_vs_fixed_links.py`)               | 00:00.449 |          0 |
-| [Entanglement Links vs. Springs](auto_examples/force_balance/plot_entanglement_link_vs_spring.html.md#sphx-glr-auto-examples-force-balance-plot-entanglement-link-vs-spring-py) (`plot_entanglement_link_vs_spring.py`)              | 00:00.399 |          0 |
-| [Polydispersity Study](auto_examples/force_balance/plot_polydispersity_study.html.md#sphx-glr-auto-examples-force-balance-plot-polydispersity-study-py) (`plot_polydispersity_study.py`)                                      | 00:00.393 |          0 |
-| [Deformation Experiment](auto_examples/force_balance/plot_fb_deformation_exp.html.md#sphx-glr-auto-examples-force-balance-plot-fb-deformation-exp-py) (`plot_fb_deformation_exp.py`)                                        | 00:00.290 |          0 |
+| [MEHP Force Relaxation](auto_examples/force_balance/plot_force_relaxation.html.md#sphx-glr-auto-examples-force-balance-plot-force-relaxation-py) (`plot_force_relaxation.py`)                                             | 00:02.223 |          0 |
+| [Representative Volume Study for PDMS Networks](auto_examples/force_balance/plot_representative_volume_pdms.html.md#sphx-glr-auto-examples-force-balance-plot-representative-volume-pdms-py) (`plot_representative_volume_pdms.py`) | 00:01.906 |          0 |
+| [Entanglement Sampling Methods](auto_examples/force_balance/plot_entanglement_sampling_comparison.html.md#sphx-glr-auto-examples-force-balance-plot-entanglement-sampling-comparison-py) (`plot_entanglement_sampling_comparison.py`)     | 00:00.952 |          0 |
+| [Sampling Cut-Off Effect](auto_examples/force_balance/plot_sampling_cutoff_effect.html.md#sphx-glr-auto-examples-force-balance-plot-sampling-cutoff-effect-py) (`plot_sampling_cutoff_effect.py`)                               | 00:00.514 |          0 |
+| [Inactive Removal & Sampling](auto_examples/force_balance/plot_inactive_removal_and_sampling.html.md#sphx-glr-auto-examples-force-balance-plot-inactive-removal-and-sampling-py) (`plot_inactive_removal_and_sampling.py`)             | 00:00.510 |          0 |
+| [Force Balance](auto_examples/force_balance/plot_force_balance.html.md#sphx-glr-auto-examples-force-balance-plot-force-balance-py) (`plot_force_balance.py`)                                                           | 00:00.324 |          0 |
+| [Slipping vs. Fixed Entanglement Links](auto_examples/force_balance/plot_slipping_vs_fixed_links.html.md#sphx-glr-auto-examples-force-balance-plot-slipping-vs-fixed-links-py) (`plot_slipping_vs_fixed_links.py`)               | 00:00.275 |          0 |
+| [Force Balance 2](auto_examples/force_balance/plot_force_balance_2.html.md#sphx-glr-auto-examples-force-balance-plot-force-balance-2-py) (`plot_force_balance_2.py`)                                                     | 00:00.264 |          0 |
+| [Entanglement Links vs. Springs](auto_examples/force_balance/plot_entanglement_link_vs_spring.html.md#sphx-glr-auto-examples-force-balance-plot-entanglement-link-vs-spring-py) (`plot_entanglement_link_vs_spring.py`)              | 00:00.233 |          0 |
+| [Polydispersity Study](auto_examples/force_balance/plot_polydispersity_study.html.md#sphx-glr-auto-examples-force-balance-plot-polydispersity-study-py) (`plot_polydispersity_study.py`)                                      | 00:00.221 |          0 |
+| [Deformation Experiment](auto_examples/force_balance/plot_fb_deformation_exp.html.md#sphx-glr-auto-examples-force-balance-plot-fb-deformation-exp-py) (`plot_fb_deformation_exp.py`)                                        | 00:00.151 |          0 |
 
 
 # auto_examples/index.html.md
@@ -11049,13 +11049,13 @@ Both methods support [`EntanglementFilteringMode`](api/pylimer_tools_cpp.Entangl
 
 See:
 
-- plot_entanglement_sampling_comparison for a detailed benchmark and comparison of discrete vs. on-demand sampling methods,
-- plot_entanglement_link_vs_spring for the difference between modeling entanglements as rigid merged links versus compliant Hookean springs in Force Balance 2,
-- plot_slipping_vs_fixed_links for a comparison of dynamic contour slipping versus fixed entanglement links in Force Balance 1, and
-- plot_inactive_removal_and_sampling for the removal of inactive strands/entanglements in Force Balance 2 and the impact of pre-filtering dangling chains during entanglement sampling,
-- plot_polydispersity_study for the effect of precursor strand length polydispersity on equilibrium shear modulus and defect fractions,
-- plot_sampling_cutoff_effect for the effect of the slip-link sampling cut-off distance on the equilibrium shear modulus in Force Balance 2, investigating pre-strain distortions, link vs. spring representations, and interactions with strand length $N$, conversion $p$, and stoichiometric imbalance $r$, and
-- plot_representative_volume_pdms for a representative volume element (RVE) study of realistic PDMS networks across chain length $N$, conversion $p$, stoichiometric imbalance $r$, and ensemble sample count.
+- [Entanglement Sampling Methods](auto_examples/force_balance/plot_entanglement_sampling_comparison.html.md) for a detailed benchmark and comparison of discrete vs. on-demand sampling methods,
+- [Entanglement Links vs. Springs](auto_examples/force_balance/plot_entanglement_link_vs_spring.html.md) for the difference between modeling entanglements as rigid merged links versus compliant Hookean springs in Force Balance 2,
+- [Slipping vs. Fixed Entanglement Links](auto_examples/force_balance/plot_slipping_vs_fixed_links.html.md) for a comparison of dynamic contour slipping versus fixed entanglement links in Force Balance 1, and
+- [Inactive Removal & Sampling](auto_examples/force_balance/plot_inactive_removal_and_sampling.html.md) for the removal of inactive strands/entanglements in Force Balance 2 and the impact of pre-filtering dangling chains during entanglement sampling,
+- [Polydispersity Study](auto_examples/force_balance/plot_polydispersity_study.html.md) for the effect of precursor strand length polydispersity on equilibrium shear modulus and defect fractions,
+- [Sampling Cut-Off Effect](auto_examples/force_balance/plot_sampling_cutoff_effect.html.md) for the effect of the slip-link sampling cut-off distance on the equilibrium shear modulus in Force Balance 2, investigating pre-strain distortions, link vs. spring representations, and interactions with strand length $N$, conversion $p$, and stoichiometric imbalance $r$, and
+- [Representative Volume Study for PDMS Networks](auto_examples/force_balance/plot_representative_volume_pdms.html.md) for a representative volume element (RVE) study of realistic PDMS networks across chain length $N$, conversion $p$, stoichiometric imbalance $r$, and ensemble sample count.
 
 <div id='sg-tag-list' class='sphx-glr-tag-list'></div><div class="sphx-glr-thumbnails">
 <!-- thumbnail-parent-div-open --><div class="sphx-glr-thumbcontainer" tooltip="In MEHPForceBalance2 (gusev_numerical_2019, bernhard_phantom_2025), users can choose between two representations for sampled entanglements via entanglements_as_springs:">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_entanglement_link_vs_spring_thumb.png)
@@ -11124,7 +11124,7 @@ or for doing fast predictions of the viscoelasticity using the [`NormalModeAnaly
 [`MEHPForceBalance`](api/pylimer_tools_cpp.MEHPForceBalance.html.md#pylimer_tools_cpp.MEHPForceBalance) and its variants.
 
 For more options, examples and advanced usage, see the [test suite](https://github.com/GenieTim/pylimer-tools/tree/main/tests)
-and the modules API reference, particularly of the [`MCUniverseGenerator`](api/pylimer_tools_cpp.MCUniverseGenerator.html.md#pylimer_tools_cpp.MCUniverseGenerator) class.
+and the [src](modules.html.md) API reference, particularly of the [`MCUniverseGenerator`](api/pylimer_tools_cpp.MCUniverseGenerator.html.md#pylimer_tools_cpp.MCUniverseGenerator) class.
 
 The network generation system allows you to:
 
@@ -11193,7 +11193,7 @@ as published in Gusev and Bernhard [[GB24](acknowledgements.html.md#id7)].
 This is useful for understanding the viscoelastic properties of the network.
 The corresponding class is [`NormalModeAnalyzer`](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer).
 
-See plot_kpm_vs_exact_pdms for a large-scale comparison of the Kernel Polynomial Method (KPM)
+See [KPM vs. Full Eigenvalue Normal Mode Analysis for PDMS Networks](auto_examples/normal_mode_analysis/plot_kpm_vs_exact_pdms.html.md) for a large-scale comparison of the Kernel Polynomial Method (KPM)
 against full eigenvalue decomposition on realistic PDMS networks generated via Monte Carlo with
 on-demand entanglement sampling.
 
@@ -11383,7 +11383,7 @@ or for doing fast predictions of the viscoelasticity using the [`NormalModeAnaly
 [`MEHPForceBalance`](api/pylimer_tools_cpp.MEHPForceBalance.html.md#pylimer_tools_cpp.MEHPForceBalance) and its variants.
 
 For more options, examples and advanced usage, see the [test suite](https://github.com/GenieTim/pylimer-tools/tree/main/tests)
-and the modules API reference, particularly of the [`MCUniverseGenerator`](api/pylimer_tools_cpp.MCUniverseGenerator.html.md#pylimer_tools_cpp.MCUniverseGenerator) class.
+and the [src](modules.html.md) API reference, particularly of the [`MCUniverseGenerator`](api/pylimer_tools_cpp.MCUniverseGenerator.html.md#pylimer_tools_cpp.MCUniverseGenerator) class.
 
 The network generation system allows you to:
 
@@ -11581,7 +11581,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.137 seconds)
+**Total running time of the script:** (0 minutes 0.076 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-add-angles-py"></a>
 
@@ -11760,7 +11760,7 @@ ax.legend()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.459 seconds)
+**Total running time of the script:** (0 minutes 0.249 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-custom-crosslinking-callback-py"></a>
 
@@ -11890,11 +11890,11 @@ plt.show()
 ```
 
 ```none
-Time without max distance:  29.14 seconds
-Time with z-score max distance: 8.58 seconds
+Time without max distance:  20.15 seconds
+Time with z-score max distance: 5.44 seconds
 ```
 
-**Total running time of the script:** (0 minutes 37.968 seconds)
+**Total running time of the script:** (0 minutes 25.720 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-monte-carlo-configuration-py"></a>
 
@@ -12008,11 +12008,11 @@ writer.write_to_file("generated_structures/multi_component_polymer_network.data"
 ```
 
 ```none
-Starting network generation at 2026-11-18 05:49:42.131907
+Starting network generation at 2026-11-18 18:56:26.160801
 Adding crosslinkers...
 Adding solvent chains...
 Adding and linking polymer strands...
-Network generation completed at 2026-11-18 05:49:42.133756
+Network generation completed at 2026-11-18 18:56:26.162203
 ```
 
 <!-- GENERATED FROM PYTHON SOURCE LINES 89-92 -->
@@ -12062,7 +12062,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.135 seconds)
+**Total running time of the script:** (0 minutes 0.074 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-multi-component-system-py"></a>
 
@@ -12180,7 +12180,7 @@ plt.title("Distribution of Strand Lengths in Polydisperse Network")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.425 seconds)
+**Total running time of the script:** (0 minutes 0.245 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-polydisperse-system-py"></a>
 
@@ -12282,7 +12282,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.097 seconds)
+**Total running time of the script:** (0 minutes 0.052 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-save-network-py"></a>
 
@@ -12406,7 +12406,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.124 seconds)
+**Total running time of the script:** (0 minutes 0.073 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-simple-crosslinked-network-py"></a>
 
@@ -12590,7 +12590,7 @@ print("Network saved to 'generated_structures/tetra_peg_network.data'")
 ```
 
 ```none
-Starting tetra-PEG network generation at 2026-11-18 05:49:43.017036
+Starting tetra-PEG network generation at 2026-11-18 18:56:26.804939
 System parameters:
   Box size: 80.0³
   Star crosslinkers: 150
@@ -12610,7 +12610,7 @@ System after strand-strand linking:
   Final strand conversion: 0.822
 Relaxing crosslink positions...
 Generating final universe with bead coordinates...
-Network generation completed at 2026-11-18 05:49:43.038125
+Network generation completed at 2026-11-18 18:56:26.818003
 Final network statistics:
   Total atoms: 12900
   Total bonds: 12985
@@ -12678,7 +12678,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.166 seconds)
+**Total running time of the script:** (0 minutes 0.096 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-tetra-peg-network-py"></a>
 
@@ -12818,7 +12818,7 @@ plt.title("Distribution of Strand Lengths in Vulcanized Network")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 22.302 seconds)
+**Total running time of the script:** (0 minutes 14.092 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-vulcanized-network-py"></a>
 
@@ -12837,7 +12837,7 @@ plt.show()
 
 # Computation times
 
-**01:01.813** total execution time for 9 files **from auto_examples/network_generator**:
+**00:40.677** total execution time for 9 files **from auto_examples/network_generator**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -12854,15 +12854,15 @@ $(document).ready( function () {
 
 | Example                                                                                                                                                                                             | Time      |   Mem (MB) |
 |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [Monte Carlo Configuration](auto_examples/network_generator/plot_monte_carlo_configuration.html.md#sphx-glr-auto-examples-network-generator-plot-monte-carlo-configuration-py) (`plot_monte_carlo_configuration.py`)           | 00:37.968 |          0 |
-| [Generate Vulcanized Networks](auto_examples/network_generator/plot_vulcanized_network.html.md#sphx-glr-auto-examples-network-generator-plot-vulcanized-network-py) (`plot_vulcanized_network.py`)                      | 00:22.302 |          0 |
-| [Custom Crosslinking Callbacks](auto_examples/network_generator/plot_custom_crosslinking_callback.html.md#sphx-glr-auto-examples-network-generator-plot-custom-crosslinking-callback-py) (`plot_custom_crosslinking_callback.py`) | 00:00.459 |          0 |
-| [Polydisperse Network](auto_examples/network_generator/plot_polydisperse_system.html.md#sphx-glr-auto-examples-network-generator-plot-polydisperse-system-py) (`plot_polydisperse_system.py`)                            | 00:00.425 |          0 |
-| [Tetra-PEG Network Generation](auto_examples/network_generator/plot_tetra_peg_network.html.md#sphx-glr-auto-examples-network-generator-plot-tetra-peg-network-py) (`plot_tetra_peg_network.py`)                        | 00:00.166 |          0 |
-| [Adding Topology Information](auto_examples/network_generator/plot_add_angles.html.md#sphx-glr-auto-examples-network-generator-plot-add-angles-py) (`plot_add_angles.py`)                                       | 00:00.137 |          0 |
-| [Multi-Component System](auto_examples/network_generator/plot_multi_component_system.html.md#sphx-glr-auto-examples-network-generator-plot-multi-component-system-py) (`plot_multi_component_system.py`)                    | 00:00.135 |          0 |
-| [Simple Crosslinked Network](auto_examples/network_generator/plot_simple_crosslinked_network.html.md#sphx-glr-auto-examples-network-generator-plot-simple-crosslinked-network-py) (`plot_simple_crosslinked_network.py`)        | 00:00.124 |          0 |
-| [Save Generated Network](auto_examples/network_generator/plot_save_network.html.md#sphx-glr-auto-examples-network-generator-plot-save-network-py) (`plot_save_network.py`)                                        | 00:00.097 |          0 |
+| [Monte Carlo Configuration](auto_examples/network_generator/plot_monte_carlo_configuration.html.md#sphx-glr-auto-examples-network-generator-plot-monte-carlo-configuration-py) (`plot_monte_carlo_configuration.py`)           | 00:25.720 |          0 |
+| [Generate Vulcanized Networks](auto_examples/network_generator/plot_vulcanized_network.html.md#sphx-glr-auto-examples-network-generator-plot-vulcanized-network-py) (`plot_vulcanized_network.py`)                      | 00:14.092 |          0 |
+| [Custom Crosslinking Callbacks](auto_examples/network_generator/plot_custom_crosslinking_callback.html.md#sphx-glr-auto-examples-network-generator-plot-custom-crosslinking-callback-py) (`plot_custom_crosslinking_callback.py`) | 00:00.249 |          0 |
+| [Polydisperse Network](auto_examples/network_generator/plot_polydisperse_system.html.md#sphx-glr-auto-examples-network-generator-plot-polydisperse-system-py) (`plot_polydisperse_system.py`)                            | 00:00.245 |          0 |
+| [Tetra-PEG Network Generation](auto_examples/network_generator/plot_tetra_peg_network.html.md#sphx-glr-auto-examples-network-generator-plot-tetra-peg-network-py) (`plot_tetra_peg_network.py`)                        | 00:00.096 |          0 |
+| [Adding Topology Information](auto_examples/network_generator/plot_add_angles.html.md#sphx-glr-auto-examples-network-generator-plot-add-angles-py) (`plot_add_angles.py`)                                       | 00:00.076 |          0 |
+| [Multi-Component System](auto_examples/network_generator/plot_multi_component_system.html.md#sphx-glr-auto-examples-network-generator-plot-multi-component-system-py) (`plot_multi_component_system.py`)                    | 00:00.074 |          0 |
+| [Simple Crosslinked Network](auto_examples/network_generator/plot_simple_crosslinked_network.html.md#sphx-glr-auto-examples-network-generator-plot-simple-crosslinked-network-py) (`plot_simple_crosslinked_network.py`)        | 00:00.073 |          0 |
+| [Save Generated Network](auto_examples/network_generator/plot_save_network.html.md#sphx-glr-auto-examples-network-generator-plot-save-network-py) (`plot_save_network.py`)                                        | 00:00.052 |          0 |
 
 
 # auto_examples/normal_mode_analysis/index.html.md
@@ -13073,10 +13073,10 @@ data = load_or_compute_cache(cache_path, run_kpm_vs_exact_pdms_study)
 Demo PDMS box (L=12 nm, N_atoms=3819, N_ent=84):
 Method   | Time [s] |  Speedup | Mean Rel. Err. G' [%] | Max Rel. Err. G' [%]
 -----------------------------------------------------------------------------
-Exact    |    6.693 |     1.0x |                  0.00 |                 0.00
-KPM      |    0.101 |    66.1x |                  2.69 |                 9.99
-SLQ      |    0.037 |   179.3x |                  0.68 |                 4.79
-Hybrid   |    0.174 |    38.5x |                  0.64 |                 1.80
+Exact    |    7.148 |     1.0x |                  0.00 |                 0.00
+KPM      |    0.089 |    80.2x |                  2.69 |                 9.99
+SLQ      |    0.032 |   224.4x |                  0.68 |                 4.79
+Hybrid   |    0.092 |    77.6x |                  0.64 |                 1.80
 Loading cached example data from kpm_vs_exact_pdms_cache.npz...
 ```
 
@@ -13248,7 +13248,7 @@ print(format_benchmark_footnote(data))
 Measured on: Apple M3 Pro (12 cores), 36 GB RAM, Mac15,7, macOS 27.2.1 (arm64), Python 3.13.18 (cached 2026-11-17).
 ```
 
-**Total running time of the script:** (0 minutes 9.676 seconds)
+**Total running time of the script:** (0 minutes 9.343 seconds)
 
 <a id="sphx-glr-download-auto-examples-normal-mode-analysis-plot-kpm-vs-exact-pdms-py"></a>
 
@@ -13403,10 +13403,10 @@ print(summary_df.to_string(index=False))
 
 ```none
 Method Time [s] Speedup Mean Rel. Err. G' [%] Max Rel. Err. G' [%] Mean Rel. Err. G'' [%] Max Rel. Err. G'' [%]
- Exact   14.117    1.0x                  0.00                 0.00                   0.00                  0.00
-   KPM    0.063  222.9x                 20.36                87.70                   8.35                 54.80
-   SLQ    0.045  316.3x                  2.06                41.07                   1.03                  6.64
-Hybrid    0.350   40.3x                  0.44                 1.38                   0.49                  1.41
+ Exact   12.731    1.0x                  0.00                 0.00                   0.00                  0.00
+   KPM    0.051  248.3x                 20.36                87.70                   8.35                 54.80
+   SLQ    0.037  340.8x                  2.06                41.07                   1.03                  6.64
+Hybrid    0.153   83.0x                  0.44                 1.38                   0.49                  1.41
 ```
 
 <!-- GENERATED FROM PYTHON SOURCE LINES 124-131 -->
@@ -13445,7 +13445,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 15.146 seconds)
+**Total running time of the script:** (0 minutes 13.490 seconds)
 
 <a id="sphx-glr-download-auto-examples-normal-mode-analysis-plot-normal-mode-analysis-py"></a>
 
@@ -13464,7 +13464,7 @@ plt.show()
 
 # Computation times
 
-**00:24.823** total execution time for 2 files **from auto_examples/normal_mode_analysis**:
+**00:22.834** total execution time for 2 files **from auto_examples/normal_mode_analysis**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -13481,8 +13481,8 @@ $(document).ready( function () {
 
 | Example                                                                                                                                                                                                           | Time      |   Mem (MB) |
 |-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [Normal Mode Analysis (NMA)](auto_examples/normal_mode_analysis/plot_normal_mode_analysis.html.md#sphx-glr-auto-examples-normal-mode-analysis-plot-normal-mode-analysis-py) (`plot_normal_mode_analysis.py`)                               | 00:15.146 |          0 |
-| [KPM vs. Full Eigenvalue Normal Mode Analysis for PDMS Networks](auto_examples/normal_mode_analysis/plot_kpm_vs_exact_pdms.html.md#sphx-glr-auto-examples-normal-mode-analysis-plot-kpm-vs-exact-pdms-py) (`plot_kpm_vs_exact_pdms.py`) | 00:09.676 |          0 |
+| [Normal Mode Analysis (NMA)](auto_examples/normal_mode_analysis/plot_normal_mode_analysis.html.md#sphx-glr-auto-examples-normal-mode-analysis-plot-normal-mode-analysis-py) (`plot_normal_mode_analysis.py`)                               | 00:13.490 |          0 |
+| [KPM vs. Full Eigenvalue Normal Mode Analysis for PDMS Networks](auto_examples/normal_mode_analysis/plot_kpm_vs_exact_pdms.html.md#sphx-glr-auto-examples-normal-mode-analysis-plot-kpm-vs-exact-pdms-py) (`plot_kpm_vs_exact_pdms.py`) | 00:09.343 |          0 |
 
 
 # auto_examples/readers_writers/index.html.md
@@ -13667,7 +13667,7 @@ plt.show()
 To convert it back to the molecule index relating to their current connectivity,
 simply repeat the process with `config_molecule_idx_for_swap(False)`
 
-**Total running time of the script:** (0 minutes 0.149 seconds)
+**Total running time of the script:** (0 minutes 0.090 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-convert-for-bond-swapping-py"></a>
 
@@ -13772,7 +13772,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.226 seconds)
+**Total running time of the script:** (0 minutes 0.142 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-convert-trajectory-to-frame-py"></a>
 
@@ -13846,7 +13846,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.120 seconds)
+**Total running time of the script:** (0 minutes 0.067 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-correlated-averages-reader-py"></a>
 
@@ -13975,7 +13975,7 @@ If your data files don’t hint the atom style in the line that starts with “A
 you should specify it manually, see [`read()`](api/pylimer_tools_cpp.DataFileReader.html.md#pylimer_tools_cpp.DataFileReader.read)
 and [`set_data_file_atom_style()`](api/pylimer_tools_cpp.UniverseSequence.html.md#pylimer_tools_cpp.UniverseSequence.set_data_file_atom_style).
 
-**Total running time of the script:** (0 minutes 0.384 seconds)
+**Total running time of the script:** (0 minutes 0.249 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-data-file-reader-py"></a>
 
@@ -14134,7 +14134,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.157 seconds)
+**Total running time of the script:** (0 minutes 0.086 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-data-file-writer-py"></a>
 
@@ -14235,7 +14235,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.096 seconds)
+**Total running time of the script:** (0 minutes 0.051 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-dump-file-reader-py"></a>
 
@@ -14304,7 +14304,7 @@ plt.title(f"Density Distribution at Step {final_timestep}")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.071 seconds)
+**Total running time of the script:** (0 minutes 0.040 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-histogram-reader-py"></a>
 
@@ -14396,7 +14396,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.116 seconds)
+**Total running time of the script:** (0 minutes 0.061 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-log-thermo-file-reader-py"></a>
 
@@ -21925,8 +21925,8 @@ Processing frame 74310 with 32 atoms
 Processing frame 74320 with 32 atoms
 
 --- Memory Usage Report ---
-Memory before processing: 962.30 MB
-Memory after processing:  962.30 MB
+Memory before processing: 962.17 MB
+Memory after processing:  962.17 MB
 Memory used by script:    0.00 MB
 ```
 
@@ -21956,7 +21956,7 @@ print(f"Dump file size:           {dump_file_size / (1024 * 1024):.2f} MB")
 Dump file size:           83.32 MB
 ```
 
-**Total running time of the script:** (0 minutes 3.562 seconds)
+**Total running time of the script:** (0 minutes 1.971 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-memory-efficient-dump-file-reading-py"></a>
 
@@ -22040,7 +22040,7 @@ plt.ylabel("Time [s]")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.045 seconds)
+**Total running time of the script:** (0 minutes 0.026 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-performance-caching-py"></a>
 
@@ -22114,7 +22114,7 @@ plt.ylabel("Temperature")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.056 seconds)
+**Total running time of the script:** (0 minutes 0.031 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-pylimer-tools-output-reader-py"></a>
 
@@ -22211,7 +22211,7 @@ for timestep, group in sectioned_data.groupby("TimeStep"):
     print(f"Timestep {timestep}: {len(group)} data points")
 ```
 
-**Total running time of the script:** (0 minutes 0.116 seconds)
+**Total running time of the script:** (0 minutes 0.061 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-time-averaged-data-reader-py"></a>
 
@@ -22317,7 +22317,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.487 seconds)
+**Total running time of the script:** (0 minutes 0.237 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-unit-conversion-py"></a>
 
@@ -22336,7 +22336,7 @@ plt.show()
 
 # Computation times
 
-**00:05.583** total execution time for 13 files **from auto_examples/readers_writers**:
+**00:03.112** total execution time for 13 files **from auto_examples/readers_writers**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -22353,19 +22353,19 @@ $(document).ready( function () {
 
 | Example                                                                                                                                                                                                    | Time      |   Mem (MB) |
 |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [Streaming Dump File Reader](auto_examples/readers_writers/plot_memory_efficient_dump_file_reading.html.md#sphx-glr-auto-examples-readers-writers-plot-memory-efficient-dump-file-reading-py) (`plot_memory_efficient_dump_file_reading.py`) | 00:03.562 |          0 |
-| [Unit Conversion](auto_examples/readers_writers/plot_unit_conversion.html.md#sphx-glr-auto-examples-readers-writers-plot-unit-conversion-py) (`plot_unit_conversion.py`)                                                  | 00:00.487 |          0 |
-| [Data File Reader](auto_examples/readers_writers/plot_data_file_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-data-file-reader-py) (`plot_data_file_reader.py`)                                               | 00:00.384 |          0 |
-| [Extract Trajectory Frame](auto_examples/readers_writers/plot_convert_trajectory_to_frame.html.md#sphx-glr-auto-examples-readers-writers-plot-convert-trajectory-to-frame-py) (`plot_convert_trajectory_to_frame.py`)                 | 00:00.226 |          0 |
-| [Data File Writer](auto_examples/readers_writers/plot_data_file_writer.html.md#sphx-glr-auto-examples-readers-writers-plot-data-file-writer-py) (`plot_data_file_writer.py`)                                               | 00:00.157 |          0 |
-| [Convert for Bond Swapping](auto_examples/readers_writers/plot_convert_for_bond_swapping.html.md#sphx-glr-auto-examples-readers-writers-plot-convert-for-bond-swapping-py) (`plot_convert_for_bond_swapping.py`)                    | 00:00.149 |          0 |
-| [Correlated Averages Reader](auto_examples/readers_writers/plot_correlated_averages_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-correlated-averages-reader-py) (`plot_correlated_averages_reader.py`)                 | 00:00.120 |          0 |
-| [Time-Averaged Data Reader](auto_examples/readers_writers/plot_time_averaged_data_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-time-averaged-data-reader-py) (`plot_time_averaged_data_reader.py`)                    | 00:00.116 |          0 |
-| [Log & Thermo File Reader](auto_examples/readers_writers/plot_log_thermo_file_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-log-thermo-file-reader-py) (`plot_log_thermo_file_reader.py`)                           | 00:00.116 |          0 |
-| [Dump File Reader](auto_examples/readers_writers/plot_dump_file_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-dump-file-reader-py) (`plot_dump_file_reader.py`)                                               | 00:00.096 |          0 |
-| [Histogram Reader](auto_examples/readers_writers/plot_histogram_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-histogram-reader-py) (`plot_histogram_reader.py`)                                               | 00:00.071 |          0 |
-| [pylimer-tools Output Reader](auto_examples/readers_writers/plot_pylimer_tools_output_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-pylimer-tools-output-reader-py) (`plot_pylimer_tools_output_reader.py`)              | 00:00.056 |          0 |
-| [Performance and Caching](auto_examples/readers_writers/plot_performance_caching.html.md#sphx-glr-auto-examples-readers-writers-plot-performance-caching-py) (`plot_performance_caching.py`)                                  | 00:00.045 |          0 |
+| [Streaming Dump File Reader](auto_examples/readers_writers/plot_memory_efficient_dump_file_reading.html.md#sphx-glr-auto-examples-readers-writers-plot-memory-efficient-dump-file-reading-py) (`plot_memory_efficient_dump_file_reading.py`) | 00:01.971 |          0 |
+| [Data File Reader](auto_examples/readers_writers/plot_data_file_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-data-file-reader-py) (`plot_data_file_reader.py`)                                               | 00:00.249 |          0 |
+| [Unit Conversion](auto_examples/readers_writers/plot_unit_conversion.html.md#sphx-glr-auto-examples-readers-writers-plot-unit-conversion-py) (`plot_unit_conversion.py`)                                                  | 00:00.237 |          0 |
+| [Extract Trajectory Frame](auto_examples/readers_writers/plot_convert_trajectory_to_frame.html.md#sphx-glr-auto-examples-readers-writers-plot-convert-trajectory-to-frame-py) (`plot_convert_trajectory_to_frame.py`)                 | 00:00.142 |          0 |
+| [Convert for Bond Swapping](auto_examples/readers_writers/plot_convert_for_bond_swapping.html.md#sphx-glr-auto-examples-readers-writers-plot-convert-for-bond-swapping-py) (`plot_convert_for_bond_swapping.py`)                    | 00:00.090 |          0 |
+| [Data File Writer](auto_examples/readers_writers/plot_data_file_writer.html.md#sphx-glr-auto-examples-readers-writers-plot-data-file-writer-py) (`plot_data_file_writer.py`)                                               | 00:00.086 |          0 |
+| [Correlated Averages Reader](auto_examples/readers_writers/plot_correlated_averages_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-correlated-averages-reader-py) (`plot_correlated_averages_reader.py`)                 | 00:00.067 |          0 |
+| [Log & Thermo File Reader](auto_examples/readers_writers/plot_log_thermo_file_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-log-thermo-file-reader-py) (`plot_log_thermo_file_reader.py`)                           | 00:00.061 |          0 |
+| [Time-Averaged Data Reader](auto_examples/readers_writers/plot_time_averaged_data_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-time-averaged-data-reader-py) (`plot_time_averaged_data_reader.py`)                    | 00:00.060 |          0 |
+| [Dump File Reader](auto_examples/readers_writers/plot_dump_file_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-dump-file-reader-py) (`plot_dump_file_reader.py`)                                               | 00:00.051 |          0 |
+| [Histogram Reader](auto_examples/readers_writers/plot_histogram_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-histogram-reader-py) (`plot_histogram_reader.py`)                                               | 00:00.040 |          0 |
+| [pylimer-tools Output Reader](auto_examples/readers_writers/plot_pylimer_tools_output_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-pylimer-tools-output-reader-py) (`plot_pylimer_tools_output_reader.py`)              | 00:00.031 |          0 |
+| [Performance and Caching](auto_examples/readers_writers/plot_performance_caching.html.md#sphx-glr-auto-examples-readers-writers-plot-performance-caching-py) (`plot_performance_caching.py`)                                  | 00:00.026 |          0 |
 
 
 # auto_examples/sg_execution_times.html.md
@@ -22543,7 +22543,7 @@ plt.ylabel("Count")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.065 seconds)
+**Total running time of the script:** (0 minutes 0.038 seconds)
 
 <a id="sphx-glr-download-auto-examples-structure-analysis-plot-decompose-structure-py"></a>
 
@@ -22639,7 +22639,7 @@ plt.ylabel("Frequency")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.123 seconds)
+**Total running time of the script:** (0 minutes 0.064 seconds)
 
 <a id="sphx-glr-download-auto-examples-structure-analysis-plot-end-to-end-distribution-py"></a>
 
@@ -22731,7 +22731,7 @@ shortest_loop = universe.find_minimal_order_loop_from(loop_start=1, loop_step1=1
 print(f"Shortest loop involving atom 1: {shortest_loop}")
 ```
 
-**Total running time of the script:** (0 minutes 0.115 seconds)
+**Total running time of the script:** (0 minutes 0.067 seconds)
 
 <a id="sphx-glr-download-auto-examples-structure-analysis-plot-loop-analysis-py"></a>
 
@@ -22841,7 +22841,7 @@ plt.ylabel("Count")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.069 seconds)
+**Total running time of the script:** (0 minutes 0.041 seconds)
 
 <a id="sphx-glr-download-auto-examples-structure-analysis-plot-structure-analysis-py"></a>
 
@@ -22860,7 +22860,7 @@ plt.show()
 
 # Computation times
 
-**00:00.372** total execution time for 4 files **from auto_examples/structure_analysis**:
+**00:00.210** total execution time for 4 files **from auto_examples/structure_analysis**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -22877,10 +22877,10 @@ $(document).ready( function () {
 
 | Example                                                                                                                                                                              | Time      |   Mem (MB) |
 |--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [End-to-End Distribution](auto_examples/structure_analysis/plot_end_to_end_distribution.html.md#sphx-glr-auto-examples-structure-analysis-plot-end-to-end-distribution-py) (`plot_end_to_end_distribution.py`) | 00:00.123 |          0 |
-| [Loop Finding and Analysis](auto_examples/structure_analysis/plot_loop_analysis.html.md#sphx-glr-auto-examples-structure-analysis-plot-loop-analysis-py) (`plot_loop_analysis.py`)                   | 00:00.115 |          0 |
-| [Extract Synthesis Parameters](auto_examples/structure_analysis/plot_structure_analysis.html.md#sphx-glr-auto-examples-structure-analysis-plot-structure-analysis-py) (`plot_structure_analysis.py`)      | 00:00.069 |          0 |
-| [Decompose/Split Structure](auto_examples/structure_analysis/plot_decompose_structure.html.md#sphx-glr-auto-examples-structure-analysis-plot-decompose-structure-py) (`plot_decompose_structure.py`)       | 00:00.065 |          0 |
+| [Loop Finding and Analysis](auto_examples/structure_analysis/plot_loop_analysis.html.md#sphx-glr-auto-examples-structure-analysis-plot-loop-analysis-py) (`plot_loop_analysis.py`)                   | 00:00.067 |          0 |
+| [End-to-End Distribution](auto_examples/structure_analysis/plot_end_to_end_distribution.html.md#sphx-glr-auto-examples-structure-analysis-plot-end-to-end-distribution-py) (`plot_end_to_end_distribution.py`) | 00:00.064 |          0 |
+| [Extract Synthesis Parameters](auto_examples/structure_analysis/plot_structure_analysis.html.md#sphx-glr-auto-examples-structure-analysis-plot-structure-analysis-py) (`plot_structure_analysis.py`)      | 00:00.041 |          0 |
+| [Decompose/Split Structure](auto_examples/structure_analysis/plot_decompose_structure.html.md#sphx-glr-auto-examples-structure-analysis-plot-decompose-structure-py) (`plot_decompose_structure.py`)       | 00:00.038 |          0 |
 
 
 # auto_examples/trajectory_analysis/index.html.md
@@ -23060,7 +23060,7 @@ msd_result = tidynamics.msd(
  )
 ```
 
-**Total running time of the script:** (4 minutes 23.384 seconds)
+**Total running time of the script:** (2 minutes 39.286 seconds)
 
 <a id="sphx-glr-download-auto-examples-trajectory-analysis-plot-trajectory-analysis-py"></a>
 
@@ -23079,7 +23079,7 @@ msd_result = tidynamics.msd(
 
 # Computation times
 
-**04:23.384** total execution time for 1 file **from auto_examples/trajectory_analysis**:
+**02:39.286** total execution time for 1 file **from auto_examples/trajectory_analysis**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -23096,7 +23096,7 @@ $(document).ready( function () {
 
 | Example                                                                                                                                                                   | Time      |   Mem (MB) |
 |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [Trajectory Analysis](auto_examples/trajectory_analysis/plot_trajectory_analysis.html.md#sphx-glr-auto-examples-trajectory-analysis-plot-trajectory-analysis-py) (`plot_trajectory_analysis.py`) | 04:23.384 |          0 |
+| [Trajectory Analysis](auto_examples/trajectory_analysis/plot_trajectory_analysis.html.md#sphx-glr-auto-examples-trajectory-analysis-plot-trajectory-analysis-py) (`plot_trajectory_analysis.py`) | 02:39.286 |          0 |
 
 
 # cli.html.md
@@ -23134,7 +23134,7 @@ pylimer-generate-network [OPTIONS]
 Name of the polymer to generate the network for
 
 * **Options:**
-  cispbd | aps | pib | pet | pib413 | ips | apma | app413 | pi7 | pbd20 | pi20 | app | pom | apva | pi34 | cispi | pi75 | pc | pi50 | sbr | spp | p6n | apoa | app348 | pdms | peo | pe413 | pe | apea | apmma | ipp | apams | pbd98 | ptfe | aphma | app463
+  pbd98 | sbr | p6n | pi50 | pi7 | cispbd | pi75 | pib413 | app | app413 | ipp | cispi | app348 | ptfe | peo | ips | apea | pc | app463 | pe | apva | pbd20 | apmma | apoa | pe413 | aphma | pet | aps | pib | pi20 | apams | spp | pi34 | apma | pom | pdms
 
 ### --parameter-type <parameter_type>
 
@@ -23245,7 +23245,7 @@ pylimer-analyse-networks [OPTIONS] [FILES]...
 Name of the polymer to use for parameter retrieval.
 
 * **Options:**
-  cispbd | aps | pib | pet | pib413 | ips | apma | app413 | pi7 | pbd20 | pi20 | app | pom | apva | pi34 | cispi | pi75 | pc | pi50 | sbr | spp | p6n | apoa | app348 | pdms | peo | pe413 | pe | apea | apmma | ipp | apams | pbd98 | ptfe | aphma | app463
+  pbd98 | sbr | p6n | pi50 | pi7 | cispbd | pi75 | pib413 | app | app413 | ipp | cispi | app348 | ptfe | peo | ips | apea | pc | app463 | pe | apva | pbd20 | apmma | apoa | pe413 | aphma | pet | aps | pib | pi20 | apams | spp | pi34 | apma | pom | pdms
 
 ### Arguments
 

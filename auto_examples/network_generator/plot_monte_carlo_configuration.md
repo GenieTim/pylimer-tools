@@ -113,11 +113,11 @@ plt.show()
 ```
 
 ```none
-Time without max distance:  29.14 seconds
-Time with z-score max distance: 8.58 seconds
+Time without max distance:  20.15 seconds
+Time with z-score max distance: 5.44 seconds
 ```
 
-**Total running time of the script:** (0 minutes 37.968 seconds)
+**Total running time of the script:** (0 minutes 25.720 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-monte-carlo-configuration-py"></a>
 

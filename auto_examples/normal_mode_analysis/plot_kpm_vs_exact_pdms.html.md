@@ -174,10 +174,10 @@ data = load_or_compute_cache(cache_path, run_kpm_vs_exact_pdms_study)
 Demo PDMS box (L=12 nm, N_atoms=3819, N_ent=84):
 Method   | Time [s] |  Speedup | Mean Rel. Err. G' [%] | Max Rel. Err. G' [%]
 -----------------------------------------------------------------------------
-Exact    |    6.693 |     1.0x |                  0.00 |                 0.00
-KPM      |    0.101 |    66.1x |                  2.69 |                 9.99
-SLQ      |    0.037 |   179.3x |                  0.68 |                 4.79
-Hybrid   |    0.174 |    38.5x |                  0.64 |                 1.80
+Exact    |    7.148 |     1.0x |                  0.00 |                 0.00
+KPM      |    0.089 |    80.2x |                  2.69 |                 9.99
+SLQ      |    0.032 |   224.4x |                  0.68 |                 4.79
+Hybrid   |    0.092 |    77.6x |                  0.64 |                 1.80
 Loading cached example data from kpm_vs_exact_pdms_cache.npz...
 ```
 
@@ -349,7 +349,7 @@ print(format_benchmark_footnote(data))
 Measured on: Apple M3 Pro (12 cores), 36 GB RAM, Mac15,7, macOS 27.2.1 (arm64), Python 3.13.18 (cached 2026-11-17).
 ```
 
-**Total running time of the script:** (0 minutes 9.676 seconds)
+**Total running time of the script:** (0 minutes 9.343 seconds)
 
 <a id="sphx-glr-download-auto-examples-normal-mode-analysis-plot-kpm-vs-exact-pdms-py"></a>
 

@@ -268,7 +268,7 @@ both contour positions :math:`\alpha` (uniform) and spatial pair separations :ma
 .. GENERATED FROM PYTHON SOURCE LINES 141-152
 
 Defective Networks Across Conversion (:math:`p \in [0.75, 1.00]`)
-----------------------------------------------------------------
+------------------------------------------------------------------
 Below full conversion, dangling chains and sol fractions must be handled consistently:
 
 - ``EntanglementFilteringMode.OMIT_INACTIVE`` discards candidate pairs on dangling/soluble
@@ -327,7 +327,7 @@ Benchmark Hardware
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.744 seconds)
+   **Total running time of the script:** (0 minutes 0.952 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_entanglement_sampling_comparison.py:

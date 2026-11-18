@@ -61,13 +61,13 @@ Both methods support [`EntanglementFilteringMode`](../api/pylimer_tools_cpp.Enta
 
 See:
 
-- plot_entanglement_sampling_comparison for a detailed benchmark and comparison of discrete vs. on-demand sampling methods,
-- plot_entanglement_link_vs_spring for the difference between modeling entanglements as rigid merged links versus compliant Hookean springs in Force Balance 2,
-- plot_slipping_vs_fixed_links for a comparison of dynamic contour slipping versus fixed entanglement links in Force Balance 1, and
-- plot_inactive_removal_and_sampling for the removal of inactive strands/entanglements in Force Balance 2 and the impact of pre-filtering dangling chains during entanglement sampling,
-- plot_polydispersity_study for the effect of precursor strand length polydispersity on equilibrium shear modulus and defect fractions,
-- plot_sampling_cutoff_effect for the effect of the slip-link sampling cut-off distance on the equilibrium shear modulus in Force Balance 2, investigating pre-strain distortions, link vs. spring representations, and interactions with strand length $N$, conversion $p$, and stoichiometric imbalance $r$, and
-- plot_representative_volume_pdms for a representative volume element (RVE) study of realistic PDMS networks across chain length $N$, conversion $p$, stoichiometric imbalance $r$, and ensemble sample count.
+- [Entanglement Sampling Methods](force_balance/plot_entanglement_sampling_comparison.html.md) for a detailed benchmark and comparison of discrete vs. on-demand sampling methods,
+- [Entanglement Links vs. Springs](force_balance/plot_entanglement_link_vs_spring.html.md) for the difference between modeling entanglements as rigid merged links versus compliant Hookean springs in Force Balance 2,
+- [Slipping vs. Fixed Entanglement Links](force_balance/plot_slipping_vs_fixed_links.html.md) for a comparison of dynamic contour slipping versus fixed entanglement links in Force Balance 1, and
+- [Inactive Removal & Sampling](force_balance/plot_inactive_removal_and_sampling.html.md) for the removal of inactive strands/entanglements in Force Balance 2 and the impact of pre-filtering dangling chains during entanglement sampling,
+- [Polydispersity Study](force_balance/plot_polydispersity_study.html.md) for the effect of precursor strand length polydispersity on equilibrium shear modulus and defect fractions,
+- [Sampling Cut-Off Effect](force_balance/plot_sampling_cutoff_effect.html.md) for the effect of the slip-link sampling cut-off distance on the equilibrium shear modulus in Force Balance 2, investigating pre-strain distortions, link vs. spring representations, and interactions with strand length $N$, conversion $p$, and stoichiometric imbalance $r$, and
+- [Representative Volume Study for PDMS Networks](force_balance/plot_representative_volume_pdms.html.md) for a representative volume element (RVE) study of realistic PDMS networks across chain length $N$, conversion $p$, stoichiometric imbalance $r$, and ensemble sample count.
 
 <div id='sg-tag-list' class='sphx-glr-tag-list'></div><div class="sphx-glr-thumbnails">
 <!-- thumbnail-parent-div-open --><div class="sphx-glr-thumbcontainer" tooltip="In MEHPForceBalance2 (gusev_numerical_2019, bernhard_phantom_2025), users can choose between two representations for sampled entanglements via entanglements_as_springs:">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_entanglement_link_vs_spring_thumb.png)
@@ -136,7 +136,7 @@ or for doing fast predictions of the viscoelasticity using the [`NormalModeAnaly
 [`MEHPForceBalance`](../api/pylimer_tools_cpp.MEHPForceBalance.html.md#pylimer_tools_cpp.MEHPForceBalance) and its variants.
 
 For more options, examples and advanced usage, see the [test suite](https://github.com/GenieTim/pylimer-tools/tree/main/tests)
-and the modules API reference, particularly of the [`MCUniverseGenerator`](../api/pylimer_tools_cpp.MCUniverseGenerator.html.md#pylimer_tools_cpp.MCUniverseGenerator) class.
+and the [src](../modules.html.md) API reference, particularly of the [`MCUniverseGenerator`](../api/pylimer_tools_cpp.MCUniverseGenerator.html.md#pylimer_tools_cpp.MCUniverseGenerator) class.
 
 The network generation system allows you to:
 
@@ -205,7 +205,7 @@ as published in Gusev and Bernhard [[GB24](../acknowledgements.html.md#id7)].
 This is useful for understanding the viscoelastic properties of the network.
 The corresponding class is [`NormalModeAnalyzer`](../api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer).
 
-See plot_kpm_vs_exact_pdms for a large-scale comparison of the Kernel Polynomial Method (KPM)
+See [KPM vs. Full Eigenvalue Normal Mode Analysis for PDMS Networks](normal_mode_analysis/plot_kpm_vs_exact_pdms.html.md) for a large-scale comparison of the Kernel Polynomial Method (KPM)
 against full eigenvalue decomposition on realistic PDMS networks generated via Monte Carlo with
 on-demand entanglement sampling.
 

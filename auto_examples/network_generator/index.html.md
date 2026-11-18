@@ -8,7 +8,7 @@ or for doing fast predictions of the viscoelasticity using the [`NormalModeAnaly
 [`MEHPForceBalance`](../../api/pylimer_tools_cpp.MEHPForceBalance.html.md#pylimer_tools_cpp.MEHPForceBalance) and its variants.
 
 For more options, examples and advanced usage, see the [test suite](https://github.com/GenieTim/pylimer-tools/tree/main/tests)
-and the modules API reference, particularly of the [`MCUniverseGenerator`](../../api/pylimer_tools_cpp.MCUniverseGenerator.html.md#pylimer_tools_cpp.MCUniverseGenerator) class.
+and the [src](../../modules.html.md) API reference, particularly of the [`MCUniverseGenerator`](../../api/pylimer_tools_cpp.MCUniverseGenerator.html.md#pylimer_tools_cpp.MCUniverseGenerator) class.
 
 The network generation system allows you to:
 
