@@ -604,3 +604,20 @@ TEST_CASE("Entanglement Detector respects distance cut-off",
     }
   }
 }
+
+TEST_CASE("randomlyFindEntanglementsV2 works in fast test",
+          "[EntanglementDetector][topo]")
+{
+  const std::string inputFile = std::string(PYLIMER_TEST_FIXTURES_DIR) +
+                                "/structure/melt_83_a_100.structure.out";
+  REQUIRE(std::filesystem::exists(inputFile));
+  pe::UniverseSequence universeSequence;
+  universeSequence.initializeFromDataSequence({ { inputFile } });
+  const pe::Universe universe = universeSequence.atIndex(0);
+
+  for (const bool filter : { false, true }) {
+    const pt::AtomPairEntanglements ents = pt::randomlyFindEntanglementsV2(
+      universe, 10, 3.0, 0.0, 0, 2.0, "v2_seed", 2, true, filter);
+    CHECK(ents.pairsOfAtoms.size() <= 10);
+  }
+}

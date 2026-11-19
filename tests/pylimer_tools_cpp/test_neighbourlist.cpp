@@ -234,3 +234,25 @@ TEST_CASE("EigenNeighbourList can be serialized and deserialized",
   CHECK(neighbourList != deserializedNeighbourList);
 }
 #endif
+
+TEST_CASE("EigenNeighbourList diagnostic validateWhyNotIncluded works",
+          "[EigenNeighbourList][entity]")
+{
+  pe::Box box = pe::Box(0.0, 10.0, 0.0, 10.0, 0.0, 10.0);
+  Eigen::VectorXd coordinates = Eigen::VectorXd::Zero(6);
+  coordinates << 1.0, 1.0, 1.0, 8.0, 8.0, 8.0;
+  pe::EigenNeighbourList neighbourList =
+    pe::EigenNeighbourList(coordinates, box, 2.0);
+
+  // Default cutoff, target outside and inside
+  CHECK_NOTHROW(neighbourList.validateWhyNotIncluded(
+    Eigen::Vector3d(1.0, 1.0, 1.0), Eigen::Vector3d(8.0, 8.0, 8.0), -1.0));
+  CHECK_NOTHROW(neighbourList.validateWhyNotIncluded(
+    Eigen::Vector3d(1.0, 1.0, 1.0), Eigen::Vector3d(1.5, 1.5, 1.5), 2.0));
+
+  // Custom cutoff, target outside and inside
+  CHECK_NOTHROW(neighbourList.validateWhyNotIncluded(
+    Eigen::Vector3d(1.0, 1.0, 1.0), Eigen::Vector3d(8.0, 8.0, 8.0), 1.0));
+  CHECK_NOTHROW(neighbourList.validateWhyNotIncluded(
+    Eigen::Vector3d(1.0, 1.0, 1.0), Eigen::Vector3d(2.0, 2.0, 2.0), 1.5));
+}

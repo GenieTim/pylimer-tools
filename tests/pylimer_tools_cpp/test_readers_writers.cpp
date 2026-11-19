@@ -522,4 +522,22 @@ TEST_CASE("AveFileReader works", "[AveFileReader][io][utils]")
       reader.autocorrelateColumnDifference(1, 2, { 1, 2 });
     CHECK(results.size() == 2);
   }
+
+  SECTION("Fresh AveFileReader autocorrelates without prior getData and "
+          "handles errors")
+  {
+    pu::AveFileReader freshReader =
+      pu::AveFileReader(suspectedPath + "/example_avg_file.out.avg.txt");
+    std::vector<double> r1 = freshReader.autocorrelateColumn(2, { 1 });
+    CHECK(r1.size() == 1);
+
+    pu::AveFileReader freshReader2 =
+      pu::AveFileReader(suspectedPath + "/example_avg_file.out.avg.txt");
+    std::vector<double> r2 =
+      freshReader2.autocorrelateColumnDifference(1, 2, { 1 });
+    CHECK(r2.size() == 1);
+
+    pu::AveFileReader missingReader("/nonexistent/path/to/avg_file.txt");
+    CHECK_THROWS(missingReader.getData());
+  }
 }

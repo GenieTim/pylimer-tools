@@ -2418,3 +2418,18 @@ TEST_CASE("On-demand entanglement sampling is spatially uniform across cells",
   const double sumGammaDisc = fbDisc.getGammaFactors(b * b).sum();
   CHECK_THAT(sumGammaOd, Catch::Matchers::WithinRel(sumGammaDisc, 0.1));
 }
+
+TEST_CASE("MCSimulator equilibrateChainWithMC works with fixFirst=false",
+          "[generator][MCSimulator]")
+{
+  Eigen::VectorXd coords = Eigen::VectorXd::Zero(3 * 5);
+  for (Eigen::Index i = 0; i < 5; ++i) {
+    coords[3 * i] = static_cast<double>(i);
+  }
+  const Eigen::VectorXd origCoords = coords;
+  std::mt19937 rng(42);
+  pylimer_tools::sim::equilibrateChainWithMC(
+    coords, 1.0, rng, false, false, 10);
+  CHECK(coords.size() == 15);
+  CHECK_FALSE(coords.isApprox(origCoords));
+}

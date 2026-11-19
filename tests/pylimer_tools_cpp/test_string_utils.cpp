@@ -63,4 +63,11 @@ TEST_CASE("String utility functions work", "[utils][StringUtil]")
   REQUIRE(pu::trimLineOmitComment("  test  ") == "test  ");
   REQUIRE(pu::trimLineOmitComment(testCommentString) == "");
   REQUIRE(pu::trimLineOmitComment(testCommentString.c_str()) == "");
+  const std::string vecStr = std::to_string(Eigen::Vector3d(1.0, 2.0, 3.0));
+  CHECK(vecStr.find("1.0") != std::string::npos);
+  CHECK(vecStr.find("2.0") != std::string::npos);
+  CHECK(vecStr.find("3.0") != std::string::npos);
+  const auto dur = std::chrono::hours(1) + std::chrono::minutes(2) +
+                   std::chrono::seconds(3) + std::chrono::milliseconds(45);
+  CHECK(std::duration_to_string(dur) == "1:02:03.045");
 }

@@ -63,6 +63,13 @@ add_compile_definitions(PYLIMER_TEST_FIXTURES_DIR="${CMAKE_CURRENT_LIST_DIR}/pyl
 # 	message(WARNING "DID NOT FIND igraph")
 # endif()
 
+if (CODE_COVERAGE)
+    set(ENABLE_COVERAGE ON)
+    set(CODE_COVERAGE_VERBOSE ON)
+    include(CodeCoverage)
+    append_coverage_compiler_flags()
+endif ()
+
 # add sources & targets
 if (NOT TARGET pylimer_tools)
     add_subdirectory(../src/pylimer_tools_cpp pylimer_tools.out)
@@ -157,10 +164,6 @@ catch_discover_tests(pylimer_tests
 
 # code coverage setup in the end
 if (CODE_COVERAGE)
-    set(ENABLE_COVERAGE ON)
-    set(CODE_COVERAGE_VERBOSE ON)
-    include(CodeCoverage)
-    append_coverage_compiler_flags()
     # NOTE: we ignore the return type of the test executable here.
     # this is required for lcov to finish running.
     # Whether the tests passed or not is determined by peeking into the output log file.

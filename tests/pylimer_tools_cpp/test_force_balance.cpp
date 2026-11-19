@@ -1256,7 +1256,8 @@ TEST_CASE(
     pcm::MEHPForceBalance forceBalancer =
       pcm::MEHPForceBalance(universe, 2, false, false, false);
     forceBalancer.configAssumeBoxLargeEnough(false);
-    size_t nrOfAddedLinks = forceBalancer.randomlyAddSliplinks(350, 2.0, 40);
+    size_t nrOfAddedLinks =
+      forceBalancer.randomlyAddSliplinks(350, 2.0, 40, 2.0, false, 42);
     CHECK(nrOfAddedLinks >= 40);
     // std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
 
@@ -1284,7 +1285,8 @@ TEST_CASE(
 
     ////////////////////////////////////////////////////////////////
     forceBalancer = pcm::MEHPForceBalance(universe, 2, true, 1.0, true);
-    nrOfAddedLinks = forceBalancer.randomlyAddSliplinks(350, 2.0, 40);
+    nrOfAddedLinks =
+      forceBalancer.randomlyAddSliplinks(350, 2.0, 40, 2.0, false, 42);
     CHECK(nrOfAddedLinks >= 40);
     // std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
     // check that all f = 2 have already been removed

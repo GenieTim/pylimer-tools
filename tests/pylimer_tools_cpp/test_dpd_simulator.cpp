@@ -991,3 +991,141 @@ TEST_CASE("OutputSupportingSimulation handles multiple autocorrelation configs "
     (std::abs(rows1[1].second - rows2[1].second) > 1e-12);
   CHECK(distinctValues);
 }
+
+TEST_CASE(
+  "DPD Simulator features, outputs, slipsprings, and serialization work",
+  "[analysis][DPDSimulator][serialization]")
+{
+  // Build a small 2-chain + 1-crosslinker system in a 5x5x5 box
+  pe::Universe u(5.0, 5.0, 5.0);
+  u.addAtoms(
+    { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 },
+    { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2 },
+    { 0.5, 1.2, 1.9, 2.6, 3.3, 4.0, 0.5, 1.2, 1.9, 2.6, 3.3, 4.0, 4.2 },
+    { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 1.1 },
+    { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+  u.addBonds({ 1, 2, 3, 4, 5, 7, 8, 9, 10, 11 },
+             { 2, 3, 4, 5, 6, 8, 9, 10, 11, 12 });
+  u.resampleVelocities(0.0, 1.0, "fast_dpd_seed", false);
+
+  pcd::DPDSimulator sim(u, 2, 9, false, "fast_dpd_sim");
+  CHECK(sim.getSlipSpringBondType() == 9);
+  CHECK(sim.getNumStepsMC() >= 0);
+  CHECK(sim.getNumStepsDPD() >= 0);
+
+  sim.configNumStepsMC(2);
+  CHECK(sim.getNumStepsMC() == 2);
+  sim.configNumStepsDPD(2);
+  CHECK(sim.getNumStepsDPD() == 2);
+  sim.configShiftPossibilityEmpty(true);
+  CHECK(sim.getShiftPossibilityEmpty());
+  sim.configShiftOneAtATime(true);
+  CHECK(sim.getShiftOneAtATime());
+
+  CHECK_THROWS(sim.configSlipspringHighCutoff(-1.0));
+  CHECK_NOTHROW(sim.configSlipspringHighCutoff(2.0));
+  CHECK_THROWS(sim.configSlipspringLowCutoff(3.0));
+  CHECK_NOTHROW(sim.configSlipspringLowCutoff(0.3));
+  CHECK_NOTHROW(sim.configAssumeBoxLargeEnough());
+
+  CHECK(sim.getVolume() == Catch::Approx(125.0));
+  CHECK(sim.getTemperature() > 0.0);
+  CHECK_FALSE(sim.getVelocities().isZero());
+  CHECK(sim.getBondLengths().size() == 10);
+  CHECK(sim.computeBondLength(0) > 0.0);
+  CHECK(sim.getStressTensor().rows() == 3);
+  CHECK_NOTHROW(sim.validateState());
+  CHECK_NOTHROW(sim.validateDebugState());
+  CHECK_NOTHROW(sim.validateNeighbourlist(1.0));
+
+  // Slip-springs & MSD
+  CHECK_NOTHROW(sim.createSlipSprings(4, 9));
+  CHECK_NOTHROW(sim.startMeasuringMSDForAtoms({ 1, 2, 3, 4 }));
+
+  // Configure step, average, and restart outputs
+  const std::filesystem::path tmpDir = std::filesystem::temp_directory_path();
+  const std::string stepFile = (tmpDir / "pylimer_fast_dpd_step.txt").string();
+  const std::string avgFile = (tmpDir / "pylimer_fast_dpd_avg.txt").string();
+  const std::string restartFile =
+    (tmpDir / "pylimer_fast_dpd_restart.bin").string();
+  std::remove(stepFile.c_str());
+  std::remove(avgFile.c_str());
+  std::remove(restartFile.c_str());
+
+  struct Cleanup
+  {
+    std::vector<std::string> paths;
+    ~Cleanup()
+    {
+      for (const std::string& p : paths) {
+        std::remove(p.c_str());
+      }
+    }
+  } cleanup{ { stepFile, avgFile, restartFile } };
+
+  ps::OutputConfiguration stepCfg;
+  stepCfg.filename = stepFile;
+  stepCfg.outputEvery = 2;
+  stepCfg.intValues = {
+    ps::ComputedIntValues::STEP,
+    ps::ComputedIntValues::NUM_SHIFT,
+    ps::ComputedIntValues::NUM_RELOC,
+    ps::ComputedIntValues::NUM_ATOMS,
+    ps::ComputedIntValues::NUM_EXTRA_ATOMS,
+    ps::ComputedIntValues::NUM_BONDS,
+    ps::ComputedIntValues::NUM_EXTRA_BONDS,
+    ps::ComputedIntValues::NUM_BONDS_TO_FORM,
+  };
+  stepCfg.doubleValues = {
+    ps::ComputedDoubleValues::TIME,        ps::ComputedDoubleValues::VOLUME,
+    ps::ComputedDoubleValues::TEMPERATURE, ps::ComputedDoubleValues::PRESSURE,
+    ps::ComputedDoubleValues::STRESS_XX,   ps::ComputedDoubleValues::GAMMA,
+    ps::ComputedDoubleValues::RESIDUAL,    ps::ComputedDoubleValues::MEAN_B,
+    ps::ComputedDoubleValues::MAX_B,       ps::ComputedDoubleValues::MSD,
+  };
+  std::vector<ps::OutputConfiguration> stepCfgs = { stepCfg };
+  REQUIRE_NOTHROW(sim.configStepOutput(stepCfgs));
+
+  ps::OutputConfiguration avgCfg;
+  avgCfg.filename = avgFile;
+  avgCfg.useEvery = 2;
+  avgCfg.outputEvery = 4;
+  avgCfg.intValues = { ps::ComputedIntValues::STEP };
+  avgCfg.doubleValues = { ps::ComputedDoubleValues::TEMPERATURE,
+                          ps::ComputedDoubleValues::MSD };
+  REQUIRE_NOTHROW(sim.configAverageOutput({ avgCfg }));
+
+#ifdef CEREALIZABLE
+  sim.configRestartOutput(restartFile, 4);
+#endif
+
+  // Run 4 steps with MC enabled (exercises DPD integration, slipspring
+  // relocation/shifting, step/average/restart output)
+  REQUIRE_NOTHROW(sim.runSimulation(4, true));
+  CHECK(std::filesystem::exists(stepFile));
+  CHECK(std::filesystem::exists(avgFile));
+
+  // Box deformation (immediate & gradual)
+  CHECK_NOTHROW(sim.deformBoxImmediately(pe::Box(5.5, 5.5, 5.5)));
+  CHECK(sim.getVolume() == Catch::Approx(5.5 * 5.5 * 5.5));
+  sim.configBoxDeformation(pe::Box(6.0, 6.0, 6.0));
+  CHECK_NOTHROW(sim.runSimulation(2, false));
+
+  // Bond formation
+  std::unordered_map<int, int> maxBondsPerType = { { 1, 2 }, { 2, 4 } };
+  CHECK_NOTHROW(sim.configBondFormation(1, maxBondsPerType, 1.5, 1, 2, 1));
+  CHECK(sim.getNrOfBondsToForm() == 1);
+  CHECK_NOTHROW(sim.attemptBondFormation());
+
+  // Reseed & serialization
+  CHECK_NOTHROW(sim.reseedRandomness("another_seed"));
+#ifdef CEREALIZABLE
+  REQUIRE(std::filesystem::exists(restartFile));
+  pcd::DPDSimulator sim2 = pcd::DPDSimulator::readRestartFile(restartFile);
+  CHECK(sim2.getCoordinates().isApprox(sim2.getCoordinates()));
+  CHECK(sim2.getVolume() > 0.0);
+#endif
+}
