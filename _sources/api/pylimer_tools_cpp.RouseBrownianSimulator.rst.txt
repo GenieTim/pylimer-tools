@@ -13,9 +13,12 @@ RouseBrownianSimulator
       ~RouseBrownianSimulator.compute_center_of_mass_msd
       ~RouseBrownianSimulator.compute_end_to_end_autocorrelation
       ~RouseBrownianSimulator.compute_msd
+      ~RouseBrownianSimulator.create_complete
       ~RouseBrownianSimulator.create_linear_chain
       ~RouseBrownianSimulator.create_ring
       ~RouseBrownianSimulator.create_star
+      ~RouseBrownianSimulator.from_matrix
+      ~RouseBrownianSimulator.from_universe
       ~RouseBrownianSimulator.get_center_of_mass
       ~RouseBrownianSimulator.get_diffusion_coefficient
       ~RouseBrownianSimulator.get_dt
@@ -56,9 +59,12 @@ RouseBrownianSimulator
    .. automethod:: compute_center_of_mass_msd
    .. automethod:: compute_end_to_end_autocorrelation
    .. automethod:: compute_msd
+   .. automethod:: create_complete
    .. automethod:: create_linear_chain
    .. automethod:: create_ring
    .. automethod:: create_star
+   .. automethod:: from_matrix
+   .. automethod:: from_universe
    .. automethod:: get_center_of_mass
    .. automethod:: get_diffusion_coefficient
    .. automethod:: get_dt

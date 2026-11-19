@@ -1,0 +1,17 @@
+# pylimer-tools
+
+> pylimer-tools is a Python and C++ toolkit for simulating, analyzing, and handling bead-spring polymer networks and LAMMPS molecular dynamics output (Monte Carlo network generation, DPD simulations with slip-springs, implicit Rouse and Brownian dynamics, Maximum Entropy Homogenization / Force Balance, normal mode analysis, and topological resistance distance & network structure analysis).
+
+
+2021-2026, Tim Bernhard
+
+## Pages in this subsection
+
+- [Rouse &amp; Brownian Dynamics Simulations](index.html.md): pylimer-tools provides an implicit time-stepping Rouse and Brownian dynamics
+- [NOTE](plot_rouse_topologies_and_resistance.html.md): Go to the end
+- [NOTE](plot_rouse_brownian_simulation.html.md): Go to the end
+- [Computation times](sg_execution_times.html.md): &#42;&#42;00:02.742&#42;&#42; total execution time for 2 files &#42;&#42;from auto_examples/rouse_simulations&#42;&#42;:
+
+## Optional
+
+- [Top-level llms.txt](../../llms.txt): Complete documentation index.

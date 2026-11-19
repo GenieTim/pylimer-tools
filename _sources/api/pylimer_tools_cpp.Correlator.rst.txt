@@ -1,0 +1,55 @@
+Correlator
+==========
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: Correlator
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~Correlator.accval
+      ~Correlator.correlation
+      ~Correlator.m
+      ~Correlator.mean
+      ~Correlator.npcorr
+      ~Correlator.num_correlators
+      ~Correlator.num_samples
+      ~Correlator.p
+      ~Correlator.raw_f
+      ~Correlator.raw_t
+      ~Correlator.times
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~Correlator.add
+      ~Correlator.add_batch
+      ~Correlator.evaluate
+      ~Correlator.reset
+      ~Correlator.set_size
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: accval
+   .. autoattribute:: correlation
+   .. autoattribute:: m
+   .. autoattribute:: mean
+   .. autoattribute:: npcorr
+   .. autoattribute:: num_correlators
+   .. autoattribute:: num_samples
+   .. autoattribute:: p
+   .. autoattribute:: raw_f
+   .. autoattribute:: raw_t
+   .. autoattribute:: times
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: add
+   .. automethod:: add_batch
+   .. automethod:: evaluate
+   .. automethod:: reset
+   .. automethod:: set_size

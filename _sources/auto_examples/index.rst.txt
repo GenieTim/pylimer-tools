@@ -829,6 +829,94 @@ The library supports four main file I/O operations:
 
     </div>
 
+Rouse & Brownian Dynamics Simulations
+-------------------------------------
+
+pylimer-tools provides an implicit time-stepping Rouse and Brownian dynamics
+simulator for polymer chains and general Hookean spring networks via
+:class:`~pylimer_tools_cpp.RouseBrownianSimulator`, returning dynamical observables
+in :class:`~pylimer_tools_cpp.RouseSimulationResult`.
+
+At each time step :math:`\Delta t`, the positions :math:`\mathbf{r}_t \in \mathbb{R}^{N \times 3}`
+are advanced using the unconditionally stable backward-Euler discretization of the
+overdamped Langevin equation on the scalar graph Laplacian :math:`\mathbf{L}`:
+
+.. math::
+
+   \left(\mathbf{I} + \Delta t \frac{k}{\gamma} \mathbf{L}\right) \mathbf{r}_{t+\Delta t}
+   = \mathbf{r}_t + \frac{\Delta t}{\gamma} \mathbf{F}_{\text{ext}} + \sqrt{2 D \Delta t}\,\boldsymbol{\xi}_t,
+
+where :math:`k` is the spring constant, :math:`\gamma` is the bead friction coefficient,
+:math:`D = k_B T / \gamma` is the bare bead diffusion coefficient, and
+:math:`\boldsymbol{\xi}_t` has i.i.d. standard normal entries. All three Cartesian
+coordinates share a single sparse factorization of
+:math:`\mathbf{A} = \mathbf{I} + \Delta t \frac{k}{\gamma} \mathbf{L}`, configurable
+through :class:`~pylimer_tools_cpp.RouseSolverType` (direct sparse LDLT, direct sparse
+LLT, or iterative Conjugate Gradient).
+
+See:
+
+- :doc:`/auto_examples/rouse_simulations/plot_rouse_brownian_simulation` for
+  deterministic normal-mode relaxation, linear solver comparison, external-force
+  drift and creep/recoil, and stochastic Rouse MSD and end-to-end relaxation dynamics
+  (including multi-tau analysis with :class:`~pylimer_tools_cpp.Correlator`).
+- :doc:`/auto_examples/rouse_simulations/plot_rouse_topologies_and_resistance` for
+  dynamics across linear, ring, star, complete, and weighted topologies and the exact
+  fluctuation-resistance duality connecting :class:`~pylimer_tools_cpp.RouseBrownianSimulator`
+  and :class:`~pylimer_tools_cpp.ResistanceDistanceAnalysis`.
+
+
+.. raw:: html
+
+  <div id='sg-tag-list' class='sphx-glr-tag-list'></div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+.. thumbnail-parent-div-open
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example bridges RouseBrownianSimulator and ResistanceDistanceAnalysis, illustrating how topological effective resistances govern the equilibrium conformational fluctuations of Gaussian polymer architectures and crosslinked networks.">
+
+.. only:: html
+
+  .. image:: /auto_examples/rouse_simulations/images/thumb/sphx_glr_plot_rouse_topologies_and_resistance_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/rouse_simulations/plot_rouse_topologies_and_resistance`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Polymer Architectures & Resistance-Fluctuation Duality in Rouse Dynamics</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use RouseBrownianSimulator to simulate overdamped polymer chain dynamics with an implicit backward-Euler integrator:">
+
+.. only:: html
+
+  .. image:: /auto_examples/rouse_simulations/images/thumb/sphx_glr_plot_rouse_brownian_simulation_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/rouse_simulations/plot_rouse_brownian_simulation`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Rouse & Brownian Dynamics Simulation</div>
+    </div>
+
+
+.. thumbnail-parent-div-close
+
+.. raw:: html
+
+    </div>
+
 Structure Analysis
 ------------------
 
@@ -865,6 +953,19 @@ Finally, to find the shortest loop a specific atom is involved in, you can use t
 
    There are exponentially many paths between two crosslinkers of a network,
    and you may run out of memory when using these functions, if your network is lattice-like.
+
+Topological Resistance Distance & Commute Times
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For cyclic and cross-linked networks where many parallel pathways connect pairs of nodes,
+:class:`~pylimer_tools_cpp.ResistanceDistanceAnalysis` computes effective resistances
+:math:`R_{ij}`, the Kirchhoff index :math:`K(G)`, the Moore-Penrose pseudo-inverse
+:math:`\mathbf{L}^+`, random-walk commute times :math:`C_{ij}`, and node resistance
+centralities directly from a :class:`~pylimer_tools_cpp.Universe`, sparse graph
+Laplacian matrix, or weighted edge list.
+
+See :doc:`/auto_examples/structure_analysis/plot_resistance_distance_analysis` for
+analytical verifications, matrix diagnostics, and performance benchmarks on crosslinked networks.
 
 
 
@@ -947,6 +1048,23 @@ Finally, to find the shortest loop a specific atom is involved in, you can use t
     </div>
 
 
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use ResistanceDistanceAnalysis to analyze the connectivity, effective resistances, Kirchhoff index, random-walk commute times, and node resistance centrality of polymer architectures and crosslinked networks.">
+
+.. only:: html
+
+  .. image:: /auto_examples/structure_analysis/images/thumb/sphx_glr_plot_resistance_distance_analysis_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/structure_analysis/plot_resistance_distance_analysis`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Topological Resistance Distance & Commute Time Analysis</div>
+    </div>
+
+
 .. thumbnail-parent-div-close
 
 .. raw:: html
@@ -1007,6 +1125,7 @@ For more information, refer to the documentation of the :class:`~pylimer_tools_c
    /auto_examples/network_generator/index.rst
    /auto_examples/normal_mode_analysis/index.rst
    /auto_examples/readers_writers/index.rst
+   /auto_examples/rouse_simulations/index.rst
    /auto_examples/structure_analysis/index.rst
    /auto_examples/trajectory_analysis/index.rst
 

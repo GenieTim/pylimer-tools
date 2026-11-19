@@ -1,6 +1,6 @@
 # pylimer-tools
 
-> pylimer-tools is a Python and C++ toolkit for simulating, analyzing, and handling bead-spring polymer networks and LAMMPS molecular dynamics output (Monte Carlo network generation, DPD simulations with slip-springs, Maximum Entropy Homogenization / Force Balance, normal mode analysis, and network topology analysis).
+> pylimer-tools is a Python and C++ toolkit for simulating, analyzing, and handling bead-spring polymer networks and LAMMPS molecular dynamics output (Monte Carlo network generation, DPD simulations with slip-springs, implicit Rouse and Brownian dynamics, Maximum Entropy Homogenization / Force Balance, normal mode analysis, and topological resistance distance & network structure analysis).
 
 
 2021-2026, Tim Bernhard
@@ -29,6 +29,7 @@
 - [ComputeBackend](pylimer_tools_cpp.ComputeBackend.html.md): Bases: &#96;Enum&#96;
 - [ComputedDoubleValues](pylimer_tools_cpp.ComputedDoubleValues.html.md): Bases: &#96;IntEnum&#96;
 - [ComputedIntValues](pylimer_tools_cpp.ComputedIntValues.html.md): Bases: &#96;IntEnum&#96;
+- [Correlator](pylimer_tools_cpp.Correlator.html.md): Bases: &#96;pybind11_object&#96;
 - [CrosslinkerUniverse](pylimer_tools_cpp.CrosslinkerUniverse.html.md): Bases: &#96;pybind11_object&#96;
 - [DPDSimulator](pylimer_tools_cpp.DPDSimulator.html.md): Bases: &#96;pybind11_object&#96;
 - [DataFileReader](pylimer_tools_cpp.DataFileReader.html.md): Bases: &#96;pybind11_object&#96;

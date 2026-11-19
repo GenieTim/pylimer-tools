@@ -2,7 +2,7 @@
 
 # Computation times
 
-**00:03.364** total execution time for 1 file **from auto_examples/dpd_simulations**:
+**00:03.174** total execution time for 1 file **from auto_examples/dpd_simulations**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -19,4 +19,4 @@ $(document).ready( function () {
 
 | Example                                                                                                                                                 | Time      |   Mem (MB) |
 |---------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [DPD Simulations](plot_dpd_simulation.html.md#sphx-glr-auto-examples-dpd-simulations-plot-dpd-simulation-py) (`plot_dpd_simulation.py`) | 00:03.364 |          0 |
+| [DPD Simulations](plot_dpd_simulation.html.md#sphx-glr-auto-examples-dpd-simulations-plot-dpd-simulation-py) (`plot_dpd_simulation.py`) | 00:03.174 |          0 |

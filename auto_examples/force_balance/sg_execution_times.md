@@ -2,7 +2,7 @@
 
 # Computation times
 
-**00:07.572** total execution time for 11 files **from auto_examples/force_balance**:
+**00:07.342** total execution time for 11 files **from auto_examples/force_balance**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -19,14 +19,14 @@ $(document).ready( function () {
 
 | Example                                                                                                                                                                                                     | Time      |   Mem (MB) |
 |-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [MEHP Force Relaxation](plot_force_relaxation.md#sphx-glr-auto-examples-force-balance-plot-force-relaxation-py) (`plot_force_relaxation.py`)                                             | 00:02.223 |          0 |
-| [Representative Volume Study for PDMS Networks](plot_representative_volume_pdms.md#sphx-glr-auto-examples-force-balance-plot-representative-volume-pdms-py) (`plot_representative_volume_pdms.py`) | 00:01.906 |          0 |
-| [Entanglement Sampling Methods](plot_entanglement_sampling_comparison.md#sphx-glr-auto-examples-force-balance-plot-entanglement-sampling-comparison-py) (`plot_entanglement_sampling_comparison.py`)     | 00:00.952 |          0 |
-| [Sampling Cut-Off Effect](plot_sampling_cutoff_effect.md#sphx-glr-auto-examples-force-balance-plot-sampling-cutoff-effect-py) (`plot_sampling_cutoff_effect.py`)                               | 00:00.514 |          0 |
-| [Inactive Removal & Sampling](plot_inactive_removal_and_sampling.md#sphx-glr-auto-examples-force-balance-plot-inactive-removal-and-sampling-py) (`plot_inactive_removal_and_sampling.py`)             | 00:00.510 |          0 |
-| [Force Balance](plot_force_balance.md#sphx-glr-auto-examples-force-balance-plot-force-balance-py) (`plot_force_balance.py`)                                                           | 00:00.324 |          0 |
-| [Slipping vs. Fixed Entanglement Links](plot_slipping_vs_fixed_links.md#sphx-glr-auto-examples-force-balance-plot-slipping-vs-fixed-links-py) (`plot_slipping_vs_fixed_links.py`)               | 00:00.275 |          0 |
-| [Force Balance 2](plot_force_balance_2.md#sphx-glr-auto-examples-force-balance-plot-force-balance-2-py) (`plot_force_balance_2.py`)                                                     | 00:00.264 |          0 |
-| [Entanglement Links vs. Springs](plot_entanglement_link_vs_spring.md#sphx-glr-auto-examples-force-balance-plot-entanglement-link-vs-spring-py) (`plot_entanglement_link_vs_spring.py`)              | 00:00.233 |          0 |
-| [Polydispersity Study](plot_polydispersity_study.md#sphx-glr-auto-examples-force-balance-plot-polydispersity-study-py) (`plot_polydispersity_study.py`)                                      | 00:00.221 |          0 |
-| [Deformation Experiment](plot_fb_deformation_exp.md#sphx-glr-auto-examples-force-balance-plot-fb-deformation-exp-py) (`plot_fb_deformation_exp.py`)                                        | 00:00.151 |          0 |
+| [MEHP Force Relaxation](plot_force_relaxation.md#sphx-glr-auto-examples-force-balance-plot-force-relaxation-py) (`plot_force_relaxation.py`)                                             | 00:02.076 |          0 |
+| [Representative Volume Study for PDMS Networks](plot_representative_volume_pdms.md#sphx-glr-auto-examples-force-balance-plot-representative-volume-pdms-py) (`plot_representative_volume_pdms.py`) | 00:01.841 |          0 |
+| [Entanglement Sampling Methods](plot_entanglement_sampling_comparison.md#sphx-glr-auto-examples-force-balance-plot-entanglement-sampling-comparison-py) (`plot_entanglement_sampling_comparison.py`)     | 00:00.972 |          0 |
+| [Sampling Cut-Off Effect](plot_sampling_cutoff_effect.md#sphx-glr-auto-examples-force-balance-plot-sampling-cutoff-effect-py) (`plot_sampling_cutoff_effect.py`)                               | 00:00.516 |          0 |
+| [Inactive Removal & Sampling](plot_inactive_removal_and_sampling.md#sphx-glr-auto-examples-force-balance-plot-inactive-removal-and-sampling-py) (`plot_inactive_removal_and_sampling.py`)             | 00:00.471 |          0 |
+| [Force Balance](plot_force_balance.md#sphx-glr-auto-examples-force-balance-plot-force-balance-py) (`plot_force_balance.py`)                                                           | 00:00.298 |          0 |
+| [Slipping vs. Fixed Entanglement Links](plot_slipping_vs_fixed_links.md#sphx-glr-auto-examples-force-balance-plot-slipping-vs-fixed-links-py) (`plot_slipping_vs_fixed_links.py`)               | 00:00.281 |          0 |
+| [Force Balance 2](plot_force_balance_2.md#sphx-glr-auto-examples-force-balance-plot-force-balance-2-py) (`plot_force_balance_2.py`)                                                     | 00:00.265 |          0 |
+| [Entanglement Links vs. Springs](plot_entanglement_link_vs_spring.md#sphx-glr-auto-examples-force-balance-plot-entanglement-link-vs-spring-py) (`plot_entanglement_link_vs_spring.py`)              | 00:00.251 |          0 |
+| [Polydispersity Study](plot_polydispersity_study.md#sphx-glr-auto-examples-force-balance-plot-polydispersity-study-py) (`plot_polydispersity_study.py`)                                      | 00:00.215 |          0 |
+| [Deformation Experiment](plot_fb_deformation_exp.md#sphx-glr-auto-examples-force-balance-plot-fb-deformation-exp-py) (`plot_fb_deformation_exp.py`)                                        | 00:00.154 |          0 |

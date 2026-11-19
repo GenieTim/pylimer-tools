@@ -170,6 +170,8 @@
         * [`ComputedDoubleValues`](api/pylimer_tools_cpp.ComputedDoubleValues.md#pylimer_tools_cpp.ComputedDoubleValues)
       * [ComputedIntValues](api/pylimer_tools_cpp.ComputedIntValues.md)
         * [`ComputedIntValues`](api/pylimer_tools_cpp.ComputedIntValues.md#pylimer_tools_cpp.ComputedIntValues)
+      * [Correlator](api/pylimer_tools_cpp.Correlator.md)
+        * [`Correlator`](api/pylimer_tools_cpp.Correlator.md#pylimer_tools_cpp.Correlator)
       * [CrosslinkerUniverse](api/pylimer_tools_cpp.CrosslinkerUniverse.md)
         * [`CrosslinkerUniverse`](api/pylimer_tools_cpp.CrosslinkerUniverse.md#pylimer_tools_cpp.CrosslinkerUniverse)
       * [DPDSimulator](api/pylimer_tools_cpp.DPDSimulator.md)

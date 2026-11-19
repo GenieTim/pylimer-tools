@@ -36,10 +36,12 @@ print(f"Mean bond length: {np.mean(universe.compute_bond_lengths())} u")
 ## 🔧 **Key Features**
 
 - **Polymer Analysis**: Calculate radius of gyration, end-to-end distances, molecular weights, bond and loop statistics
+- **Resistance Distance Analysis**: Compute topological effective resistances, Kirchhoff index, random-walk commute times, and node resistance centrality
 - **Network Generation**: Monte Carlo network generators for polymer systems with highly flexible parameters
 - **Force Balance**: Reduce polymer networks to their minimum energy, maximum entropy homogenized state, predict the equilibrium shear modulus
 - **Normal Mode Analysis**: Predict the loss and storage modulus of polymer networks
 - **Dissipative Particle Dynamics**: Simulate coarse-grained polymer systems with slip-springs and DPD
+- **Rouse & Brownian Dynamics**: Implicit time-stepping Rouse and Brownian dynamics for polymer chains and general spring networks
 - **High Performance**: C++ backend with Python bindings for optimal performance on large polymer structures
 - **LAMMPS Integration**: Seamlessly read and write LAMMPS data and dump files with memory-efficient streaming
 - **Comprehensive**: Support for angles, dihedrals, crosslinkers, velocities, charges, and custom polymer properties

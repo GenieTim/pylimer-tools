@@ -24,6 +24,8 @@ ResistanceDistanceAnalysis
       ~ResistanceDistanceAnalysis.create_linear_chain
       ~ResistanceDistanceAnalysis.create_ring
       ~ResistanceDistanceAnalysis.create_star
+      ~ResistanceDistanceAnalysis.from_matrix
+      ~ResistanceDistanceAnalysis.from_universe
       ~ResistanceDistanceAnalysis.get_connected_components
       ~ResistanceDistanceAnalysis.get_laplacian
       ~ResistanceDistanceAnalysis.get_nr_of_connected_components
@@ -50,6 +52,8 @@ ResistanceDistanceAnalysis
    .. automethod:: create_linear_chain
    .. automethod:: create_ring
    .. automethod:: create_star
+   .. automethod:: from_matrix
+   .. automethod:: from_universe
    .. automethod:: get_connected_components
    .. automethod:: get_laplacian
    .. automethod:: get_nr_of_connected_components

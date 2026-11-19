@@ -24,24 +24,30 @@ Overloaded function.
    > Construct from a pre-assembled sparse scalar graph Laplacian matrix L.
    > * **param L:**
    >   Symmetric positive semidefinite graph Laplacian matrix
+3. \_\_init_\_(self: pylimer_tools_cpp.ResistanceDistanceAnalysis, universe: pylimer_tools_cpp.Universe) -> None
+   > Construct from a Universe’s atom-bond graph.
+   > * **param universe:**
+   >   Universe instance
 
 ### Methods Summary
 
-| [`compute_all_pairs_commute_time`](#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_all_pairs_commute_time)(self)              | Compute the N x N matrix of all-pairs random-walk commute times.                              |
+| [`compute_all_pairs_commute_time`](#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_all_pairs_commute_time)(self[, ...])       | Compute the N x N matrix of all-pairs random-walk commute times.                              |
 |----------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
 | [`compute_all_pairs_effective_resistance`](#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_all_pairs_effective_resistance)(self)      | Compute the N x N symmetric matrix of all-pairs effective resistances.                        |
 | [`compute_commute_time`](#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_commute_time)(self, i, j)                  | Compute the random-walk commute time C_ij = 2 \* M \* R_ij between nodes i and j.             |
 | [`compute_effective_resistance`](#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_effective_resistance)(self, i, j)          | Compute the effective resistance between nodes i and j.                                       |
-| [`compute_effective_resistance_batched`](#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_effective_resistance_batched)(self, pairs) | Compute the effective resistance for a batch of node pairs using a single multi-RHS solve.    |
-| [`compute_kirchhoff_index`](#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_kirchhoff_index)(self)                     | Compute the Kirchhoff index K(G) = sum_{i < j} R_ij without allocating the full N x N matrix. |
+| [`compute_effective_resistance_batched`](#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_effective_resistance_batched)(self, pairs) | Compute the effective resistance for a batch of node pairs using chunked multi-RHS solves.    |
+| [`compute_kirchhoff_index`](#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_kirchhoff_index)(self[, chunk_size])       | Compute the Kirchhoff index K(G) = sum_{i < j} R_ij without allocating the full N x N matrix. |
 | [`compute_kirchhoff_index_spectral`](#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_kirchhoff_index_spectral)(self)            | Compute the Kirchhoff index from the non-zero eigenvalues of the Laplacian.                   |
 | [`compute_moore_penrose_pseudo_inverse`](#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_moore_penrose_pseudo_inverse)(self[, ...]) | Compute the Moore-Penrose pseudo-inverse L^+ of the graph Laplacian.                          |
-| [`compute_resistance_centrality`](#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_resistance_centrality)(self)               | Compute the resistance centrality (N - 1) / sum_{j != i} R_ij for each node.                  |
-| [`compute_total_resistance_per_node`](#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_total_resistance_per_node)(self)           | Compute the sum of effective resistances from each node to all other nodes.                   |
+| [`compute_resistance_centrality`](#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_resistance_centrality)(self[, chunk_size]) | Compute the resistance centrality (N - 1) / sum_{j != i} R_ij for each node.                  |
+| [`compute_total_resistance_per_node`](#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_total_resistance_per_node)(self[, ...])    | Compute the sum of effective resistances from each node to all other nodes.                   |
 | [`create_complete`](#pylimer_tools_cpp.ResistanceDistanceAnalysis.create_complete)(num_nodes)                        | Create a ResistanceDistanceAnalysis instance for a complete graph K_N.                        |
 | [`create_linear_chain`](#pylimer_tools_cpp.ResistanceDistanceAnalysis.create_linear_chain)(num_nodes)                    | Create a ResistanceDistanceAnalysis instance for a linear chain of num_nodes nodes.           |
 | [`create_ring`](#pylimer_tools_cpp.ResistanceDistanceAnalysis.create_ring)(num_nodes)                            | Create a ResistanceDistanceAnalysis instance for a ring graph of num_nodes nodes.             |
 | [`create_star`](#pylimer_tools_cpp.ResistanceDistanceAnalysis.create_star)(num_arms[, arm_length])               | Create a ResistanceDistanceAnalysis instance for a star graph.                                |
+| [`from_matrix`](#pylimer_tools_cpp.ResistanceDistanceAnalysis.from_matrix)(L)                                    | Construct a ResistanceDistanceAnalysis instance from a sparse graph Laplacian matrix L.       |
+| [`from_universe`](#pylimer_tools_cpp.ResistanceDistanceAnalysis.from_universe)(universe)                           | Construct a ResistanceDistanceAnalysis instance from a Universe's atom-bond graph.            |
 | [`get_connected_components`](#pylimer_tools_cpp.ResistanceDistanceAnalysis.get_connected_components)(self)                    | Get the list of node indices for each connected component.                                    |
 | [`get_laplacian`](#pylimer_tools_cpp.ResistanceDistanceAnalysis.get_laplacian)(self)                               | Get the sparse graph Laplacian matrix L.                                                      |
 | [`get_nr_of_connected_components`](#pylimer_tools_cpp.ResistanceDistanceAnalysis.get_nr_of_connected_components)(self)              | Get the number of connected components in the graph.                                          |
@@ -54,10 +60,12 @@ Overloaded function.
 
 ### Methods Documentation
 
-#### compute_all_pairs_commute_time(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, n]']
+#### compute_all_pairs_commute_time(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis), chunk_size: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 128) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, n]']
 
 Compute the N x N matrix of all-pairs random-walk commute times.
 
+* **Parameters:**
+  **chunk_size** – Number of columns per solve chunk (defaults to 128)
 * **Returns:**
   N x N matrix of commute times
 
@@ -90,19 +98,22 @@ Compute the effective resistance between nodes i and j.
 * **Returns:**
   Effective resistance R_ij (or inf if in different components)
 
-#### compute_effective_resistance_batched(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis), pairs: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)]]) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
+#### compute_effective_resistance_batched(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis), pairs: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)]], chunk_size: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 128) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
 
-Compute the effective resistance for a batch of node pairs using a single multi-RHS solve.
+Compute the effective resistance for a batch of node pairs using chunked multi-RHS solves.
 
 * **Parameters:**
-  **pairs** – List of (i, j) node index pairs
+  * **pairs** – List of (i, j) node index pairs
+  * **chunk_size** – Number of columns per solve chunk (defaults to 128)
 * **Returns:**
   Vector of effective resistances for each pair
 
-#### compute_kirchhoff_index(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis)) → [float](https://docs.python.org/3/builtins/functions.html#float)
+#### compute_kirchhoff_index(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis), chunk_size: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 128) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Compute the Kirchhoff index K(G) = sum_{i < j} R_ij without allocating the full N x N matrix.
 
+* **Parameters:**
+  **chunk_size** – Number of columns per solve chunk (defaults to 128)
 * **Returns:**
   Kirchhoff index (or inf if disconnected)
 
@@ -122,17 +133,21 @@ Compute the Moore-Penrose pseudo-inverse L^+ of the graph Laplacian.
 * **Returns:**
   N x N Moore-Penrose pseudo-inverse matrix
 
-#### compute_resistance_centrality(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
+#### compute_resistance_centrality(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis), chunk_size: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 128) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
 
 Compute the resistance centrality (N - 1) / sum_{j != i} R_ij for each node.
 
+* **Parameters:**
+  **chunk_size** – Number of columns per solve chunk (defaults to 128)
 * **Returns:**
   Vector of resistance centralities
 
-#### compute_total_resistance_per_node(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
+#### compute_total_resistance_per_node(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis), chunk_size: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 128) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
 
 Compute the sum of effective resistances from each node to all other nodes.
 
+* **Parameters:**
+  **chunk_size** – Number of columns per solve chunk (defaults to 128)
 * **Returns:**
   Vector of total resistance per node
 
@@ -170,6 +185,24 @@ Create a ResistanceDistanceAnalysis instance for a star graph.
 * **Parameters:**
   * **num_arms** – Number of arms (at least 2)
   * **arm_length** – Number of edges per arm (defaults to 1)
+* **Returns:**
+  ResistanceDistanceAnalysis instance
+
+#### *static* from_matrix(L: [scipy.sparse.csc_matrix](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csc_matrix.html#scipy.sparse.csc_matrix)[numpy.float64]) → [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis)
+
+Construct a ResistanceDistanceAnalysis instance from a sparse graph Laplacian matrix L.
+
+* **Parameters:**
+  **L** – Symmetric positive semidefinite graph Laplacian matrix
+* **Returns:**
+  ResistanceDistanceAnalysis instance
+
+#### *static* from_universe(universe: [pylimer_tools_cpp.Universe](pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe)) → [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis)
+
+Construct a ResistanceDistanceAnalysis instance from a Universe’s atom-bond graph.
+
+* **Parameters:**
+  **universe** – Universe instance
 * **Returns:**
   ResistanceDistanceAnalysis instance
 

@@ -33,6 +33,18 @@ Finally, to find the shortest loop a specific atom is involved in, you can use t
 There are exponentially many paths between two crosslinkers of a network,
 and you may run out of memory when using these functions, if your network is lattice-like.
 
+## Topological Resistance Distance & Commute Times
+
+For cyclic and cross-linked networks where many parallel pathways connect pairs of nodes,
+[`ResistanceDistanceAnalysis`](../../api/pylimer_tools_cpp.ResistanceDistanceAnalysis.html.md#pylimer_tools_cpp.ResistanceDistanceAnalysis) computes effective resistances
+$R_{ij}$, the Kirchhoff index $K(G)$, the Moore-Penrose pseudo-inverse
+$\mathbf{L}^+$, random-walk commute times $C_{ij}$, and node resistance
+centralities directly from a [`Universe`](../../api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe), sparse graph
+Laplacian matrix, or weighted edge list.
+
+See [Topological Resistance Distance & Commute Time Analysis](plot_resistance_distance_analysis.html.md) for
+analytical verifications, matrix diagnostics, and performance benchmarks on crosslinked networks.
+
 <div id='sg-tag-list' class='sphx-glr-tag-list'></div><div class="sphx-glr-thumbnails">
 <!-- thumbnail-parent-div-open --><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to decompose a crosslinked polymer network into chains and analyze its structure using pylimer-tools.">![](auto_examples/structure_analysis/images/thumb/sphx_glr_plot_decompose_structure_thumb.png)
 
@@ -54,5 +66,10 @@ and you may run out of memory when using these functions, if your network is lat
 [Extract Synthesis Parameters](plot_structure_analysis.html.md)
 
   <div class="sphx-glr-thumbnail-title">Extract Synthesis Parameters</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use ResistanceDistanceAnalysis to analyze the connectivity, effective resistances, Kirchhoff index, random-walk commute times, and node resistance centrality of polymer architectures and crosslinked networks.">![](auto_examples/structure_analysis/images/thumb/sphx_glr_plot_resistance_distance_analysis_thumb.png)
+
+[Topological Resistance Distance & Commute Time Analysis](plot_resistance_distance_analysis.html.md)
+
+  <div class="sphx-glr-thumbnail-title">Topological Resistance Distance & Commute Time Analysis</div>
 </div>
 <!-- thumbnail-parent-div-close --></div>
