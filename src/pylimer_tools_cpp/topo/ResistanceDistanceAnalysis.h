@@ -7,6 +7,10 @@
 #include <utility>
 #include <vector>
 
+namespace pylimer_tools::entities {
+class Universe;
+}
+
 namespace pylimer_tools::topo {
 
 /**
@@ -38,7 +42,19 @@ public:
    */
   explicit ResistanceDistanceAnalysis(const Eigen::SparseMatrix<double>& L);
 
-  // Factory methods for canonical topologies
+  /**
+   * @brief Construct from a Universe's atom-bond graph.
+   *
+   * @param universe Universe instance
+   */
+  explicit ResistanceDistanceAnalysis(
+    const pylimer_tools::entities::Universe& universe);
+
+  // Factory methods
+  static ResistanceDistanceAnalysis fromMatrix(
+    const Eigen::SparseMatrix<double>& L);
+  static ResistanceDistanceAnalysis fromUniverse(
+    const pylimer_tools::entities::Universe& universe);
   static ResistanceDistanceAnalysis createLinearChain(size_t numNodes);
   static ResistanceDistanceAnalysis createRing(size_t numNodes);
   static ResistanceDistanceAnalysis createComplete(size_t numNodes);
@@ -79,15 +95,17 @@ public:
   double computeEffectiveResistance(size_t i, size_t j) const;
 
   /**
-   * @brief Compute effective resistance for a batch of B pairs simultaneously
-   *        using a single Multi-RHS linear solve:
-   *        L [v_1, ..., v_B] = [b_1, ..., b_B].
+   * @brief Compute effective resistance for a batch of B pairs using chunked
+   *        Multi-RHS linear solves:
+   *        L [v_1, ..., v_c] = [b_1, ..., b_c].
    *
    * @param pairs Vector of (i, j) node index pairs
+   * @param chunkSize Number of columns to solve per chunk (defaults to 128)
    * @return Vector of effective resistances for each query pair
    */
   Eigen::VectorXd computeEffectiveResistanceBatched(
-    const std::vector<std::pair<size_t, size_t>>& pairs) const;
+    const std::vector<std::pair<size_t, size_t>>& pairs,
+    size_t chunkSize = 128) const;
 
   /**
    * @brief Solve L_pinned * X = I in multi-column chunks (Level-3 BLAS dtrsm)
@@ -116,8 +134,10 @@ public:
    *
    * For connected graphs, K(G) = N * Tr(L^+) = N * sum_{k=2}^N (1 / lambda_k).
    * Returns infinity if the graph is disconnected.
+   *
+   * @param chunkSize Number of columns per solve chunk (defaults to 128)
    */
-  double computeKirchhoffIndex() const;
+  double computeKirchhoffIndex(size_t chunkSize = 128) const;
 
   /**
    * @brief Compute Kirchhoff index from Laplacian non-zero eigenvalues for
@@ -144,21 +164,27 @@ public:
 
   /**
    * @brief Compute all-pairs commute time matrix: C = 2 * M * R.
+   *
+   * @param chunkSize Number of columns per solve chunk (defaults to 128)
    */
-  Eigen::MatrixXd computeAllPairsCommuteTime() const;
+  Eigen::MatrixXd computeAllPairsCommuteTime(size_t chunkSize = 128) const;
 
   /**
    * @brief Compute total effective resistance from each node to all other
    * nodes: S_i = sum_{j} R_ij.
+   *
+   * @param chunkSize Number of columns per solve chunk (defaults to 128)
    */
-  Eigen::VectorXd computeTotalResistancePerNode() const;
+  Eigen::VectorXd computeTotalResistancePerNode(size_t chunkSize = 128) const;
 
   /**
    * @brief Compute resistance centrality for each node: (N - 1) / sum_{j != i}
    * R_ij. Higher values indicate nodes closer to all other nodes in resistance
    * distance.
+   *
+   * @param chunkSize Number of columns per solve chunk (defaults to 128)
    */
-  Eigen::VectorXd computeResistanceCentrality() const;
+  Eigen::VectorXd computeResistanceCentrality(size_t chunkSize = 128) const;
 
 private:
   size_t numNodes_{ 0 };
@@ -170,6 +196,7 @@ private:
   std::vector<std::vector<size_t>> connectedComponents_{};
   std::vector<size_t> nodeComponentId_{};
   std::vector<size_t> referenceNodePerComponent_{};
+  std::vector<double> componentTotalWeight_{};
 
   mutable Eigen::SimplicialLDLT<Eigen::SparseMatrix<double>> solver_{};
   mutable bool solverFactorized_{ false };

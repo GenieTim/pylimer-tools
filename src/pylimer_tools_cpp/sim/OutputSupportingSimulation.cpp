@@ -260,16 +260,20 @@ OutputSupportingSimulation::handleOutput(const long int currentStep)
   size_t autocorrelator_idx = 0;
   for (const OutputConfiguration& oc : this->outputAutoCorrelationConfigs) {
     const size_t autocorrelator_idx_before = autocorrelator_idx;
-    for (const ComputedDoubleValues cv : oc.doubleValues) {
-      assert(autocorrelator_idx < this->autocorrelators.size());
-      RUNTIME_EXP_IFN(std::isfinite(doublevalues[cv]),
-                      "Expect output quantities to be finite, found " +
-                        std::to_string(doublevalues[cv]) + " for property " +
-                        ComputedDoubleValuesNames[cv] + ".");
-      this->autocorrelators[autocorrelator_idx].add(doublevalues[cv]);
-      autocorrelator_idx += 1;
+    if ((currentStep % oc.useEvery) == 0) {
+      for (const ComputedDoubleValues cv : oc.doubleValues) {
+        assert(autocorrelator_idx < this->autocorrelators.size());
+        RUNTIME_EXP_IFN(std::isfinite(doublevalues[cv]),
+                        "Expect output quantities to be finite, found " +
+                          std::to_string(doublevalues[cv]) + " for property " +
+                          ComputedDoubleValuesNames[cv] + ".");
+        this->autocorrelators[autocorrelator_idx].add(doublevalues[cv]);
+        autocorrelator_idx += 1;
+      }
+    } else {
+      autocorrelator_idx += oc.doubleValues.size();
     }
-    if (currentStep % oc.outputEvery == 0) {
+    if (currentStep % oc.outputEvery == 0 && !oc.doubleValues.empty()) {
       outputBuffer += "# TimeStep " +
                       std::to_string(intvalues[ComputedIntValues::STEP]) + "\n";
       this->autocorrelators[autocorrelator_idx_before].evaluate();
@@ -300,7 +304,6 @@ OutputSupportingSimulation::handleOutput(const long int currentStep)
         outputBuffer += "\n";
       }
       (*(this->outputStreams[streamIdx])) << outputBuffer << std::flush;
-      streamIdx += 1;
       outputBuffer.clear();
     }
 
@@ -352,9 +355,6 @@ OutputSupportingSimulation::doOutputValues(
           assert(this->msdOrigins[msdIdx].size() ==
                  this->msdMeasuredIndices[msdIdx].size());
           Eigen::VectorXd relCoords = this->getCoordinates();
-          const int maxCoeff = this->msdMeasuredIndices[msdIdx].maxCoeff();
-          std::cout << "Size: " << relCoords.size() << ", max coeff "
-                    << maxCoeff << std::endl;
           assert(relCoords.size() >
                  this->msdMeasuredIndices[msdIdx].maxCoeff());
           Eigen::ArrayXi nIndices = this->msdMeasuredIndices[msdIdx];
@@ -425,12 +425,12 @@ OutputSupportingSimulation::validateAndTruncateOutputFiles(
   const std::vector<OutputConfiguration>& vals)
 {
   for (size_t i = 0; i < vals.size(); ++i) {
-    if (vals[i].filename.size() > 0) {
+    if (!vals[i].filename.empty() && vals[i].filename != "stdio") {
       // empty the file
-      std::ifstream file;
+      std::ofstream file;
       file.open(vals[i].filename.c_str(),
-                std::ifstream::out |
-                  (vals[i].append ? std::ifstream::app : std::ifstream::trunc));
+                std::ofstream::out |
+                  (vals[i].append ? std::ofstream::app : std::ofstream::trunc));
       if (!file.is_open() || file.fail()) {
         file.close();
         throw std::invalid_argument("The file " + vals[i].filename +
@@ -451,6 +451,8 @@ OutputSupportingSimulation::configAutoCorrelatorOutput(
   for (size_t i = 0; i < vals.size(); ++i) {
     INVALIDARG_EXP_IFN(vals[i].intValues.size() == 0,
                        "Correlation of integer values is not supported yet.");
+    INVALIDARG_EXP_IFN(vals[i].useEvery > 0 && vals[i].outputEvery > 0,
+                       "Require useEvery and outputEvery to be positive");
     INVALIDARG_EXP_IFN(vals[i].outputEvery >= vals[i].useEvery,
                        "Require useEvery to be smaller than output every");
     num_values_to_correlate += vals[i].doubleValues.size();
@@ -470,13 +472,12 @@ void
 OutputSupportingSimulation::configAverageOutput(
   const std::vector<OutputConfiguration>& configs)
 {
-  this->outputAverageConfigs = configs;
-  this->updateValuesRequiredEvery(configs);
-
   size_t numAverages = 0;
   for (const OutputConfiguration& c : configs) {
     numAverages += c.doubleValues.size();
     numAverages += c.intValues.size();
+    INVALIDARG_EXP_IFN(c.useEvery > 0 && c.outputEvery > 0,
+                       "Require useEvery and outputEvery to be positive");
     INVALIDARG_EXP_IFN(c.outputEvery >= c.useEvery,
                        "Require useEvery to be smaller than output every");
     INVALIDARG_EXP_IFN(c.outputEvery % c.useEvery == 0,
@@ -484,6 +485,8 @@ OutputSupportingSimulation::configAverageOutput(
   }
 
   this->validateAndTruncateOutputFiles(configs);
+  this->outputAverageConfigs = configs;
+  this->updateValuesRequiredEvery(configs);
 
   this->runningAverages =
     pylimer_tools::utils::initializeWithValue<double>(numAverages, 0.);
@@ -494,6 +497,8 @@ OutputSupportingSimulation::configStepOutput(
   std::vector<OutputConfiguration>& vals)
 {
   for (size_t i = 0; i < vals.size(); ++i) {
+    INVALIDARG_EXP_IFN(vals[i].outputEvery > 0,
+                       "Require outputEvery to be positive");
     vals[i].useEvery = vals[i].outputEvery;
   }
 

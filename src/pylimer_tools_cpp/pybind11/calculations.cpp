@@ -1,6 +1,7 @@
 #ifndef PYBIND_CALC_H
 #define PYBIND_CALC_H
 
+#include "../calc/Correlator.h"
 #include "../calc/MMTanalysis.h"
 #include "../calc/NormalModeAnalyzer.h"
 #include "../entities/Universe.h"
@@ -360,6 +361,113 @@ init_pylimer_bound_calc(py::module_& m)
       [](py::tuple t) {
         const std::string in = t[0].cast<std::string>();
         return NormalModeAnalyzer::fromString(in);
+      }));
+#else
+    ;
+#endif
+
+  py::class_<Correlator, py::smart_holder>(m,
+                                           "Correlator",
+                                           py::module_local(),
+                                           R"pbdoc(
+    Multi-tau scalar autocorrelator computing :math:`f(\tau) = \langle A(t) A(t + \tau) \rangle`.
+
+    Uses a hierarchy of coarse-grained shift registers (Likhtman/Ramirez multi-tau algorithm)
+    to evaluate time correlations across exponentially spanning lag times in O(1) amortized time per sample.
+    )pbdoc")
+    .def(py::init<unsigned int, unsigned int, unsigned int>(),
+         R"pbdoc(
+         Construct a multi-tau scalar Correlator.
+
+         :param num_correlators: Number of hierarchical correlator levels (default: 32)
+         :param p: Number of lag points per correlator level (default: 16)
+         :param m: Averaging factor between consecutive levels; recommended ``p % m == 0`` (default: 2)
+         )pbdoc",
+         py::arg("num_correlators") = 32,
+         py::arg("p") = 16,
+         py::arg("m") = 2)
+    .def("set_size",
+         &Correlator::setsize,
+         R"pbdoc(
+         Reconfigure correlator dimensions and reset accumulated state.
+
+         :param num_correlators: Number of hierarchical correlator levels (default: 32)
+         :param p: Number of lag points per correlator level (default: 16)
+         :param m: Averaging factor between consecutive levels (default: 2)
+         )pbdoc",
+         py::arg("num_correlators") = 32,
+         py::arg("p") = 16,
+         py::arg("m") = 2)
+    .def("reset",
+         &Correlator::reset,
+         "Reset accumulated state while keeping the current correlator "
+         "dimensions.")
+    .def("add",
+         &Correlator::add,
+         R"pbdoc(
+         Add a scalar observation to correlator level ``level``.
+
+         :param value: Finite scalar observation
+         :param level: Correlator level index (default: 0)
+         )pbdoc",
+         py::arg("value"),
+         py::arg("level") = 0)
+    .def("add_batch",
+         &Correlator::addBatch,
+         R"pbdoc(
+         Add a 1D array of scalar observations at level 0.
+
+         :param values: 1D array of finite scalar observations
+         )pbdoc",
+         py::arg("values"))
+    .def("evaluate",
+         &Correlator::evaluate,
+         R"pbdoc(
+         Evaluate the autocorrelation function at all populated lag times.
+
+         :param norm: If True, subtract the squared sample mean :math:`\langle A \rangle^2` (default: False)
+         )pbdoc",
+         py::arg("norm") = false)
+    .def_property_readonly("times",
+                           &Correlator::getTimes,
+                           "Evaluated lag times (call evaluate() first).")
+    .def_property_readonly(
+      "correlation",
+      &Correlator::getCorrelation,
+      "Evaluated correlation values (call evaluate() first).")
+    .def_property_readonly("num_correlators",
+                           &Correlator::getNumCorrelators,
+                           "Number of correlator levels configured.")
+    .def_property_readonly("num_samples",
+                           &Correlator::getNumSamples,
+                           "Total number of samples added at level 0.")
+    .def_property_readonly(
+      "mean", &Correlator::getMean, "Running sample mean at level 0.")
+    .def_readonly("npcorr",
+                  &Correlator::npcorr,
+                  "Number of populated correlation points after evaluate().")
+    .def_readonly(
+      "p", &Correlator::p, "Number of lag points per correlator level.")
+    .def_readonly(
+      "m", &Correlator::m, "Averaging factor between consecutive levels.")
+    .def_readonly(
+      "accval", &Correlator::accval, "Accumulated sum of level-0 samples.")
+    .def_readonly(
+      "raw_t", &Correlator::t, "Full pre-allocated lag time buffer.")
+    .def_readonly(
+      "raw_f", &Correlator::f, "Full pre-allocated correlation buffer.")
+#ifdef CEREALIZABLE
+    .def(py::pickle(
+      [](const Correlator& c) {
+        return py::make_tuple(
+          py::bytes(pylimer_tools::utils::serializeToString(c)));
+      },
+      [](py::tuple t) {
+        if (t.size() != 1) {
+          throw std::runtime_error("Invalid Correlator pickle state");
+        }
+        const std::string in = t[0].cast<std::string>();
+        return Correlator::fromString(in);
       }));
 #else
     ;

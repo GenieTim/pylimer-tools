@@ -1,6 +1,7 @@
 #ifndef PYBIND_ENTANGLEMENT_DETECT_H
 #define PYBIND_ENTANGLEMENT_DETECT_H
 
+#include "../entities/Universe.h"
 #include "../topo/EntanglementDetector.h"
 #include "../topo/ResistanceDistanceAnalysis.h"
 #include "../utils/CrosslinkerUniverseStats.h"
@@ -364,6 +365,42 @@ init_pylimer_bound_topo(py::module_& m)
            :param L: Symmetric positive semidefinite graph Laplacian matrix
          )pbdoc",
          py::arg("L"))
+    .def(py::init<const pe::Universe&>(),
+         R"pbdoc(
+           Construct from a Universe's atom-bond graph.
+
+           :param universe: Universe instance
+         )pbdoc",
+         py::arg("universe"))
+    .def_static(
+      "from_matrix",
+      [](const Eigen::SparseMatrix<double>& L) {
+        return std::unique_ptr<pylimer_tools::topo::ResistanceDistanceAnalysis>(
+          new pylimer_tools::topo::ResistanceDistanceAnalysis(
+            pylimer_tools::topo::ResistanceDistanceAnalysis::fromMatrix(L)));
+      },
+      R"pbdoc(
+        Construct a ResistanceDistanceAnalysis instance from a sparse graph Laplacian matrix L.
+
+        :param L: Symmetric positive semidefinite graph Laplacian matrix
+        :return: ResistanceDistanceAnalysis instance
+      )pbdoc",
+      py::arg("L"))
+    .def_static(
+      "from_universe",
+      [](const pe::Universe& universe) {
+        return std::unique_ptr<pylimer_tools::topo::ResistanceDistanceAnalysis>(
+          new pylimer_tools::topo::ResistanceDistanceAnalysis(
+            pylimer_tools::topo::ResistanceDistanceAnalysis::fromUniverse(
+              universe)));
+      },
+      R"pbdoc(
+        Construct a ResistanceDistanceAnalysis instance from a Universe's atom-bond graph.
+
+        :param universe: Universe instance
+        :return: ResistanceDistanceAnalysis instance
+      )pbdoc",
+      py::arg("universe"))
     .def_static(
       "create_linear_chain",
       [](size_t num_nodes) {
@@ -500,12 +537,14 @@ init_pylimer_bound_topo(py::module_& m)
          &pylimer_tools::topo::ResistanceDistanceAnalysis::
            computeEffectiveResistanceBatched,
          R"pbdoc(
-           Compute the effective resistance for a batch of node pairs using a single multi-RHS solve.
+           Compute the effective resistance for a batch of node pairs using chunked multi-RHS solves.
 
            :param pairs: List of (i, j) node index pairs
+           :param chunk_size: Number of columns per solve chunk (defaults to 128)
            :return: Vector of effective resistances for each pair
          )pbdoc",
-         py::arg("pairs"))
+         py::arg("pairs"),
+         py::arg("chunk_size") = 128)
     .def("compute_all_pairs_effective_resistance",
          &pylimer_tools::topo::ResistanceDistanceAnalysis::
            computeAllPairsEffectiveResistance,
@@ -541,8 +580,10 @@ init_pylimer_bound_topo(py::module_& m)
       R"pbdoc(
         Compute the Kirchhoff index K(G) = sum_{i < j} R_ij without allocating the full N x N matrix.
 
+        :param chunk_size: Number of columns per solve chunk (defaults to 128)
         :return: Kirchhoff index (or inf if disconnected)
-      )pbdoc")
+      )pbdoc",
+      py::arg("chunk_size") = 128)
     .def("compute_kirchhoff_index_spectral",
          &pylimer_tools::topo::ResistanceDistanceAnalysis::
            computeKirchhoffIndexSpectral,
@@ -557,16 +598,20 @@ init_pylimer_bound_topo(py::module_& m)
          R"pbdoc(
            Compute the sum of effective resistances from each node to all other nodes.
 
+           :param chunk_size: Number of columns per solve chunk (defaults to 128)
            :return: Vector of total resistance per node
-         )pbdoc")
+         )pbdoc",
+         py::arg("chunk_size") = 128)
     .def("compute_resistance_centrality",
          &pylimer_tools::topo::ResistanceDistanceAnalysis::
            computeResistanceCentrality,
          R"pbdoc(
            Compute the resistance centrality (N - 1) / sum_{j != i} R_ij for each node.
 
+           :param chunk_size: Number of columns per solve chunk (defaults to 128)
            :return: Vector of resistance centralities
-         )pbdoc")
+         )pbdoc",
+         py::arg("chunk_size") = 128)
     .def("compute_commute_time",
          &pylimer_tools::topo::ResistanceDistanceAnalysis::computeCommuteTime,
          R"pbdoc(
@@ -584,8 +629,10 @@ init_pylimer_bound_topo(py::module_& m)
          R"pbdoc(
            Compute the N x N matrix of all-pairs random-walk commute times.
 
+           :param chunk_size: Number of columns per solve chunk (defaults to 128)
            :return: N x N matrix of commute times
-         )pbdoc");
+         )pbdoc",
+         py::arg("chunk_size") = 128);
 };
 // }
 

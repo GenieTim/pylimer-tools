@@ -35,3 +35,16 @@ Finally, to find the shortest loop a specific atom is involved in, you can use t
    There are exponentially many paths between two crosslinkers of a network,
    and you may run out of memory when using these functions, if your network is lattice-like.
 
+Topological Resistance Distance & Commute Times
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For cyclic and cross-linked networks where many parallel pathways connect pairs of nodes,
+:class:`~pylimer_tools_cpp.ResistanceDistanceAnalysis` computes effective resistances
+:math:`R_{ij}`, the Kirchhoff index :math:`K(G)`, the Moore-Penrose pseudo-inverse
+:math:`\mathbf{L}^+`, random-walk commute times :math:`C_{ij}`, and node resistance
+centralities directly from a :class:`~pylimer_tools_cpp.Universe`, sparse graph
+Laplacian matrix, or weighted edge list.
+
+See :doc:`/auto_examples/structure_analysis/plot_resistance_distance_analysis` for
+analytical verifications, matrix diagnostics, and performance benchmarks on crosslinked networks.
+

@@ -103,8 +103,8 @@ llms_txt_description = (
     "pylimer-tools is a Python and C++ toolkit for simulating, analyzing, and "
     "handling bead-spring polymer networks and LAMMPS molecular dynamics output "
     "(Monte Carlo network generation, DPD simulations with slip-springs, "
-    "Maximum Entropy Homogenization / Force Balance, normal mode analysis, "
-    "and network topology analysis)."
+    "implicit Rouse and Brownian dynamics, Maximum Entropy Homogenization / Force Balance, "
+    "normal mode analysis, and topological resistance distance & network structure analysis)."
 )
 llms_txt_full_build = True
 llms_txt_exclude = ["*sg_execution_times*"]

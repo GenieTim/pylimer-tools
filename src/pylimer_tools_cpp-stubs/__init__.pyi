@@ -17,7 +17,7 @@ import numpy
 import numpy.typing
 import scipy.sparse
 import typing
-__all__: list[str] = ['Atom', 'AtomPairEntanglements', 'AtomStyle', 'AveFileReader', 'BackTrackStatus', 'BondLengthStats', 'Box', 'ComputeBackend', 'ComputedDoubleValues', 'ComputedIntValues', 'CrosslinkerUniverse', 'DPDSimulator', 'DataFileReader', 'DataFileWriter', 'DumpFileReader', 'EndToEndStats', 'EntanglementFilteringMode', 'ExitReason', 'HybridConfig', 'KPMConfig', 'LazyUniverseSequenceIterator', 'LinearMaxDistanceProvider', 'LinkSwappingMode', 'MCUniverseGenerator', 'MEHPForceBalance', 'MEHPForceBalance2', 'MEHPForceEvaluator', 'MEHPForceRelaxation', 'MaxDistanceProvider', 'Molecule', 'MoleculeIterator', 'MoleculeType', 'NoMaxDistanceProvider', 'NonGaussianSpringForceEvaluator', 'NormalModeAnalyzer', 'NormalModeSolver', 'NormalModeSpectrum', 'OutputConfiguration', 'ResistanceDistanceAnalysis', 'RouseBrownianSimulator', 'RouseSimulationResult', 'RouseSolverType', 'SLESolver', 'SLQConfig', 'STOP', 'SimpleSpringMEHPForceEvaluator', 'SimplifiedBalance2Network', 'SimplifiedBalanceNetwork', 'SimplifiedNetwork', 'StrandCategory', 'StrandPairEntanglements', 'StructureSimplificationMode', 'TRACK_BACKWARD', 'TRACK_FORWARD', 'Universe', 'UniverseSequence', 'ZScoreMaxDistanceProvider', 'do_linear_walk_chain_from_to', 'do_random_walk', 'do_random_walk_chain_from_to', 'do_random_walk_chain_from_to_mc', 'inverse_langevin', 'peel_topological_leaves', 'randomly_sample_entanglements', 'randomly_sample_entanglements_on_demand', 'randomly_sample_entanglements_v2', 'sample_strand_beads_on_demand', 'split_csv', 'version_information']
+__all__: list[str] = ['Atom', 'AtomPairEntanglements', 'AtomStyle', 'AveFileReader', 'BackTrackStatus', 'BondLengthStats', 'Box', 'ComputeBackend', 'ComputedDoubleValues', 'ComputedIntValues', 'Correlator', 'CrosslinkerUniverse', 'DPDSimulator', 'DataFileReader', 'DataFileWriter', 'DumpFileReader', 'EndToEndStats', 'EntanglementFilteringMode', 'ExitReason', 'HybridConfig', 'KPMConfig', 'LazyUniverseSequenceIterator', 'LinearMaxDistanceProvider', 'LinkSwappingMode', 'MCUniverseGenerator', 'MEHPForceBalance', 'MEHPForceBalance2', 'MEHPForceEvaluator', 'MEHPForceRelaxation', 'MaxDistanceProvider', 'Molecule', 'MoleculeIterator', 'MoleculeType', 'NoMaxDistanceProvider', 'NonGaussianSpringForceEvaluator', 'NormalModeAnalyzer', 'NormalModeSolver', 'NormalModeSpectrum', 'OutputConfiguration', 'ResistanceDistanceAnalysis', 'RouseBrownianSimulator', 'RouseSimulationResult', 'RouseSolverType', 'SLESolver', 'SLQConfig', 'STOP', 'SimpleSpringMEHPForceEvaluator', 'SimplifiedBalance2Network', 'SimplifiedBalanceNetwork', 'SimplifiedNetwork', 'StrandCategory', 'StrandPairEntanglements', 'StructureSimplificationMode', 'TRACK_BACKWARD', 'TRACK_FORWARD', 'Universe', 'UniverseSequence', 'ZScoreMaxDistanceProvider', 'do_linear_walk_chain_from_to', 'do_random_walk', 'do_random_walk_chain_from_to', 'do_random_walk_chain_from_to_mc', 'inverse_langevin', 'peel_topological_leaves', 'randomly_sample_entanglements', 'randomly_sample_entanglements_on_demand', 'randomly_sample_entanglements_v2', 'sample_strand_beads_on_demand', 'split_csv', 'version_information']
 class Atom:
     """
     
@@ -567,6 +567,113 @@ class ComputedIntValues(enum.IntEnum):
     def __format__(self, format_spec):
         """
         Convert to a string according to format_spec.
+        """
+class Correlator:
+    """
+    
+        Multi-tau scalar autocorrelator computing :math:`f(\\tau) = \\langle A(t) A(t + \\tau) \\rangle`.
+    
+        Uses a hierarchy of coarse-grained shift registers (Likhtman/Ramirez multi-tau algorithm)
+        to evaluate time correlations across exponentially spanning lag times in O(1) amortized time per sample.
+        
+    """
+    def __getstate__(self) -> tuple[bytes]:
+        ...
+    def __init__(self, num_correlators: typing.SupportsInt | typing.SupportsIndex = 32, p: typing.SupportsInt | typing.SupportsIndex = 16, m: typing.SupportsInt | typing.SupportsIndex = 2) -> None:
+        """
+                 Construct a multi-tau scalar Correlator.
+        
+                 :param num_correlators: Number of hierarchical correlator levels (default: 32)
+                 :param p: Number of lag points per correlator level (default: 16)
+                 :param m: Averaging factor between consecutive levels; recommended ``p % m == 0`` (default: 2)
+        """
+    def __setstate__(self, arg0: tuple) -> None:
+        ...
+    def add(self, value: typing.SupportsFloat | typing.SupportsIndex, level: typing.SupportsInt | typing.SupportsIndex = 0) -> None:
+        """
+                 Add a scalar observation to correlator level ``level``.
+        
+                 :param value: Finite scalar observation
+                 :param level: Correlator level index (default: 0)
+        """
+    def add_batch(self, values: typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]) -> None:
+        """
+                 Add a 1D array of scalar observations at level 0.
+        
+                 :param values: 1D array of finite scalar observations
+        """
+    def evaluate(self, norm: bool = False) -> None:
+        """
+                 Evaluate the autocorrelation function at all populated lag times.
+        
+                 :param norm: If True, subtract the squared sample mean :math:`\\langle A \\rangle^2` (default: False)
+        """
+    def reset(self) -> None:
+        """
+        Reset accumulated state while keeping the current correlator dimensions.
+        """
+    def set_size(self, num_correlators: typing.SupportsInt | typing.SupportsIndex = 32, p: typing.SupportsInt | typing.SupportsIndex = 16, m: typing.SupportsInt | typing.SupportsIndex = 2) -> None:
+        """
+                 Reconfigure correlator dimensions and reset accumulated state.
+        
+                 :param num_correlators: Number of hierarchical correlator levels (default: 32)
+                 :param p: Number of lag points per correlator level (default: 16)
+                 :param m: Averaging factor between consecutive levels (default: 2)
+        """
+    @property
+    def accval(self) -> float:
+        """
+        Accumulated sum of level-0 samples.
+        """
+    @property
+    def correlation(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+        """
+        Evaluated correlation values (call evaluate() first).
+        """
+    @property
+    def m(self) -> int:
+        """
+        Averaging factor between consecutive levels.
+        """
+    @property
+    def mean(self) -> float:
+        """
+        Running sample mean at level 0.
+        """
+    @property
+    def npcorr(self) -> int:
+        """
+        Number of populated correlation points after evaluate().
+        """
+    @property
+    def num_correlators(self) -> int:
+        """
+        Number of correlator levels configured.
+        """
+    @property
+    def num_samples(self) -> int:
+        """
+        Total number of samples added at level 0.
+        """
+    @property
+    def p(self) -> int:
+        """
+        Number of lag points per correlator level.
+        """
+    @property
+    def raw_f(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+        """
+        Full pre-allocated correlation buffer.
+        """
+    @property
+    def raw_t(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+        """
+        Full pre-allocated lag time buffer.
+        """
+    @property
+    def times(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+        """
+        Evaluated lag times (call evaluate() first).
         """
 class CrosslinkerUniverse:
     """
@@ -3998,6 +4105,22 @@ class ResistanceDistanceAnalysis:
                 :param arm_length: Number of edges per arm (defaults to 1)
                 :return: ResistanceDistanceAnalysis instance
         """
+    @staticmethod
+    def from_matrix(L: scipy.sparse.csc_matrix) -> ResistanceDistanceAnalysis:
+        """
+                Construct a ResistanceDistanceAnalysis instance from a sparse graph Laplacian matrix L.
+        
+                :param L: Symmetric positive semidefinite graph Laplacian matrix
+                :return: ResistanceDistanceAnalysis instance
+        """
+    @staticmethod
+    def from_universe(universe: Universe) -> ResistanceDistanceAnalysis:
+        """
+                Construct a ResistanceDistanceAnalysis instance from a Universe's atom-bond graph.
+        
+                :param universe: Universe instance
+                :return: ResistanceDistanceAnalysis instance
+        """
     @typing.overload
     def __init__(self, spring_from: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], spring_to: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], weights: collections.abc.Sequence[typing.SupportsFloat | typing.SupportsIndex] = [], num_nodes: typing.SupportsInt | typing.SupportsIndex = 0) -> None:
         """
@@ -4016,10 +4139,18 @@ class ResistanceDistanceAnalysis:
         
                    :param L: Symmetric positive semidefinite graph Laplacian matrix
         """
-    def compute_all_pairs_commute_time(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, n]"]:
+    @typing.overload
+    def __init__(self, universe: Universe) -> None:
+        """
+                   Construct from a Universe's atom-bond graph.
+        
+                   :param universe: Universe instance
+        """
+    def compute_all_pairs_commute_time(self, chunk_size: typing.SupportsInt | typing.SupportsIndex = 128) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, n]"]:
         """
                    Compute the N x N matrix of all-pairs random-walk commute times.
         
+                   :param chunk_size: Number of columns per solve chunk (defaults to 128)
                    :return: N x N matrix of commute times
         """
     def compute_all_pairs_effective_resistance(self, chunk_size: typing.SupportsInt | typing.SupportsIndex = 128) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, n]"]:
@@ -4045,17 +4176,19 @@ class ResistanceDistanceAnalysis:
                    :param j: Second node index
                    :return: Effective resistance R_ij (or inf if in different components)
         """
-    def compute_effective_resistance_batched(self, pairs: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+    def compute_effective_resistance_batched(self, pairs: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]], chunk_size: typing.SupportsInt | typing.SupportsIndex = 128) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         """
-                   Compute the effective resistance for a batch of node pairs using a single multi-RHS solve.
+                   Compute the effective resistance for a batch of node pairs using chunked multi-RHS solves.
         
                    :param pairs: List of (i, j) node index pairs
+                   :param chunk_size: Number of columns per solve chunk (defaults to 128)
                    :return: Vector of effective resistances for each pair
         """
-    def compute_kirchhoff_index(self) -> float:
+    def compute_kirchhoff_index(self, chunk_size: typing.SupportsInt | typing.SupportsIndex = 128) -> float:
         """
                 Compute the Kirchhoff index K(G) = sum_{i < j} R_ij without allocating the full N x N matrix.
         
+                :param chunk_size: Number of columns per solve chunk (defaults to 128)
                 :return: Kirchhoff index (or inf if disconnected)
         """
     def compute_kirchhoff_index_spectral(self) -> float:
@@ -4071,16 +4204,18 @@ class ResistanceDistanceAnalysis:
                    :param chunk_size: Number of columns per solve chunk (defaults to 128)
                    :return: N x N Moore-Penrose pseudo-inverse matrix
         """
-    def compute_resistance_centrality(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+    def compute_resistance_centrality(self, chunk_size: typing.SupportsInt | typing.SupportsIndex = 128) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         """
                    Compute the resistance centrality (N - 1) / sum_{j != i} R_ij for each node.
         
+                   :param chunk_size: Number of columns per solve chunk (defaults to 128)
                    :return: Vector of resistance centralities
         """
-    def compute_total_resistance_per_node(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+    def compute_total_resistance_per_node(self, chunk_size: typing.SupportsInt | typing.SupportsIndex = 128) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         """
                    Compute the sum of effective resistances from each node to all other nodes.
         
+                   :param chunk_size: Number of columns per solve chunk (defaults to 128)
                    :return: Vector of total resistance per node
         """
     def get_connected_components(self) -> list[list[int]]:
@@ -4151,14 +4286,26 @@ class RouseBrownianSimulator:
         Compute center-of-mass mean-squared displacement from a trajectory of (N, 3) position matrices.
         """
     @staticmethod
-    def compute_end_to_end_autocorrelation(trajectory: collections.abc.Sequence[typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, n]"]], node_a: typing.SupportsInt | typing.SupportsIndex = 0, node_b: typing.SupportsInt | typing.SupportsIndex = -1, time_averaged: bool = False) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+    def compute_end_to_end_autocorrelation(trajectory: collections.abc.Sequence[typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, n]"]], node_a: typing.SupportsInt | typing.SupportsIndex = 0, node_b: typing.SupportsInt | typing.SupportsIndex | None = None, time_averaged: bool = False) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         """
-        Compute normalized end-to-end vector autocorrelation from a trajectory of (N, 3) position matrices.
+        Compute normalized end-to-end vector autocorrelation from a trajectory of (N, 3) position matrices (node_b=None defaults to N - 1).
         """
     @staticmethod
     def compute_msd(trajectory: collections.abc.Sequence[typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, n]"]], time_averaged: bool = False) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         """
         Compute bead mean-squared displacement from a trajectory of (N, 3) position matrices.
+        """
+    @staticmethod
+    def create_complete(num_nodes: typing.SupportsInt | typing.SupportsIndex, gamma: typing.SupportsFloat | typing.SupportsIndex = 1.0, k: typing.SupportsFloat | typing.SupportsIndex = 1.0, T: typing.SupportsFloat | typing.SupportsIndex = 1.0, dt: typing.SupportsFloat | typing.SupportsIndex = 0.01) -> RouseBrownianSimulator:
+        """
+                Create a RouseBrownianSimulator for a complete graph K_N of num_nodes beads.
+        
+                :param num_nodes: Number of nodes in the complete graph (at least 2)
+                :param gamma: Bead friction coefficient
+                :param k: Hookean spring constant
+                :param T: Temperature
+                :param dt: Integration time step
+                :return: RouseBrownianSimulator instance
         """
     @staticmethod
     def create_linear_chain(num_nodes: typing.SupportsInt | typing.SupportsIndex, gamma: typing.SupportsFloat | typing.SupportsIndex = 1.0, k: typing.SupportsFloat | typing.SupportsIndex = 1.0, T: typing.SupportsFloat | typing.SupportsIndex = 1.0, dt: typing.SupportsFloat | typing.SupportsIndex = 0.01) -> RouseBrownianSimulator:
@@ -4175,11 +4322,36 @@ class RouseBrownianSimulator:
         """
                 Create a RouseBrownianSimulator for a star polymer with num_arms arms of arm_length bonds each.
         """
+    @staticmethod
+    def from_matrix(L: scipy.sparse.csc_matrix, gamma: typing.SupportsFloat | typing.SupportsIndex = 1.0, k: typing.SupportsFloat | typing.SupportsIndex = 1.0, T: typing.SupportsFloat | typing.SupportsIndex = 1.0, dt: typing.SupportsFloat | typing.SupportsIndex = 0.01) -> RouseBrownianSimulator:
+        """
+                Create a RouseBrownianSimulator from a sparse graph Laplacian matrix L.
+        
+                :param L: Symmetric positive semidefinite graph Laplacian matrix
+                :param gamma: Bead friction coefficient
+                :param k: Hookean spring constant
+                :param T: Temperature
+                :param dt: Integration time step
+                :return: RouseBrownianSimulator instance
+        """
+    @staticmethod
+    def from_universe(universe: Universe, gamma: typing.SupportsFloat | typing.SupportsIndex = 1.0, k: typing.SupportsFloat | typing.SupportsIndex = 1.0, T: typing.SupportsFloat | typing.SupportsIndex = 1.0, dt: typing.SupportsFloat | typing.SupportsIndex = 0.01) -> RouseBrownianSimulator:
+        """
+                Create a RouseBrownianSimulator from a Universe's atom-bond graph and coordinates.
+        
+                :param universe: Universe instance
+                :param gamma: Bead friction coefficient
+                :param k: Hookean spring constant
+                :param T: Temperature
+                :param dt: Integration time step
+                :return: RouseBrownianSimulator instance
+        """
     @typing.overload
-    def __init__(self, spring_from: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], spring_to: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], gamma: typing.SupportsFloat | typing.SupportsIndex = 1.0, k: typing.SupportsFloat | typing.SupportsIndex = 1.0, T: typing.SupportsFloat | typing.SupportsIndex = 1.0, dt: typing.SupportsFloat | typing.SupportsIndex = 0.01, num_nodes: typing.SupportsInt | typing.SupportsIndex = 0) -> None:
+    def __init__(self, spring_from: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], spring_to: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], gamma: typing.SupportsFloat | typing.SupportsIndex = 1.0, k: typing.SupportsFloat | typing.SupportsIndex = 1.0, T: typing.SupportsFloat | typing.SupportsIndex = 1.0, dt: typing.SupportsFloat | typing.SupportsIndex = 0.01, num_nodes: typing.SupportsInt | typing.SupportsIndex = 0, weights: collections.abc.Sequence[typing.SupportsFloat | typing.SupportsIndex] = []) -> None:
         """
                    Construct from edge lists (spring_from, spring_to), friction gamma,
-                   spring constant k, temperature T, time step dt, and optional num_nodes.
+                   spring constant k, temperature T, time step dt, optional num_nodes,
+                   and optional edge weights.
         
                    :param spring_from: Source node indices of springs
                    :param spring_to: Target node indices of springs
@@ -4188,6 +4360,7 @@ class RouseBrownianSimulator:
                    :param T: Temperature
                    :param dt: Integration time step
                    :param num_nodes: Total number of nodes (deduced if 0)
+                   :param weights: Optional positive edge weights (defaults to 1.0)
         """
     @typing.overload
     def __init__(self, L: scipy.sparse.csc_matrix, gamma: typing.SupportsFloat | typing.SupportsIndex = 1.0, k: typing.SupportsFloat | typing.SupportsIndex = 1.0, T: typing.SupportsFloat | typing.SupportsIndex = 1.0, dt: typing.SupportsFloat | typing.SupportsIndex = 0.01) -> None:
@@ -4195,6 +4368,17 @@ class RouseBrownianSimulator:
                    Construct from a pre-assembled sparse scalar graph Laplacian matrix L.
         
                    :param L: Symmetric positive semidefinite graph Laplacian matrix
+                   :param gamma: Bead friction coefficient
+                   :param k: Hookean spring constant
+                   :param T: Temperature
+                   :param dt: Integration time step
+        """
+    @typing.overload
+    def __init__(self, universe: Universe, gamma: typing.SupportsFloat | typing.SupportsIndex = 1.0, k: typing.SupportsFloat | typing.SupportsIndex = 1.0, T: typing.SupportsFloat | typing.SupportsIndex = 1.0, dt: typing.SupportsFloat | typing.SupportsIndex = 0.01) -> None:
+        """
+                   Construct from a Universe's atom-bond graph and initial coordinates.
+        
+                   :param universe: Universe instance
                    :param gamma: Bead friction coefficient
                    :param k: Hookean spring constant
                    :param T: Temperature
@@ -4212,13 +4396,13 @@ class RouseBrownianSimulator:
         """
         Get the integration time step dt.
         """
-    def get_end_to_end_distance(self, node_a: typing.SupportsInt | typing.SupportsIndex = 0, node_b: typing.SupportsInt | typing.SupportsIndex = -1) -> float:
+    def get_end_to_end_distance(self, node_a: typing.SupportsInt | typing.SupportsIndex = 0, node_b: typing.SupportsInt | typing.SupportsIndex | None = None) -> float:
         """
-        Compute the Euclidean distance between node_a and node_b (defaults to last node if node_b < 0).
+        Compute the Euclidean distance between node_a and node_b (None defaults to N - 1).
         """
-    def get_end_to_end_vector(self, node_a: typing.SupportsInt | typing.SupportsIndex = 0, node_b: typing.SupportsInt | typing.SupportsIndex = -1) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 1]"]:
+    def get_end_to_end_vector(self, node_a: typing.SupportsInt | typing.SupportsIndex = 0, node_b: typing.SupportsInt | typing.SupportsIndex | None = None) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 1]"]:
         """
-        Compute the 3D vector from node_a to node_b (defaults to last node if node_b < 0).
+        Compute the 3D vector from node_a to node_b (None defaults to N - 1).
         """
     def get_gamma(self) -> float:
         """
@@ -4276,9 +4460,9 @@ class RouseBrownianSimulator:
         """
         Initialize bead positions as a 3D random walk.
         """
-    def run(self, total_steps: typing.SupportsInt | typing.SupportsIndex, sample_interval: typing.SupportsInt | typing.SupportsIndex = 1, save_trajectory: bool = False, end_to_end_node_a: typing.SupportsInt | typing.SupportsIndex = 0, end_to_end_node_b: typing.SupportsInt | typing.SupportsIndex = -1) -> RouseSimulationResult:
+    def run(self, total_steps: typing.SupportsInt | typing.SupportsIndex, sample_interval: typing.SupportsInt | typing.SupportsIndex = 1, save_trajectory: bool = False, end_to_end_node_a: typing.SupportsInt | typing.SupportsIndex = 0, end_to_end_node_b: typing.SupportsInt | typing.SupportsIndex | None = None) -> RouseSimulationResult:
         """
-        Run the simulation for total_steps and record dynamical observables every sample_interval steps.
+        Run the simulation for total_steps and record dynamical observables every sample_interval steps (end_to_end_node_b=None defaults to N - 1).
         """
     def set_dt(self, dt: typing.SupportsFloat | typing.SupportsIndex) -> None:
         """

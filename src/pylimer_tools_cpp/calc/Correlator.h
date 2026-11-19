@@ -22,7 +22,9 @@ SOFTWARE.
 #ifndef CORRELATOR_H
 #define CORRELATOR_H
 
+#include "../utils/CerealUtils.h"
 #include <Eigen/Dense>
+#include <string>
 
 namespace pylimer_tools::calc {
 typedef Eigen::Matrix<unsigned long int, Eigen::Dynamic, Eigen::Dynamic>
@@ -80,21 +82,50 @@ public:
   double accval;
 
   /** Constructor */
-  // Correlator() { numcorrelators = 0; };
-  Correlator(const unsigned int numcorrin = 32,
-             const unsigned int pin = 16,
-             const unsigned int min = 2);
+  Correlator(unsigned int numcorrin = 32,
+             unsigned int pin = 16,
+             unsigned int min = 2);
 
   /** Set size of correlator */
-  void setsize(const unsigned int numcorrin = 32,
-               const unsigned int pin = 16,
-               const unsigned int min = 2);
+  void setsize(unsigned int numcorrin = 32,
+               unsigned int pin = 16,
+               unsigned int min = 2);
+
+  /** Reset accumulated state while keeping current (numcorrelators, p, m) */
+  void reset();
 
   /** Add a scalar to the correlator number k */
-  void add(const double w, const unsigned int k = 0);
+  void add(double w, unsigned int k = 0);
+
+  /** Add a batch of scalar observations at level k = 0 */
+  void addBatch(const Eigen::Ref<const Eigen::VectorXd>& values);
 
   /** Evaluate the current state of the correlator */
-  void evaluate(const bool norm = false);
+  void evaluate(bool norm = false);
+
+  /** Return evaluated lag times (prefix of length npcorr) */
+  Eigen::VectorXd getTimes() const;
+
+  /** Return evaluated correlation values (prefix of length npcorr) */
+  Eigen::VectorXd getCorrelation() const;
+
+  /** Number of correlator levels configured */
+  unsigned int getNumCorrelators() const { return numcorrelators; }
+
+  /** Total number of samples added at level 0 */
+  unsigned long int getNumSamples() const;
+
+  /** Running sample mean at level 0 */
+  double getMean() const;
+
+#ifdef CEREALIZABLE
+  static Correlator fromString(const std::string& in)
+  {
+    Correlator c;
+    pylimer_tools::utils::deserializeFromString(c, in);
+    return c;
+  }
+#endif
 
   /** serialize this object */
   template<class Archive>
@@ -122,5 +153,5 @@ public:
   }
 };
 
-}
+} // namespace pylimer_tools::calc
 #endif

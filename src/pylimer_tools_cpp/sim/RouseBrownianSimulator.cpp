@@ -1,5 +1,7 @@
 #include "RouseBrownianSimulator.h"
 
+#include "../entities/Universe.h"
+#include "../utils/GraphLaplacianUtils.h"
 #include "../utils/utilityMacros.h"
 #include <algorithm>
 #include <cmath>
@@ -9,37 +11,69 @@
 
 namespace pylimer_tools::sim {
 
+namespace {
+
+  void validateTrajectoryFrames(const std::vector<Eigen::MatrixXd>& trajectory)
+  {
+    INVALIDARG_EXP_IFN(!trajectory.empty(), "Trajectory cannot be empty");
+    const Eigen::Index numNodes = trajectory[0].rows();
+    INVALIDARG_EXP_IFN(
+      numNodes > 0 && trajectory[0].cols() == 3,
+      "Trajectory frames must have dimensions (numNodes, 3) with numNodes > 0");
+    for (size_t t = 1; t < trajectory.size(); ++t) {
+      INVALIDARG_EXP_IFN(
+        trajectory[t].rows() == numNodes && trajectory[t].cols() == 3,
+        "All trajectory frames must have uniform (numNodes, 3) dimensions");
+    }
+  }
+
+} // namespace
+
+void
+RouseBrownianSimulator::validateSimulationParameters(const double gamma,
+                                                     const double k,
+                                                     const double T,
+                                                     const double dt)
+{
+  INVALIDARG_EXP_IFN(std::isfinite(gamma) && gamma > 0.0,
+                     "Friction gamma must be finite and positive");
+  INVALIDARG_EXP_IFN(std::isfinite(k) && k > 0.0,
+                     "Spring constant k must be finite and positive");
+  INVALIDARG_EXP_IFN(std::isfinite(T) && T >= 0.0,
+                     "Temperature T must be finite and non-negative");
+  INVALIDARG_EXP_IFN(std::isfinite(dt) && dt > 0.0,
+                     "Time step dt must be finite and positive");
+}
+
 RouseBrownianSimulator::RouseBrownianSimulator(
   const std::vector<size_t>& springFrom,
   const std::vector<size_t>& springTo,
-  double gamma,
-  double k,
-  double T,
-  double dt,
-  size_t numNodes)
+  const double gamma,
+  const double k,
+  const double T,
+  const double dt,
+  const size_t numNodes,
+  const std::vector<double>& weights)
   : gamma_(gamma)
   , k_(k)
   , T_(T)
   , dt_(dt)
 {
-  INVALIDARG_EXP_IFN(gamma_ > 0.0, "Friction gamma must be positive");
-  INVALIDARG_EXP_IFN(k_ > 0.0, "Spring constant k must be positive");
-  INVALIDARG_EXP_IFN(T_ >= 0.0, "Temperature T must be non-negative");
-  INVALIDARG_EXP_IFN(dt_ > 0.0, "Time step dt must be positive");
+  validateSimulationParameters(gamma_, k_, T_, dt_);
 
-  initializeFromEdges(springFrom, springTo, numNodes);
-  positions_ = Eigen::MatrixXd::Zero(static_cast<Eigen::Index>(numNodes_), 3);
-  rhsBuffer_.resize(static_cast<Eigen::Index>(numNodes_), 3);
-  cgSolutionBuffer_.resize(static_cast<Eigen::Index>(numNodes_), 3);
+  initializeFromEdges(springFrom, springTo, numNodes, weights);
+  positions_ = Eigen::MatrixXd::Zero(numNodes_, 3);
+  rhsBuffer_.resize(numNodes_, 3);
+  cgSolutionBuffer_.resize(numNodes_, 3);
   updateShiftedMatrixAndFactorization();
 }
 
 RouseBrownianSimulator::RouseBrownianSimulator(
   const Eigen::SparseMatrix<double>& L,
-  double gamma,
-  double k,
-  double T,
-  double dt)
+  const double gamma,
+  const double k,
+  const double T,
+  const double dt)
   : numNodes_(L.rows())
   , gamma_(gamma)
   , k_(k)
@@ -47,104 +81,92 @@ RouseBrownianSimulator::RouseBrownianSimulator(
   , dt_(dt)
   , L_(L)
 {
-  INVALIDARG_EXP_IFN(L.rows() == L.cols(), "Laplacian matrix L must be square");
-  INVALIDARG_EXP_IFN(L.rows() > 0, "Laplacian matrix L cannot be empty");
-  INVALIDARG_EXP_IFN(gamma_ > 0.0, "Friction gamma must be positive");
-  INVALIDARG_EXP_IFN(k_ > 0.0, "Spring constant k must be positive");
-  INVALIDARG_EXP_IFN(T_ >= 0.0, "Temperature T must be non-negative");
-  INVALIDARG_EXP_IFN(dt_ > 0.0, "Time step dt must be positive");
+  validateSimulationParameters(gamma_, k_, T_, dt_);
+  L_.makeCompressed();
+  pylimer_tools::utils::validateGraphLaplacian(L_);
 
-  const Eigen::SparseMatrix<double> diff =
-    L_ - Eigen::SparseMatrix<double>(L_.transpose());
-  INVALIDARG_EXP_IFN(diff.norm() <= 1e-10 * std::max(1.0, L_.norm()),
-                     "Laplacian matrix L must be symmetric");
-  for (int col = 0; col < L_.outerSize(); ++col) {
-    for (Eigen::SparseMatrix<double>::InnerIterator it(L_, col); it; ++it) {
-      if (it.row() == it.col()) {
-        INVALIDARG_EXP_IFN(
-          it.value() >= 0.0,
-          "Laplacian matrix L must have non-negative diagonal entries");
-      }
-    }
-  }
-
-  positions_ = Eigen::MatrixXd::Zero(static_cast<Eigen::Index>(numNodes_), 3);
-  rhsBuffer_.resize(static_cast<Eigen::Index>(numNodes_), 3);
-  cgSolutionBuffer_.resize(static_cast<Eigen::Index>(numNodes_), 3);
+  positions_ = Eigen::MatrixXd::Zero(numNodes_, 3);
+  rhsBuffer_.resize(numNodes_, 3);
+  cgSolutionBuffer_.resize(numNodes_, 3);
   updateShiftedMatrixAndFactorization();
+}
+
+RouseBrownianSimulator::RouseBrownianSimulator(
+  const pylimer_tools::entities::Universe& universe,
+  const double gamma,
+  const double k,
+  const double T,
+  const double dt)
+  : gamma_(gamma)
+  , k_(k)
+  , T_(T)
+  , dt_(dt)
+{
+  validateSimulationParameters(gamma_, k_, T_, dt_);
+
+  std::vector<size_t> springFrom;
+  std::vector<size_t> springTo;
+  size_t nNodes = 0;
+  pylimer_tools::utils::extractUniverseEdges(
+    universe, springFrom, springTo, nNodes);
+  initializeFromEdges(springFrom, springTo, nNodes, {});
+
+  positions_.resize(numNodes_, 3);
+  const Eigen::VectorXd coords =
+    (universe.vertexPropertyExists("nx") &&
+     universe.vertexPropertyExists("ny") && universe.vertexPropertyExists("nz"))
+      ? universe.getUnwrappedVertexCoordinates(universe.getBox())
+      : universe.getVertexCoordinates();
+  setPositionsFlattened(coords, true);
+
+  rhsBuffer_.resize(numNodes_, 3);
+  cgSolutionBuffer_.resize(numNodes_, 3);
+  updateShiftedMatrixAndFactorization();
+}
+
+RouseBrownianSimulator
+RouseBrownianSimulator::fromMatrix(const Eigen::SparseMatrix<double>& L,
+                                   const double gamma,
+                                   const double k,
+                                   const double T,
+                                   const double dt)
+{
+  return RouseBrownianSimulator(L, gamma, k, T, dt);
+}
+
+RouseBrownianSimulator
+RouseBrownianSimulator::fromUniverse(
+  const pylimer_tools::entities::Universe& universe,
+  const double gamma,
+  const double k,
+  const double T,
+  const double dt)
+{
+  return RouseBrownianSimulator(universe, gamma, k, T, dt);
 }
 
 void
 RouseBrownianSimulator::initializeFromEdges(
   const std::vector<size_t>& springFrom,
   const std::vector<size_t>& springTo,
-  size_t numNodes)
+  const size_t numNodes,
+  const std::vector<double>& weights)
 {
-  INVALIDARG_EXP_IFN(springFrom.size() == springTo.size(),
-                     "springFrom and springTo must have the same size");
-  INVALIDARG_EXP_IFN(springFrom.size() > 0 || numNodes > 0,
-                     "Graph cannot be completely empty");
-
-  if (numNodes == 0) {
-    size_t maxIdx = 0;
-    for (size_t i = 0; i < springFrom.size(); ++i) {
-      maxIdx = std::max(maxIdx, std::max(springFrom[i], springTo[i]));
-    }
-    numNodes_ = static_cast<Eigen::Index>(maxIdx + 1);
-  } else {
-    numNodes_ = static_cast<Eigen::Index>(numNodes);
-    for (size_t i = 0; i < springFrom.size(); ++i) {
-      INVALIDARG_EXP_IFN(springFrom[i] < numNodes && springTo[i] < numNodes,
-                         "Node indices in springFrom/springTo exceed numNodes");
-    }
-  }
-
-  std::vector<Eigen::Triplet<double>> triplets;
-  triplets.reserve(springFrom.size() * 4);
-  Eigen::VectorXd diag = Eigen::VectorXd::Zero(numNodes_);
-
-  for (size_t e = 0; e < springFrom.size(); ++e) {
-    const Eigen::Index u = static_cast<Eigen::Index>(springFrom[e]);
-    const Eigen::Index v = static_cast<Eigen::Index>(springTo[e]);
-    if (u == v) {
-      continue;
-    }
-    triplets.emplace_back(static_cast<int>(u), static_cast<int>(v), -1.0);
-    triplets.emplace_back(static_cast<int>(v), static_cast<int>(u), -1.0);
-    diag(u) += 1.0;
-    diag(v) += 1.0;
-  }
-
-  for (Eigen::Index i = 0; i < numNodes_; ++i) {
-    if (diag(i) != 0.0) {
-      triplets.emplace_back(static_cast<int>(i), static_cast<int>(i), diag(i));
-    }
-  }
-
-  L_.resize(numNodes_, numNodes_);
-  L_.setFromTriplets(triplets.begin(), triplets.end());
+  size_t resolvedNumNodes = 0;
+  L_ = pylimer_tools::utils::assembleGraphLaplacian(
+    springFrom, springTo, weights, numNodes, &resolvedNumNodes);
+  numNodes_ = static_cast<Eigen::Index>(resolvedNumNodes);
 }
 
 void
 RouseBrownianSimulator::updateShiftedMatrixAndFactorization()
 {
   // A = I + dt * (k / gamma) * L
-  double alpha = dt_ * (k_ / gamma_);
-  std::vector<Eigen::Triplet<double>> triplets;
-  triplets.reserve(static_cast<size_t>(L_.nonZeros() + numNodes_));
-
-  for (int col = 0; col < L_.outerSize(); ++col) {
-    for (Eigen::SparseMatrix<double>::InnerIterator it(L_, col); it; ++it) {
-      triplets.emplace_back(it.row(), it.col(), alpha * it.value());
-    }
-  }
-
-  for (Eigen::Index i = 0; i < numNodes_; ++i) {
-    triplets.emplace_back(static_cast<int>(i), static_cast<int>(i), 1.0);
-  }
-
-  A_.resize(numNodes_, numNodes_);
-  A_.setFromTriplets(triplets.begin(), triplets.end());
+  const double alpha = dt_ * (k_ / gamma_);
+  Eigen::SparseMatrix<double> identity(numNodes_, numNodes_);
+  identity.setIdentity();
+  A_ = identity + alpha * L_;
+  A_.makeCompressed();
 
   solverFactorized_ = false;
 }
@@ -165,6 +187,7 @@ RouseBrownianSimulator::ensureFactorized() const
                         "SimplicialLLT factorization of A failed");
         break;
       case RouseSolverType::CONJUGATE_GRADIENT:
+        cgSolver_.setTolerance(1e-10);
         cgSolver_.compute(A_);
         RUNTIME_EXP_IFN(cgSolver_.info() == Eigen::Success,
                         "ConjugateGradient setup of A failed");
@@ -189,10 +212,12 @@ RouseBrownianSimulator::solveShiftedRHS(const Eigen::MatrixXd& rhs,
       result = lltSolver_.solve(rhs);
       break;
     case RouseSolverType::CONJUGATE_GRADIENT: {
-      cgSolutionBuffer_.resize(static_cast<Eigen::Index>(numNodes_), 3);
+      cgSolutionBuffer_.resize(numNodes_, 3);
       for (int c = 0; c < 3; ++c) {
         cgSolutionBuffer_.col(c) =
           cgSolver_.solveWithGuess(rhs.col(c), positions_.col(c));
+        RUNTIME_EXP_IFN(cgSolver_.info() == Eigen::Success,
+                        "ConjugateGradient solve of A failed");
       }
       result.noalias() = cgSolutionBuffer_;
       break;
@@ -203,17 +228,14 @@ RouseBrownianSimulator::solveShiftedRHS(const Eigen::MatrixXd& rhs,
 }
 
 void
-RouseBrownianSimulator::setParameters(double gamma,
-                                      double k,
-                                      double T,
-                                      double dt)
+RouseBrownianSimulator::setParameters(const double gamma,
+                                      const double k,
+                                      const double T,
+                                      const double dt)
 {
-  INVALIDARG_EXP_IFN(gamma > 0.0, "Friction gamma must be positive");
-  INVALIDARG_EXP_IFN(k > 0.0, "Spring constant k must be positive");
-  INVALIDARG_EXP_IFN(T >= 0.0, "Temperature T must be non-negative");
-  INVALIDARG_EXP_IFN(dt > 0.0, "Time step dt must be positive");
+  validateSimulationParameters(gamma, k, T, dt);
 
-  bool needsUpdate = (gamma != gamma_ || k != k_ || dt != dt_);
+  const bool needsUpdate = (gamma != gamma_ || k != k_ || dt != dt_);
   gamma_ = gamma;
   k_ = k;
   T_ = T;
@@ -225,38 +247,39 @@ RouseBrownianSimulator::setParameters(double gamma,
 }
 
 void
-RouseBrownianSimulator::setGamma(double gamma)
+RouseBrownianSimulator::setGamma(const double gamma)
 {
   setParameters(gamma, k_, T_, dt_);
 }
 
 void
-RouseBrownianSimulator::setK(double k)
+RouseBrownianSimulator::setK(const double k)
 {
   setParameters(gamma_, k, T_, dt_);
 }
 
 void
-RouseBrownianSimulator::setTemperature(double T)
+RouseBrownianSimulator::setTemperature(const double T)
 {
   setParameters(gamma_, k_, T, dt_);
 }
 
 void
-RouseBrownianSimulator::setDt(double dt)
+RouseBrownianSimulator::setDt(const double dt)
 {
   setParameters(gamma_, k_, T_, dt);
 }
 
 void
-RouseBrownianSimulator::setKB(double kB)
+RouseBrownianSimulator::setKB(const double kB)
 {
-  INVALIDARG_EXP_IFN(kB > 0.0, "Boltzmann constant kB must be positive");
+  INVALIDARG_EXP_IFN(std::isfinite(kB) && kB > 0.0,
+                     "Boltzmann constant kB must be finite and positive");
   kB_ = kB;
 }
 
 void
-RouseBrownianSimulator::setSolverType(RouseSolverType type)
+RouseBrownianSimulator::setSolverType(const RouseSolverType type)
 {
   if (type != solverType_) {
     solverType_ = type;
@@ -265,9 +288,10 @@ RouseBrownianSimulator::setSolverType(RouseSolverType type)
 }
 
 void
-RouseBrownianSimulator::setSeed(uint64_t seed)
+RouseBrownianSimulator::setSeed(const uint64_t seed)
 {
   rng_.seed(seed);
+  normalDist_.reset();
 }
 
 void
@@ -275,15 +299,20 @@ RouseBrownianSimulator::setPositions(const Eigen::MatrixXd& positions)
 {
   INVALIDARG_EXP_IFN(positions.rows() == numNodes_ && positions.cols() == 3,
                      "Positions matrix must have dimensions (numNodes, 3)");
+  INVALIDARG_EXP_IFN(positions.allFinite(),
+                     "Positions matrix must contain only finite values");
   positions_ = positions;
 }
 
 void
 RouseBrownianSimulator::setPositionsFlattened(const Eigen::VectorXd& r,
-                                              bool interleaved)
+                                              const bool interleaved)
 {
   INVALIDARG_EXP_IFN(r.size() == numNodes_ * 3,
                      "Flattened positions vector must have size 3 * numNodes");
+  INVALIDARG_EXP_IFN(
+    r.allFinite(),
+    "Flattened positions vector must contain only finite values");
 
   if (interleaved) {
     for (Eigen::Index i = 0; i < numNodes_; ++i) {
@@ -299,7 +328,7 @@ RouseBrownianSimulator::setPositionsFlattened(const Eigen::VectorXd& r,
 }
 
 Eigen::VectorXd
-RouseBrownianSimulator::getPositionsFlattened(bool interleaved) const
+RouseBrownianSimulator::getPositionsFlattened(const bool interleaved) const
 {
   Eigen::VectorXd r(numNodes_ * 3);
   if (interleaved) {
@@ -317,8 +346,11 @@ RouseBrownianSimulator::getPositionsFlattened(bool interleaved) const
 }
 
 void
-RouseBrownianSimulator::initializeLinearPositions(double bondLength, int axis)
+RouseBrownianSimulator::initializeLinearPositions(const double bondLength,
+                                                  const int axis)
 {
+  INVALIDARG_EXP_IFN(std::isfinite(bondLength) && bondLength >= 0.0,
+                     "bondLength must be finite and non-negative");
   INVALIDARG_EXP_IFN(axis >= 0 && axis < 3,
                      "axis must be 0 (x), 1 (y), or 2 (z)");
   positions_ = Eigen::MatrixXd::Zero(numNodes_, 3);
@@ -328,29 +360,40 @@ RouseBrownianSimulator::initializeLinearPositions(double bondLength, int axis)
 }
 
 void
-RouseBrownianSimulator::initializeRandomWalk(double bondLength, uint64_t seed)
+RouseBrownianSimulator::initializeRandomWalk(const double bondLength,
+                                             const uint64_t seed)
 {
+  INVALIDARG_EXP_IFN(std::isfinite(bondLength) && bondLength >= 0.0,
+                     "bondLength must be finite and non-negative");
   std::mt19937_64 gen(seed);
   std::normal_distribution<double> dist(0.0, 1.0);
 
   positions_ = Eigen::MatrixXd::Zero(numNodes_, 3);
   for (Eigen::Index i = 1; i < numNodes_; ++i) {
-    Eigen::Vector3d step(dist(gen), dist(gen), dist(gen));
-    step.normalize();
+    const double dx = dist(gen);
+    const double dy = dist(gen);
+    const double dz = dist(gen);
+    Eigen::Vector3d step(dx, dy, dz);
+    const double norm = step.norm();
+    if (norm > 0.0) {
+      step /= norm;
+    } else {
+      step = Eigen::Vector3d(1.0, 0.0, 0.0);
+    }
     positions_.row(i) = positions_.row(i - 1) + (bondLength * step).transpose();
   }
 }
 
 void
-RouseBrownianSimulator::step(size_t numSteps)
+RouseBrownianSimulator::step(const size_t numSteps)
 {
   const double D = getDiffusionCoefficient();
   const double sigma = (T_ > 0.0) ? std::sqrt(2.0 * D * dt_) : 0.0;
-  rhsBuffer_.resize(static_cast<Eigen::Index>(numNodes_), 3);
+  rhsBuffer_.resize(numNodes_, 3);
 
   for (size_t s = 0; s < numSteps; ++s) {
     if (sigma > 0.0) {
-      for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(numNodes_); ++i) {
+      for (Eigen::Index i = 0; i < numNodes_; ++i) {
         rhsBuffer_(i, 0) = positions_(i, 0) + sigma * normalDist_(rng_);
         rhsBuffer_(i, 1) = positions_(i, 1) + sigma * normalDist_(rng_);
         rhsBuffer_(i, 2) = positions_(i, 2) + sigma * normalDist_(rng_);
@@ -364,20 +407,22 @@ RouseBrownianSimulator::step(size_t numSteps)
 
 void
 RouseBrownianSimulator::stepWithExternalForces(const Eigen::MatrixXd& forces,
-                                               size_t numSteps)
+                                               const size_t numSteps)
 {
   INVALIDARG_EXP_IFN(
     forces.rows() == numNodes_ && forces.cols() == 3,
     "External forces matrix must have dimensions (numNodes, 3)");
+  INVALIDARG_EXP_IFN(forces.allFinite(),
+                     "External forces matrix must contain only finite values");
 
   const double D = getDiffusionCoefficient();
   const double sigma = (T_ > 0.0) ? std::sqrt(2.0 * D * dt_) : 0.0;
   const double forceCoeff = dt_ / gamma_;
-  rhsBuffer_.resize(static_cast<Eigen::Index>(numNodes_), 3);
+  rhsBuffer_.resize(numNodes_, 3);
 
   for (size_t s = 0; s < numSteps; ++s) {
     if (sigma > 0.0) {
-      for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(numNodes_); ++i) {
+      for (Eigen::Index i = 0; i < numNodes_; ++i) {
         rhsBuffer_(i, 0) = positions_(i, 0) + forceCoeff * forces(i, 0) +
                            sigma * normalDist_(rng_);
         rhsBuffer_(i, 1) = positions_(i, 1) + forceCoeff * forces(i, 1) +
@@ -393,9 +438,9 @@ RouseBrownianSimulator::stepWithExternalForces(const Eigen::MatrixXd& forces,
 }
 
 void
-RouseBrownianSimulator::stepDeterministic(size_t numSteps)
+RouseBrownianSimulator::stepDeterministic(const size_t numSteps)
 {
-  rhsBuffer_.resize(static_cast<Eigen::Index>(numNodes_), 3);
+  rhsBuffer_.resize(numNodes_, 3);
   for (size_t s = 0; s < numSteps; ++s) {
     rhsBuffer_.noalias() = positions_;
     solveShiftedRHS(rhsBuffer_, positions_);
@@ -405,14 +450,16 @@ RouseBrownianSimulator::stepDeterministic(size_t numSteps)
 void
 RouseBrownianSimulator::stepDeterministicWithExternalForces(
   const Eigen::MatrixXd& forces,
-  size_t numSteps)
+  const size_t numSteps)
 {
   INVALIDARG_EXP_IFN(
     forces.rows() == numNodes_ && forces.cols() == 3,
     "External forces matrix must have dimensions (numNodes, 3)");
+  INVALIDARG_EXP_IFN(forces.allFinite(),
+                     "External forces matrix must contain only finite values");
 
   const double forceCoeff = dt_ / gamma_;
-  rhsBuffer_.resize(static_cast<Eigen::Index>(numNodes_), 3);
+  rhsBuffer_.resize(numNodes_, 3);
   for (size_t s = 0; s < numSteps; ++s) {
     rhsBuffer_.noalias() = positions_ + forceCoeff * forces;
     solveShiftedRHS(rhsBuffer_, positions_);
@@ -426,20 +473,24 @@ RouseBrownianSimulator::getCenterOfMass() const
 }
 
 Eigen::Vector3d
-RouseBrownianSimulator::getEndToEndVector(size_t nodeA, size_t nodeB) const
+RouseBrownianSimulator::getEndToEndVector(
+  const size_t nodeA,
+  const std::optional<size_t> nodeB) const
 {
-  const Eigen::Index nodeAIdx = static_cast<Eigen::Index>(nodeA);
-  const Eigen::Index nodeBIdx = (nodeB == static_cast<size_t>(-1))
-                                  ? (numNodes_ - 1)
-                                  : static_cast<Eigen::Index>(nodeB);
-  INVALIDINDEX_EXP_IFN(nodeAIdx < numNodes_ && nodeBIdx < numNodes_,
+  const size_t numNodesSz = static_cast<size_t>(numNodes_);
+  const size_t resolvedNodeB = nodeB.value_or(numNodesSz - 1);
+  INVALIDINDEX_EXP_IFN(nodeA < numNodesSz && resolvedNodeB < numNodesSz,
                        "End-to-end node index out of range");
 
-  return (positions_.row(nodeBIdx) - positions_.row(nodeAIdx)).transpose();
+  return (positions_.row(static_cast<Eigen::Index>(resolvedNodeB)) -
+          positions_.row(static_cast<Eigen::Index>(nodeA)))
+    .transpose();
 }
 
 double
-RouseBrownianSimulator::getEndToEndDistance(size_t nodeA, size_t nodeB) const
+RouseBrownianSimulator::getEndToEndDistance(
+  const size_t nodeA,
+  const std::optional<size_t> nodeB) const
 {
   return getEndToEndVector(nodeA, nodeB).norm();
 }
@@ -451,10 +502,7 @@ RouseBrownianSimulator::getRadiusOfGyration() const
     return 0.0;
   }
   const Eigen::Vector3d cm = getCenterOfMass();
-  double rgSq = 0.0;
-  for (Eigen::Index i = 0; i < numNodes_; ++i) {
-    rgSq += (positions_.row(i).transpose() - cm).squaredNorm();
-  }
+  const double rgSq = (positions_.rowwise() - cm.transpose()).squaredNorm();
   return std::sqrt(rgSq / static_cast<double>(numNodes_));
 }
 
@@ -470,16 +518,15 @@ RouseBrownianSimulator::getPotentialEnergy() const
 }
 
 RouseSimulationResult
-RouseBrownianSimulator::run(size_t totalSteps,
-                            size_t sampleInterval,
-                            bool saveTrajectory,
-                            size_t endToEndNodeA,
-                            size_t endToEndNodeB)
+RouseBrownianSimulator::run(const size_t totalSteps,
+                            const size_t sampleInterval,
+                            const bool saveTrajectory,
+                            const size_t endToEndNodeA,
+                            const std::optional<size_t> endToEndNodeB)
 {
   INVALIDARG_EXP_IFN(sampleInterval > 0, "sampleInterval must be > 0");
-  if (endToEndNodeB == static_cast<size_t>(-1)) {
-    endToEndNodeB = static_cast<size_t>(numNodes_ - 1);
-  }
+  const size_t resolvedNodeB =
+    endToEndNodeB.value_or(static_cast<size_t>(numNodes_ - 1));
 
   const size_t numSamples = totalSteps / sampleInterval + 1;
   RouseSimulationResult result;
@@ -497,14 +544,15 @@ RouseBrownianSimulator::run(size_t totalSteps,
   const Eigen::MatrixXd initialPos = positions_;
   const Eigen::Vector3d initialCM = getCenterOfMass();
   const Eigen::Vector3d initialR_ee =
-    getEndToEndVector(endToEndNodeA, endToEndNodeB);
+    getEndToEndVector(endToEndNodeA, resolvedNodeB);
   const double initialR_eeSq = initialR_ee.squaredNorm();
+  const double normFactor = (initialR_eeSq > 1e-12) ? initialR_eeSq : 1.0;
 
   // Record t = 0
   result.times(0) = 0.0;
   result.msd(0) = 0.0;
   result.msdCenterOfMass(0) = 0.0;
-  result.endToEndCorrelation(0) = (initialR_eeSq > 1e-12) ? 1.0 : 0.0;
+  result.endToEndCorrelation(0) = initialR_eeSq / normFactor;
   if (saveTrajectory) {
     result.trajectory.push_back(positions_);
   }
@@ -523,11 +571,8 @@ RouseBrownianSimulator::run(size_t totalSteps,
       result.times(sampleIdx) = t;
 
       // Bead MSD: (1/N) * sum_i |r_i(t) - r_i(0)|^2
-      double msdVal = 0.0;
-      for (Eigen::Index i = 0; i < numNodes_; ++i) {
-        msdVal += (positions_.row(i) - initialPos.row(i)).squaredNorm();
-      }
-      result.msd(sampleIdx) = msdVal / static_cast<double>(numNodes_);
+      result.msd(sampleIdx) = (positions_ - initialPos).squaredNorm() /
+                              static_cast<double>(numNodes_);
 
       // Center of mass MSD: |r_cm(t) - r_cm(0)|^2
       const Eigen::Vector3d curCM = getCenterOfMass();
@@ -535,13 +580,9 @@ RouseBrownianSimulator::run(size_t totalSteps,
 
       // End-to-end vector autocorrelation: <R_ee(t) . R_ee(0)> / |R_ee(0)|^2
       const Eigen::Vector3d curR_ee =
-        getEndToEndVector(endToEndNodeA, endToEndNodeB);
-      if (initialR_eeSq > 1e-12) {
-        result.endToEndCorrelation(sampleIdx) =
-          curR_ee.dot(initialR_ee) / initialR_eeSq;
-      } else {
-        result.endToEndCorrelation(sampleIdx) = curR_ee.dot(initialR_ee);
-      }
+        getEndToEndVector(endToEndNodeA, resolvedNodeB);
+      result.endToEndCorrelation(sampleIdx) =
+        curR_ee.dot(initialR_ee) / normFactor;
 
       if (saveTrajectory) {
         result.trajectory.push_back(positions_);
@@ -556,10 +597,10 @@ RouseBrownianSimulator::run(size_t totalSteps,
 Eigen::VectorXd
 RouseBrownianSimulator::computeMSD(
   const std::vector<Eigen::MatrixXd>& trajectory,
-  bool timeAveraged)
+  const bool timeAveraged)
 {
-  size_t M = trajectory.size();
-  INVALIDARG_EXP_IFN(M > 0, "Trajectory cannot be empty");
+  validateTrajectoryFrames(trajectory);
+  const size_t M = trajectory.size();
   const Eigen::Index numFrames = static_cast<Eigen::Index>(M);
   const Eigen::Index N = trajectory[0].rows();
 
@@ -568,12 +609,8 @@ RouseBrownianSimulator::computeMSD(
   if (!timeAveraged) {
     const Eigen::MatrixXd& r0 = trajectory[0];
     for (size_t t = 0; t < M; ++t) {
-      double sumSq = 0.0;
-      const Eigen::MatrixXd& rt = trajectory[t];
-      for (Eigen::Index i = 0; i < N; ++i) {
-        sumSq += (rt.row(i) - r0.row(i)).squaredNorm();
-      }
-      msd(static_cast<Eigen::Index>(t)) = sumSq / static_cast<double>(N);
+      msd(static_cast<Eigen::Index>(t)) =
+        (trajectory[t] - r0).squaredNorm() / static_cast<double>(N);
     }
   } else {
 #ifdef OPENMP_FOUND
@@ -583,11 +620,8 @@ RouseBrownianSimulator::computeMSD(
       double sumSq = 0.0;
       const size_t count = M - static_cast<size_t>(tau);
       for (size_t t = 0; t < count; ++t) {
-        const Eigen::MatrixXd& rTau = trajectory[t + static_cast<size_t>(tau)];
-        const Eigen::MatrixXd& rT = trajectory[t];
-        for (Eigen::Index i = 0; i < N; ++i) {
-          sumSq += (rTau.row(i) - rT.row(i)).squaredNorm();
-        }
+        sumSq += (trajectory[t + static_cast<size_t>(tau)] - trajectory[t])
+                   .squaredNorm();
       }
       msd(tau) = sumSq / (static_cast<double>(count) * static_cast<double>(N));
     }
@@ -599,10 +633,10 @@ RouseBrownianSimulator::computeMSD(
 Eigen::VectorXd
 RouseBrownianSimulator::computeCenterOfMassMSD(
   const std::vector<Eigen::MatrixXd>& trajectory,
-  bool timeAveraged)
+  const bool timeAveraged)
 {
-  size_t M = trajectory.size();
-  INVALIDARG_EXP_IFN(M > 0, "Trajectory cannot be empty");
+  validateTrajectoryFrames(trajectory);
+  const size_t M = trajectory.size();
 
   std::vector<Eigen::Vector3d> cms(M);
   for (size_t t = 0; t < M; ++t) {
@@ -621,7 +655,7 @@ RouseBrownianSimulator::computeCenterOfMassMSD(
 #endif
     for (size_t tau = 0; tau < M; ++tau) {
       double sumSq = 0.0;
-      size_t count = M - tau;
+      const size_t count = M - tau;
       for (size_t t = 0; t < count; ++t) {
         sumSq += (cms[t + tau] - cms[t]).squaredNorm();
       }
@@ -635,20 +669,19 @@ RouseBrownianSimulator::computeCenterOfMassMSD(
 Eigen::VectorXd
 RouseBrownianSimulator::computeEndToEndAutocorrelation(
   const std::vector<Eigen::MatrixXd>& trajectory,
-  size_t nodeA,
-  size_t nodeB,
-  bool timeAveraged)
+  const size_t nodeA,
+  const std::optional<size_t> nodeB,
+  const bool timeAveraged)
 {
-  size_t M = trajectory.size();
-  INVALIDARG_EXP_IFN(M > 0, "Trajectory cannot be empty");
-  size_t N = static_cast<size_t>(trajectory[0].rows());
-  if (nodeB == static_cast<size_t>(-1)) {
-    nodeB = N - 1;
-  }
-  INVALIDINDEX_EXP_IFN(nodeA < N && nodeB < N, "Node index out of range");
+  validateTrajectoryFrames(trajectory);
+  const size_t M = trajectory.size();
+  const size_t N = static_cast<size_t>(trajectory[0].rows());
+  const size_t resolvedNodeB = nodeB.value_or(N - 1);
+  INVALIDINDEX_EXP_IFN(nodeA < N && resolvedNodeB < N,
+                       "Node index out of range");
 
   const Eigen::Index nodeAIdx = static_cast<Eigen::Index>(nodeA);
-  const Eigen::Index nodeBIdx = static_cast<Eigen::Index>(nodeB);
+  const Eigen::Index nodeBIdx = static_cast<Eigen::Index>(resolvedNodeB);
   std::vector<Eigen::Vector3d> r_ee(M);
   for (size_t t = 0; t < M; ++t) {
     r_ee[t] =
@@ -658,8 +691,8 @@ RouseBrownianSimulator::computeEndToEndAutocorrelation(
   Eigen::VectorXd corr = Eigen::VectorXd::Zero(static_cast<Eigen::Index>(M));
 
   if (!timeAveraged) {
-    double norm0Sq = r_ee[0].squaredNorm();
-    double normFactor = (norm0Sq > 1e-12) ? norm0Sq : 1.0;
+    const double norm0Sq = r_ee[0].squaredNorm();
+    const double normFactor = (norm0Sq > 1e-12) ? norm0Sq : 1.0;
     for (size_t t = 0; t < M; ++t) {
       corr(static_cast<Eigen::Index>(t)) = r_ee[t].dot(r_ee[0]) / normFactor;
     }
@@ -668,15 +701,15 @@ RouseBrownianSimulator::computeEndToEndAutocorrelation(
     for (size_t t = 0; t < M; ++t) {
       totalNormSq += r_ee[t].squaredNorm();
     }
-    double meanNormSq = totalNormSq / static_cast<double>(M);
-    double normFactor = (meanNormSq > 1e-12) ? meanNormSq : 1.0;
+    const double meanNormSq = totalNormSq / static_cast<double>(M);
+    const double normFactor = (meanNormSq > 1e-12) ? meanNormSq : 1.0;
 
 #ifdef OPENMP_FOUND
 #pragma omp parallel for schedule(dynamic, 16) if (M > 64)
 #endif
     for (size_t tau = 0; tau < M; ++tau) {
       double sumDot = 0.0;
-      size_t count = M - tau;
+      const size_t count = M - tau;
       for (size_t t = 0; t < count; ++t) {
         sumDot += r_ee[t + tau].dot(r_ee[t]);
       }
@@ -689,70 +722,56 @@ RouseBrownianSimulator::computeEndToEndAutocorrelation(
 }
 
 RouseBrownianSimulator
-RouseBrownianSimulator::createLinearChain(size_t numNodes,
-                                          double gamma,
-                                          double k,
-                                          double T,
-                                          double dt)
+RouseBrownianSimulator::createLinearChain(const size_t numNodes,
+                                          const double gamma,
+                                          const double k,
+                                          const double T,
+                                          const double dt)
 {
-  INVALIDARG_EXP_IFN(numNodes > 0, "numNodes must be > 0");
-  if (numNodes == 1) {
-    return RouseBrownianSimulator({}, {}, gamma, k, T, dt, 1);
-  }
-  std::vector<size_t> from(numNodes - 1);
-  std::vector<size_t> to(numNodes - 1);
-  for (size_t i = 0; i < numNodes - 1; ++i) {
-    from[i] = i;
-    to[i] = i + 1;
-  }
-  return RouseBrownianSimulator(from, to, gamma, k, T, dt, numNodes);
-}
-
-RouseBrownianSimulator
-RouseBrownianSimulator::createRing(size_t numNodes,
-                                   double gamma,
-                                   double k,
-                                   double T,
-                                   double dt)
-{
-  INVALIDARG_EXP_IFN(numNodes >= 3, "Ring requires at least 3 nodes");
-  std::vector<size_t> from(numNodes);
-  std::vector<size_t> to(numNodes);
-  for (size_t i = 0; i < numNodes - 1; ++i) {
-    from[i] = i;
-    to[i] = i + 1;
-  }
-  from[numNodes - 1] = numNodes - 1;
-  to[numNodes - 1] = 0;
-  return RouseBrownianSimulator(from, to, gamma, k, T, dt, numNodes);
-}
-
-RouseBrownianSimulator
-RouseBrownianSimulator::createStar(size_t numArms,
-                                   size_t armLength,
-                                   double gamma,
-                                   double k,
-                                   double T,
-                                   double dt)
-{
-  INVALIDARG_EXP_IFN(numArms >= 2, "Star requires at least 2 arms");
-  INVALIDARG_EXP_IFN(armLength >= 1, "armLength must be >= 1");
-  size_t numNodes = 1 + numArms * armLength;
   std::vector<size_t> from;
   std::vector<size_t> to;
-  from.reserve(numArms * armLength);
-  to.reserve(numArms * armLength);
+  pylimer_tools::utils::buildLinearChainEdges(numNodes, from, to);
+  return RouseBrownianSimulator(from, to, gamma, k, T, dt, numNodes);
+}
 
-  size_t nextNode = 1;
-  for (size_t a = 0; a < numArms; ++a) {
-    from.push_back(0);
-    to.push_back(nextNode);
-    for (size_t l = 1; l < armLength; ++l) {
-      from.push_back(nextNode + l - 1);
-      to.push_back(nextNode + l);
-    }
-    nextNode += armLength;
-  }
+RouseBrownianSimulator
+RouseBrownianSimulator::createRing(const size_t numNodes,
+                                   const double gamma,
+                                   const double k,
+                                   const double T,
+                                   const double dt)
+{
+  std::vector<size_t> from;
+  std::vector<size_t> to;
+  pylimer_tools::utils::buildRingEdges(numNodes, from, to);
+  return RouseBrownianSimulator(from, to, gamma, k, T, dt, numNodes);
+}
+
+RouseBrownianSimulator
+RouseBrownianSimulator::createComplete(const size_t numNodes,
+                                       const double gamma,
+                                       const double k,
+                                       const double T,
+                                       const double dt)
+{
+  std::vector<size_t> from;
+  std::vector<size_t> to;
+  pylimer_tools::utils::buildCompleteGraphEdges(numNodes, from, to);
+  return RouseBrownianSimulator(from, to, gamma, k, T, dt, numNodes);
+}
+
+RouseBrownianSimulator
+RouseBrownianSimulator::createStar(const size_t numArms,
+                                   const size_t armLength,
+                                   const double gamma,
+                                   const double k,
+                                   const double T,
+                                   const double dt)
+{
+  std::vector<size_t> from;
+  std::vector<size_t> to;
+  size_t numNodes = 0;
+  pylimer_tools::utils::buildStarEdges(numArms, armLength, from, to, numNodes);
   return RouseBrownianSimulator(from, to, gamma, k, T, dt, numNodes);
 }
 

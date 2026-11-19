@@ -4,10 +4,14 @@
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
+#include <cmath>
 #include <cstdio>
 #include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <string>
+#include <utility>
+#include <vector>
 #ifdef OPENMP_FOUND
 #include <omp.h>
 #endif
@@ -892,3 +896,98 @@ TEST_CASE("DPD Simulator can be serialized",
   }
 }
 #endif
+
+TEST_CASE("OutputSupportingSimulation handles multiple autocorrelation configs "
+          "and useEvery > 1",
+          "[analysis][DPDSimulator][Correlator]")
+{
+  pe::Universe u(5.0, 5.0, 5.0);
+  u.addAtoms({ 1, 2, 3, 4 },
+             { 1, 1, 1, 1 },
+             { 0.5, 1.5, 2.5, 3.5 },
+             { 1.0, 1.0, 1.0, 1.0 },
+             { 1.0, 1.0, 1.0, 1.0 },
+             { 0, 0, 0, 0 },
+             { 0, 0, 0, 0 },
+             { 0, 0, 0, 0 });
+  u.addBonds({ 1, 2, 3 }, { 2, 3, 4 });
+
+  pcd::DPDSimulator simulator(u, 2, 9, false, "autocorr_test");
+
+  const std::filesystem::path tmpDir = std::filesystem::temp_directory_path();
+  const std::string file1 = (tmpDir / "pylimer_test_autocorr_1.txt").string();
+  const std::string file2 = (tmpDir / "pylimer_test_autocorr_2.txt").string();
+  std::remove(file1.c_str());
+  std::remove(file2.c_str());
+
+  struct TempFileCleanup
+  {
+    std::string path1;
+    std::string path2;
+    ~TempFileCleanup()
+    {
+      std::remove(path1.c_str());
+      std::remove(path2.c_str());
+    }
+  };
+  const TempFileCleanup cleanup{ file1, file2 };
+
+  ps::OutputConfiguration ac1;
+  ac1.filename = file1;
+  ac1.useEvery = 2;
+  ac1.outputEvery = 4;
+  ac1.doubleValues = { ps::ComputedDoubleValues::STRESS_XX };
+
+  ps::OutputConfiguration ac2;
+  ac2.filename = file2;
+  ac2.useEvery = 2;
+  ac2.outputEvery = 4;
+  ac2.doubleValues = { ps::ComputedDoubleValues::PRESSURE };
+
+  REQUIRE_NOTHROW(simulator.configAutoCorrelatorOutput({ ac1, ac2 }, 4, 8, 2));
+  REQUIRE_NOTHROW(simulator.runSimulation(4, false));
+
+  REQUIRE(std::filesystem::exists(file1));
+  REQUIRE(std::filesystem::exists(file2));
+
+  auto parseDataRows =
+    [](const std::string& path) -> std::vector<std::pair<double, double>> {
+    std::ifstream in(path);
+    std::string line;
+    std::vector<std::pair<double, double>> rows;
+    while (std::getline(in, line)) {
+      if (!line.empty() && line[0] != '#' && line.rfind("Step\t", 0) != 0) {
+        const size_t tabPos = line.find('\t');
+        REQUIRE(tabPos != std::string::npos);
+        const double lag = std::stod(line.substr(0, tabPos));
+        const double val = std::stod(line.substr(tabPos + 1));
+        rows.emplace_back(lag, val);
+      }
+    }
+    return rows;
+  };
+
+  // 4 steps with useEvery = 2 gives 2 samples (steps 2 and 4) -> 2 lag points
+  // (0, 1)
+  const std::vector<std::pair<double, double>> rows1 = parseDataRows(file1);
+  const std::vector<std::pair<double, double>> rows2 = parseDataRows(file2);
+  REQUIRE(rows1.size() == 2);
+  REQUIRE(rows2.size() == 2);
+
+  for (size_t i = 0; i < 2; ++i) {
+    CHECK(std::isfinite(rows1[i].first));
+    CHECK(std::isfinite(rows1[i].second));
+    CHECK(std::isfinite(rows2[i].first));
+    CHECK(std::isfinite(rows2[i].second));
+  }
+
+  CHECK(rows1[0].first >= 0.0);
+  CHECK(rows1[1].first > rows1[0].first);
+  CHECK(rows2[0].first >= 0.0);
+  CHECK(rows2[1].first > rows2[0].first);
+
+  const bool distinctValues =
+    (std::abs(rows1[0].second - rows2[0].second) > 1e-12) ||
+    (std::abs(rows1[1].second - rows2[1].second) > 1e-12);
+  CHECK(distinctValues);
+}

@@ -2767,10 +2767,12 @@ A strand is a chain of connected links between two crosslinks.
                   double,
                   double,
                   double,
-                  size_t>(),
+                  size_t,
+                  const std::vector<double>&>(),
          R"pbdoc(
            Construct from edge lists (spring_from, spring_to), friction gamma,
-           spring constant k, temperature T, time step dt, and optional num_nodes.
+           spring constant k, temperature T, time step dt, optional num_nodes,
+           and optional edge weights.
 
            :param spring_from: Source node indices of springs
            :param spring_to: Target node indices of springs
@@ -2779,6 +2781,7 @@ A strand is a chain of connected links between two crosslinks.
            :param T: Temperature
            :param dt: Integration time step
            :param num_nodes: Total number of nodes (deduced if 0)
+           :param weights: Optional positive edge weights (defaults to 1.0)
          )pbdoc",
          py::arg("spring_from"),
          py::arg("spring_to"),
@@ -2786,7 +2789,8 @@ A strand is a chain of connected links between two crosslinks.
          py::arg("k") = 1.0,
          py::arg("T") = 1.0,
          py::arg("dt") = 0.01,
-         py::arg("num_nodes") = 0)
+         py::arg("num_nodes") = 0,
+         py::arg("weights") = std::vector<double>{})
     .def(py::init<const Eigen::SparseMatrix<double>&,
                   double,
                   double,
@@ -2806,6 +2810,73 @@ A strand is a chain of connected links between two crosslinks.
          py::arg("k") = 1.0,
          py::arg("T") = 1.0,
          py::arg("dt") = 0.01)
+    .def(py::init<const pe::Universe&, double, double, double, double>(),
+         R"pbdoc(
+           Construct from a Universe's atom-bond graph and initial coordinates.
+
+           :param universe: Universe instance
+           :param gamma: Bead friction coefficient
+           :param k: Hookean spring constant
+           :param T: Temperature
+           :param dt: Integration time step
+         )pbdoc",
+         py::arg("universe"),
+         py::arg("gamma") = 1.0,
+         py::arg("k") = 1.0,
+         py::arg("T") = 1.0,
+         py::arg("dt") = 0.01)
+    .def_static(
+      "from_matrix",
+      [](const Eigen::SparseMatrix<double>& L,
+         double gamma,
+         double k,
+         double T,
+         double dt) {
+        return std::unique_ptr<RouseBrownianSimulator>(
+          new RouseBrownianSimulator(
+            RouseBrownianSimulator::fromMatrix(L, gamma, k, T, dt)));
+      },
+      R"pbdoc(
+        Create a RouseBrownianSimulator from a sparse graph Laplacian matrix L.
+
+        :param L: Symmetric positive semidefinite graph Laplacian matrix
+        :param gamma: Bead friction coefficient
+        :param k: Hookean spring constant
+        :param T: Temperature
+        :param dt: Integration time step
+        :return: RouseBrownianSimulator instance
+      )pbdoc",
+      py::arg("L"),
+      py::arg("gamma") = 1.0,
+      py::arg("k") = 1.0,
+      py::arg("T") = 1.0,
+      py::arg("dt") = 0.01)
+    .def_static(
+      "from_universe",
+      [](const pe::Universe& universe,
+         double gamma,
+         double k,
+         double T,
+         double dt) {
+        return std::unique_ptr<RouseBrownianSimulator>(
+          new RouseBrownianSimulator(
+            RouseBrownianSimulator::fromUniverse(universe, gamma, k, T, dt)));
+      },
+      R"pbdoc(
+        Create a RouseBrownianSimulator from a Universe's atom-bond graph and coordinates.
+
+        :param universe: Universe instance
+        :param gamma: Bead friction coefficient
+        :param k: Hookean spring constant
+        :param T: Temperature
+        :param dt: Integration time step
+        :return: RouseBrownianSimulator instance
+      )pbdoc",
+      py::arg("universe"),
+      py::arg("gamma") = 1.0,
+      py::arg("k") = 1.0,
+      py::arg("T") = 1.0,
+      py::arg("dt") = 0.01)
     .def_static(
       "create_linear_chain",
       [](size_t num_nodes, double gamma, double k, double T, double dt) {
@@ -2830,6 +2901,28 @@ A strand is a chain of connected links between two crosslinks.
       },
       R"pbdoc(
         Create a RouseBrownianSimulator for a ring polymer of num_nodes beads.
+      )pbdoc",
+      py::arg("num_nodes"),
+      py::arg("gamma") = 1.0,
+      py::arg("k") = 1.0,
+      py::arg("T") = 1.0,
+      py::arg("dt") = 0.01)
+    .def_static(
+      "create_complete",
+      [](size_t num_nodes, double gamma, double k, double T, double dt) {
+        return std::unique_ptr<RouseBrownianSimulator>(
+          new RouseBrownianSimulator(RouseBrownianSimulator::createComplete(
+            num_nodes, gamma, k, T, dt)));
+      },
+      R"pbdoc(
+        Create a RouseBrownianSimulator for a complete graph K_N of num_nodes beads.
+
+        :param num_nodes: Number of nodes in the complete graph (at least 2)
+        :param gamma: Bead friction coefficient
+        :param k: Hookean spring constant
+        :param T: Temperature
+        :param dt: Integration time step
+        :return: RouseBrownianSimulator instance
       )pbdoc",
       py::arg("num_nodes"),
       py::arg("gamma") = 1.0,
@@ -2975,26 +3068,16 @@ A strand is a chain of connected links between two crosslinks.
          "Compute the 3D center of mass of all nodes.")
     .def(
       "get_end_to_end_vector",
-      [](const RouseBrownianSimulator& self, size_t node_a, long node_b) {
-        const size_t actual_b =
-          (node_b < 0) ? static_cast<size_t>(-1) : static_cast<size_t>(node_b);
-        return self.getEndToEndVector(node_a, actual_b);
-      },
-      "Compute the 3D vector from node_a to node_b (defaults to last node if "
-      "node_b < 0).",
+      &RouseBrownianSimulator::getEndToEndVector,
+      "Compute the 3D vector from node_a to node_b (None defaults to N - 1).",
       py::arg("node_a") = 0,
-      py::arg("node_b") = -1)
-    .def(
-      "get_end_to_end_distance",
-      [](const RouseBrownianSimulator& self, size_t node_a, long node_b) {
-        const size_t actual_b =
-          (node_b < 0) ? static_cast<size_t>(-1) : static_cast<size_t>(node_b);
-        return self.getEndToEndDistance(node_a, actual_b);
-      },
-      "Compute the Euclidean distance between node_a and node_b (defaults to "
-      "last node if node_b < 0).",
-      py::arg("node_a") = 0,
-      py::arg("node_b") = -1)
+      py::arg("node_b") = std::nullopt)
+    .def("get_end_to_end_distance",
+         &RouseBrownianSimulator::getEndToEndDistance,
+         "Compute the Euclidean distance between node_a and node_b (None "
+         "defaults to N - 1).",
+         py::arg("node_a") = 0,
+         py::arg("node_b") = std::nullopt)
     .def("get_radius_of_gyration",
          &RouseBrownianSimulator::getRadiusOfGyration,
          "Compute the radius of gyration of the current bead configuration.")
@@ -3004,28 +3087,14 @@ A strand is a chain of connected links between two crosslinks.
          "configuration.")
     .def(
       "run",
-      [](RouseBrownianSimulator& self,
-         size_t total_steps,
-         size_t sample_interval,
-         bool save_trajectory,
-         size_t end_to_end_node_a,
-         long end_to_end_node_b) {
-        const size_t actual_b = (end_to_end_node_b < 0)
-                                  ? static_cast<size_t>(-1)
-                                  : static_cast<size_t>(end_to_end_node_b);
-        return self.run(total_steps,
-                        sample_interval,
-                        save_trajectory,
-                        end_to_end_node_a,
-                        actual_b);
-      },
+      &RouseBrownianSimulator::run,
       "Run the simulation for total_steps and record dynamical observables "
-      "every sample_interval steps.",
+      "every sample_interval steps (end_to_end_node_b=None defaults to N - 1).",
       py::arg("total_steps"),
       py::arg("sample_interval") = 1,
       py::arg("save_trajectory") = false,
       py::arg("end_to_end_node_a") = 0,
-      py::arg("end_to_end_node_b") = -1)
+      py::arg("end_to_end_node_b") = std::nullopt)
     .def_static("compute_msd",
                 &RouseBrownianSimulator::computeMSD,
                 "Compute bead mean-squared displacement from a trajectory of "
@@ -3038,23 +3107,15 @@ A strand is a chain of connected links between two crosslinks.
                 "trajectory of (N, 3) position matrices.",
                 py::arg("trajectory"),
                 py::arg("time_averaged") = false)
-    .def_static(
-      "compute_end_to_end_autocorrelation",
-      [](const std::vector<Eigen::MatrixXd>& trajectory,
-         size_t node_a,
-         long node_b,
-         bool time_averaged) {
-        const size_t actual_b =
-          (node_b < 0) ? static_cast<size_t>(-1) : static_cast<size_t>(node_b);
-        return RouseBrownianSimulator::computeEndToEndAutocorrelation(
-          trajectory, node_a, actual_b, time_averaged);
-      },
-      "Compute normalized end-to-end vector autocorrelation from a trajectory "
-      "of (N, 3) position matrices.",
-      py::arg("trajectory"),
-      py::arg("node_a") = 0,
-      py::arg("node_b") = -1,
-      py::arg("time_averaged") = false);
+    .def_static("compute_end_to_end_autocorrelation",
+                &RouseBrownianSimulator::computeEndToEndAutocorrelation,
+                "Compute normalized end-to-end vector autocorrelation from a "
+                "trajectory of (N, 3) position matrices (node_b=None defaults "
+                "to N - 1).",
+                py::arg("trajectory"),
+                py::arg("node_a") = 0,
+                py::arg("node_b") = std::nullopt,
+                py::arg("time_averaged") = false);
 }
 
 #endif /* PYBIND_CALC_H */

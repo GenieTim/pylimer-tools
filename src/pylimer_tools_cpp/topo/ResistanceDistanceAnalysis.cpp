@@ -1,12 +1,12 @@
 #include "ResistanceDistanceAnalysis.h"
 
+#include "../entities/Universe.h"
+#include "../utils/GraphLaplacianUtils.h"
 #include "../utils/utilityMacros.h"
 #include <Eigen/Eigenvalues>
 #include <algorithm>
 #include <cmath>
 #include <limits>
-#include <queue>
-#include <unordered_set>
 #ifdef OPENMP_FOUND
 #include <omp.h>
 #endif
@@ -17,7 +17,7 @@ ResistanceDistanceAnalysis::ResistanceDistanceAnalysis(
   const std::vector<size_t>& springFrom,
   const std::vector<size_t>& springTo,
   const std::vector<double>& weights,
-  size_t numNodes)
+  const size_t numNodes)
 {
   initializeFromEdges(springFrom, springTo, weights, numNodes);
 }
@@ -32,36 +32,37 @@ ResistanceDistanceAnalysis::ResistanceDistanceAnalysis(
   , connectedComponents_()
   , nodeComponentId_()
   , referenceNodePerComponent_()
+  , componentTotalWeight_()
   , solver_()
   , solverFactorized_(false)
 {
-  INVALIDARG_EXP_IFN(L.rows() == L.cols(), "Laplacian matrix L must be square");
-  INVALIDARG_EXP_IFN(L.rows() > 0, "Laplacian matrix L cannot be empty");
-
-  const Eigen::SparseMatrix<double> diff =
-    L_ - Eigen::SparseMatrix<double>(L_.transpose());
-  INVALIDARG_EXP_IFN(diff.norm() <= 1e-10 * std::max(1.0, L_.norm()),
-                     "Laplacian matrix L must be symmetric");
-
-  // Compute totalWeight_ = 0.5 * Tr(L) and count off-diagonal edges
-  double diagSum = 0.0;
-  size_t offDiagCount = 0;
-  for (int k = 0; k < L_.outerSize(); ++k) {
-    for (Eigen::SparseMatrix<double>::InnerIterator it(L_, k); it; ++it) {
-      if (it.row() == it.col()) {
-        INVALIDARG_EXP_IFN(
-          it.value() >= 0.0,
-          "Laplacian matrix L must have non-negative diagonal entries");
-        diagSum += it.value();
-      } else if (it.row() < it.col()) {
-        ++offDiagCount;
-      }
-    }
-  }
-  totalWeight_ = 0.5 * diagSum;
-  numEdges_ = offDiagCount;
-
+  L_.makeCompressed();
+  pylimer_tools::utils::validateGraphLaplacian(L_, &numEdges_, &totalWeight_);
   findComponentsAndSetupPinnedSystem();
+}
+
+ResistanceDistanceAnalysis::ResistanceDistanceAnalysis(
+  const pylimer_tools::entities::Universe& universe)
+{
+  std::vector<size_t> springFrom;
+  std::vector<size_t> springTo;
+  size_t nNodes = 0;
+  pylimer_tools::utils::extractUniverseEdges(
+    universe, springFrom, springTo, nNodes);
+  initializeFromEdges(springFrom, springTo, {}, nNodes);
+}
+
+ResistanceDistanceAnalysis
+ResistanceDistanceAnalysis::fromMatrix(const Eigen::SparseMatrix<double>& L)
+{
+  return ResistanceDistanceAnalysis(L);
+}
+
+ResistanceDistanceAnalysis
+ResistanceDistanceAnalysis::fromUniverse(
+  const pylimer_tools::entities::Universe& universe)
+{
+  return ResistanceDistanceAnalysis(universe);
 }
 
 void
@@ -69,117 +70,32 @@ ResistanceDistanceAnalysis::initializeFromEdges(
   const std::vector<size_t>& springFrom,
   const std::vector<size_t>& springTo,
   const std::vector<double>& weights,
-  size_t numNodes)
+  const size_t numNodes)
 {
-  INVALIDARG_EXP_IFN(springFrom.size() == springTo.size(),
-                     "springFrom and springTo must have the same size");
-  INVALIDARG_EXP_IFN(springFrom.size() > 0 || numNodes > 0,
-                     "Graph cannot be completely empty");
-  INVALIDARG_EXP_IFN(
-    weights.empty() || weights.size() == springFrom.size(),
-    "weights must be empty or have the same size as springFrom");
-
-  numEdges_ = 0;
-
-  if (numNodes == 0) {
-    size_t maxIdx = 0;
-    for (size_t i = 0; i < springFrom.size(); ++i) {
-      maxIdx = std::max(maxIdx, std::max(springFrom[i], springTo[i]));
-    }
-    numNodes_ = maxIdx + 1;
-  } else {
-    numNodes_ = numNodes;
-    for (size_t i = 0; i < springFrom.size(); ++i) {
-      INVALIDARG_EXP_IFN(springFrom[i] < numNodes_ && springTo[i] < numNodes_,
-                         "Node indices in springFrom/springTo exceed numNodes");
-    }
-  }
-
-  std::vector<Eigen::Triplet<double>> triplets;
-  triplets.reserve(springFrom.size() * 4);
-  Eigen::VectorXd diag =
-    Eigen::VectorXd::Zero(static_cast<Eigen::Index>(numNodes_));
-  totalWeight_ = 0.0;
-
-  for (size_t e = 0; e < springFrom.size(); ++e) {
-    const size_t u = springFrom[e];
-    const size_t v = springTo[e];
-    if (u == v) {
-      continue; // Skip self loops in Laplacian assembly
-    }
-    const double w = weights.empty() ? 1.0 : weights[e];
-    INVALIDARG_EXP_IFN(w > 0.0, "Edge weight/spring constant must be positive");
-
-    triplets.emplace_back(static_cast<int>(u), static_cast<int>(v), -w);
-    triplets.emplace_back(static_cast<int>(v), static_cast<int>(u), -w);
-    diag(static_cast<Eigen::Index>(u)) += w;
-    diag(static_cast<Eigen::Index>(v)) += w;
-    totalWeight_ += w;
-    ++numEdges_;
-  }
-
-  for (size_t i = 0; i < numNodes_; ++i) {
-    if (diag(static_cast<Eigen::Index>(i)) != 0.0) {
-      triplets.emplace_back(static_cast<int>(i),
-                            static_cast<int>(i),
-                            diag(static_cast<Eigen::Index>(i)));
-    }
-  }
-
-  L_.resize(static_cast<Eigen::Index>(numNodes_),
-            static_cast<Eigen::Index>(numNodes_));
-  L_.setFromTriplets(triplets.begin(), triplets.end());
-
+  L_ = pylimer_tools::utils::assembleGraphLaplacian(springFrom,
+                                                    springTo,
+                                                    weights,
+                                                    numNodes,
+                                                    &numNodes_,
+                                                    &numEdges_,
+                                                    &totalWeight_);
   findComponentsAndSetupPinnedSystem();
 }
 
 void
 ResistanceDistanceAnalysis::findComponentsAndSetupPinnedSystem()
 {
-  std::vector<std::vector<size_t>> adj(numNodes_);
-  for (int k = 0; k < L_.outerSize(); ++k) {
-    for (Eigen::SparseMatrix<double>::InnerIterator it(L_, k); it; ++it) {
-      const Eigen::Index r = it.row();
-      const Eigen::Index c = it.col();
-      if (r != c && std::abs(it.value()) > 1e-14) {
-        adj[static_cast<size_t>(r)].push_back(static_cast<size_t>(c));
-      }
-    }
-  }
+  pylimer_tools::utils::computeConnectedComponents(
+    L_, connectedComponents_, &nodeComponentId_, &componentTotalWeight_);
 
-  std::vector<bool> visited(numNodes_, false);
-  connectedComponents_.clear();
-  nodeComponentId_.assign(numNodes_, 0);
   referenceNodePerComponent_.clear();
-
-  for (size_t i = 0; i < numNodes_; ++i) {
-    if (!visited[i]) {
-      std::vector<size_t> comp;
-      std::queue<size_t> q;
-      visited[i] = true;
-      q.push(i);
-      size_t compId = connectedComponents_.size();
-
-      while (!q.empty()) {
-        size_t u = q.front();
-        q.pop();
-        comp.push_back(u);
-        nodeComponentId_[u] = compId;
-        for (size_t v : adj[u]) {
-          if (!visited[v]) {
-            visited[v] = true;
-            q.push(v);
-          }
-        }
-      }
-
-      referenceNodePerComponent_.push_back(comp[0]);
-      connectedComponents_.push_back(std::move(comp));
-    }
+  referenceNodePerComponent_.reserve(connectedComponents_.size());
+  for (const std::vector<size_t>& comp : connectedComponents_) {
+    referenceNodePerComponent_.push_back(comp[0]);
   }
 
   std::vector<bool> isRefNode(numNodes_, false);
-  for (size_t r : referenceNodePerComponent_) {
+  for (const size_t r : referenceNodePerComponent_) {
     isRefNode[r] = true;
   }
 
@@ -189,14 +105,13 @@ ResistanceDistanceAnalysis::findComponentsAndSetupPinnedSystem()
 
   for (int k = 0; k < L_.outerSize(); ++k) {
     for (Eigen::SparseMatrix<double>::InnerIterator it(L_, k); it; ++it) {
-      size_t r = static_cast<size_t>(it.row());
-      size_t c = static_cast<size_t>(it.col());
+      const size_t r = static_cast<size_t>(it.row());
+      const size_t c = static_cast<size_t>(it.col());
       if (isRefNode[r] || isRefNode[c]) {
         // Zero out off-diagonals on reference rows and columns
         if (r == c && isRefNode[r]) {
-          // Set reference diagonal entry to 1.0 to pin potential v_r = 0
-          pinnedTriplets.emplace_back(
-            static_cast<int>(r), static_cast<int>(c), 1.0);
+          // Reference node diagonal will be set to 1.0 below
+          continue;
         }
       } else {
         pinnedTriplets.emplace_back(
@@ -206,13 +121,14 @@ ResistanceDistanceAnalysis::findComponentsAndSetupPinnedSystem()
   }
 
   // Ensure reference nodes always have diagonal 1.0 even if isolated
-  for (size_t r : referenceNodePerComponent_) {
+  for (const size_t r : referenceNodePerComponent_) {
     pinnedTriplets.emplace_back(static_cast<int>(r), static_cast<int>(r), 1.0);
   }
 
   L_pinned_.resize(static_cast<Eigen::Index>(numNodes_),
                    static_cast<Eigen::Index>(numNodes_));
   L_pinned_.setFromTriplets(pinnedTriplets.begin(), pinnedTriplets.end());
+  L_pinned_.makeCompressed();
 
   solverFactorized_ = false;
 }
@@ -229,7 +145,8 @@ ResistanceDistanceAnalysis::ensureFactorized() const
 }
 
 double
-ResistanceDistanceAnalysis::computeEffectiveResistance(size_t i, size_t j) const
+ResistanceDistanceAnalysis::computeEffectiveResistance(const size_t i,
+                                                       const size_t j) const
 {
   INVALIDINDEX_EXP_IFN(i < numNodes_ && j < numNodes_,
                        "Node index out of range");
@@ -243,8 +160,8 @@ ResistanceDistanceAnalysis::computeEffectiveResistance(size_t i, size_t j) const
   }
 
   ensureFactorized();
-  size_t comp = nodeComponentId_[i];
-  size_t r = referenceNodePerComponent_[comp];
+  const size_t comp = nodeComponentId_[i];
+  const size_t r = referenceNodePerComponent_[comp];
 
   Eigen::VectorXd b =
     Eigen::VectorXd::Zero(static_cast<Eigen::Index>(numNodes_));
@@ -255,73 +172,91 @@ ResistanceDistanceAnalysis::computeEffectiveResistance(size_t i, size_t j) const
     b(static_cast<Eigen::Index>(j)) = -1.0;
   }
 
-  Eigen::VectorXd v = solver_.solve(b);
-  double vi = (i == r) ? 0.0 : v(static_cast<Eigen::Index>(i));
-  double vj = (j == r) ? 0.0 : v(static_cast<Eigen::Index>(j));
+  const Eigen::VectorXd v = solver_.solve(b);
+  const double vi = (i == r) ? 0.0 : v(static_cast<Eigen::Index>(i));
+  const double vj = (j == r) ? 0.0 : v(static_cast<Eigen::Index>(j));
 
   return std::max(0.0, vi - vj);
 }
 
 Eigen::VectorXd
 ResistanceDistanceAnalysis::computeEffectiveResistanceBatched(
-  const std::vector<std::pair<size_t, size_t>>& pairs) const
+  const std::vector<std::pair<size_t, size_t>>& pairs,
+  const size_t chunkSize) const
 {
-  size_t B = pairs.size();
+  INVALIDARG_EXP_IFN(chunkSize > 0, "chunkSize must be > 0");
+  const size_t B = pairs.size();
   Eigen::VectorXd result = Eigen::VectorXd::Zero(static_cast<Eigen::Index>(B));
   if (B == 0) {
     return result;
   }
 
-  ensureFactorized();
-
-  Eigen::MatrixXd Brhs = Eigen::MatrixXd::Zero(
-    static_cast<Eigen::Index>(numNodes_), static_cast<Eigen::Index>(B));
-  std::vector<bool> isInfinite(B, false);
+  std::vector<size_t> activeIndices;
+  activeIndices.reserve(B);
 
   for (size_t b = 0; b < B; ++b) {
-    size_t i = pairs[b].first;
-    size_t j = pairs[b].second;
+    const size_t i = pairs[b].first;
+    const size_t j = pairs[b].second;
     INVALIDINDEX_EXP_IFN(i < numNodes_ && j < numNodes_,
                          "Node index out of range in batched resistance pairs");
 
     if (i == j) {
-      continue;
-    }
-    if (nodeComponentId_[i] != nodeComponentId_[j]) {
-      isInfinite[b] = true;
-      continue;
-    }
-
-    size_t comp = nodeComponentId_[i];
-    size_t r = referenceNodePerComponent_[comp];
-    if (i != r) {
-      Brhs(static_cast<Eigen::Index>(i), static_cast<Eigen::Index>(b)) += 1.0;
-    }
-    if (j != r) {
-      Brhs(static_cast<Eigen::Index>(j), static_cast<Eigen::Index>(b)) -= 1.0;
-    }
-  }
-
-  // Single Multi-RHS linear solve for all B query pairs simultaneously
-  Eigen::MatrixXd V = solver_.solve(Brhs);
-
-  for (size_t b = 0; b < B; ++b) {
-    size_t i = pairs[b].first;
-    size_t j = pairs[b].second;
-    if (i == j) {
       result(static_cast<Eigen::Index>(b)) = 0.0;
-    } else if (isInfinite[b]) {
+    } else if (nodeComponentId_[i] != nodeComponentId_[j]) {
       result(static_cast<Eigen::Index>(b)) =
         std::numeric_limits<double>::infinity();
     } else {
-      size_t comp = nodeComponentId_[i];
-      size_t r = referenceNodePerComponent_[comp];
-      double vi = (i == r) ? 0.0
-                           : V(static_cast<Eigen::Index>(i),
-                               static_cast<Eigen::Index>(b));
-      double vj = (j == r) ? 0.0
-                           : V(static_cast<Eigen::Index>(j),
-                               static_cast<Eigen::Index>(b));
+      activeIndices.push_back(b);
+    }
+  }
+
+  if (activeIndices.empty()) {
+    return result;
+  }
+
+  ensureFactorized();
+
+  const Eigen::Index N = static_cast<Eigen::Index>(numNodes_);
+  const size_t numActive = activeIndices.size();
+  const size_t numChunks = (numActive + chunkSize - 1) / chunkSize;
+
+#ifdef OPENMP_FOUND
+#pragma omp parallel for schedule(dynamic) if (numChunks > 1)
+#endif
+  for (size_t chunkIdx = 0; chunkIdx < numChunks; ++chunkIdx) {
+    const size_t start = chunkIdx * chunkSize;
+    const size_t curChunk = std::min(chunkSize, numActive - start);
+    Eigen::MatrixXd Brhs =
+      Eigen::MatrixXd::Zero(N, static_cast<Eigen::Index>(curChunk));
+
+    for (size_t c = 0; c < curChunk; ++c) {
+      const size_t b = activeIndices[start + c];
+      const size_t i = pairs[b].first;
+      const size_t j = pairs[b].second;
+      const size_t comp = nodeComponentId_[i];
+      const size_t r = referenceNodePerComponent_[comp];
+      if (i != r) {
+        Brhs(static_cast<Eigen::Index>(i), static_cast<Eigen::Index>(c)) += 1.0;
+      }
+      if (j != r) {
+        Brhs(static_cast<Eigen::Index>(j), static_cast<Eigen::Index>(c)) -= 1.0;
+      }
+    }
+
+    const Eigen::MatrixXd V = solver_.solve(Brhs);
+
+    for (size_t c = 0; c < curChunk; ++c) {
+      const size_t b = activeIndices[start + c];
+      const size_t i = pairs[b].first;
+      const size_t j = pairs[b].second;
+      const size_t comp = nodeComponentId_[i];
+      const size_t r = referenceNodePerComponent_[comp];
+      const double vi = (i == r) ? 0.0
+                                 : V(static_cast<Eigen::Index>(i),
+                                     static_cast<Eigen::Index>(c));
+      const double vj = (j == r) ? 0.0
+                                 : V(static_cast<Eigen::Index>(j),
+                                     static_cast<Eigen::Index>(c));
       result(static_cast<Eigen::Index>(b)) = std::max(0.0, vi - vj);
     }
   }
@@ -330,8 +265,9 @@ ResistanceDistanceAnalysis::computeEffectiveResistanceBatched(
 }
 
 Eigen::MatrixXd
-ResistanceDistanceAnalysis::solveIdentityChunked(size_t chunkSize) const
+ResistanceDistanceAnalysis::solveIdentityChunked(const size_t chunkSize) const
 {
+  INVALIDARG_EXP_IFN(chunkSize > 0, "chunkSize must be > 0");
   ensureFactorized();
   if (numNodes_ == 0) {
     return Eigen::MatrixXd(0, 0);
@@ -339,20 +275,24 @@ ResistanceDistanceAnalysis::solveIdentityChunked(size_t chunkSize) const
 
   const Eigen::Index N = static_cast<Eigen::Index>(numNodes_);
   Eigen::MatrixXd X(N, N);
-  const Eigen::Index chunkSizeIdx =
-    chunkSize == 0 ? 128 : static_cast<Eigen::Index>(chunkSize);
+  const Eigen::Index chunkSizeIdx = static_cast<Eigen::Index>(chunkSize);
+  const Eigen::Index numChunks = (N + chunkSizeIdx - 1) / chunkSizeIdx;
 
   // Level-3 BLAS chunked forward/back-substitutions:
   // Solving in chunks of B columns converts triangular solves from memory-bound
   // dtrsv (Level-2 BLAS) into compute-bound dtrsm (Level-3 BLAS), exploiting
   // AMX/Accelerate
-  for (Eigen::Index colStart = 0; colStart < N; colStart += chunkSizeIdx) {
+#ifdef OPENMP_FOUND
+#pragma omp parallel for schedule(dynamic) if (N > 256 && numChunks > 1)
+#endif
+  for (Eigen::Index chunkIdx = 0; chunkIdx < numChunks; ++chunkIdx) {
+    const Eigen::Index colStart = chunkIdx * chunkSizeIdx;
     const Eigen::Index curChunk = std::min(chunkSizeIdx, N - colStart);
     Eigen::MatrixXd I_chunk = Eigen::MatrixXd::Zero(N, curChunk);
     for (Eigen::Index c = 0; c < curChunk; ++c) {
       I_chunk(colStart + c, c) = 1.0;
     }
-    X.middleCols(colStart, curChunk) = solver_.solve(I_chunk);
+    X.middleCols(colStart, curChunk).noalias() = solver_.solve(I_chunk);
   }
 
   return X;
@@ -360,30 +300,32 @@ ResistanceDistanceAnalysis::solveIdentityChunked(size_t chunkSize) const
 
 Eigen::MatrixXd
 ResistanceDistanceAnalysis::computeAllPairsEffectiveResistance(
-  size_t chunkSize) const
+  const size_t chunkSize) const
 {
   Eigen::MatrixXd X = solveIdentityChunked(chunkSize);
 
   // Zero out rows and columns corresponding to pinned reference nodes
-  for (size_t r : referenceNodePerComponent_) {
+  for (const size_t r : referenceNodePerComponent_) {
     X.row(static_cast<Eigen::Index>(r)).setZero();
     X.col(static_cast<Eigen::Index>(r)).setZero();
   }
 
+  const Eigen::VectorXd diagX = X.diagonal();
   const Eigen::Index N = static_cast<Eigen::Index>(numNodes_);
   Eigen::MatrixXd R(N, N);
 #ifdef OPENMP_FOUND
 #pragma omp parallel for schedule(static) if (N > 128)
 #endif
-  for (Eigen::Index i = 0; i < N; ++i) {
-    const size_t compI = nodeComponentId_[static_cast<size_t>(i)];
-    for (Eigen::Index j = 0; j < N; ++j) {
+  for (Eigen::Index j = 0; j < N; ++j) {
+    const size_t compJ = nodeComponentId_[static_cast<size_t>(j)];
+    const double diagJ = diagX(j);
+    for (Eigen::Index i = 0; i < N; ++i) {
       if (i == j) {
         R(i, j) = 0.0;
-      } else if (compI != nodeComponentId_[static_cast<size_t>(j)]) {
+      } else if (compJ != nodeComponentId_[static_cast<size_t>(i)]) {
         R(i, j) = std::numeric_limits<double>::infinity();
       } else {
-        const double res = X(i, i) + X(j, j) - 2.0 * X(i, j);
+        const double res = diagX(i) + diagJ - 2.0 * X(i, j);
         R(i, j) = std::max(0.0, res);
       }
     }
@@ -393,7 +335,7 @@ ResistanceDistanceAnalysis::computeAllPairsEffectiveResistance(
 }
 
 double
-ResistanceDistanceAnalysis::computeKirchhoffIndex() const
+ResistanceDistanceAnalysis::computeKirchhoffIndex(const size_t chunkSize) const
 {
   if (!isConnected()) {
     return std::numeric_limits<double>::infinity();
@@ -402,7 +344,7 @@ ResistanceDistanceAnalysis::computeKirchhoffIndex() const
     return 0.0;
   }
 
-  return 0.5 * computeTotalResistancePerNode().sum();
+  return 0.5 * computeTotalResistancePerNode(chunkSize).sum();
 }
 
 double
@@ -422,10 +364,11 @@ ResistanceDistanceAnalysis::computeKirchhoffIndexSpectral() const
 
   const Eigen::VectorXd eigenvalues = es.eigenvalues();
   double sumReciprocal = 0.0;
-  for (int i = 0; i < eigenvalues.size(); ++i) {
-    if (eigenvalues(i) > 1e-10) {
-      sumReciprocal += 1.0 / eigenvalues(i);
-    }
+  for (Eigen::Index i = 1; i < eigenvalues.size(); ++i) {
+    RUNTIME_EXP_IFN(
+      eigenvalues(i) > 0.0,
+      "Connected graph Laplacian has non-positive non-trivial eigenvalue");
+    sumReciprocal += 1.0 / eigenvalues(i);
   }
 
   return static_cast<double>(numNodes_) * sumReciprocal;
@@ -433,13 +376,28 @@ ResistanceDistanceAnalysis::computeKirchhoffIndexSpectral() const
 
 Eigen::MatrixXd
 ResistanceDistanceAnalysis::computeMoorePenrosePseudoInverse(
-  size_t chunkSize) const
+  const size_t chunkSize) const
 {
   Eigen::MatrixXd X = solveIdentityChunked(chunkSize);
 
-  for (size_t r : referenceNodePerComponent_) {
+  for (const size_t r : referenceNodePerComponent_) {
     X.row(static_cast<Eigen::Index>(r)).setZero();
     X.col(static_cast<Eigen::Index>(r)).setZero();
+  }
+
+  if (connectedComponents_.size() == 1) {
+    if (numNodes_ <= 1) {
+      return Eigen::MatrixXd::Zero(static_cast<Eigen::Index>(numNodes_),
+                                   static_cast<Eigen::Index>(numNodes_));
+    }
+    // P * X * P equals double-centering rows and columns in O(N^2) time
+    const Eigen::VectorXd rowMeans = X.rowwise().mean();
+    const Eigen::RowVectorXd colMeans = X.colwise().mean();
+    const double grandMean = rowMeans.mean();
+    X.colwise() -= rowMeans;
+    X.rowwise() -= colMeans;
+    X.array() += grandMean;
+    return X;
   }
 
   Eigen::MatrixXd Lplus = Eigen::MatrixXd::Zero(
@@ -451,28 +409,32 @@ ResistanceDistanceAnalysis::computeMoorePenrosePseudoInverse(
       continue;
     }
 
-    Eigen::MatrixXd Xc(nComp, nComp);
-    for (size_t a = 0; a < nComp; ++a) {
-      for (size_t b = 0; b < nComp; ++b) {
-        Xc(static_cast<Eigen::Index>(a), static_cast<Eigen::Index>(b)) =
-          X(static_cast<Eigen::Index>(comp[a]),
-            static_cast<Eigen::Index>(comp[b]));
-      }
-    }
-
     const Eigen::Index nCompIdx = static_cast<Eigen::Index>(nComp);
-    const Eigen::MatrixXd Pc =
-      Eigen::MatrixXd::Identity(nCompIdx, nCompIdx) -
-      (1.0 / static_cast<double>(nComp)) *
-        Eigen::MatrixXd::Constant(nCompIdx, nCompIdx, 1.0);
+    Eigen::VectorXd rowMeans = Eigen::VectorXd::Zero(nCompIdx);
+    Eigen::VectorXd colMeans = Eigen::VectorXd::Zero(nCompIdx);
 
-    const Eigen::MatrixXd Lplus_c = Pc * Xc * Pc;
+    for (size_t b = 0; b < nComp; ++b) {
+      const Eigen::Index colIdx = static_cast<Eigen::Index>(comp[b]);
+      double colSum = 0.0;
+      for (size_t a = 0; a < nComp; ++a) {
+        const double val = X(static_cast<Eigen::Index>(comp[a]), colIdx);
+        rowMeans(static_cast<Eigen::Index>(a)) += val;
+        colSum += val;
+      }
+      colMeans(static_cast<Eigen::Index>(b)) =
+        colSum / static_cast<double>(nComp);
+    }
+    rowMeans /= static_cast<double>(nComp);
+    const double grandMean = rowMeans.mean();
 
-    for (size_t a = 0; a < nComp; ++a) {
-      for (size_t b = 0; b < nComp; ++b) {
-        Lplus(static_cast<Eigen::Index>(comp[a]),
-              static_cast<Eigen::Index>(comp[b])) =
-          Lplus_c(static_cast<Eigen::Index>(a), static_cast<Eigen::Index>(b));
+    for (size_t b = 0; b < nComp; ++b) {
+      const Eigen::Index colIdx = static_cast<Eigen::Index>(comp[b]);
+      const double cMean = colMeans(static_cast<Eigen::Index>(b));
+      for (size_t a = 0; a < nComp; ++a) {
+        const Eigen::Index rowIdx = static_cast<Eigen::Index>(comp[a]);
+        Lplus(rowIdx, colIdx) = X(rowIdx, colIdx) -
+                                rowMeans(static_cast<Eigen::Index>(a)) - cMean +
+                                grandMean;
       }
     }
   }
@@ -481,25 +443,30 @@ ResistanceDistanceAnalysis::computeMoorePenrosePseudoInverse(
 }
 
 double
-ResistanceDistanceAnalysis::computeCommuteTime(size_t i, size_t j) const
+ResistanceDistanceAnalysis::computeCommuteTime(const size_t i,
+                                               const size_t j) const
 {
   const double R = computeEffectiveResistance(i, j);
   if (std::isinf(R)) {
     return std::numeric_limits<double>::infinity();
   }
-  return 2.0 * totalWeight_ * R;
+  return 2.0 * componentTotalWeight_[nodeComponentId_[i]] * R;
 }
 
 Eigen::MatrixXd
-ResistanceDistanceAnalysis::computeAllPairsCommuteTime() const
+ResistanceDistanceAnalysis::computeAllPairsCommuteTime(
+  const size_t chunkSize) const
 {
-  const Eigen::MatrixXd R = computeAllPairsEffectiveResistance();
-  const Eigen::Index N = R.rows();
-  const double twoM = 2.0 * totalWeight_;
-  Eigen::MatrixXd C(N, N);
-  for (Eigen::Index i = 0; i < N; ++i) {
-    for (Eigen::Index j = 0; j < N; ++j) {
-      const double r = R(i, j);
+  Eigen::MatrixXd C = computeAllPairsEffectiveResistance(chunkSize);
+  const Eigen::Index N = C.rows();
+#ifdef OPENMP_FOUND
+#pragma omp parallel for schedule(static) if (N > 128)
+#endif
+  for (Eigen::Index j = 0; j < N; ++j) {
+    const double twoM =
+      2.0 * componentTotalWeight_[nodeComponentId_[static_cast<size_t>(j)]];
+    for (Eigen::Index i = 0; i < N; ++i) {
+      const double r = C(i, j);
       C(i, j) =
         std::isinf(r) ? std::numeric_limits<double>::infinity() : twoM * r;
     }
@@ -508,8 +475,10 @@ ResistanceDistanceAnalysis::computeAllPairsCommuteTime() const
 }
 
 Eigen::VectorXd
-ResistanceDistanceAnalysis::computeTotalResistancePerNode() const
+ResistanceDistanceAnalysis::computeTotalResistancePerNode(
+  const size_t chunkSize) const
 {
+  INVALIDARG_EXP_IFN(chunkSize > 0, "chunkSize must be > 0");
   if (numNodes_ <= 1) {
     return Eigen::VectorXd::Zero(static_cast<Eigen::Index>(numNodes_));
   }
@@ -521,32 +490,34 @@ ResistanceDistanceAnalysis::computeTotalResistancePerNode() const
   ensureFactorized();
 
   const Eigen::Index N = static_cast<Eigen::Index>(numNodes_);
-  const size_t chunkSize = 128;
-  const size_t r = referenceNodePerComponent_[0];
+  const Eigen::Index chunkSizeIdx = static_cast<Eigen::Index>(chunkSize);
+  const Eigen::Index numChunks = (N + chunkSizeIdx - 1) / chunkSizeIdx;
+  const Eigen::Index rIdx =
+    static_cast<Eigen::Index>(referenceNodePerComponent_[0]);
+
+  // Compute rowSumsX = X * 1 via a single linear solve L_pinned * y = 1_pinned
+  Eigen::VectorXd onesPinned = Eigen::VectorXd::Ones(N);
+  onesPinned(rIdx) = 0.0;
+  Eigen::VectorXd rowSumsX = solver_.solve(onesPinned);
+  rowSumsX(rIdx) = 0.0;
 
   Eigen::VectorXd diagX = Eigen::VectorXd::Zero(N);
-  Eigen::VectorXd rowSumsX = Eigen::VectorXd::Zero(N);
-
-  for (size_t colStart = 0; colStart < numNodes_; colStart += chunkSize) {
-    const size_t curChunk = std::min(chunkSize, numNodes_ - colStart);
-    Eigen::MatrixXd I_chunk =
-      Eigen::MatrixXd::Zero(N, static_cast<Eigen::Index>(curChunk));
-    for (size_t c = 0; c < curChunk; ++c) {
-      I_chunk(static_cast<Eigen::Index>(colStart + c),
-              static_cast<Eigen::Index>(c)) = 1.0;
+#ifdef OPENMP_FOUND
+#pragma omp parallel for schedule(dynamic) if (N > 256 && numChunks > 1)
+#endif
+  for (Eigen::Index chunkIdx = 0; chunkIdx < numChunks; ++chunkIdx) {
+    const Eigen::Index colStart = chunkIdx * chunkSizeIdx;
+    const Eigen::Index curChunk = std::min(chunkSizeIdx, N - colStart);
+    Eigen::MatrixXd I_chunk = Eigen::MatrixXd::Zero(N, curChunk);
+    for (Eigen::Index c = 0; c < curChunk; ++c) {
+      I_chunk(colStart + c, c) = 1.0;
     }
 
-    Eigen::MatrixXd X_chunk = solver_.solve(I_chunk);
-    X_chunk.row(static_cast<Eigen::Index>(r)).setZero();
-    if (r >= colStart && r < colStart + curChunk) {
-      X_chunk.col(static_cast<Eigen::Index>(r - colStart)).setZero();
+    const Eigen::MatrixXd X_chunk = solver_.solve(I_chunk);
+    for (Eigen::Index c = 0; c < curChunk; ++c) {
+      const Eigen::Index globalCol = colStart + c;
+      diagX(globalCol) = (globalCol == rIdx) ? 0.0 : X_chunk(globalCol, c);
     }
-
-    for (size_t c = 0; c < curChunk; ++c) {
-      const Eigen::Index globalCol = static_cast<Eigen::Index>(colStart + c);
-      diagX(globalCol) = X_chunk(globalCol, static_cast<Eigen::Index>(c));
-    }
-    rowSumsX += X_chunk.rowwise().sum();
   }
 
   const double traceX = diagX.sum();
@@ -560,9 +531,10 @@ ResistanceDistanceAnalysis::computeTotalResistancePerNode() const
 }
 
 Eigen::VectorXd
-ResistanceDistanceAnalysis::computeResistanceCentrality() const
+ResistanceDistanceAnalysis::computeResistanceCentrality(
+  const size_t chunkSize) const
 {
-  const Eigen::VectorXd tot = computeTotalResistancePerNode();
+  const Eigen::VectorXd tot = computeTotalResistancePerNode(chunkSize);
   const Eigen::Index N = tot.size();
   Eigen::VectorXd centrality = Eigen::VectorXd::Zero(N);
   const double nMinusOne = static_cast<double>(N > 1 ? N - 1 : 1);
@@ -577,75 +549,40 @@ ResistanceDistanceAnalysis::computeResistanceCentrality() const
 }
 
 ResistanceDistanceAnalysis
-ResistanceDistanceAnalysis::createLinearChain(size_t numNodes)
+ResistanceDistanceAnalysis::createLinearChain(const size_t numNodes)
 {
-  INVALIDARG_EXP_IFN(numNodes > 0, "numNodes must be > 0");
-  if (numNodes == 1) {
-    return ResistanceDistanceAnalysis({}, {}, {}, 1);
-  }
-  std::vector<size_t> from(numNodes - 1);
-  std::vector<size_t> to(numNodes - 1);
-  for (size_t i = 0; i < numNodes - 1; ++i) {
-    from[i] = i;
-    to[i] = i + 1;
-  }
-  return ResistanceDistanceAnalysis(from, to, {}, numNodes);
-}
-
-ResistanceDistanceAnalysis
-ResistanceDistanceAnalysis::createRing(size_t numNodes)
-{
-  INVALIDARG_EXP_IFN(numNodes >= 3, "Ring graph requires at least 3 nodes");
-  std::vector<size_t> from(numNodes);
-  std::vector<size_t> to(numNodes);
-  for (size_t i = 0; i < numNodes - 1; ++i) {
-    from[i] = i;
-    to[i] = i + 1;
-  }
-  from[numNodes - 1] = numNodes - 1;
-  to[numNodes - 1] = 0;
-  return ResistanceDistanceAnalysis(from, to, {}, numNodes);
-}
-
-ResistanceDistanceAnalysis
-ResistanceDistanceAnalysis::createComplete(size_t numNodes)
-{
-  INVALIDARG_EXP_IFN(numNodes >= 2, "Complete graph requires at least 2 nodes");
   std::vector<size_t> from;
   std::vector<size_t> to;
-  size_t nEdges = (numNodes * (numNodes - 1)) / 2;
-  from.reserve(nEdges);
-  to.reserve(nEdges);
-  for (size_t i = 0; i < numNodes; ++i) {
-    for (size_t j = i + 1; j < numNodes; ++j) {
-      from.push_back(i);
-      to.push_back(j);
-    }
-  }
+  pylimer_tools::utils::buildLinearChainEdges(numNodes, from, to);
   return ResistanceDistanceAnalysis(from, to, {}, numNodes);
 }
 
 ResistanceDistanceAnalysis
-ResistanceDistanceAnalysis::createStar(size_t numArms, size_t armLength)
+ResistanceDistanceAnalysis::createRing(const size_t numNodes)
 {
-  INVALIDARG_EXP_IFN(numArms >= 2, "Star graph requires at least 2 arms");
-  INVALIDARG_EXP_IFN(armLength >= 1, "armLength must be >= 1");
-  size_t numNodes = 1 + numArms * armLength;
   std::vector<size_t> from;
   std::vector<size_t> to;
-  from.reserve(numArms * armLength);
-  to.reserve(numArms * armLength);
+  pylimer_tools::utils::buildRingEdges(numNodes, from, to);
+  return ResistanceDistanceAnalysis(from, to, {}, numNodes);
+}
 
-  size_t nextNode = 1;
-  for (size_t a = 0; a < numArms; ++a) {
-    from.push_back(0);
-    to.push_back(nextNode);
-    for (size_t l = 1; l < armLength; ++l) {
-      from.push_back(nextNode + l - 1);
-      to.push_back(nextNode + l);
-    }
-    nextNode += armLength;
-  }
+ResistanceDistanceAnalysis
+ResistanceDistanceAnalysis::createComplete(const size_t numNodes)
+{
+  std::vector<size_t> from;
+  std::vector<size_t> to;
+  pylimer_tools::utils::buildCompleteGraphEdges(numNodes, from, to);
+  return ResistanceDistanceAnalysis(from, to, {}, numNodes);
+}
+
+ResistanceDistanceAnalysis
+ResistanceDistanceAnalysis::createStar(const size_t numArms,
+                                       const size_t armLength)
+{
+  std::vector<size_t> from;
+  std::vector<size_t> to;
+  size_t numNodes = 0;
+  pylimer_tools::utils::buildStarEdges(numArms, armLength, from, to, numNodes);
   return ResistanceDistanceAnalysis(from, to, {}, numNodes);
 }
 

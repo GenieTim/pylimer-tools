@@ -6,9 +6,13 @@
 #include <Eigen/Sparse>
 #include <cstddef>
 #include <cstdint>
+#include <optional>
 #include <random>
-#include <utility>
 #include <vector>
+
+namespace pylimer_tools::entities {
+class Universe;
+}
 
 namespace pylimer_tools::sim {
 
@@ -51,8 +55,8 @@ class RouseBrownianSimulator
 public:
   /**
    * @brief Construct from edge lists (springFrom, springTo), friction gamma,
-   *        spring constant k, temperature T, time step dt, and optional
-   * numNodes.
+   *        spring constant k, temperature T, time step dt, optional numNodes,
+   *        and optional edge weights.
    */
   RouseBrownianSimulator(const std::vector<size_t>& springFrom,
                          const std::vector<size_t>& springTo,
@@ -60,7 +64,8 @@ public:
                          double k = 1.0,
                          double T = 1.0,
                          double dt = 0.01,
-                         size_t numNodes = 0);
+                         size_t numNodes = 0,
+                         const std::vector<double>& weights = {});
 
   /**
    * @brief Construct from pre-assembled sparse scalar graph Laplacian matrix L.
@@ -71,7 +76,30 @@ public:
                                   double T = 1.0,
                                   double dt = 0.01);
 
-  // Factory methods for canonical topologies
+  /**
+   * @brief Construct from a Universe's atom-bond graph and initial coordinates.
+   */
+  explicit RouseBrownianSimulator(
+    const pylimer_tools::entities::Universe& universe,
+    double gamma = 1.0,
+    double k = 1.0,
+    double T = 1.0,
+    double dt = 0.01);
+
+  // Factory methods
+  static RouseBrownianSimulator fromMatrix(const Eigen::SparseMatrix<double>& L,
+                                           double gamma = 1.0,
+                                           double k = 1.0,
+                                           double T = 1.0,
+                                           double dt = 0.01);
+
+  static RouseBrownianSimulator fromUniverse(
+    const pylimer_tools::entities::Universe& universe,
+    double gamma = 1.0,
+    double k = 1.0,
+    double T = 1.0,
+    double dt = 0.01);
+
   static RouseBrownianSimulator createLinearChain(size_t numNodes,
                                                   double gamma = 1.0,
                                                   double k = 1.0,
@@ -83,6 +111,12 @@ public:
                                            double k = 1.0,
                                            double T = 1.0,
                                            double dt = 0.01);
+
+  static RouseBrownianSimulator createComplete(size_t numNodes,
+                                               double gamma = 1.0,
+                                               double k = 1.0,
+                                               double T = 1.0,
+                                               double dt = 0.01);
 
   static RouseBrownianSimulator createStar(size_t numArms,
                                            size_t armLength = 1,
@@ -140,9 +174,9 @@ public:
   Eigen::Vector3d getCenterOfMass() const;
   Eigen::Vector3d getEndToEndVector(
     size_t nodeA = 0,
-    size_t nodeB = static_cast<size_t>(-1)) const;
+    std::optional<size_t> nodeB = std::nullopt) const;
   double getEndToEndDistance(size_t nodeA = 0,
-                             size_t nodeB = static_cast<size_t>(-1)) const;
+                             std::optional<size_t> nodeB = std::nullopt) const;
   double getRadiusOfGyration() const;
   double getPotentialEnergy() const;
 
@@ -151,7 +185,7 @@ public:
                             size_t sampleInterval = 1,
                             bool saveTrajectory = false,
                             size_t endToEndNodeA = 0,
-                            size_t endToEndNodeB = static_cast<size_t>(-1));
+                            std::optional<size_t> endToEndNodeB = std::nullopt);
 
   // Trajectory post-processing
   static Eigen::VectorXd computeMSD(
@@ -165,7 +199,7 @@ public:
   static Eigen::VectorXd computeEndToEndAutocorrelation(
     const std::vector<Eigen::MatrixXd>& trajectory,
     size_t nodeA = 0,
-    size_t nodeB = static_cast<size_t>(-1),
+    std::optional<size_t> nodeB = std::nullopt,
     bool timeAveraged = false);
 
 private:
@@ -193,9 +227,14 @@ private:
   std::mt19937_64 rng_{ 42 };
   std::normal_distribution<double> normalDist_{ 0.0, 1.0 };
 
+  static void validateSimulationParameters(double gamma,
+                                           double k,
+                                           double T,
+                                           double dt);
   void initializeFromEdges(const std::vector<size_t>& springFrom,
                            const std::vector<size_t>& springTo,
-                           size_t numNodes);
+                           size_t numNodes,
+                           const std::vector<double>& weights);
   void updateShiftedMatrixAndFactorization();
   void ensureFactorized() const;
   void solveShiftedRHS(const Eigen::MatrixXd& rhs, Eigen::MatrixXd& result);

@@ -2,6 +2,7 @@
 
 #include "../entities/Universe.h"
 #include "../utils/ExtraEigenTypes.h"
+#include "../utils/GraphLaplacianUtils.h"
 #include "../utils/utilityMacros.h"
 #ifdef OPENMP_FOUND
 #include <omp.h>
@@ -211,64 +212,18 @@ NormalModeAnalyzer::NormalModeAnalyzer(
   const size_t nrOfNodes,
   const std::optional<std::vector<double>>& weights)
 {
-  INVALIDARG_EXP_IFN(springFrom.size() == springTo.size(),
-                     "springFrom and springTo must have the same size");
   if (weights.has_value()) {
     INVALIDARG_EXP_IFN(weights->size() == springFrom.size(),
                        "weights must have the same size as springFrom and "
                        "springTo");
   }
-  INVALIDARG_EXP_IFN(!springFrom.empty() || nrOfNodes > 0,
-                     "springFrom and springTo cannot be empty when nrOfNodes "
-                     "is 0");
-
-  size_t nRows = nrOfNodes;
-  if (!springFrom.empty()) {
-    const size_t maxIdx =
-      std::max(*std::max_element(springFrom.begin(), springFrom.end()),
-               *std::max_element(springTo.begin(), springTo.end()));
-    if (nrOfNodes > 0) {
-      INVALIDARG_EXP_IFN(
-        nrOfNodes > maxIdx,
-        "nrOfNodes must be greater than the maximum node index in springs (" +
-          std::to_string(maxIdx) + "), but got " + std::to_string(nrOfNodes));
-      nRows = nrOfNodes;
-    } else {
-      nRows = maxIdx + 1;
-    }
-  }
-
-  std::vector<Eigen::Triplet<double>> triplets;
-  triplets.reserve(springFrom.size() * 2 + nRows);
-
-  Eigen::VectorXd diagonal =
-    Eigen::VectorXd::Zero(static_cast<Eigen::Index>(nRows));
-  for (size_t i = 0; i < springFrom.size(); ++i) {
-    assert(springFrom[i] < nRows);
-    assert(springTo[i] < nRows);
-    if (springFrom[i] == springTo[i]) {
-      continue;
-    }
-    const double w = weights.has_value() ? (*weights)[i] : 1.0;
-    triplets.emplace_back(
-      static_cast<int>(springFrom[i]), static_cast<int>(springTo[i]), -w);
-    triplets.emplace_back(
-      static_cast<int>(springTo[i]), static_cast<int>(springFrom[i]), -w);
-    diagonal[static_cast<Eigen::Index>(springFrom[i])] += w;
-    diagonal[static_cast<Eigen::Index>(springTo[i])] += w;
-  }
-
-  for (Eigen::Index i = 0; i < diagonal.size(); ++i) {
-    if (diagonal[i] != 0.0) {
-      triplets.emplace_back(i, i, diagonal[i]);
-    }
-  }
-
-  this->assembledConnectivityMatrix_ = Eigen::SparseMatrix<double>(
-    static_cast<Eigen::Index>(nRows), static_cast<Eigen::Index>(nRows));
-  this->assembledConnectivityMatrix_.setFromTriplets(triplets.begin(),
-                                                     triplets.end());
-  this->assembledConnectivityMatrix_.makeCompressed();
+  static const std::vector<double> kEmptyWeights;
+  this->assembledConnectivityMatrix_ =
+    pylimer_tools::utils::assembleGraphLaplacian(
+      springFrom,
+      springTo,
+      weights.has_value() ? *weights : kEmptyWeights,
+      nrOfNodes);
 }
 
 NormalModeAnalyzer
@@ -286,20 +241,11 @@ NormalModeAnalyzer
 NormalModeAnalyzer::fromUniverse(
   const pylimer_tools::entities::Universe& universe)
 {
-  const size_t nAtoms = universe.getNrOfAtoms();
-  const std::map<std::string, std::vector<long int>> edges =
-    universe.getEdges();
-  const std::vector<long int>& fromRaw = edges.at("edge_from");
-  const std::vector<long int>& toRaw = edges.at("edge_to");
-
   std::vector<size_t> springFrom;
   std::vector<size_t> springTo;
-  springFrom.reserve(fromRaw.size());
-  springTo.reserve(toRaw.size());
-  for (size_t i = 0; i < fromRaw.size(); ++i) {
-    springFrom.push_back(static_cast<size_t>(fromRaw[i]));
-    springTo.push_back(static_cast<size_t>(toRaw[i]));
-  }
+  size_t nAtoms = 0;
+  pylimer_tools::utils::extractUniverseEdges(
+    universe, springFrom, springTo, nAtoms);
   return NormalModeAnalyzer(springFrom, springTo, nAtoms);
 }
 
@@ -1268,56 +1214,13 @@ NormalModeAnalyzer::computeConnectedComponents(
   std::vector<size_t>& labels,
   std::vector<size_t>& counts) const
 {
-  const size_t n =
-    static_cast<size_t>(this->assembledConnectivityMatrix_.rows());
-  labels.assign(n, 0);
-  counts.clear();
-  numComponents = 0;
-  if (n == 0) {
-    return;
-  }
-
-  std::vector<size_t> parent(n);
-  std::iota(parent.begin(), parent.end(), 0);
-  auto findRoot = [&](size_t i) -> size_t {
-    while (parent[i] != i) {
-      parent[i] = parent[parent[i]];
-      i = parent[i];
-    }
-    return i;
-  };
-
-  for (Eigen::Index u = 0; u < static_cast<Eigen::Index>(n); ++u) {
-    for (Eigen::SparseMatrix<double>::InnerIterator it(
-           this->assembledConnectivityMatrix_, u);
-         it;
-         ++it) {
-      const Eigen::Index v = it.row();
-      if (v > u) {
-        const size_t ru = findRoot(static_cast<size_t>(u));
-        const size_t rv = findRoot(static_cast<size_t>(v));
-        if (ru != rv) {
-          parent[ru] = rv;
-        }
-      }
-    }
-  }
-
-  std::unordered_map<size_t, size_t> rootToLabel;
-  rootToLabel.reserve(16);
-  for (size_t i = 0; i < n; ++i) {
-    const size_t root = findRoot(i);
-    const std::unordered_map<size_t, size_t>::const_iterator it =
-      rootToLabel.find(root);
-    if (it == rootToLabel.end()) {
-      const size_t id = numComponents++;
-      rootToLabel[root] = id;
-      labels[i] = id;
-      counts.push_back(1);
-    } else {
-      labels[i] = it->second;
-      counts[it->second]++;
-    }
+  std::vector<std::vector<size_t>> components;
+  pylimer_tools::utils::computeConnectedComponents(
+    this->assembledConnectivityMatrix_, components, &labels);
+  numComponents = components.size();
+  counts.resize(numComponents);
+  for (size_t c = 0; c < numComponents; ++c) {
+    counts[c] = components[c].size();
   }
 }
 

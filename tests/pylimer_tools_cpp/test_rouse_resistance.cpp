@@ -1,3 +1,4 @@
+#include "../../src/pylimer_tools_cpp/entities/Universe.h"
 #include "../../src/pylimer_tools_cpp/sim/RouseBrownianSimulator.h"
 #include "../../src/pylimer_tools_cpp/topo/ResistanceDistanceAnalysis.h"
 
@@ -7,6 +8,7 @@
 #include <chrono>
 #include <cmath>
 #include <iostream>
+#include <limits>
 #include <numeric>
 #include <vector>
 
@@ -751,4 +753,302 @@ TEST_CASE(
                "============\n";
 
   CHECK(speedup >= 1.0);
+}
+
+TEST_CASE("ResistanceDistanceAnalysis and RouseBrownianSimulator Universe, "
+          "fromMatrix, and validation extensions",
+          "[topo][sim][ResistanceDistanceAnalysis][RouseBrownianSimulator]")
+{
+  SECTION("Construction from Universe and fromMatrix")
+  {
+    pylimer_tools::entities::Universe u(10.0, 10.0, 10.0);
+    u.addAtoms({ 1, 2, 3, 4 },
+               { 1, 1, 1, 1 },
+               { 0.0, 1.5, 3.0, 4.5 },
+               { 0.0, 0.0, 0.0, 0.0 },
+               { 0.0, 0.0, 0.0, 0.0 },
+               { 0, 0, 0, 0 },
+               { 0, 0, 0, 0 },
+               { 0, 0, 0, 0 });
+    u.addBonds({ 1, 2, 3 }, { 2, 3, 4 });
+
+    pt::ResistanceDistanceAnalysis rdaU(u);
+    pt::ResistanceDistanceAnalysis rdaFromU =
+      pt::ResistanceDistanceAnalysis::fromUniverse(u);
+    CHECK(rdaU.getNrOfNodes() == 4);
+    CHECK(rdaU.getNrOfEdges() == 3);
+    CHECK_THAT(rdaU.computeEffectiveResistance(0, 3),
+               Catch::Matchers::WithinAbs(3.0, 1e-9));
+    CHECK_THAT(rdaFromU.computeKirchhoffIndex(),
+               Catch::Matchers::WithinAbs(10.0, 1e-8));
+
+    pt::ResistanceDistanceAnalysis rdaFromM =
+      pt::ResistanceDistanceAnalysis::fromMatrix(rdaU.getLaplacian());
+    CHECK_THAT(rdaFromM.computeEffectiveResistance(0, 3),
+               Catch::Matchers::WithinAbs(3.0, 1e-9));
+
+    ps::RouseBrownianSimulator simU(u, 1.0, 2.0, 0.5, 0.01);
+    ps::RouseBrownianSimulator simFromU =
+      ps::RouseBrownianSimulator::fromUniverse(u, 1.0, 2.0, 0.5, 0.01);
+    CHECK(simU.getNrOfNodes() == 4);
+    CHECK_THAT(simU.getEndToEndDistance(),
+               Catch::Matchers::WithinAbs(4.5, 1e-12));
+    CHECK((simU.getPositions() - simFromU.getPositions()).norm() < 1e-12);
+
+    ps::RouseBrownianSimulator simFromM =
+      ps::RouseBrownianSimulator::fromMatrix(simU.getLaplacian(), 1.0, 2.0);
+    CHECK(simFromM.getNrOfNodes() == 4);
+  }
+
+  SECTION("Reject positive off-diagonals and non-zero row/column sums")
+  {
+    Eigen::SparseMatrix<double> adj(2, 2);
+    adj.insert(0, 1) = 1.0;
+    adj.insert(1, 0) = 1.0;
+    adj.makeCompressed();
+    CHECK_THROWS_AS(pt::ResistanceDistanceAnalysis(adj), std::invalid_argument);
+    CHECK_THROWS_AS(ps::RouseBrownianSimulator(adj), std::invalid_argument);
+
+    Eigen::SparseMatrix<double> shiftedL(2, 2);
+    shiftedL.insert(0, 0) = 2.0;
+    shiftedL.insert(0, 1) = -1.0;
+    shiftedL.insert(1, 0) = -1.0;
+    shiftedL.insert(1, 1) = 2.0;
+    shiftedL.makeCompressed();
+    CHECK_THROWS_AS(pt::ResistanceDistanceAnalysis(shiftedL),
+                    std::invalid_argument);
+    CHECK_THROWS_AS(ps::RouseBrownianSimulator(shiftedL),
+                    std::invalid_argument);
+  }
+
+  SECTION("Explicit sparse zeros are not counted as edges")
+  {
+    Eigen::SparseMatrix<double> sparseWithZeros(3, 3);
+    sparseWithZeros.insert(0, 0) = 1.0;
+    sparseWithZeros.insert(0, 1) = -1.0;
+    sparseWithZeros.insert(1, 0) = -1.0;
+    sparseWithZeros.insert(1, 1) = 1.0;
+    sparseWithZeros.insert(1, 2) = 0.0;
+    sparseWithZeros.insert(2, 1) = 0.0;
+    sparseWithZeros.insert(2, 2) = 0.0;
+    sparseWithZeros.makeCompressed();
+
+    pt::ResistanceDistanceAnalysis rda(sparseWithZeros);
+    CHECK(rda.getNrOfNodes() == 3);
+    CHECK(rda.getNrOfEdges() == 1);
+    CHECK_FALSE(rda.isConnected());
+    CHECK_THAT(rda.computeEffectiveResistance(0, 1),
+               Catch::Matchers::WithinAbs(1.0, 1e-9));
+    CHECK(std::isinf(rda.computeEffectiveResistance(0, 2)));
+  }
+
+  SECTION("Disconnected Moore-Penrose pseudo-inverse properties")
+  {
+    std::vector<size_t> from = { 0, 1, 3, 4 };
+    std::vector<size_t> to = { 1, 2, 4, 3 };
+    pt::ResistanceDistanceAnalysis rda(from, to, {}, 6);
+    Eigen::MatrixXd Lplus = rda.computeMoorePenrosePseudoInverse(2);
+    Eigen::MatrixXd L = Eigen::MatrixXd(rda.getLaplacian());
+
+    CHECK((L * Lplus * L - L).norm() < 1e-9);
+    CHECK((Lplus * L * Lplus - Lplus).norm() < 1e-9);
+    CHECK((Lplus * Eigen::VectorXd::Ones(6)).norm() < 1e-10);
+    CHECK_THAT(Lplus(0, 0) + Lplus(2, 2) - 2.0 * Lplus(0, 2),
+               Catch::Matchers::WithinAbs(2.0, 1e-9));
+    CHECK_THAT(Lplus(5, 5), Catch::Matchers::WithinAbs(0.0, 1e-12));
+  }
+
+  SECTION("Total resistance per node matches row sums across chunk sizes")
+  {
+    const pt::ResistanceDistanceAnalysis rda =
+      pt::ResistanceDistanceAnalysis::createLinearChain(20);
+    Eigen::MatrixXd allR = rda.computeAllPairsEffectiveResistance(5);
+    Eigen::VectorXd expectedRowSums = allR.rowwise().sum();
+    Eigen::VectorXd tot1 = rda.computeTotalResistancePerNode(1);
+    Eigen::VectorXd tot7 = rda.computeTotalResistancePerNode(7);
+    CHECK((tot1 - expectedRowSums).cwiseAbs().maxCoeff() < 1e-9);
+    CHECK((tot7 - expectedRowSums).cwiseAbs().maxCoeff() < 1e-9);
+  }
+
+  SECTION("RouseBrownianSimulator createComplete, weighted springs, and "
+          "trajectory validation")
+  {
+    ps::RouseBrownianSimulator simComplete =
+      ps::RouseBrownianSimulator::createComplete(4, 1.0, 2.0);
+    CHECK(simComplete.getNrOfNodes() == 4);
+    simComplete.initializeLinearPositions(1.0, 0);
+    // All 6 pairs (0,1),(0,2),(0,3),(1,2),(1,3),(2,3) have dx = 1,2,3,1,2,1
+    // sum dx^2 = 1 + 4 + 9 + 1 + 4 + 1 = 20 -> U = 0.5 * 2.0 * 20 = 20.0
+    CHECK_THAT(simComplete.getPotentialEnergy(),
+               Catch::Matchers::WithinAbs(20.0, 1e-10));
+
+    ps::RouseBrownianSimulator simWeighted(
+      { 0 }, { 1 }, 1.0, 1.0, 0.0, 0.01, 2, { 3.0 });
+    simWeighted.initializeLinearPositions(2.0, 0);
+    // U = 0.5 * k * w * r^2 = 0.5 * 1.0 * 3.0 * 4.0 = 6.0
+    CHECK_THAT(simWeighted.getPotentialEnergy(),
+               Catch::Matchers::WithinAbs(6.0, 1e-10));
+
+    std::vector<Eigen::MatrixXd> emptyTraj;
+    CHECK_THROWS_AS(ps::RouseBrownianSimulator::computeMSD(emptyTraj),
+                    std::invalid_argument);
+    std::vector<Eigen::MatrixXd> badCols = { Eigen::MatrixXd::Zero(3, 2) };
+    CHECK_THROWS_AS(ps::RouseBrownianSimulator::computeCenterOfMassMSD(badCols),
+                    std::invalid_argument);
+    std::vector<Eigen::MatrixXd> mismatchedFrames = {
+      Eigen::MatrixXd::Zero(3, 3), Eigen::MatrixXd::Zero(4, 3)
+    };
+    CHECK_THROWS_AS(ps::RouseBrownianSimulator::computeEndToEndAutocorrelation(
+                      mismatchedFrames),
+                    std::invalid_argument);
+  }
+
+  SECTION("Disconnected graph commute times use per-component edge weights")
+  {
+    // Component 1: 3-node chain (0-1-2) with weight 1.0 -> M_1 = 2.0, 2*M_1 = 4
+    // Component 2: 2-node edge (3-4) with weight 5.0 -> M_2 = 5.0, 2*M_2 = 10
+    const std::vector<size_t> from = { 0, 1, 3 };
+    const std::vector<size_t> to = { 1, 2, 4 };
+    const std::vector<double> weights = { 1.0, 1.0, 5.0 };
+    const pt::ResistanceDistanceAnalysis rda(from, to, weights, 5);
+
+    REQUIRE_FALSE(rda.isConnected());
+    REQUIRE(rda.getNrOfConnectedComponents() == 2);
+
+    // Per-component commute times: C_ij = 2 * M_C * R_ij
+    CHECK_THAT(rda.computeCommuteTime(0, 1),
+               Catch::Matchers::WithinAbs(4.0, 1e-9));
+    CHECK_THAT(rda.computeCommuteTime(0, 2),
+               Catch::Matchers::WithinAbs(8.0, 1e-9));
+    CHECK_THAT(rda.computeCommuteTime(1, 2),
+               Catch::Matchers::WithinAbs(4.0, 1e-9));
+    // R_34 = 1 / 5 = 0.2 -> C_34 = 2 * 5 * 0.2 = 2.0
+    CHECK_THAT(rda.computeCommuteTime(3, 4),
+               Catch::Matchers::WithinAbs(2.0, 1e-9));
+    CHECK_THAT(rda.computeCommuteTime(0, 0),
+               Catch::Matchers::WithinAbs(0.0, 1e-12));
+    CHECK(std::isinf(rda.computeCommuteTime(0, 3)));
+
+    const Eigen::MatrixXd allC = rda.computeAllPairsCommuteTime(2);
+    REQUIRE(allC.rows() == 5);
+    REQUIRE(allC.cols() == 5);
+    CHECK_THAT(allC(0, 1), Catch::Matchers::WithinAbs(4.0, 1e-9));
+    CHECK_THAT(allC(0, 2), Catch::Matchers::WithinAbs(8.0, 1e-9));
+    CHECK_THAT(allC(1, 2), Catch::Matchers::WithinAbs(4.0, 1e-9));
+    CHECK_THAT(allC(3, 4), Catch::Matchers::WithinAbs(2.0, 1e-9));
+    CHECK_THAT(allC(4, 3), Catch::Matchers::WithinAbs(2.0, 1e-9));
+    CHECK(std::isinf(allC(0, 3)));
+    CHECK(std::isinf(allC(2, 4)));
+  }
+
+  SECTION("Small-weight Laplacian preserves connectivity and resistance scale")
+  {
+    const double w = 1e-15;
+    const std::vector<size_t> from = { 0, 1, 2 };
+    const std::vector<size_t> to = { 1, 2, 3 };
+    const std::vector<double> weights = { w, w, w };
+    const pt::ResistanceDistanceAnalysis rda(from, to, weights, 4);
+
+    CHECK(rda.getNrOfNodes() == 4);
+    CHECK(rda.getNrOfEdges() == 3);
+    CHECK(rda.isConnected());
+    CHECK(rda.getNrOfConnectedComponents() == 1);
+    CHECK_THAT(rda.computeEffectiveResistance(0, 1),
+               Catch::Matchers::WithinRel(1e15, 1e-9));
+    CHECK_THAT(rda.computeEffectiveResistance(0, 3),
+               Catch::Matchers::WithinRel(3e15, 1e-9));
+
+    const double kirchhoff = rda.computeKirchhoffIndex();
+    const double kirchhoffSpectral = rda.computeKirchhoffIndexSpectral();
+    CHECK_THAT(kirchhoff, Catch::Matchers::WithinRel(10.0 * 1e15, 1e-9));
+    CHECK_THAT(kirchhoffSpectral, Catch::Matchers::WithinRel(kirchhoff, 1e-9));
+  }
+
+  SECTION("Chunk size handling and validation in ResistanceDistanceAnalysis")
+  {
+    const pt::ResistanceDistanceAnalysis rda =
+      pt::ResistanceDistanceAnalysis::createLinearChain(6);
+    const std::vector<std::pair<size_t, size_t>> pairs = {
+      { 0, 1 }, { 0, 5 }, { 1, 4 }, { 2, 5 }, { 3, 3 }
+    };
+    const Eigen::VectorXd defaultBatched =
+      rda.computeEffectiveResistanceBatched(pairs);
+    const Eigen::VectorXd chunkedBatched =
+      rda.computeEffectiveResistanceBatched(pairs, 2);
+    CHECK((chunkedBatched - defaultBatched).cwiseAbs().maxCoeff() < 1e-9);
+
+    CHECK_THROWS_AS(rda.computeEffectiveResistanceBatched(pairs, 0),
+                    std::invalid_argument);
+    CHECK_THROWS_AS(rda.computeResistanceCentrality(0), std::invalid_argument);
+    CHECK_THROWS_AS(rda.computeAllPairsCommuteTime(0), std::invalid_argument);
+  }
+
+  SECTION("RouseBrownianSimulator setSeed is reproducible after odd normal "
+          "draws")
+  {
+    // 3 nodes * 3 dimensions = 9 normal draws per step (odd)
+    ps::RouseBrownianSimulator simA =
+      ps::RouseBrownianSimulator::createLinearChain(3, 1.0, 1.0, 1.0, 0.01);
+    simA.initializeLinearPositions(1.0, 0);
+    simA.setSeed(999);
+    simA.step(1);
+
+    simA.initializeLinearPositions(1.0, 0);
+    simA.setSeed(123);
+
+    ps::RouseBrownianSimulator simB =
+      ps::RouseBrownianSimulator::createLinearChain(3, 1.0, 1.0, 1.0, 0.01);
+    simB.initializeLinearPositions(1.0, 0);
+    simB.setSeed(123);
+
+    simA.step(5);
+    simB.step(5);
+    CHECK((simA.getPositions() - simB.getPositions()).norm() < 1e-12);
+  }
+
+  SECTION("RouseBrownianSimulator rejects non-finite inputs and invalid "
+          "weights")
+  {
+    ps::RouseBrownianSimulator sim =
+      ps::RouseBrownianSimulator::createLinearChain(3, 1.0, 1.0, 0.0, 0.01);
+    const double nanVal = std::numeric_limits<double>::quiet_NaN();
+    const double infVal = std::numeric_limits<double>::infinity();
+
+    Eigen::MatrixXd badPos = Eigen::MatrixXd::Zero(3, 3);
+    badPos(1, 2) = nanVal;
+    CHECK_THROWS_AS(sim.setPositions(badPos), std::invalid_argument);
+    badPos(1, 2) = infVal;
+    CHECK_THROWS_AS(sim.setPositions(badPos), std::invalid_argument);
+
+    Eigen::VectorXd badFlat = Eigen::VectorXd::Zero(9);
+    badFlat(4) = nanVal;
+    CHECK_THROWS_AS(sim.setPositionsFlattened(badFlat), std::invalid_argument);
+    badFlat(4) = infVal;
+    CHECK_THROWS_AS(sim.setPositionsFlattened(badFlat), std::invalid_argument);
+
+    Eigen::MatrixXd badForces = Eigen::MatrixXd::Zero(3, 3);
+    badForces(0, 0) = nanVal;
+    CHECK_THROWS_AS(sim.stepWithExternalForces(badForces),
+                    std::invalid_argument);
+    CHECK_THROWS_AS(sim.stepDeterministicWithExternalForces(badForces),
+                    std::invalid_argument);
+    badForces(0, 0) = infVal;
+    CHECK_THROWS_AS(sim.stepWithExternalForces(badForces),
+                    std::invalid_argument);
+    CHECK_THROWS_AS(sim.stepDeterministicWithExternalForces(badForces),
+                    std::invalid_argument);
+
+    CHECK_THROWS_AS(ps::RouseBrownianSimulator(
+                      { 0 }, { 1 }, 1.0, 1.0, 0.0, 0.01, 2, { -1.0 }),
+                    std::invalid_argument);
+    CHECK_THROWS_AS(
+      ps::RouseBrownianSimulator({ 0 }, { 1 }, 1.0, 1.0, 0.0, 0.01, 2, { 0.0 }),
+      std::invalid_argument);
+    CHECK_THROWS_AS(ps::RouseBrownianSimulator(
+                      { 0 }, { 1 }, 1.0, 1.0, 0.0, 0.01, 2, { nanVal }),
+                    std::invalid_argument);
+    CHECK_THROWS_AS(ps::RouseBrownianSimulator(
+                      { 0 }, { 1 }, 1.0, 1.0, 0.0, 0.01, 2, { 1.0, 2.0 }),
+                    std::invalid_argument);
+  }
 }

@@ -521,7 +521,7 @@ serializeToString(const T& obj)
 
 template<typename T>
 void
-deserializeFromString(T& obj, std::string& in)
+deserializeFromString(T& obj, const std::string& in)
 {
   std::stringstream is(in);
   cereal::BinaryInputArchive iarchive(is);
