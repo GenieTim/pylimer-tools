@@ -1,14 +1,16 @@
 #!/usr/bin/env python
 # cli.py
-import click
 import statistics
+from typing import Tuple
+
+import click
 
 from pylimer_tools.io.read_lammps_output_file import read_data_file
 
 
 @click.command()
 @click.argument("files", nargs=-1, type=click.Path(exists=True))
-def cli(files):
+def cli(files: Tuple[str, ...]) -> None:
     """
     Basic CLI application reading all passed files, outputting some stats on the structures therein
 

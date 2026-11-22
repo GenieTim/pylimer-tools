@@ -12,7 +12,7 @@ from pylimer_tools_cpp import Atom, DataFileWriter
 @click.command()
 @click.argument("file", type=click.Path(exists=True), required=True)
 @click.argument("max_displacement", default=0.5, type=click.FLOAT)
-def cli(file, max_displacement):
+def cli(file: str, max_displacement: float) -> None:
     """
     Basic CLI application iterating all atoms in a file, displacing them by a bit.
 

@@ -1,5 +1,6 @@
 #include "../../src/pylimer_tools_cpp/entities/UniverseSequence.h"
 #include "../../src/pylimer_tools_cpp/io/AveFileReader.h"
+#include "../../src/pylimer_tools_cpp/io/CSVSplitter.h"
 #include "../../src/pylimer_tools_cpp/io/DataFileParser.h"
 #include "../../src/pylimer_tools_cpp/io/DataFileWriter.h"
 #include "../../src/pylimer_tools_cpp/io/DumpFileParser.h"
@@ -540,4 +541,56 @@ TEST_CASE("AveFileReader works", "[AveFileReader][io][utils]")
     pu::AveFileReader missingReader("/nonexistent/path/to/avg_file.txt");
     CHECK_THROWS(missingReader.getData());
   }
+}
+
+TEST_CASE("CSVSplitter splits without leaking temp files",
+          "[CSVSplitter][io][utils]")
+{
+  const std::filesystem::path tempDir = std::filesystem::temp_directory_path();
+  auto countTempCsvFiles = [&tempDir]() -> size_t {
+    size_t count = 0;
+    for (const std::filesystem::directory_entry& entry :
+         std::filesystem::directory_iterator(tempDir)) {
+      const std::string name = entry.path().filename().string();
+      if (name.starts_with("pylimer_csv_") && name.ends_with(".tmp")) {
+        ++count;
+      }
+    }
+    return count;
+  };
+
+  const size_t initialTempCount = countTempCsvFiles();
+
+  // Empty file should not create any temporary files
+  const std::filesystem::path emptyInput =
+    tempDir / "pylimer_test_csv_empty.txt";
+  {
+    std::ofstream out(emptyInput);
+  }
+  const std::vector<std::string> emptyResults =
+    pu::splitCSV(emptyInput.string(), " ");
+  CHECK(emptyResults.empty());
+  CHECK(countTempCsvFiles() == initialTempCount);
+  std::filesystem::remove(emptyInput);
+
+  // Multi-section file should create only the returned temporary files
+  const std::filesystem::path multiInput =
+    tempDir / "pylimer_test_csv_multi.txt";
+  {
+    std::ofstream out(multiInput);
+    out << "Step a b\n";
+    out << "1 2 3\n";
+    out << "Step a b c\n";
+    out << "1 2 3 4\n";
+  }
+  const std::vector<std::string> results =
+    pu::splitCSV(multiInput.string(), " ");
+  CHECK(results.size() == 2);
+  CHECK(countTempCsvFiles() == initialTempCount + results.size());
+
+  for (const std::string& tmpPath : results) {
+    CHECK(std::filesystem::exists(tmpPath));
+    std::filesystem::remove(tmpPath);
+  }
+  std::filesystem::remove(multiInput);
 }

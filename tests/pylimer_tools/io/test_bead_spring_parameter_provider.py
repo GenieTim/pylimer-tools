@@ -2,6 +2,8 @@
 
 import unittest
 
+from pint import UnitRegistry
+
 from pylimer_tools.io.bead_spring_parameter_provider import (
     ParameterType,
     Parameters,
@@ -88,6 +90,23 @@ class TestBeadSpringParameterProvider(unittest.TestCase):
         t_direct = params.get("T")
         t_dynamic = params.get_T()
         self.assertEqual(t_direct, t_dynamic)
+
+    def test_parameters_optional_c_inf_and_no_mutation(self):
+        """Test that Parameters handles optional C_inf without mutating caller dict."""
+        ureg = UnitRegistry()
+        raw_data = {
+            "Mw": 100.0 * ureg("g/mol"),
+            "<b>": 1.0 * ureg("nm"),
+            "<b^2>": 1.0 * ureg("nm^2"),
+            "rho": 1.0 * ureg("g/cm^3"),
+        }
+        original_keys = set(raw_data.keys())
+        params = Parameters(raw_data, ureg, name="test")
+        self.assertEqual(set(raw_data.keys()), original_keys)
+        self.assertEqual(params.get("C_inf").magnitude, 1.0)
+        self.assertTrue(params.get("C_inf").check(""))
+        self.assertEqual(params.get("R02"), raw_data["<b^2>"])
+        self.assertIn("kb", params.data)
 
 
 if __name__ == "__main__":

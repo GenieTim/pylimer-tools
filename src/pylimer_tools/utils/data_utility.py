@@ -1,6 +1,10 @@
 import warnings
+from typing import Any, Optional, TypeVar
 
 import pandas as pd
+
+T = TypeVar("T")
+DataFrameLike = TypeVar("DataFrameLike")
 
 
 def apply_to_numeric_ignore_compat(df: pd.DataFrame) -> pd.DataFrame:
@@ -25,12 +29,17 @@ def apply_to_numeric_ignore_compat(df: pd.DataFrame) -> pd.DataFrame:
     return df.apply(_convert)
 
 
-def get_tail(data, percentage=0.2, min_n=25, max_percentage=0.5):
+def get_tail(
+    data: T,
+    percentage: float = 0.2,
+    min_n: int = 25,
+    max_percentage: float = 0.5,
+) -> T:
     """
-    Extract the last few entries of a list
+    Extract the last few entries of a list, DataFrame, or Series.
 
     :param data: The list, DataFrame, or Series to extract the last few entries from
-    :type data: list or pd.DataFrame or pd.Series
+    :type data: list or pd.DataFrame or pd.Series or pl.DataFrame or pl.Series
     :param percentage: The percentage of entries to extract (default: 0.2)
     :type percentage: float
     :param min_n: The minimum number of entries to extract (default: 25)
@@ -48,49 +57,63 @@ def get_tail(data, percentage=0.2, min_n=25, max_percentage=0.5):
     assert max_percentage <= 1
     tail_n = int(
         min(
-            max(min(min_n, max_percentage * len(data)), percentage * len(data)),
-            len(data),
+            max(min(min_n, max_percentage * len(data)), percentage * len(data)),  # type: ignore[arg-type]
+            len(data),  # type: ignore[arg-type]
         )
     )
-    if isinstance(data, pd.DataFrame) or isinstance(data, pd.Series):
-        return data.tail(tail_n)
-    else:
-        return data[-tail_n:]
+    if hasattr(data, "tail") and callable(data.tail):
+        return data.tail(tail_n)  # type: ignore[return-value]
+    if tail_n == 0:
+        return data[:0]  # type: ignore[index, return-value]
+    return data[-tail_n:]  # type: ignore[index, return-value]
 
 
 def unify_data_stepsizes(
-    data: pd.DataFrame,
+    data: DataFrameLike,
     key: str,
-    step_size: int = None,
-    max_expected_step_size: int = 100,
-) -> pd.DataFrame:
+    step_size: Optional[float] = None,
+    max_expected_step_size: float = 100,
+) -> DataFrameLike:
     """
     Get a DataFrame where all data points have the same step between the values in column given by `key`
 
-    :param data: The DataFrame to unify the step-size for
-    :type data: pd.DataFrame
+    :param data: The DataFrame to unify the step-size for (pandas or polars DataFrame)
+    :type data: pd.DataFrame or pl.DataFrame
     :param key: The column name indicating the column containing the step-nr
     :type key: str
     :param step_size: The step size to use for filtering (if None, computed automatically)
-    :type step_size: int, optional
+    :type step_size: Optional[float]
     :param max_expected_step_size: Used to get a warning if the computed step-size is larger
-    :type max_expected_step_size: int, default=100
+    :type max_expected_step_size: float, default=100
     :return: A DataFrame with a consistent step-size
-    :rtype: pd.DataFrame
+    :rtype: Same type as input data
 
     NOTE: this function is rather unstable, as it has a few assumptions:
     - steps are modulo stepsize. Breaks e.g. with steps start with 1 and go up by step_size.
     - ideal step-size is max step difference. Breaks e.g. if there is one big gap
     """
-    # lenBefore = len(data)
+    is_polars = hasattr(data, "filter") and not isinstance(data, pd.DataFrame)
+
     if step_size is None:
-        step_size = data[key].sort_values().diff().max()
+        if len(data) <= 1:  # type: ignore[arg-type]
+            return data
+        if is_polars:
+            computed: Any = data[key].sort().diff().max()  # type: ignore[index]
+        else:
+            computed = data[key].sort_values().diff().max()  # type: ignore[index]
+        if computed is None or pd.isna(computed):
+            return data
+        step_size = float(computed)
+
+    if pd.isna(step_size) or step_size == 0:
+        return data
+
     if step_size > max_expected_step_size:
         warnings.warn(
             "Step size {} unexpectedly large, with max expected {}".format(
                 step_size, max_expected_step_size
             )
         )
-    data = data[(data[key] % step_size) == 0]
-    # print("Reduced from {} to {} data-points using step size of {}".format(lenBefore, len(data), step_size))
-    return data
+    if is_polars:
+        return data.filter((data[key] % step_size) == 0)  # type: ignore[attr-defined, index, return-value]
+    return data[(data[key] % step_size) == 0]  # type: ignore[index, return-value]

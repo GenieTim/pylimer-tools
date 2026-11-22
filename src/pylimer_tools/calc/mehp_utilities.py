@@ -26,7 +26,7 @@ def predict_shear_modulus(
     temperature: float = 1,
     k_boltzmann: float = 1,
     crosslinker_type: int = 2,
-    total_mass=1,
+    total_mass: float = 1,
 ) -> float:
     """
     Predict the shear modulus using ANT Analysis.
@@ -69,7 +69,7 @@ def compute_cycle_rank(
     networks: Union[Sequence[Universe], None] = None,
     nu: Union[float, None] = None,
     mu: Union[float, None] = None,
-    abs_tol: float = 1,
+    abs_tol: Union[float, None] = 1,
     rel_tol: float = 1,
     crosslinker_type: int = 2,
 ) -> float:
@@ -127,7 +127,7 @@ def compute_cycle_rank(
 
 def compute_effective_nr_density_of_network(
     networks: Sequence[Universe],
-    abs_tol: float = 1,
+    abs_tol: Union[float, None] = 1,
     rel_tol: float = 1,
     crosslinker_type: int = 2,
 ) -> float:
@@ -222,10 +222,10 @@ def compute_mean_universe_volume(
 
 def compute_effective_nr_density_of_junctions(
     networks: Sequence[Universe],
-    abs_tol: float = 0,
+    abs_tol: Union[float, None] = 0,
     rel_tol: float = 1,
     crosslinker_type: int = 2,
-    min_num_effective_strands=2,
+    min_num_effective_strands: int = 2,
 ) -> float:
     """
     Compute the number density of the elastically effective crosslinks,
@@ -350,15 +350,14 @@ def compute_topological_factor(
             # Cannot compute Kuhn factor for direct crosslink-crosslink bonds
             # (N <= 2)
             continue
-        if b is None:
-            b = float(np.mean(molecule.compute_bond_lengths()))
+        b_mol = float(np.mean(molecule.compute_bond_lengths())) if b is None else b
         crosslinkers = [crosslinkers[0], crosslinkers[1]]
         # sort crosslinkers by name as a way to keep the vector directions
         # consistent between timesteps
         crosslinkers.sort(key=lambda a: a.get_id())
         key = molecule.get_key()
         gamma_sum += (
-            r_taus[key] * r_taus[key] / ((n_atoms - 2) * b * b)
+            r_taus[key] * r_taus[key] / ((n_atoms - 2) * b_mol * b_mol)
         )  # -2: remove crosslinkers again (assumption 3)
 
     return gamma_sum / total_mass

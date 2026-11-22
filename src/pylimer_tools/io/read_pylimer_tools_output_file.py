@@ -2,13 +2,17 @@
 This module provides a few functions to read output from pylimer_tools_cpp's simulators.
 """
 
+from __future__ import annotations
+
+import os
+
 import pandas as pd
 
-from pylimer_tools.utils.cache_utility import do_cache, load_cache
+from pylimer_tools.utils.cache_utility import PathLike, do_cache, load_cache
 from pylimer_tools.utils.data_utility import apply_to_numeric_ignore_compat
 
 
-def read_avg_file(filename: str) -> pd.DataFrame:
+def read_avg_file(filename: PathLike) -> pd.DataFrame:
     """
     Read an averages-output file from one of the simulators shipped with pylimer_tools.
 
@@ -17,7 +21,7 @@ def read_avg_file(filename: str) -> pd.DataFrame:
     The function also caches results to improve performance on subsequent reads.
 
     :param filename: Path to the averages file to read
-    :type filename: str
+    :type filename: PathLike
     :return: DataFrame containing the parsed averages data, grouped by OutputStep
     :rtype: pd.DataFrame
 
@@ -26,11 +30,12 @@ def read_avg_file(filename: str) -> pd.DataFrame:
     :note: The returned DataFrame is grouped by OutputStep, keeping only the last
            entry for each step.
     """
-    cache = load_cache(filename, "my-avg")
+    filename_str = os.fspath(filename)
+    cache = load_cache(filename_str, "my-avg")
     if cache is not None:
         return cache
     data_frames = []
-    with open(filename, "r") as f:
+    with open(filename_str, "r") as f:
         first_line_split = f.readline().removeprefix("#").strip().split()
         data = []
         for line in f:
@@ -49,5 +54,5 @@ def read_avg_file(filename: str) -> pd.DataFrame:
     result = apply_to_numeric_ignore_compat(df)
     result = result.groupby("OutputStep", as_index=False).last()
     assert not result["OutputStep"].duplicated().any()
-    do_cache(result, filename, "my-avg")
+    do_cache(result, filename_str, "my-avg")
     return result

@@ -9,6 +9,7 @@ from pint import UnitRegistry
 
 from pylimer_tools.calc.miller_macosko_theory import (
     _compute_validate_parameters,
+    compute_entanglement_modulus,
     compute_miller_macosko_probabilities,
     compute_modulus_decomposition,
     compute_weight_fraction_of_soluble_material,
@@ -463,6 +464,154 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         self.assertRaises(
             ValueError, lambda: compute_miller_macosko_probabilities(r=1.0, p=2, f=7)
         )
+
+    def test_monofunctional_weight_fractions_and_mass_conservation(self):
+        """Test MMT weight fractions with monofunctional chains (b2 < 1) and solvent."""
+        for b2 in [0.5, 0.8]:
+            params = {
+                "crosslinker_type": 2,
+                "functionality_per_type": {1: 2, 2: 4, 3: 1},
+                "weight_fractions": {1: 0.70, 2: 0.15, 3: 0.15},
+                "r": 1.0,
+                "p": 0.95,
+                "b2": b2,
+            }
+            w_bb = compute_weight_fraction_of_backbone(None, **params)
+            w_dang = compute_weight_fraction_of_dangling_chains(None, **params)
+            w_sol = compute_weight_fraction_of_soluble_material(None, **params)
+            self.assertAlmostEqual(w_bb + w_dang + w_sol, 1.0, places=10)
+
+            # Compare backbone with same system where monofunctional has weight 0
+            # (f=1 must contribute 0.0 to backbone)
+            params_no_mono = {
+                **params,
+                "weight_fractions": {1: 0.70, 2: 0.15, 3: 0.0},
+            }
+            self.assertAlmostEqual(
+                w_bb,
+                compute_weight_fraction_of_backbone(None, **params_no_mono),
+                places=10,
+            )
+
+        # Solvent (f=0) must also contribute 0.0 to backbone
+        params_with_solvent = {
+            "crosslinker_type": 2,
+            "functionality_per_type": {1: 2, 2: 4, 4: 0},
+            "weight_fractions": {1: 0.70, 2: 0.15, 4: 0.15},
+            "r": 1.0,
+            "p": 0.95,
+            "b2": 1.0,
+        }
+        params_no_solvent = {
+            **params_with_solvent,
+            "weight_fractions": {1: 0.70, 2: 0.15, 4: 0.0},
+        }
+        self.assertAlmostEqual(
+            compute_weight_fraction_of_backbone(None, **params_with_solvent),
+            compute_weight_fraction_of_backbone(None, **params_no_solvent),
+            places=10,
+        )
+
+    def test_compute_entanglement_modulus_with_beta(self):
+        """Test compute_entanglement_modulus with explicit beta and without temperature."""
+        ureg = UnitRegistry()
+        g_e_1 = 0.5 * ureg("MPa")
+        beta = 0.2
+        result = compute_entanglement_modulus(g_e_1, beta=beta)
+        self.assertAlmostEqual(
+            result.to("MPa").magnitude, 0.5 * (1 - beta) ** 4, places=10
+        )
+
+        # Also works when computing beta from p, r, f, b2
+        result_from_params = compute_entanglement_modulus(
+            g_e_1, p=0.95, r=1.0, f=4, b2=1.0
+        )
+        _, expected_beta = compute_miller_macosko_probabilities(r=1.0, p=0.95, f=4)
+        self.assertAlmostEqual(
+            result_from_params.to("MPa").magnitude,
+            0.5 * (1 - expected_beta) ** 4,
+            places=10,
+        )
+
+        with self.assertRaises(ValueError):
+            compute_entanglement_modulus(g_e_1, beta=1.5)
+
+    def test_predict_p_from_w_sol_edge_cases(self):
+        """Test predict_p_from_w_sol with r > 1 and with a 0-bond network."""
+        from pylimer_tools_cpp import Universe
+
+        # r > 1: p_max < 1.0
+        r = 1.3
+        f = 4
+        p_true = 0.7
+        weight_fractions = {1: 0.85, 2: 0.15}
+        func_per_type = {1: 2, 2: f}
+        w_sol = compute_weight_fraction_of_soluble_material(
+            network=None,
+            crosslinker_type=2,
+            functionality_per_type=func_per_type,
+            weight_fractions=weight_fractions,
+            r=r,
+            p=p_true,
+            b2=1.0,
+        )
+        p_pred = predict_p_from_w_sol(
+            w_sol=w_sol,
+            network=None,
+            crosslinker_type=2,
+            functionality_per_type=func_per_type,
+            weight_fractions=weight_fractions,
+            r=r,
+            b2=1.0,
+        )
+        self.assertAlmostEqual(p_pred, p_true, places=5)
+
+        # 0-bond network should not short-circuit compute_wsol to 1.0
+        zero_bond_net = Universe(10, 10, 10)
+        zero_bond_net.add_atoms(
+            [1, 2], [1, 2], [0.0, 1.0], [0.0, 0.0], [0.0, 0.0], [0, 0], [0, 0], [0, 0]
+        )
+        p_pred_net = predict_p_from_w_sol(
+            w_sol=w_sol,
+            network=zero_bond_net,
+            crosslinker_type=2,
+            functionality_per_type=func_per_type,
+            weight_fractions=weight_fractions,
+            r=r,
+            b2=1.0,
+        )
+        self.assertAlmostEqual(p_pred_net, p_true, places=5)
+
+    def test_predict_number_density_with_explicit_crosslinker_density_and_b2(self):
+        """Test crosslinker_number_density and b2 forwarding in number density predictors."""
+        mu = predict_number_density_of_junction_points(
+            network=self.saturatedTestUniverse,
+            crosslinker_type=2,
+            functionality_per_type={1: 2, 2: 4},
+            b2=0.9,
+            crosslinker_number_density=2.5,
+        )
+        nu = predict_number_density_of_network_strands(
+            network=self.saturatedTestUniverse,
+            crosslinker_type=2,
+            functionality_per_type={1: 2, 2: 4},
+            b2=0.9,
+            crosslinker_number_density=2.5,
+        )
+        self.assertGreater(mu, 0.0)
+        self.assertGreater(nu, mu)
+
+    def test_predict_number_density_weight_fractions_fallback_deprecated(self):
+        """Omitting crosslinker_number_density emits DeprecationWarning."""
+        self.saturatedTestUniverse.set_masses({1: 1, 2: 1})
+        with self.assertWarns(DeprecationWarning):
+            predict_number_density_of_junction_points(
+                self.saturatedTestUniverse, 2, functionality_per_type={1: 2, 2: 4}
+            )
+        with self.assertWarns(DeprecationWarning):
+            predict_number_density_of_network_strands(
+                self.saturatedTestUniverse, 2, functionality_per_type={1: 2, 2: 4}
+            )
 
 
 if __name__ == "__main__":

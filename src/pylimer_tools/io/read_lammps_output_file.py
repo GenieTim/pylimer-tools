@@ -9,32 +9,36 @@ This module provides a few functions to read LAMMPS' output files, including:
 
 """
 
+from __future__ import annotations
+
 import os
 import re
 import warnings
-from typing import List, Union
+from typing import List, Optional, Union
 
 import pandas as pd
 
 from pylimer_tools.io.extract_thermo_data import extract_thermo_params
-from pylimer_tools.utils.cache_utility import do_cache, load_cache
+from pylimer_tools.utils.cache_utility import PathLike, do_cache, load_cache
 from pylimer_tools.utils.data_utility import apply_to_numeric_ignore_compat
 from pylimer_tools_cpp import AtomStyle, Universe, UniverseSequence
 
 
-def read_log_file(filepath, lines_to_read_to_detect_header=500000) -> pd.DataFrame:
+def read_log_file(
+    filepath: PathLike, lines_to_read_to_detect_header: int = 500000
+) -> pd.DataFrame:
     """
     Read a LAMMPS' log (thermo output) file.
 
     :param filepath: Path to the LAMMPS log file
-    :type filepath: str
+    :type filepath: PathLike
     :param lines_to_read_to_detect_header: Maximum number of lines to read when detecting the header
     :type lines_to_read_to_detect_header: int
     :return: DataFrame containing the parsed thermo data
     :rtype: pd.DataFrame
     """
     return extract_thermo_params(
-        filepath,
+        os.fspath(filepath),
         header=None,
         texts_to_read=500000,
         lines_to_read_to_detect_header=lines_to_read_to_detect_header,
@@ -42,53 +46,58 @@ def read_log_file(filepath, lines_to_read_to_detect_header=500000) -> pd.DataFra
 
 
 def read_dump_file(
-    data_file, dump_file, atom_style: Union[List[AtomStyle], None] = None
+    data_file: PathLike,
+    dump_file: PathLike,
+    atom_style: Optional[List[AtomStyle]] = None,
 ) -> UniverseSequence:
     """
     Read a file with LAMMPS' dump of snapshots of structures into a Universe.
 
     :param data_file: Path to the LAMMPS data file containing structure information
-    :type data_file: str
+    :type data_file: PathLike
     :param dump_file: Path to the LAMMPS dump file containing trajectory information
-    :type dump_file: str
+    :type dump_file: PathLike
     :param atom_style: The atom style(s) used in the data file
-    :type atom_style: Union[List[AtomStyle], None]
+    :type atom_style: Optional[List[AtomStyle]]
     :return: Sequence of Universe objects representing the trajectory
     :rtype: UniverseSequence
     """
     u_s = UniverseSequence()
     if atom_style is not None:
         u_s.set_data_file_atom_style(atom_style)
-    u_s.initialize_from_dump_file(data_file, dump_file)
+    u_s.initialize_from_dump_file(os.fspath(data_file), os.fspath(dump_file))
     return u_s
 
 
 def read_data_file(
-    structure_file: str, atom_style: Union[List[AtomStyle], None] = None
+    structure_file: PathLike, atom_style: Optional[List[AtomStyle]] = None
 ) -> Universe:
     """
     Read a file with LAMMPS' data type of structure into a Universe.
 
     :param structure_file: Path to the structure file
-    :type structure_file: str
+    :type structure_file: PathLike
     :param atom_style: The atom style(s) in the structure file (defaults to AtomStyle.Molecule if None)
-    :type atom_style: Union[List[AtomStyle], None]
+    :type atom_style: Optional[List[AtomStyle]]
     :return: Universe object representing the molecular structure
     :rtype: Universe
     :raises FileNotFoundError: If the structure file does not exist
     """
-    if not (os.path.isfile(structure_file)):
-        raise FileNotFoundError(f"Structure-file '{structure_file}' not found.")
+    structure_file_str = os.fspath(structure_file)
+    if not os.path.isfile(structure_file_str):
+        raise FileNotFoundError(f"Structure-file '{structure_file_str}' not found.")
     u_s = UniverseSequence()
     if atom_style is not None:
         u_s.set_data_file_atom_style(atom_style)
-    u_s.initialize_from_data_sequence([structure_file])
+    u_s.initialize_from_data_sequence([structure_file_str])
     universe = u_s.at_index(0)
     del u_s
     return universe
 
 
-def read_averages_file(filepath, use_cache: bool = True, sep=" ") -> pd.DataFrame:
+def read_averages_file(
+    filepath: PathLike, use_cache: bool = True, sep: str = " "
+) -> pd.DataFrame:
     """
     Read a file written by a `fix ave/time` command.
 
@@ -100,7 +109,7 @@ def read_averages_file(filepath, use_cache: bool = True, sep=" ") -> pd.DataFram
         - and then either data or potentially a second header, if it is a sectioned file (e.g., from a `fix ave/time ... vector`)
 
     :param filepath: Path to the averages file
-    :type filepath: str
+    :type filepath: PathLike
     :param use_cache: Whether to use the cache to speed up reading & writing
     :type use_cache: bool
     :param sep: Delimiter used in the file (default is space)
@@ -109,29 +118,40 @@ def read_averages_file(filepath, use_cache: bool = True, sep=" ") -> pd.DataFram
     :rtype: pd.DataFrame
     :raises FileNotFoundError: If the averages file does not exist
     """
-    if not (os.path.isfile(filepath)):
-        raise FileNotFoundError(f"Averages-file '{filepath}' not found.")
+    filepath_str = os.fspath(filepath)
+    if not os.path.isfile(filepath_str):
+        raise FileNotFoundError(f"Averages-file '{filepath_str}' not found.")
     header_line = None
-    with open(filepath, "r") as f:
+    with open(filepath_str, "r") as f:
         line0 = f.readline()
         line1 = f.readline()
         line2 = f.readline()
 
         if line2.startswith("#"):
-            return read_sectioned_averages_file(filepath, use_cache=use_cache)
+            return read_sectioned_averages_file(filepath_str, use_cache=use_cache)
 
         header_line = line1 if line1.startswith("#") else line0
     header_line = header_line.removeprefix("#").strip()
 
+    cache_suffix = "avg-{}-cache.pickle".format(sep.encode("utf-8").hex())
+    cache_content = load_cache(filepath_str, cache_suffix)
+    if cache_content is not None and use_cache:
+        return cache_content
+
     try:
-        data = pd.read_csv(filepath, comment="#", names=header_line.split(), sep=sep)
+        data = pd.read_csv(
+            filepath_str, comment="#", names=header_line.split(), sep=sep
+        )
     except pd.errors.EmptyDataError:
         return pd.DataFrame()
 
+    do_cache(data, filepath_str, cache_suffix)
     return data
 
 
-def read_sectioned_averages_file(filepath, use_cache: bool = True) -> pd.DataFrame:
+def read_sectioned_averages_file(
+    filepath: PathLike, use_cache: bool = True
+) -> pd.DataFrame:
     """
     Read a file written by a `fix ave/time` command with multiple sections.
 
@@ -139,7 +159,7 @@ def read_sectioned_averages_file(filepath, use_cache: bool = True) -> pd.DataFra
     to restore the original sections.
 
     :param filepath: Path to the sectioned averages file
-    :type filepath: str
+    :type filepath: PathLike
     :param use_cache: Whether to use the cache to speed up reading & writing
     :type use_cache: bool
     :return: DataFrame containing the parsed sectioned data
@@ -147,17 +167,18 @@ def read_sectioned_averages_file(filepath, use_cache: bool = True) -> pd.DataFra
     :raises FileNotFoundError: If the file does not exist
     :raises ValueError: If the file format is not recognized as a proper sectioned averages file
     """
-    if not (os.path.isfile(filepath)):
-        raise FileNotFoundError(f"Averages-file '{filepath}' not found.")
+    filepath_str = os.fspath(filepath)
+    if not os.path.isfile(filepath_str):
+        raise FileNotFoundError(f"Averages-file '{filepath_str}' not found.")
 
     cache_suffix = "sectionedavg-cache.pickle"
-    cache_content = load_cache(filepath, cache_suffix)
+    cache_content = load_cache(filepath_str, cache_suffix)
 
     if cache_content is not None and use_cache:
         return cache_content
 
     data = {}
-    with open(filepath, "r") as f:
+    with open(filepath_str, "r") as f:
         f.readline()  # discard line 0
         line1 = f.readline()
         line2 = f.readline()
@@ -165,10 +186,9 @@ def read_sectioned_averages_file(filepath, use_cache: bool = True) -> pd.DataFra
         if not line2.startswith("#"):
             raise ValueError(
                 "The file '{}' was not detected to be a proper sectioned averages file.".format(
-                    filepath
+                    filepath_str
                 )
             )
-            # return readSectionedAveragesFile(filepath)
 
         header_line1 = line1.removeprefix("#").strip()
         header_line2 = line2.removeprefix("#").strip()
@@ -181,12 +201,12 @@ def read_sectioned_averages_file(filepath, use_cache: bool = True) -> pd.DataFra
                 "Cannot read this file, as we cannot distinguish between section header and main data"
             )
 
-        current_data = []
-        current_key = None
+        current_data: List[List[str]] = []
+        current_key: Optional[str] = None
         for line in f:
             split_line = line.split()
             if current_key is None:
-                assert len(split_line) == len(header_line1.split())
+                assert len(split_line) == len(header_line1_split)
                 current_key = line
                 continue
             if len(split_line) == len(header_line1_split):
@@ -196,38 +216,35 @@ def read_sectioned_averages_file(filepath, use_cache: bool = True) -> pd.DataFra
             else:
                 assert len(split_line) == len(header_line2_split)
                 current_data.append(split_line)
-        data[current_key] = current_data
-
-    # convert all the data to a dataframe
-    dfs_to_concat = []
+        if current_key is not None:
+            data[current_key] = current_data
 
     if header_line1_split is None:
         raise ValueError("Did not find a useable header line.")
 
-    for key in data.keys():
+    all_rows: List[List[str]] = []
+    for key, rows in data.items():
         split_key = key.split()
-        local_dataframe = pd.DataFrame(data[key], columns=header_line2_split)
-        for i, col in enumerate(header_line1_split):
-            local_dataframe[col] = split_key[i]
-        dfs_to_concat.append(local_dataframe)
+        for row in rows:
+            all_rows.append(row + split_key)
 
-    df = pd.concat(dfs_to_concat, ignore_index=True)
+    df = pd.DataFrame(all_rows, columns=header_line2_split + header_line1_split)
 
     # convert all columns of DataFrame
     df = apply_to_numeric_ignore_compat(df)
-    do_cache(df, filepath, cache_suffix)
+    do_cache(df, filepath_str, cache_suffix)
 
     return df
 
 
-def read_histogram_file(filepath, use_cache: bool = True) -> pd.DataFrame:
+def read_histogram_file(filepath: PathLike, use_cache: bool = True) -> pd.DataFrame:
     """
     Read a file written by `fix ave/hist` or similar.
 
     This is a wrapper around read_sectioned_averages_file for histogram data.
 
     :param filepath: Path to the histogram file
-    :type filepath: str
+    :type filepath: PathLike
     :param use_cache: Whether to use the cache to speed up reading & writing
     :type use_cache: bool
     :return: DataFrame containing the parsed histogram data
@@ -239,13 +256,13 @@ def read_histogram_file(filepath, use_cache: bool = True) -> pd.DataFrame:
 
 
 def read_correlation_file(
-    filepath, group_key="Timestep", use_cache: bool = True
+    filepath: PathLike, group_key: str = "Timestep", use_cache: bool = True
 ) -> pd.DataFrame:
     """
     Read a file written by a `fix ave/correlate{/long}` command.
 
     :param filepath: Path to the correlation file
-    :type filepath: str
+    :type filepath: PathLike
     :param group_key: The key that denotes a new section
     :type group_key: str
     :param use_cache: Whether to use the cache to speed up reading & writing
@@ -255,22 +272,23 @@ def read_correlation_file(
     :rtype: pd.DataFrame
     :raises FileNotFoundError: If the correlation file does not exist
     """
-    if not (os.path.isfile(filepath)):
-        raise FileNotFoundError(f"Correlation-file '{filepath}' not found.")
+    filepath_str = os.fspath(filepath)
+    if not os.path.isfile(filepath_str):
+        raise FileNotFoundError(f"Correlation-file '{filepath_str}' not found.")
 
     cache_suffix = "{}-correlation-cache.pickle".format(
         group_key if isinstance(group_key, str) else "g"
     )
-    cache_content = load_cache(filepath, cache_suffix)
+    cache_content = load_cache(filepath_str, cache_suffix)
 
     if cache_content is not None and use_cache:
         return cache_content
 
     data = {}
     header_line = None
-    with open(filepath, "r") as f:
-        current_data = []
-        current_key = None
+    with open(filepath_str, "r") as f:
+        current_data: List[List[Union[str, int]]] = []
+        current_key: Optional[str] = None
         header_line = f.readline()
         if header_line.startswith("#"):
             # in LAMMPS files, there is a title line that does not exist in our DPD output,
@@ -280,10 +298,7 @@ def read_correlation_file(
         normal_line_len = len(cols)
         lines_interpreted = 0
 
-        def is_group_key(line):
-            # if (isinstance(group_key, list)):
-            #     return np.any([x in line for x in group_key])
-            # else:
+        def is_group_key(line: str) -> bool:
             return group_key in line
 
         for line in f:
@@ -303,12 +318,11 @@ def read_correlation_file(
                 # new key
                 current_key = line
             elif len(split) == normal_line_len or normal_line_len is None:
-                # normal_line_len = len(split)
-                current_data.append(split)
+                current_data.append(list(split))
             else:
                 raise ValueError(
                     "Did not expect {} splited values on line with content {} in correlation file {}".format(
-                        len(split), line, filepath
+                        len(split), line, filepath_str
                     )
                 )
             lines_interpreted += 1
@@ -324,7 +338,7 @@ def read_correlation_file(
         if results is None:
             warnings.warn(
                 "Did not find {} with number in {} when reading {}".format(
-                    group_key, key, filepath
+                    group_key, key, filepath_str
                 )
             )
         assert results is not None
@@ -337,6 +351,6 @@ def read_correlation_file(
     correlated_data = pd.DataFrame(correlated_data_assembled, columns=cols)
     # convert all columns of DataFrame
     correlated_data = apply_to_numeric_ignore_compat(correlated_data)
-    do_cache(correlated_data, filepath, cache_suffix)
+    do_cache(correlated_data, filepath_str, cache_suffix)
 
     return correlated_data

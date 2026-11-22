@@ -40,8 +40,21 @@ class TestMEHPAssumptions(unittest.TestCase):
                 linalg.norm(dist_1) + linalg.norm(dist_2 + offset),
             )
 
-            # with this choice done, this test here
-            # should now check that no other combination gets smaller
+            # Check that reference_norm is finite, positive, and <= both choices,
+            # and <= any opposite-sign shift (e.g., dist_1 - offset or dist_2 - offset)
+            self.assertGreater(reference_norm, 0.0)
+            self.assertLessEqual(
+                reference_norm, linalg.norm(dist_1 + offset) + linalg.norm(dist_2)
+            )
+            self.assertLessEqual(
+                reference_norm, linalg.norm(dist_1) + linalg.norm(dist_2 + offset)
+            )
+            self.assertLessEqual(
+                reference_norm, linalg.norm(dist_1 - offset) + linalg.norm(dist_2)
+            )
+            self.assertLessEqual(
+                reference_norm, linalg.norm(dist_1) + linalg.norm(dist_2 - offset)
+            )
 
 
 if __name__ == "__main__":

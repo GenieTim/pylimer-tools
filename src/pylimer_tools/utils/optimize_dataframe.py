@@ -8,15 +8,19 @@ Heavily inspired by the following sources:
 """
 
 import gc
-from typing import List
+from typing import List, Optional, Sequence
 
 import numpy as np
 import pandas as pd
 
 
 def reduce_mem_usage(
-    df, obj_to_category=False, subset=None, inplace=True, print_stats=False
-):
+    df: pd.DataFrame,
+    obj_to_category: bool = False,
+    subset: Optional[Sequence[str]] = None,
+    inplace: bool = True,
+    print_stats: bool = False,
+) -> pd.DataFrame:
     """
     Iterate through all the columns of a dataframe and modify the data type to reduce memory usage.
 
@@ -25,7 +29,7 @@ def reduce_mem_usage(
     :param obj_to_category: convert non-datetime related objects to category dtype
     :type obj_to_category: bool
     :param subset: subset of columns to analyse
-    :type subset: List[str] or None
+    :type subset: Optional[Sequence[str]]
     :param inplace: whether to modify the dataframe in place
     :type inplace: bool
     :param print_stats: whether to print memory usage statistics
@@ -42,60 +46,66 @@ def reduce_mem_usage(
     if not inplace:
         df = df.copy()
 
-    cols = subset if subset is not None else df.columns.tolist()
+    cols: List[str] = list(subset) if subset is not None else df.columns.tolist()
 
     for col in cols:
         col_type = df[col].dtype
 
         if (
-            pd.api.types.is_numeric_dtype(col_type)
-            and col_type != object
-            and col_type.name != "category"
-            and "datetime" not in col_type.name
+            pd.api.types.is_bool_dtype(col_type)
+            or isinstance(col_type, pd.CategoricalDtype)
+            or pd.api.types.is_datetime64_any_dtype(col_type)
+            or pd.api.types.is_timedelta64_dtype(col_type)
         ):
+            continue
+
+        if pd.api.types.is_numeric_dtype(col_type) and col_type != object:
             c_min = df[col].min()
             c_max = df[col].max()
 
-            # test if column can be converted to an integer
-            treat_as_int = str(col_type)[:3] == "int" or str(col_type)[:4] == "uint"
-
-            if treat_as_int:
-                if c_min > np.iinfo(np.int8).min and c_max < np.iinfo(np.int8).max:
+            if pd.api.types.is_integer_dtype(col_type):
+                if c_min >= np.iinfo(np.int8).min and c_max <= np.iinfo(np.int8).max:
                     df[col] = df[col].astype(np.int8)
-                elif c_min > np.iinfo(np.uint8).min and c_max < np.iinfo(np.uint8).max:
+                elif (
+                    c_min >= np.iinfo(np.uint8).min and c_max <= np.iinfo(np.uint8).max
+                ):
                     df[col] = df[col].astype(np.uint8)
-                elif c_min > np.iinfo(np.int16).min and c_max < np.iinfo(np.int16).max:
+                elif (
+                    c_min >= np.iinfo(np.int16).min and c_max <= np.iinfo(np.int16).max
+                ):
                     df[col] = df[col].astype(np.int16)
                 elif (
-                    c_min > np.iinfo(np.uint16).min and c_max < np.iinfo(np.uint16).max
+                    c_min >= np.iinfo(np.uint16).min
+                    and c_max <= np.iinfo(np.uint16).max
                 ):
                     df[col] = df[col].astype(np.uint16)
-                elif c_min > np.iinfo(np.int32).min and c_max < np.iinfo(np.int32).max:
+                elif (
+                    c_min >= np.iinfo(np.int32).min and c_max <= np.iinfo(np.int32).max
+                ):
                     df[col] = df[col].astype(np.int32)
                 elif (
-                    c_min > np.iinfo(np.uint32).min and c_max < np.iinfo(np.uint32).max
+                    c_min >= np.iinfo(np.uint32).min
+                    and c_max <= np.iinfo(np.uint32).max
                 ):
                     df[col] = df[col].astype(np.uint32)
-                elif c_min > np.iinfo(np.int64).min and c_max < np.iinfo(np.int64).max:
+                elif (
+                    c_min >= np.iinfo(np.int64).min and c_max <= np.iinfo(np.int64).max
+                ):
                     df[col] = df[col].astype(np.int64)
                 elif (
-                    c_min > np.iinfo(np.uint64).min and c_max < np.iinfo(np.uint64).max
+                    c_min >= np.iinfo(np.uint64).min
+                    and c_max <= np.iinfo(np.uint64).max
                 ):
                     df[col] = df[col].astype(np.uint64)
             else:
                 if (
-                    c_min > np.finfo(np.float16).min
-                    and c_max < np.finfo(np.float16).max
-                ):
-                    df[col] = df[col].astype(np.float16)
-                elif (
-                    c_min > np.finfo(np.float32).min
-                    and c_max < np.finfo(np.float32).max
+                    c_min >= np.finfo(np.float32).min
+                    and c_max <= np.finfo(np.float32).max
                 ):
                     df[col] = df[col].astype(np.float32)
                 else:
                     df[col] = df[col].astype(np.float64)
-        elif "datetime" not in col_type.name and obj_to_category:
+        elif obj_to_category:
             df[col] = df[col].astype("category")
     gc.collect()
     end_mem = df.memory_usage().sum() / 1024**2
@@ -136,37 +146,45 @@ def optimize_ints(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def optimize_objects(df: pd.DataFrame, datetime_features: List[str]) -> pd.DataFrame:
+def optimize_objects(
+    df: pd.DataFrame, datetime_features: Optional[Sequence[str]] = None
+) -> pd.DataFrame:
     """
-    Optimize object type entries.
+    Optimize object and string type entries.
 
     :param df: dataframe to reduce
     :type df: pd.DataFrame
     :param datetime_features: list of column names that contain datetime data
-    :type datetime_features: List[str]
+    :type datetime_features: Optional[Sequence[str]]
 
     :return: dataset with the column dtypes adjusted
     :rtype: pd.DataFrame
     """
-    for col in df.select_dtypes(include=["object"]):
-        if col not in datetime_features:
+    dt_features = set(datetime_features) if datetime_features is not None else set()
+    for col in df.select_dtypes(include=["object", "string"]):
+        if col not in dt_features:
             num_unique_values = len(df[col].unique())
             num_total_values = len(df[col])
-            if float(num_unique_values) / num_total_values < 0.5:
+            if (
+                num_total_values > 0
+                and float(num_unique_values) / num_total_values < 0.5
+            ):
                 df[col] = df[col].astype("category")
         else:
             df[col] = pd.to_datetime(df[col])
     return df
 
 
-def optimize(df: pd.DataFrame, datetime_features: List[str] = []):
+def optimize(
+    df: pd.DataFrame, datetime_features: Optional[Sequence[str]] = None
+) -> pd.DataFrame:
     """
     Optimize all types of all columns in a dataframe.
 
     :param df: dataframe to reduce
     :type df: pd.DataFrame
     :param datetime_features: list of column names that contain datetime data
-    :type datetime_features: List[str]
+    :type datetime_features: Optional[Sequence[str]]
 
     :return: dataset with the column dtypes adjusted
     :rtype: pd.DataFrame

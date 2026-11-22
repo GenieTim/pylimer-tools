@@ -1,11 +1,14 @@
 #!/usr/bin/env python
 import os
+import pathlib as pl
+import tempfile
 import unittest
 
 import mock
 import pandas as pd
 
 from pylimer_tools.io.extract_thermo_data import (
+    _is_numeric_string,
     detect_headers,
     extract_thermo_params,
     get_thermo_cache_name_suffix,
@@ -19,6 +22,7 @@ from pylimer_tools.io.read_lammps_output_file import (
     read_histogram_file,
     read_log_file,
 )
+from pylimer_tools.io.read_pylimer_tools_output_file import read_avg_file
 from pylimer_tools.utils.cache_utility import get_cache_file_name
 from pylimer_tools.utils.optimize_dataframe import reduce_mem_usage
 from pylimer_tools_cpp import AtomStyle, Universe, UniverseSequence
@@ -38,13 +42,13 @@ class TestFileReader(PandasComparingTestCase):
         # read again. this time from cache
         read_data2 = extract_thermo_params(thermo_file, header=header)
         self.assertIsInstance(read_data2, pd.DataFrame)
-        self.assertCountEqual(read_data, read_data2)
+        self.assertDataframeEqual(read_data, read_data2)
         # read again. this time with a header list (whatever)
         read_data3 = extract_thermo_params(
             thermo_file, header=[header], use_cache=False
         )
         self.assertIsInstance(read_data3, pd.DataFrame)
-        self.assertCountEqual(read_data3, read_data2)
+        self.assertDataframeEqual(read_data3, read_data2)
         reduced_df = reduce_mem_usage(read_data)
         self.assertIsInstance(reduced_df, pd.DataFrame)
         self.assertFalse(reduced_df.empty)
@@ -84,18 +88,6 @@ class TestFileReader(PandasComparingTestCase):
         self.assertDataframeEqual(
             read_data, reduce_mem_usage(read_data4), check_dtype=False
         )
-
-    @mock.patch("pylimer_tools.io.extract_thermo_data.os.remove")
-    def test_cache_delete_fail(self, mock_os_remove):
-        mock_os_remove.side_effect = Exception
-        thermo_file = os.path.join(
-            os.path.dirname(__file__), "../fixtures/thermo_file.dat"
-        )
-        header = "Step Temp E_pair E_mol TotEng Press Volume"
-        read_data = extract_thermo_params(thermo_file, header=header, use_cache=False)
-        self.assertIsInstance(read_data, pd.DataFrame)
-        self.assertEqual(" ".join(read_data.columns), header)
-        self.assertTrue(mock_os_remove.called)
 
     @mock.patch("pylimer_tools.io.extract_thermo_data.pd.read_csv")
     def test_pd_csv_read_fail(self, mock_csv_reader):
@@ -201,6 +193,58 @@ class TestFileReader(PandasComparingTestCase):
         # again, from cache
         data2 = read_multi_section_separated_value_file(data_file)
         self.assertDataframeEqual(data, data2)
+
+    def test_read_avg_file(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            avg_path = pl.Path(tmp_dir) / "sim_avg.txt"
+            avg_path.write_text(
+                "# OutputStep Temp Press\n"
+                "0 1.0 0.5\n"
+                "1 1.1 0.6\n"
+                "1 1.2 0.7\n"
+                "2 -nan 0.8\n"
+                "OutputStep Temp Press\n"
+                "2 1.3 0.9\n"
+            )
+            df = read_avg_file(avg_path)
+            self.assertEqual(len(df), 3)
+            self.assertListEqual(df["OutputStep"].tolist(), [0, 1, 2])
+            self.assertAlmostEqual(df.loc[df["OutputStep"] == 1, "Temp"].iloc[0], 1.2)
+            # second call from cache
+            df_cached = read_avg_file(avg_path)
+            self.assertDataframeEqual(df, df_cached)
+
+    def test_pathlib_support_and_numeric_check(self):
+        fixtures_dir = pl.Path(__file__).parent / "../fixtures"
+        universe = read_data_file(
+            fixtures_dir / "lammps_data_file_small.out", [AtomStyle.BOND]
+        )
+        self.assertEqual(universe.get_nr_of_atoms(), 12)
+
+        avg_df = read_averages_file(
+            fixtures_dir / "example_avg_file.out.avg.txt", use_cache=False
+        )
+        avg_df_cached = read_averages_file(
+            fixtures_dir / "example_avg_file.out.avg.txt", use_cache=True
+        )
+        self.assertDataframeEqual(avg_df, avg_df_cached)
+
+        corr_df = read_correlation_file(
+            fixtures_dir / "example_correlation_file.out.corr.txt"
+        )
+        self.assertEqual(len(corr_df), 118)
+
+        msv_df = read_multi_section_separated_value_file(
+            fixtures_dir / "example_multisection_value.txt"
+        )
+        self.assertEqual(len(msv_df), 4)
+
+        self.assertFalse(_is_numeric_string(""))
+        self.assertFalse(_is_numeric_string("   "))
+        self.assertFalse(_is_numeric_string("..."))
+        self.assertFalse(_is_numeric_string("-"))
+        self.assertFalse(_is_numeric_string("e"))
+        self.assertTrue(_is_numeric_string("-1.25e-3"))
 
 
 if __name__ == "__main__":

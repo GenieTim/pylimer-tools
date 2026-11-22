@@ -9,6 +9,11 @@ from pylimer_tools.io.bead_spring_parameter_provider import (
     get_parameters_for_polymer,
     get_supported_polymer_names,
 )
+from pylimer_tools.io.polymer_data import (
+    PolymerData,
+    PolymerDataFrame,
+    load_everaers_et_al_data,
+)
 from pylimer_tools.io.unit_styles import UnitStyle, UnitStyleFactory
 
 
@@ -163,6 +168,58 @@ class UnitStyleTest(unittest.TestCase):
             )
             self.assertIsInstance(params, Parameters)
             self.assertEqual(params.get_name(), "si-" + name)
+
+    def test_lj_dict_repeated_calls_and_attribute_error(self):
+        factory = UnitStyleFactory()
+        pdms_style = factory.get_unit_style("lj", polymer="pdms", warning=False)
+        ps_style = factory.get_unit_style("lj", polymer="a-PS*", warning=False)
+        self.assertNotAlmostEqual(
+            pdms_style.distance.to("nanometer").magnitude,
+            ps_style.distance.to("nanometer").magnitude,
+        )
+        # Re-check pdms_style was not mutated by ps_style
+        pdms_style_2 = factory.get_unit_style("lj", polymer="pdms", warning=False)
+        self.assertAlmostEqual(
+            pdms_style.distance.to("nanometer").magnitude,
+            pdms_style_2.distance.to("nanometer").magnitude,
+        )
+        self.assertAlmostEqual(
+            pdms_style.energy.to("joule").magnitude,
+            pdms_style_2.energy.to("joule").magnitude,
+        )
+
+        # Dict polymer input
+        dict_style = factory.get_unit_style(
+            "lj",
+            polymer={
+                "l_K": 10.0,
+                "Cb": 1.0,
+                "kB_Tref": 4.11,
+                "Mb": 74.15,
+                "T_ref": 298.0,
+                "rho_bulk": 0.97,
+            },
+            warning=False,
+        )
+        self.assertAlmostEqual(
+            dict_style.distance.to("nanometer").magnitude, 1.0 / 0.965
+        )
+
+        # Unknown attribute raises AttributeError
+        with self.assertRaises(AttributeError):
+            _ = pdms_style.non_existent_unit_property
+
+    def test_polymer_data_frame_methods(self):
+        df = load_everaers_et_al_data()
+        self.assertIsInstance(df, PolymerDataFrame)
+        self.assertGreater(len(df), 0)
+        self.assertEqual(len(df.tail(0)), 0)
+        self.assertEqual(len(df.head(0)), 0)
+        self.assertIsInstance(df[0], PolymerData)
+        self.assertIsInstance(df[0:2], PolymerDataFrame)
+        self.assertEqual(len(df[0:2]), 2)
+        self.assertIsInstance(df["name"], list)
+        self.assertEqual(len(df["name"]), len(df))
 
 
 if __name__ == "__main__":

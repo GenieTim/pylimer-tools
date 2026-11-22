@@ -9,8 +9,10 @@ properties of the networks, and outputs statistics such as bond lengths,
 end-to-end distances, and stoichiometric imbalances.
 """
 
-import click
 import statistics
+from typing import Tuple
+
+import click
 
 from pylimer_tools.calc.structure_analysis import (
     compute_crosslinker_conversion,
@@ -18,6 +20,7 @@ from pylimer_tools.calc.structure_analysis import (
     compute_stoichiometric_imbalance,
 )
 from pylimer_tools.io.bead_spring_parameter_provider import (
+    ParameterType,
     get_parameters_for_polymer,
     get_supported_polymer_names,
 )
@@ -34,7 +37,18 @@ from pylimer_tools_cpp import MEHPForceBalance2
     default="PDMS",
     help="Name of the polymer to use for parameter retrieval.",
 )
-def cli(files, crosslinker_type, polymer_name):
+@click.option(
+    "--parameter-type",
+    type=click.Choice(["GAUSSIAN", "KG_LJ", "KUHN"], case_sensitive=False),
+    default="GAUSSIAN",
+    help="Type of parameters to use for the polymer model.",
+)
+def cli(
+    files: Tuple[str, ...],
+    crosslinker_type: int,
+    polymer_name: str,
+    parameter_type: str,
+) -> None:
     """
     Basic CLI application reading all passed files, outputting some stats on the structures therein
 
@@ -42,9 +56,9 @@ def cli(files, crosslinker_type, polymer_name):
       - files: list of files to read
     """
     click.echo("Processing {} files".format(len(files)))
-    crosslinker_type = crosslinker_type
     params = get_parameters_for_polymer(
         polymer_name=polymer_name,
+        parameter_type=ParameterType[parameter_type.upper()],
     )
     base_distance_unit = params.get_base_distance_units().units
 

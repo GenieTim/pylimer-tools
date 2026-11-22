@@ -5,16 +5,14 @@ This module provides functions to compute various quantities related to polymer 
 from __future__ import annotations
 
 import math
-import statistics
 import warnings
-from collections import Counter
 from typing import TYPE_CHECKING, Sequence, Tuple, Union
 
 
 from pylimer_tools_cpp import MoleculeType
 
 if TYPE_CHECKING:
-    from pylimer_tools_cpp import Universe
+    from pylimer_tools_cpp import Molecule, Universe
 
 
 def compute_stoichiometric_imbalance(
@@ -49,7 +47,7 @@ def compute_stoichiometric_imbalance(
     if network.get_nr_of_atoms() == 0:
         return 0.0
 
-    counts = Counter(network.get_atom_types())
+    counts = network.count_atom_types()
 
     if functionality_per_type is not None and (
         crosslinker_type not in functionality_per_type
@@ -74,16 +72,16 @@ def compute_stoichiometric_imbalance(
     # TODO: use the data from the functionality_per_type to determine the
     # functionality per strand, maybe?
     strands = network.get_molecules(crosslinker_type)
-    if ignore_types is None:
-        ignore_types = []
-    ignore_types.append(crosslinker_type)
-    num_relevant_strands = len(
-        [
-            m
+    ignore_types_set = set(ignore_types) if ignore_types is not None else set()
+    ignore_types_set.discard(crosslinker_type)
+    if not ignore_types_set:
+        num_relevant_strands = len(strands)
+    else:
+        num_relevant_strands = sum(
+            1
             for m in strands
-            if not all([a.get_type() in ignore_types for a in m.get_atoms()])
-        ]
-    )
+            if not all(a.get_type() in ignore_types_set for a in m.get_atoms())
+        )
 
     crosslinker_formable_bonds = (
         counts[crosslinker_type] * functionality_per_type[crosslinker_type]
@@ -179,25 +177,31 @@ def compute_fraction_of_bifunctional_reactive_sites(
     :return: The mole fraction of reactive sites in B2 among all reactive sites in a mixture of B1 and B2
     :rtype: float
     """
+    functionality_per_type_given = functionality_per_type is not None
     if functionality_per_type is None:
         functionality_per_type = network.determine_functionality_per_type()
 
     monofunctional_types = [t for t, f in functionality_per_type.items() if f == 1]
-    if len(monofunctional_types) == 0:
+    if len(monofunctional_types) == 0 and not functionality_per_type_given:
         """
         Assume the whole monofunctional chain has the same atom type
         """
         chains_with_crosslinks = network.get_chains_with_crosslinker(
             crosslinker_type=crosslinker_type
         )
-        all_atom_types = set(network.get_atom_types())
-        atom_type_has_only_monofunctional = {atype: True for atype in all_atom_types}
+        all_atom_types = network.count_atom_types().keys()
+        atom_type_has_only_monofunctional = {
+            atype: True
+            for atype in all_atom_types
+            if atype != crosslinker_type and functionality_per_type.get(atype, 0) != 0
+        }
         for chain in chains_with_crosslinks:
             n_xlinks = len(chain.get_atoms_by_type(crosslinker_type))
             atom_types_in_chain = set(chain.get_atom_types())
             if n_xlinks > 1:
                 for atype in atom_types_in_chain:
-                    atom_type_has_only_monofunctional[atype] = False
+                    if atype in atom_type_has_only_monofunctional:
+                        atom_type_has_only_monofunctional[atype] = False
 
         # the atom_type_has_only_monofunctional is now a dictionary that indicates
         # the atom types belonging to a monofunctional chain
@@ -228,9 +232,10 @@ def compute_fraction_of_bifunctional_reactive_sites(
     n_bifunctional_chains = (
         len(network.get_molecules(crosslinker_type)) - n_monofunctional_chains
     )
-    return (2 * n_bifunctional_chains) / (
-        n_monofunctional_chains + 2 * n_bifunctional_chains
-    )
+    total_reactive_sites = n_monofunctional_chains + 2 * n_bifunctional_chains
+    if total_reactive_sites == 0:
+        return 1.0
+    return (2 * n_bifunctional_chains) / total_reactive_sites
 
 
 def compute_mean_end_to_end_distances(
@@ -304,9 +309,7 @@ def compute_mean_end_to_end_vectors(
                 )
             key_counts[key] += 1
         iteration += 1
-    if len(key_counts) > 0 and not all(
-        c == list(key_counts.values())[0] for c in key_counts.values()
-    ):
+    if len(key_counts) > 0 and not all(c == len(networks) for c in key_counts.values()):
         raise ValueError("The networks contain different molecules.")
     return end_to_end_vectors
 
@@ -390,10 +393,11 @@ def compute_effective_crosslinker_functionality(
     :return: The (mean) effective crosslinker functionality
     :rtype: float
     """
-    junction_degrees = compute_effective_crosslinker_functionalities(
-        network, crosslinker_type
+    if network.get_nr_of_atoms() == 0:
+        return 0.0
+    return network.determine_effective_functionality_per_type().get(
+        crosslinker_type, 0.0
     )
-    return statistics.mean(junction_degrees) if len(junction_degrees) > 0 else 0.0
 
 
 def compute_effective_crosslinker_functionalities(
@@ -428,7 +432,9 @@ def compute_weight_fractions(network: Universe) -> dict:
     return network.compute_weight_fractions()
 
 
-def measure_weight_fraction_of_backbone(network: Universe, crosslinker_type: int = 2):
+def measure_weight_fraction_of_backbone(
+    network: Universe, crosslinker_type: int = 2
+) -> float:
     """
     Compute the weight fraction of network backbone in infinite network
 
@@ -472,13 +478,12 @@ def measure_weight_fraction_of_dangling_chains(
         return 0.0, 0.0
 
     weights = network.get_masses()
+    has_all_masses = all(t in weights for t in network.count_atom_types())
 
-    def get_weight_of_graph(graph):
-        counts = Counter(graph.get_atom_types())
-        weight_total = 0
-        for key in counts:
-            weight_total += weights[key] * counts[key]
-        return weight_total
+    def get_weight_of_graph(graph: Union[Universe, Molecule]) -> float:
+        if has_all_masses:
+            return graph.compute_total_mass()
+        return sum(weights.get(t, 1.0) for t in graph.get_atom_types())
 
     all_chains = network.get_chains_with_crosslinker(crosslinker_type)
     num_total = network.get_nr_of_atoms()

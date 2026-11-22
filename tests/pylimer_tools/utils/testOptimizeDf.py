@@ -51,7 +51,7 @@ class TestOptimizeDf(PandasComparingTestCase):
                     "testInt": np.int64(1e1),
                     "testObject": testObject,
                     "testUint64": np.uint64(np.iinfo(np.uint64).max - 1),
-                    "testFloat64": np.float64(np.finfo(np.float32).max + 10**20),
+                    "testFloat64": np.float64(1e39),
                     "testString": "strong",
                 }
             ]
@@ -61,11 +61,11 @@ class TestOptimizeDf(PandasComparingTestCase):
         expectedReducedMemDf = pd.DataFrame(
             [
                 {
-                    "testFloat": np.float16(1.01),
+                    "testFloat": np.float32(1.01),
                     "testInt": np.int8(1e1),
                     "testObject": testObject,
                     "testUint64": np.uint64(np.iinfo(np.uint64).max - 1),
-                    "testFloat64": np.float64(np.finfo(np.float32).max + 10**20),
+                    "testFloat64": np.float64(1e39),
                     "testString": "strong",
                 }
             ]
@@ -130,3 +130,27 @@ class TestOptimizeDf(PandasComparingTestCase):
         optimizedDf = reduce_mem_usage(df)
         for i in range(52):
             self.assertEqual(optimizedDf[str(i)][0], 2**i + 1)
+
+    def testBoundaryZeroBoolTimedeltaAndStringDtypes(self):
+        df = pd.DataFrame(
+            {
+                "zero_int": np.array([0, 127, -128], dtype=np.int64),
+                "uint8_bound": np.array([0, 255, 1], dtype=np.uint64),
+                "flag": [True, False, True],
+                "td": pd.to_timedelta(["1D", "2D", "3D"]),
+                "str_col": pd.Series(["a", "a", "a"], dtype="string"),
+                "float_col": np.array([1.234567, 2.345678, 3.456789], dtype=np.float64),
+            }
+        )
+        reduced = reduce_mem_usage(df, obj_to_category=True, inplace=False)
+        self.assertEqual(reduced["zero_int"].dtype, np.int8)
+        self.assertEqual(reduced["uint8_bound"].dtype, np.uint8)
+        self.assertTrue(pd.api.types.is_bool_dtype(reduced["flag"].dtype))
+        self.assertTrue(pd.api.types.is_timedelta64_dtype(reduced["td"].dtype))
+        self.assertEqual(reduced["str_col"].dtype, "category")
+        self.assertEqual(reduced["float_col"].dtype, np.float32)
+
+        opt = optimize(df.copy())
+        self.assertEqual(opt["str_col"].dtype, "category")
+        self.assertTrue(pd.api.types.is_bool_dtype(opt["flag"].dtype))
+        self.assertEqual(opt["float_col"].dtype, np.float32)

@@ -51,8 +51,7 @@ namespace utils {
     }
 
     std::ofstream outputFile;
-    std::string currentTempFile = makeTempCsvFilePath();
-    outputFile.open(currentTempFile);
+    std::string currentTempFile;
     int previousLen = -1;
     std::string shortenedLine = "";
     std::vector<std::string> tokenzierResults;
@@ -64,19 +63,23 @@ namespace utils {
       shortenedLine = pylimer_tools::utils::trim(shortenedLine);
       int newLength =
         pylimer_tools::utils::split(tokenzierResults, shortenedLine, delimiter);
-      if (newLength != previousLen || tokenzierResults[0] == "Step") {
+      if (newLength != previousLen ||
+          (!tokenzierResults.empty() && tokenzierResults[0] == "Step")) {
         // todo: also check for headers with same length?!?
         previousLen = newLength;
-        outputFile.close();
+        if (outputFile.is_open()) {
+          outputFile.close();
+        }
         currentTempFile = makeTempCsvFilePath();
-        // let's not care about the first one
         results.push_back(currentTempFile);
         outputFile.open(currentTempFile);
       }
       outputFile << shortenedLine << "\n";
     }
 
-    outputFile.close();
+    if (outputFile.is_open()) {
+      outputFile.close();
+    }
 
     return results;
   }

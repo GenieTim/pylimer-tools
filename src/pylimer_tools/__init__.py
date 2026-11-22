@@ -10,10 +10,6 @@ that builds a bridge to other Python libraries, such as pandas,
 or offer functionality that does not need to be as optimized for performance.
 """
 
-import os
-import sys
 import pylimer_tools_cpp
-
-sys.path.append(os.path.dirname(__file__))
 
 __version__ = pylimer_tools_cpp.__version__

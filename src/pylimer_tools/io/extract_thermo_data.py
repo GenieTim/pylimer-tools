@@ -1,17 +1,20 @@
+from __future__ import annotations
+
 import base64
 import csv
 import hashlib
+import io
 import os
 import re
 import tempfile
 import warnings
 from datetime import datetime
-from typing import Iterable, List, Union
+from typing import IO, Iterable, List, Optional, Union
 
 import numpy as np
 import pandas as pd
 
-from pylimer_tools.utils.cache_utility import do_cache, load_cache
+from pylimer_tools.utils.cache_utility import PathLike, do_cache, load_cache
 from pylimer_tools_cpp import split_csv
 
 
@@ -24,23 +27,18 @@ def _is_numeric_string(test: str) -> bool:
     :return: True if the string represents a numeric value, False otherwise
     :rtype: bool
     """
-    return bool(
-        all(
-            [
-                c.isnumeric()
-                or c == "."
-                or c == "+"
-                or c == "-"
-                or c == "e"
-                or c == "E"
-                for c in test.strip()
-            ]
-        )
-    )
+    stripped = test.strip()
+    if not stripped:
+        return False
+    try:
+        float(stripped)
+        return True
+    except ValueError:
+        return False
 
 
 def detect_headers(
-    file: str, max_nr_of_lines_to_read: int = 1500, use_cache: bool = True
+    file: PathLike, max_nr_of_lines_to_read: int = 1500, use_cache: bool = True
 ) -> List[str]:
     """
     Read `max_nr_of_lines_to_read` lines from the given file and return all possible header lines.
@@ -48,7 +46,7 @@ def detect_headers(
     Some assumptions are made regarding the columns, e.g., that 75% of them start with a character.
 
     :param file: The file to search for header lines
-    :type file: str
+    :type file: PathLike
     :param max_nr_of_lines_to_read: The number of lines to read in search for header lines.
                                    Use a negative number to read the whole file.
     :type max_nr_of_lines_to_read: int
@@ -58,8 +56,9 @@ def detect_headers(
     :return: List of detected header lines
     :rtype: List[str]
     """
+    file_path = os.fspath(file)
     suffix = str(max_nr_of_lines_to_read)
-    cache_content = load_cache(file, suffix)
+    cache_content = load_cache(file_path, suffix)
 
     if cache_content is not None and use_cache:
         return cache_content
@@ -67,7 +66,7 @@ def detect_headers(
     lines_read = 0
     previous_line = None
     results = []
-    with open(file, "r") as f:
+    with open(file_path, "r") as f:
         for line in f:
             if (
                 previous_line is not None
@@ -101,113 +100,112 @@ def detect_headers(
             if lines_read > max_nr_of_lines_to_read and max_nr_of_lines_to_read > 0:
                 break
 
-    do_cache(results, file, suffix)
+    do_cache(results, file_path, suffix)
     return results
 
 
 def read_one_group(
-    fp, header, min_line_len=4, additional_lines_skip=0, lines_to_read_till_header=1e3
-) -> str:
+    fp: IO[str],
+    header: Union[str, List[str]],
+    min_line_len: int = 4,
+    additional_lines_skip: int = 0,
+    lines_to_read_till_header: float = 1e3,
+) -> Optional[io.StringIO]:
     """
     Read one group of csv lines from the file.
 
     :param fp: The file pointer to the file to read from
-    :type fp: file object
+    :type fp: IO[str]
     :param header: The header of the CSV (where to start reading at)
-    :type header: str or list
+    :type header: Union[str, List[str]]
     :param min_line_len: The minimal length of a line to be accepted as data
     :type min_line_len: int
     :param additional_lines_skip: Number of lines to skip after reading the header
     :type additional_lines_skip: int
     :param lines_to_read_till_header: Maximum number of lines to read until finding the header
     :type lines_to_read_till_header: float
-    :return: The filename of a temporary CSV file, or empty string if no data was read
-    :rtype: str
+    :return: An in-memory StringIO CSV buffer, or None if no data was read
+    :rtype: Optional[io.StringIO]
     """
     if len(header) == 0:
         raise ValueError("header must have more than zero characters")
     assert isinstance(header, str) or (isinstance(header, list) and len(header) > 0)
-    csv_file_to_write = "{}/{}_{}".format(
-        tempfile.gettempdir(),
-        hashlib.md5(
-            datetime.now().strftime("%m.%d.%Y, %H:%M:%S.%f").encode()
-        ).hexdigest(),
-        "tmp_thermo_file.csv",
-    )
+    output_csv = io.StringIO()
     n_lines = 0
-    with open(csv_file_to_write, "w") as output_csv:
-        line = fp.readline()
-        separator = ", "
-        header_len = None
-        if isinstance(header, str):
-            min_line_len = max(min_line_len, len(header.split()))
-        else:
-            min_line_len = max(min_line_len, min([len(h.split()) for h in header]))
+    line = fp.readline()
+    separator = ", "
+    header_len = None
+    if isinstance(header, str):
+        min_line_len = max(min_line_len, len(header.split()))
+    else:
+        min_line_len = max(min_line_len, min([len(h.split()) for h in header]))
 
-        def check_skip_line(line, header):
-            return line and not line.startswith(header)
+    def check_skip_line(line: str, header: str) -> bool:
+        return bool(line) and not line.startswith(header)
 
-        def check_skip_line_header_list(line, header):
-            if not line:
-                return False
-            for header_line in header:
-                if line.startswith(header_line):
-                    return False
-            return True
-
-        skip_line_fun = (
-            check_skip_line_header_list if isinstance(header, list) else check_skip_line
-        )
-        # skip lines up until header (or file ending)
-        n_lines_skipped = 0
-        while skip_line_fun(line, header) and line.endswith("\n"):
-            line = fp.readline()
-            n_lines_skipped += 1
-            if (
-                n_lines_skipped > lines_to_read_till_header
-                and lines_to_read_till_header > 0
-            ):
-                raise RuntimeError(
-                    "Skipped {} lines, not encountered any header yet.".format(
-                        n_lines_skipped
-                    )
-                )
-        # found header. Take next few lines:
-        header_len = len(line.split())
+    def check_skip_line_header_list(line: str, header: List[str]) -> bool:
         if not line:
-            return ""
-        else:
-            output_csv.write((separator.join(line.split())).strip() + "\n")
+            return False
+        for header_line in header:
+            if line.startswith(header_line):
+                return False
+        return True
 
-        n_lines = 0
-        while line and n_lines < additional_lines_skip:
-            # skip ${additional_lines_skip} further
-            line = fp.readline()
-            # text += (', '.join(line.split())).strip() + "\n"
-            n_lines += 1
-        while line and not line.startswith("Loop time of"):
-            line = fp.readline()
-            if (
-                len(line) < min_line_len
-                or (len(line.split()) != header_len)
-                or (
-                    len(line) > 0
-                    and (
-                        line.startswith("WARNING")
-                        or line[0].isalpha()
-                        or (line[0] == "-" and line[1] == "-")
-                        or (line[2].isalpha() or line[3].isalpha())
-                        or (line[0] == "[")
-                        or ("src" in line)
-                        or ("fene" in line or ")" in line)  # from ":90)"
-                    )
+    skip_line_fun = (
+        check_skip_line_header_list if isinstance(header, list) else check_skip_line
+    )
+    # skip lines up until header (or file ending)
+    n_lines_skipped = 0
+    while skip_line_fun(line, header) and line.endswith("\n"):  # type: ignore[arg-type]
+        line = fp.readline()
+        n_lines_skipped += 1
+        if (
+            n_lines_skipped > lines_to_read_till_header
+            and lines_to_read_till_header > 0
+        ):
+            raise RuntimeError(
+                "Skipped {} lines, not encountered any header yet.".format(
+                    n_lines_skipped
                 )
-            ):
-                # skip line due to error, warning or similar
-                continue
-            output_csv.write((separator.join(line.split())).strip() + "\n")
-            n_lines += 1
-    return csv_file_to_write if n_lines > 0 else ""
+            )
+    # found header. Take next few lines:
+    header_len = len(line.split())
+    if not line:
+        return None
+    output_csv.write((separator.join(line.split())).strip() + "\n")
+
+    n_lines = 0
+    while line and n_lines < additional_lines_skip:
+        # skip ${additional_lines_skip} further
+        line = fp.readline()
+        n_lines += 1
+    while line and not line.startswith("Loop time of"):
+        line = fp.readline()
+        if (
+            len(line) < min_line_len
+            or (len(line.split()) != header_len)
+            or (
+                len(line) > 0
+                and (
+                    line.startswith("WARNING")
+                    or line[0].isalpha()
+                    or (line[0] == "-" and line[1] == "-")
+                    or (line[2].isalpha() or line[3].isalpha())
+                    or (line[0] == "[")
+                    or ("src" in line)
+                    or ("fene" in line or ")" in line)  # from ":90)"
+                )
+            )
+        ):
+            # skip line due to error, warning or similar
+            continue
+        output_csv.write((separator.join(line.split())).strip() + "\n")
+        n_lines += 1
+
+    if n_lines > 0:
+        output_csv.seek(0)
+        return output_csv
+    return None
 
 
 def get_thermo_cache_name_suffix(
@@ -240,7 +238,7 @@ def get_thermo_cache_name_suffix(
 
 
 def extract_thermo_params(
-    file,
+    file: PathLike,
     header: Union[str, List[str], None] = "Step Temp E_pair E_mol TotEng Press",
     texts_to_read: int = 50,
     min_line_len: int = 5,
@@ -281,11 +279,12 @@ def extract_thermo_params(
     :return: The thermodynamic parameters
     :rtype: pd.DataFrame
     """
+    file_path = os.fspath(file)
     df = None
 
     if header is None:
         header = detect_headers(
-            file,
+            file_path,
             max_nr_of_lines_to_read=(
                 lines_to_read_to_detect_header
                 if lines_to_read_to_detect_header > 0
@@ -296,86 +295,81 @@ def extract_thermo_params(
             raise RuntimeError(
                 "Failed to find suitable header. "
                 + "Set a higher value of `lines_to_read_to_detect_header` if the file '{}' is appropriate.".format(
-                    file
+                    file_path
                 )
             )
 
     suffix = get_thermo_cache_name_suffix(header, texts_to_read, min_line_len)
-    cache_content = load_cache(file, suffix)
+    cache_content = load_cache(file_path, suffix)
 
     if cache_content is not None and use_cache:
         return cache_content
 
-    def csv_file_to_df(filepath) -> pd.DataFrame:
+    def csv_buffer_to_df(csv_buffer: io.StringIO) -> pd.DataFrame:
         try:
-            tmp_df = pd.read_csv(
-                filepath, low_memory=False, on_bad_lines="skip", quoting=csv.QUOTE_NONE
+            return pd.read_csv(
+                csv_buffer,
+                low_memory=False,
+                on_bad_lines="skip",
+                quoting=csv.QUOTE_NONE,
             )
-            try:
-                os.remove(filepath)
-            except Exception as e:
-                warnings.warn("Could not remove file {}: {}".format(filepath, e))
-                pass
-            return tmp_df
         except Exception as e:
             warnings.warn(
-                "Error reading temporary CSV thermo file '{}': {}".format(filepath, e),
+                "Error reading temporary CSV thermo buffer: {}".format(e),
                 source=e,
             )
             return pd.DataFrame()
 
-    with open(file, "r") as fp:
-        tmp_csv_file = read_one_group(
+    with open(file_path, "r") as fp:
+        tmp_csv_buffer = read_one_group(
             fp,
             header,
             min_line_len=min_line_len,
             lines_to_read_till_header=lines_to_read_till_header,
         )
         n_texts_read = 1
-        tmp_csv_files = []
-        if tmp_csv_file != "":
-            tmp_csv_files.append(tmp_csv_file)
+        tmp_csv_buffers: List[io.StringIO] = []
+        if tmp_csv_buffer is not None:
+            tmp_csv_buffers.append(tmp_csv_buffer)
         while n_texts_read < texts_to_read:
-            tmp_csv_file = read_one_group(
+            tmp_csv_buffer = read_one_group(
                 fp,
                 header,
                 min_line_len=min_line_len,
                 lines_to_read_till_header=lines_to_read_till_header,
             )
             n_texts_read += 1
-            if tmp_csv_file != "":
-                tmp_csv_files.append(tmp_csv_file)
+            if tmp_csv_buffer is not None:
+                tmp_csv_buffers.append(tmp_csv_buffer)
             else:
                 break
-        if len(tmp_csv_files) == 1:
-            df = csv_file_to_df(tmp_csv_files[0])
-        elif len(tmp_csv_files) > 0:
+        if len(tmp_csv_buffers) == 1:
+            df = csv_buffer_to_df(tmp_csv_buffers[0])
+        elif len(tmp_csv_buffers) > 0:
             df = pd.concat(
                 [
-                    df
-                    for df in [csv_file_to_df(f) for f in tmp_csv_files]
-                    if not df.empty
+                    parsed_df
+                    for parsed_df in [csv_buffer_to_df(buf) for buf in tmp_csv_buffers]
+                    if not parsed_df.empty
                 ],
                 ignore_index=True,
             )
 
     if df is not None:
-        # df.columns = df.columns.str.replace(' ', '')
-        df.rename(columns=lambda x: x.strip(), inplace=True)
+        df = df.rename(columns=lambda x: x.strip())
     else:
         df = pd.DataFrame()
 
-    do_cache(df, file, suffix)
-    # print("Read {} rows for file {}".format(len(df), file))
+    do_cache(df, file_path, suffix)
 
     return df
 
 
 def read_multi_section_separated_value_file(
-    file: str,
-    separator: Union[str, None] = None,
+    file: PathLike,
+    separator: Optional[str] = None,
     use_cache: bool = True,
-    comment: Union[str, None] = None,
+    comment: Optional[str] = None,
     skip_err: bool = False,
 ) -> pd.DataFrame:
     """
@@ -385,13 +379,13 @@ def read_multi_section_separated_value_file(
     It automatically detects the separator if not specified and combines all sections into a single DataFrame.
 
     :param file: Path to the file to read
-    :type file: str
+    :type file: PathLike
     :param separator: Character used to separate values in the file (auto-detected if None)
-    :type separator: Union[str, None]
+    :type separator: Optional[str]
     :param use_cache: Whether to use cached results if available
     :type use_cache: bool
     :param comment: Character indicating the start of comments (e.g., "#")
-    :type comment: Union[str, None]
+    :type comment: Optional[str]
     :param skip_err: Whether to skip errors when processing sections
     :type skip_err: bool
     :return: Combined DataFrame containing all data from the file
@@ -401,6 +395,7 @@ def read_multi_section_separated_value_file(
        Particularly useful for reading output files from the DPDSimulator or other
        multi-section files where the structure may change between sections.
     """
+    file_path = os.fspath(file)
     suffix = (
         (
             base64.urlsafe_b64encode(comment.encode("utf-8")).decode("utf-8")
@@ -408,18 +403,20 @@ def read_multi_section_separated_value_file(
             else ""
         )
         + "mssv2-"
-        + base64.urlsafe_b64encode(separator.encode("utf-8")).decode("utf-8")
-        if separator is not None
-        else "-any"
+        + (
+            base64.urlsafe_b64encode(separator.encode("utf-8")).decode("utf-8")
+            if separator is not None
+            else "-any"
+        )
     )
-    cache_content = load_cache(file, suffix)
+    cache_content = load_cache(file_path, suffix)
 
     if cache_content is not None and use_cache:
         return cache_content
 
     if separator is None:
         # detect separator
-        with open(file) as f:
+        with open(file_path) as f:
             first_line = f.readline().strip("\n")
         possible_separators = [",", ";", " ", "\t"]
         best_sep = " "
@@ -430,23 +427,14 @@ def read_multi_section_separated_value_file(
                 best_sep = sep
         separator = best_sep
 
-    print("Splitting CSV...")
-
-    tmp_csv_files = split_csv(file, separator)
-    print(
-        "CSV split to {} files... e.g. to {}, {} or {}".format(
-            len(tmp_csv_files),
-            tmp_csv_files[0],
-            tmp_csv_files[1] if len(tmp_csv_files) > 1 else "",
-            tmp_csv_files[2] if len(tmp_csv_files) > 2 else "",
-        )
-    )
+    sep_pattern = re.escape(separator) + "+"
+    tmp_csv_files = split_csv(file_path, separator)
 
     if len(tmp_csv_files) == 0:
         return pd.DataFrame()
 
     # determine the columns we want to have in the end
-    all_headers = set()
+    all_headers_set = set()
     detected_dtypes = {}
     erronous_files = []
     for csv_file in tmp_csv_files:
@@ -462,22 +450,25 @@ def read_multi_section_separated_value_file(
                 got_err = True
         if got_err:
             continue
-        headers = re.split("{}+".format(separator), header_line.strip())
+        headers = re.split(sep_pattern, header_line.strip())
         if sum([_is_numeric_string(h) for h in headers]) > 0.5 * len(headers):
             warnings.warn(
                 "CSV file {} has header line {}, which does not seem to be a header.".format(
                     csv_file, header_line
                 )
             )
+        first_line_split = re.split(sep_pattern, first_line.strip())
+        if len(first_line_split) != len(headers):
+            if skip_err:
+                erronous_files.append(csv_file)
+                continue
+            raise ValueError(
+                "Headers and first line do not match in nr of values",
+                first_line,
+                header_line,
+            )
         for i, h in enumerate(headers):
-            if h not in all_headers:
-                first_line_split = re.split("{}+".format(separator), first_line.strip())
-                if len(first_line_split) != len(headers):
-                    raise ValueError(
-                        "Headers and first line do not match in nr of values",
-                        first_line,
-                        header_line,
-                    )
+            if h not in all_headers_set:
                 if all([c.isdigit() or c == "-" for c in first_line_split[i]]):
                     detected_dtypes[h] = np.int64
                 elif all(
@@ -487,8 +478,8 @@ def read_multi_section_separated_value_file(
                     ]
                 ):
                     detected_dtypes[h] = np.float64
-                all_headers.add(h)
-    all_headers = list(all_headers)
+                all_headers_set.add(h)
+    all_headers = list(all_headers_set)
     csv_file_to_write = "{}/{}_{}".format(
         tempfile.gettempdir(),
         hashlib.md5(
@@ -497,27 +488,23 @@ def read_multi_section_separated_value_file(
         "tmp_mssv2_file.csv",
     )
 
-    print("{} Headers mapped...".format(len(all_headers)))
-
     # re-join the CSV files in one big file with all the columns
     # put NaN where we do not have a value for a column
     with open(csv_file_to_write, "w") as out_file:
         out_file.write(separator.join(all_headers) + "\n")
         for csv_file in tmp_csv_files:
             if csv_file in erronous_files:
-                print("File {} skipped".format(csv_file))
                 try:
                     os.remove(csv_file)
                 except OSError as e:
                     warnings.warn("Could not remove file {}: {}".format(csv_file, e))
-                    pass
                 continue
             with open(csv_file, "r") as fp:
                 header_line = next(fp)
-                split_header = re.split("{}+".format(separator), header_line.strip())
+                split_header = re.split(sep_pattern, header_line.strip())
                 map_to_col = []
                 n_found = 0
-                for i, col in enumerate(all_headers):
+                for col in all_headers:
                     if col in split_header:
                         map_to_col.append(split_header.index(col))
                         n_found += 1
@@ -527,7 +514,7 @@ def read_multi_section_separated_value_file(
                 for line in fp:
                     if line == header_line or line.startswith("Step"):
                         continue
-                    split_line = re.split("{}+".format(separator), line.strip())
+                    split_line = re.split(sep_pattern, line.strip())
                     str_to_write = separator.join(
                         [split_line[i] if i != -1 else "NaN" for i in map_to_col]
                     )
@@ -536,28 +523,24 @@ def read_multi_section_separated_value_file(
                 os.remove(csv_file)
             except OSError as e:
                 warnings.warn("Could not remove file {}: {}".format(csv_file, e))
-                pass
-            print("File {} handled".format(csv_file))
     # read the csv files again
-    print("Reading final csv file {}".format(csv_file_to_write))
     try:
         df = pd.read_csv(
             csv_file_to_write,
-            sep=separator + "+",
+            sep=sep_pattern,
+            engine="python",
             comment=comment,
-            dtype=detected_dtypes,
+            dtype=detected_dtypes,  # type: ignore[arg-type]
             na_values=["NaN"],
         )
     except pd.errors.EmptyDataError:
-        warnings.warn("Data file '{}' turned out to be empty".format(file))
+        warnings.warn("Data file '{}' turned out to be empty".format(file_path))
         return pd.DataFrame()
-    do_cache(df, file, suffix)
-    try:
-        os.remove(csv_file_to_write)
-    except OSError as e:
-        warnings.warn("Could not remove file {}: {}".format(csv_file_to_write, e))
-        pass
-    # doCache(reduce_mem_usage(df), file, suffix)
-    # print("Read {} rows for file {}".format(len(df), file))
+    finally:
+        try:
+            os.remove(csv_file_to_write)
+        except OSError as e:
+            warnings.warn("Could not remove file {}: {}".format(csv_file_to_write, e))
+    do_cache(df, file_path, suffix)
 
     return df

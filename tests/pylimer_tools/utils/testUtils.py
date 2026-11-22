@@ -38,6 +38,11 @@ class TestUtilFunctions(PandasComparingTestCase):
         )
 
         self.assertEqual(get_tail([0, 1, 2, 3]), [2, 3])
+        self.assertEqual(get_tail([0, 1, 2, 3], percentage=0.0, min_n=0), [])
+        self.assertEqual(
+            get_tail(test_dataframe, percentage=0.0, min_n=0),
+            test_dataframe.iloc[0:0],
+        )
 
     def test_unify_step_sizes(self):
         test_dataframe = pd.DataFrame(
@@ -52,6 +57,9 @@ class TestUtilFunctions(PandasComparingTestCase):
 
         with self.assertWarns(Warning):
             unify_data_stepsizes(test_dataframe, key="a", max_expected_step_size=0.5)
+
+        one_row_df = pd.DataFrame([{"a": 1, "b": 2}])
+        self.assertEqual(unify_data_stepsizes(one_row_df, key="a"), one_row_df)
 
     def test_cache_utility(self):
         test_dataframe = pd.DataFrame(
@@ -87,6 +95,16 @@ class TestUtilFunctions(PandasComparingTestCase):
             future_time = time.time() + 10.0
             os.utime(file, (future_time, future_time))
             self.assertIsNone(load_cache(file, suffix, tmp_dir=tmp_dir))
+
+            # test pathlib.Path support
+            path_obj = pl.Path(file)
+            past_time2 = time.time() - 10.0
+            os.utime(path_obj, (past_time2, past_time2))
+            do_cache(test_dataframe, path_obj, "path-test", tmp_dir=pl.Path(tmp_dir))
+            loaded_from_path = load_cache(
+                path_obj, "path-test", tmp_dir=pl.Path(tmp_dir)
+            )
+            self.assertEqual(test_dataframe, loaded_from_path)
 
     def test_mc_universe_generator_streaming_stats(self):
         from pylimer_tools_cpp import (

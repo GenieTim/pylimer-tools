@@ -297,6 +297,21 @@ class TestComputeWeightFractions(unittest.TestCase):
 
         self.assertIn("b2 must be between 0 and 1", str(context.exception))
 
+    def test_compute_weight_fractions_mixed_units(self):
+        """Test that mixed compatible units (kg/mol and g/mol) give consistent results."""
+        mw_bi_g = 2000 * self.ureg("g/mol")
+        mw_mono_g = 1000 * self.ureg("g/mol")
+        mw_mono_kg = 1.0 * self.ureg("kg/mol")
+
+        w_bi_ref, w_mono_ref = compute_weight_fractions(
+            mw_bifunctional=mw_bi_g, mw_monofunctional=mw_mono_g, b2=0.5
+        )
+        w_bi_mixed, w_mono_mixed = compute_weight_fractions(
+            mw_bifunctional=mw_bi_g, mw_monofunctional=mw_mono_kg, b2=0.5
+        )
+        self.assertAlmostEqual(w_bi_ref, w_bi_mixed, places=10)
+        self.assertAlmostEqual(w_mono_ref, w_mono_mixed, places=10)
+
 
 class TestStrandNumberDensity(unittest.TestCase):
     """Test the compute_strand_number_density function."""

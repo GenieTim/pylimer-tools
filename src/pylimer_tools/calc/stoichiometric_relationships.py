@@ -108,7 +108,9 @@ def compute_weight_fractions(
     bifunctional_fraction, monofunctional_fraction = compute_number_fractions(b2)
 
     mass_bifunctional = bifunctional_fraction * mw_bifunctional.magnitude
-    mass_monofunctional = monofunctional_fraction * mw_monofunctional.magnitude
+    mass_monofunctional = (
+        monofunctional_fraction * mw_monofunctional.to(mw_bifunctional.units).magnitude
+    )
     total_mass = mass_bifunctional + mass_monofunctional
 
     w_bifunctional = mass_bifunctional / total_mass

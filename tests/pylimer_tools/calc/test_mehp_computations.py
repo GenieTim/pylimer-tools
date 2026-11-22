@@ -156,15 +156,15 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
         for m in self.testUniverse.get_molecules(2):
             bond_lengths.extend(m.compute_bond_lengths())
         self.assertEqual(1, np.mean(bond_lengths))
-        self.assertEqual(
-            0.5485762961986437, compute_topological_factor([self.testUniverse], 2)
+        self.assertAlmostEqual(
+            0.29309490041698655, compute_topological_factor([self.testUniverse], 2)
         )
         # larger system
         # g = self.saturatedTestUniverse.getUnderlyingGraph()
         # igraph.plot(g, vertex_label=g.vs["name"], vertex_color=["green" if n["type"] == 2 else "red" for n in g.vs],
         # target="large_test.png", vertex_label_dist=1)
-        self.assertEqual(
-            0.7249043914053506,
+        self.assertAlmostEqual(
+            4.999093764521486,
             compute_topological_factor([self.saturatedTestUniverse], 2),
         )
 
@@ -194,12 +194,33 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
         gamma = compute_topological_factor([universe], crosslinker_type=2, b=1.0)
         self.assertAlmostEqual(4.0, gamma)
 
+    def test_topological_factor_heterogeneous_bond_lengths(self):
+        """Test that b=None computes each molecule's own mean bond length."""
+        universe = Universe(20, 20, 20)
+        # Chain 1: crosslinker 1 - monomer 2 - crosslinker 3, bond length = 1.0, R = 2.0
+        # Contribution: 2^2 / (1 * 1^2) = 4.0
+        # Chain 2: crosslinker 4 - monomer 5 - crosslinker 6, bond length = 2.0, R = 4.0
+        # Contribution: 4^2 / (1 * 2^2) = 4.0
+        universe.add_atoms(
+            [1, 2, 3, 4, 5, 6],
+            [2, 1, 2, 2, 1, 2],
+            [0.0, 1.0, 2.0, 0.0, 2.0, 4.0],
+            [0.0, 0.0, 0.0, 5.0, 5.0, 5.0],
+            [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            [0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0],
+        )
+        universe.add_bonds([1, 2, 4, 5], [2, 3, 5, 6])
+        gamma = compute_topological_factor([universe], crosslinker_type=2, b=None)
+        self.assertAlmostEqual(8.0, gamma)
+
     def test_shear_modulus_prediction(self):
         self.assertEqual(
             0.0, predict_shear_modulus([self.emptyUniverse], crosslinker_type=2)
         )
-        self.assertEqual(
-            0.003624521957026753,
+        self.assertAlmostEqual(
+            0.024995468822607433,
             predict_shear_modulus([self.saturatedTestUniverse], crosslinker_type=2),
         )
 

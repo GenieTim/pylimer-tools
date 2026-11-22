@@ -55,6 +55,7 @@ class Parameters:
             required parameters ("Mw", "<b>", "<b^2>", "rho") are missing from the data dictionary.
 
         """
+        data = dict(data)
         for key, value in data.items():
             assert isinstance(value, Quantity), (
                 f"Invalid value for parameter {key}: {value}"
@@ -71,7 +72,6 @@ class Parameters:
         assert data["rho"].check("[mass]/[volume]") or data["rho"].check(
             "[substance]/[volume]"
         )
-        assert data["C_inf"].check("")
 
         if "R02" not in data:
             data["R02"] = data["<b^2>"]
@@ -80,7 +80,9 @@ class Parameters:
             data["kb"] = 1.380649e-23 * ureg.joule / ureg.kelvin
 
         if "C_inf" not in data:
-            data["C_inf"] = Quantity(1.0, "")
+            data["C_inf"] = ureg.Quantity(1.0, "")
+        else:
+            assert data["C_inf"].check("")
 
         self.data = data
         self.name = name
@@ -281,7 +283,7 @@ def get_kg_lj_parameters_for_polymer(polymer_name: str) -> Parameters:
         {
             "distance_units": 1 * unit_style.distance,
             "Mw": bead_mass,
-            "<b>": 0.975 * ureg.sigma,
+            "<b>": 0.975 * unit_style.distance,
             "<b^2>": (
                 row["R_to_2_over_M_c"] * ureg("angstrom^2 * mol / g") * bead_mass
             ).to(unit_style.distance**2),
@@ -387,19 +389,4 @@ def _get_relevant_everaers_row(polymer_name: str) -> dict:
     """
     from .polymer_data import get_polymer_by_name
 
-    try:
-        polymer_data = get_polymer_by_name(polymer_name)
-        return polymer_data.to_dict()
-    except ValueError:
-        # Fallback to old method for backward compatibility
-        unit_style_factory = UnitStyleFactory()
-        everaers_data = unit_style_factory.get_everares_et_al_data()
-
-        for _, row in everaers_data.iterrows():
-            if (
-                "".join(filter(str.isalnum, polymer_name)).lower()
-                == "".join(filter(str.isalnum, str(row["name"]))).lower()
-            ):
-                return row.to_dict()
-
-        raise ValueError(f"Polymer '{polymer_name}' not found in Everaers et al. data.")
+    return get_polymer_by_name(polymer_name).to_dict()

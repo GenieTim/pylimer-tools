@@ -1,12 +1,13 @@
 import warnings
-from typing import Final
+from typing import Any, Dict, Final, List
 
-from pint import UnitRegistry
+from pint import Quantity, UnitRegistry
 from .polymer_data import (
-    load_everaers_et_al_data,
+    PolymerData,
+    PolymerDataFrame,
     get_available_polymers,
     get_polymer_by_name,
-    PolymerData,
+    load_everaers_et_al_data,
 )
 
 
@@ -29,12 +30,12 @@ class UnitStyle(object):
         lj_stress_to_si_conversion_factor = (1.*unit_style.pressure).to("MPa").magnitude
     """
 
-    def __init__(self, unit_configuration: dict, ureg: UnitRegistry):
+    def __init__(self, unit_configuration: Dict[str, Any], ureg: UnitRegistry) -> None:
         """
         Initialize a UnitStyle object.
 
         :param unit_configuration: Dictionary containing unit definitions
-        :type unit_configuration: dict
+        :type unit_configuration: Dict[str, Any]
         :param ureg: Pint unit registry to use for unit conversions
         :type ureg: UnitRegistry
         """
@@ -45,7 +46,7 @@ class UnitStyle(object):
         if "volume" not in self.unit_configuration:
             self.unit_configuration["volume"] = self.unit_configuration["distance"] ** 3
 
-    def get_underlying_unit_registry(self):
+    def get_underlying_unit_registry(self) -> UnitRegistry:
         """
         Get the underlying Pint unit registry.
 
@@ -54,7 +55,7 @@ class UnitStyle(object):
         """
         return self.underlying_unit_registry
 
-    def get_base_unit_of(self, property: str):
+    def get_base_unit_of(self, property: str) -> Quantity:
         """
         Returns the conversion factor from the unit style to SI units.
 
@@ -79,9 +80,9 @@ class UnitStyle(object):
             property = translator[property]
         return self.unit_configuration[property]
 
-    def __getattr__(self, property: str):
+    def __getattr__(self, property: str) -> Quantity:
         """
-        Shorthand access for :func:`~pylimer_tools.io.unitStyles.UnitStyle.get_base_unit_of`.
+        Shorthand access for :func:`~pylimer_tools.io.unit_styles.UnitStyle.get_base_unit_of`.
 
         :param property: The property name to get the unit for
         :type property: str
@@ -97,6 +98,9 @@ class UnitStyle(object):
         """
         if property.lower() in self.unit_configuration.keys():
             return self.unit_configuration[property.lower()]
+        raise AttributeError(
+            f"'{self.__class__.__name__}' object has no attribute '{property}'"
+        )
 
 
 class UnitStyleFactory(object):
@@ -106,13 +110,13 @@ class UnitStyleFactory(object):
     using the same UnitRegistry, such that they are compatible.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Initialize the UnitStyleFactory with a new UnitRegistry.
         """
         self.ureg = UnitRegistry()
 
-    def get_unit_registry(self):
+    def get_unit_registry(self) -> UnitRegistry:
         """
         Get the underlying unit registry.
 
@@ -121,7 +125,7 @@ class UnitStyleFactory(object):
         """
         return self.ureg
 
-    def get_everares_et_al_data(self):
+    def get_everares_et_al_data(self) -> PolymerDataFrame:
         """
         Load the Everaers et al. (2020) unit properties data.
 
@@ -130,16 +134,18 @@ class UnitStyleFactory(object):
         """
         return load_everaers_et_al_data()
 
-    def get_available_polymers(self) -> list:
+    def get_available_polymers(self) -> List[str]:
         """
         List all available polymers for which we have lj unit conversions.
 
         :return: List of polymer names
-        :rtype: list
+        :rtype: List[str]
         """
         return get_available_polymers()
 
-    def get_unit_style(self, unit_type: str, dimension: int = 3, **kwargs) -> UnitStyle:
+    def get_unit_style(
+        self, unit_type: str, dimension: int = 3, **kwargs: Any
+    ) -> UnitStyle:
         """
         Get a UnitStyle instance corresponding to the unit system requested.
 
@@ -182,36 +188,22 @@ class UnitStyleFactory(object):
                 )
             polymer_data = kwargs["polymer"]
             if isinstance(polymer_data, str):
-                try:
-                    polymer_data = get_polymer_by_name(polymer_data)
-                except ValueError:
-                    # Fallback to the old iteration method for backward
-                    # compatibility
-                    all_polymer_data = self.get_everares_et_al_data()
-                    for row in all_polymer_data.itertuples():
-                        if (
-                            "".join(filter(str.isalnum, polymer_data)).lower()
-                            == "".join(filter(str.isalnum, row.name)).lower()
-                        ):
-                            polymer_data = row
-                            break
-            if (
-                not isinstance(polymer_data, dict)
-                and not isinstance(polymer_data, tuple)
-                and not isinstance(polymer_data, PolymerData)
-            ):
+                polymer_data = get_polymer_by_name(polymer_data)
+            elif isinstance(polymer_data, dict):
+                polymer_data = PolymerData(polymer_data)
+            if not isinstance(polymer_data, (tuple, PolymerData)):
                 raise ValueError(
                     "No useable data for this polymer found to use for lj units. Check whether your usage is correct."
                 )
             # follow derivation for more accurate results
-            # sigma_conversion = polymer_data.sigma
             sigma_conversion = (
                 0.1 * float(polymer_data.l_K) / (0.965 * float(polymer_data.Cb))
             )
-            ureg.define("sigma = {} * nanometer".format(sigma_conversion))
-            ureg.define("eps = {}e-21 joule".format(polymer_data.kB_Tref))
+            sigma = sigma_conversion * ureg.nanometer
+            eps = float(polymer_data.kB_Tref) * 1e-21 * ureg.joule
             # time is most difficult in LJ — let's keep tau
-            ureg.define("tau = 1 * tau")
+            if "tau" not in ureg:
+                ureg.define("tau = 1 * tau")
             # NOTE: The formula in the LAMMPS documentation contains \epsilon_0.
             # BUT: it does not add up in terms of units, so... the implementation here
             # *might* be wrong
@@ -223,32 +215,29 @@ class UnitStyleFactory(object):
                         if accept_mol
                         else polymer_data.Mb * ureg("g") / avogadro_constant
                     ),
-                    "distance": ureg.sigma,
+                    "distance": sigma,
                     "time": ureg.tau,
-                    "energy": ureg.eps,
-                    "velocity": ureg.sigma / ureg.tau,
-                    "force": ureg.eps / (ureg.sigma),
-                    "torque": ureg.eps,
+                    "energy": eps,
+                    "velocity": sigma / ureg.tau,
+                    "force": eps / sigma,
+                    "torque": eps,
                     "temperature": polymer_data.T_ref * ureg.kelvin,
                     "pressure": (
                         polymer_data.kB_Tref_over_sigma_to_3 * ureg("MPa")
                         if hasattr(polymer_data, "kB_Tref_over_sigma_to_3")
-                        else ureg.eps / (ureg.sigma ** (3))
+                        else eps / (sigma**3)
                     ),
-                    "viscosity": ureg.eps * ureg.tau / (ureg.sigma ** (3)),
+                    "viscosity": eps * ureg.tau / (sigma**3),
                     # TODO: The use of elementary charge might not be correct, see
                     # above
                     "charge": elementary_charge,
-                    "dipole": elementary_charge * ureg.sigma,
-                    "electric_field": ureg.eps / (elementary_charge * ureg.sigma),
+                    "dipole": elementary_charge * sigma,
+                    "electric_field": eps / (elementary_charge * sigma),
                     "density": (polymer_data.rho_bulk * ureg("g/(cm^3)")).to(
-                        "g/(sigma^3)"
+                        "g/(nanometer^3)"
                     ),
-                    # polymer_data.M_k * ureg('g/mol') / (ureg.sigma**(dimension)) if accept_mol
-                    # else (polymer_data.M_k / avogadro_constant) * ureg('g') /
-                    # (ureg.sigma**(dimension)),
                     "dt": 0.005 * ureg.tau,
-                    "skin": 0.3 * ureg.sigma,
+                    "skin": 0.3 * sigma,
                 },
                 ureg,
             )

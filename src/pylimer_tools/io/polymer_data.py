@@ -5,9 +5,10 @@ This module provides functionality to load polymer properties data
 without requiring pandas or openpyxl as runtime dependencies.
 """
 
+import functools
 import json
 import os
-from typing import Dict, List, Any, Union
+from typing import Any, Dict, Iterator, List, Tuple, Union, overload
 
 
 class PolymerData:
@@ -52,7 +53,9 @@ class PolymerDataFrame:
         self._polymers = polymers
         self._columns = columns
 
-    def itertuples(self, index: bool = True, name: str = "Pandas"):
+    def itertuples(
+        self, index: bool = True, name: str = "Pandas"
+    ) -> Iterator[Tuple[Any, ...]]:
         """
         Iterate over DataFrame rows as named tuples.
 
@@ -61,7 +64,7 @@ class PolymerDataFrame:
         from collections import namedtuple
 
         # Create namedtuple class with the polymer properties
-        PolymerTuple = namedtuple(
+        PolymerTuple = namedtuple(  # type: ignore[misc]
             name, ["Index"] + self._columns if index else self._columns
         )
 
@@ -72,7 +75,7 @@ class PolymerDataFrame:
             else:
                 yield PolymerTuple(*values)
 
-    def iterrows(self):
+    def iterrows(self) -> Iterator[Tuple[int, PolymerData]]:
         """
         Iterate over DataFrame rows as (index, Series) pairs.
 
@@ -81,12 +84,23 @@ class PolymerDataFrame:
         for i, polymer in enumerate(self._polymers):
             yield i, PolymerData(polymer)
 
+    @overload
+    def __getitem__(self, key: str) -> List[Any]: ...
+
+    @overload
+    def __getitem__(self, key: List[str]) -> "PolymerDataFrame": ...
+
+    @overload
+    def __getitem__(self, key: slice) -> "PolymerDataFrame": ...
+
+    @overload
+    def __getitem__(self, key: int) -> PolymerData: ...
+
     def __getitem__(
-        self, key: Union[int, str, List[str]]
-    ) -> Union[List[PolymerData], "PolymerDataFrame"]:
+        self, key: Union[int, slice, str, List[str]]
+    ) -> Union[PolymerData, "PolymerDataFrame", List[Any]]:
         """
-        Access columns by name or list of names.
-        Access rows by integer index.
+        Access columns by name or list of names, or rows by integer index or slice.
         """
         if isinstance(key, str):
             return [polymer.get(key) for polymer in self._polymers]
@@ -96,15 +110,19 @@ class PolymerDataFrame:
                 {col: polymer.get(col) for col in key} for polymer in self._polymers
             ]
             return PolymerDataFrame(filtered_polymers, key)
+        elif isinstance(key, slice):
+            return PolymerDataFrame(self._polymers[key], self._columns)
         elif isinstance(key, int):
             # Row selection by index
             if 0 <= key < len(self._polymers):
+                return PolymerData(self._polymers[key])
+            elif -len(self._polymers) <= key < 0:
                 return PolymerData(self._polymers[key])
             else:
                 raise IndexError("Row index out of range")
         else:
             raise TypeError(
-                f"Key must be string, list of strings, or int, got {type(key)}"
+                f"Key must be string, list of strings, slice, or int, got {type(key)}"
             )
 
     @property
@@ -124,10 +142,14 @@ class PolymerDataFrame:
 
     def head(self, n: int = 5) -> "PolymerDataFrame":
         """Get first n rows."""
+        if n <= 0:
+            return PolymerDataFrame([], self._columns)
         return PolymerDataFrame(self._polymers[:n], self._columns)
 
     def tail(self, n: int = 5) -> "PolymerDataFrame":
         """Get last n rows."""
+        if n <= 0:
+            return PolymerDataFrame([], self._columns)
         return PolymerDataFrame(self._polymers[-n:], self._columns)
 
     def query(self, expr: str) -> "PolymerDataFrame":
@@ -191,6 +213,7 @@ class PolymerDataFrame:
         return "\n".join(lines)
 
 
+@functools.lru_cache(maxsize=1)
 def load_everaers_et_al_data() -> PolymerDataFrame:
     """
     Load the Everaers et al. (2020) unit properties data from JSON.

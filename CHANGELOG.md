@@ -1,5 +1,31 @@
 # Changelog
 
+## main
+
+### Python Correctness, Type Safety, I/O & DataFrame Optimization Improvements
+- **Breaking & Behavioral Changes**:
+  - `pylimer_tools.io.extract_thermo_data.read_one_group`: Now returns an in-memory `Optional[io.StringIO]` buffer (or `None` when no data was read) instead of writing a temporary file to disk and returning its file path string (or `""`).
+  - `pylimer_tools.utils.optimize_dataframe.reduce_mem_usage`:
+    - Floating-point columns are now downcast at most to `np.float32` (no longer to `np.float16`, avoiding severe precision loss) and use inclusive (`>=` / `<=`) bounds checks.
+    - Integer columns now use inclusive (`>=` / `<=`) bounds checks so exact boundary values (e.g., `-128`, `127`, `0`, `255`) are downcast to the tightest matching integer type.
+    - Boolean and `timedelta64` columns are now preserved instead of being coerced to integers or `category` when `obj_to_category=True`.
+  - `pylimer_tools.calc.miller_macosko_theory.predict_number_density_of_junction_points` & `predict_number_density_of_network_strands`: Added `crosslinker_number_density` and `b2` parameters. Calling either function without `crosslinker_number_density` now emits a `DeprecationWarning` for the legacy `weight_fractions[crosslinker_type]` fallback.
+  - `pylimer_tools.io.unit_styles.UnitStyle`: Accessing an unknown attribute via `__getattr__` now raises `AttributeError` instead of returning `None`. For `"lj"` unit styles, `"density"` is now expressed in `"g/(nanometer^3)"` and `"distance"` / `"energy"` use per-instance `Quantity` values rather than redefining global `sigma` and `eps` units on the shared `UnitRegistry`.
+  - Removed `sys.path.append(os.path.dirname(__file__))` side effects from `pylimer_tools`, `pylimer_tools.calc`, `pylimer_tools.io`, and `pylimer_tools.utils` package `__init__.py` files.
+- **Polymer Physics & Structure Analysis Fixes (`pylimer_tools.calc`)**:
+  - Fix `compute_topological_factor` in `mehp_utilities.py` not to overwrite the `b=None` argument across molecules after the first molecule in a loop.
+  - Handle monofunctional chains ($f = 1$) and solvent ($f = 0$) in `compute_weight_fraction_of_backbone`, make `temperature` optional in `compute_entanglement_modulus`, use `scipy.optimize.root_scalar(..., method="brentq")` over `[p_gel, p_max]` in `predict_p_from_w_sol`, and compute `p_f_a_out` and `p_f_b_out` together in a single `compute_miller_macosko_probabilities` call in `miller_macosko_theory.py`.
+  - Convert `mw_monofunctional` to `mw_bifunctional.units` before computing weight fractions in `stoichiometric_relationships.compute_weight_fractions`.
+  - Avoid mutating caller-supplied `ignore_types` in `compute_stoichiometric_imbalance`, guard against zero reactive sites and solvent/crosslinker misclassification in `compute_fraction_of_bifunctional_reactive_sites`, check all networks in `compute_mean_end_to_end_vectors`, use `Universe.determine_effective_functionality_per_type()` in `compute_effective_crosslinker_functionality`, and fall back to default mass `1.0` when atom masses are unset in `measure_weight_fraction_of_dangling_chains`.
+- **I/O, Caching, Data Utilities & CLI (`pylimer_tools.io`, `pylimer_tools.utils`, `CSVSplitter.h`)**:
+  - Support `os.PathLike` (e.g., `pathlib.Path`) across file readers (`extract_thermo_data`, `read_lammps_output_file`, `read_pylimer_tools_output_file`) and `cache_utility` (`do_cache`, `load_cache`, `get_cache_file_name`, `is_current_cache`).
+  - Fix `CSVSplitter::splitCSV` not to leak an unused temporary file on empty inputs or before the first section, and guard against empty token vectors.
+  - Fix `Parameters.__init__` in `bead_spring_parameter_provider.py` not to mutate the caller's dictionary or fail when optional `C_inf` is omitted, and use `unit_style.distance` for `<b>` in `get_kg_lj_parameters_for_polymer`.
+  - Cache `load_everaers_et_al_data()` with `functools.lru_cache`, support slices and negative indices on `PolymerDataFrame`, and handle `head(0)` / `tail(0)` in `polymer_data.py`.
+  - Wire up `use_cache` in `read_averages_file` and build the `read_sectioned_averages_file` `DataFrame` in a single pass.
+  - Handle `tail_n == 0` for sequence inputs in `get_tail`, guard `unify_data_stepsizes` against single-row or zero-step inputs, and support `string` dtype and optional `datetime_features` in `optimize_objects` / `optimize`.
+  - Add `--parameter-type` CLI option to `pylimer-analyse-networks` and use `universe.compute_bond_length_stats()` in `generate_network.py`.
+
 ## v0.7.0
 
 ### Normal Mode Analysis Refactor, Approximate Spectral Methods & Zero-Copy Internals

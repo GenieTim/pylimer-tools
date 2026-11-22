@@ -11,7 +11,6 @@ import time
 from typing import Union
 
 import click
-import statistics
 from termcolor import colored
 
 from pylimer_tools.calc.structure_analysis import compute_crosslinker_conversion
@@ -333,14 +332,13 @@ def generate_structure(
         )
     # TODO: also check for w_sol instead
 
-    bond_lengths = universe.compute_bond_lengths()
+    bond_stats = universe.compute_bond_length_stats()
     print(
-        "Bond lengths, squared mean: {}, mean: {} (median: {}, max: {}, min: {})".format(
-            statistics.mean(bl**2 for bl in bond_lengths),
-            statistics.mean(bond_lengths),
-            statistics.median(bond_lengths),
-            max(bond_lengths),
-            min(bond_lengths),
+        "Bond lengths, squared mean: {}, mean: {} (max: {}, min: {})".format(
+            bond_stats.mean_squared_bond_length,
+            bond_stats.mean_bond_length,
+            bond_stats.max_bond_length,
+            bond_stats.min_bond_length,
         )
     )
 
@@ -508,28 +506,28 @@ def generate_structure(
     help="Output file for the generated network",
 )
 def cli(
-    polymer_name,
-    parameter_type,
-    target_p,
-    target_wsol,
-    n_chains_crosslinkers,
-    target_f,
-    n_solvent_chains,
-    n_beads_per_solvent_chain,
-    n_chains_1,
-    n_beads_per_chain_1,
-    n_chains_2,
-    n_beads_per_chain_2,
-    n_mono_chains,
-    n_mono_beads_per_chain,
-    n_beads_per_xlink,
-    remove_wsol,
-    functionalize_discrete,
-    disable_primary_loops,
-    disable_secondary_loops,
-    z_score_std_mult,
-    target_file,
-):
+    polymer_name: str,
+    parameter_type: str,
+    target_p: Union[float, None],
+    target_wsol: Union[float, None],
+    n_chains_crosslinkers: int,
+    target_f: int,
+    n_solvent_chains: int,
+    n_beads_per_solvent_chain: int,
+    n_chains_1: int,
+    n_beads_per_chain_1: int,
+    n_chains_2: int,
+    n_beads_per_chain_2: int,
+    n_mono_chains: int,
+    n_mono_beads_per_chain: int,
+    n_beads_per_xlink: int,
+    remove_wsol: bool,
+    functionalize_discrete: bool,
+    disable_primary_loops: bool,
+    disable_secondary_loops: bool,
+    z_score_std_mult: float,
+    target_file: str,
+) -> None:
     """
     Generate a crosslinked polymer network using Monte Carlo procedure.
 
@@ -538,7 +536,7 @@ def cli(
     (soluble fraction), but not both.
 
     Example:
-        pylimer-generate-network --polymer-name PDMS --parameter-type GAUSSIAN --target-p 0.8 --n-chains-crosslinks 100 --target-file network.dat
+        pylimer-generate-network --polymer-name PDMS --parameter-type GAUSSIAN --target-p 0.8 --n-chains-crosslinkers 100 --target-file network.dat
     """
     # Validate mutually exclusive options
     if target_p is not None and target_wsol is not None:

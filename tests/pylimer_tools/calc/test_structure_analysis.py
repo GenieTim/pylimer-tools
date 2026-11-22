@@ -19,13 +19,15 @@ from pylimer_tools.calc.structure_analysis import (
     compute_crosslinker_conversion,
     compute_effective_crosslinker_functionalities,
     compute_effective_crosslinker_functionality,
+    compute_fraction_of_bifunctional_reactive_sites,
     compute_mean_end_to_end_distances,
     compute_mean_end_to_end_vectors,
+    compute_stoichiometric_imbalance,
     measure_weight_fraction_of_backbone,
     measure_weight_fraction_of_dangling_chains,
     measure_weight_fraction_of_soluble_material,
 )
-from pylimer_tools_cpp import MoleculeType
+from pylimer_tools_cpp import MoleculeType, Universe
 
 if __name__ == "__main__":
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../../"))
@@ -88,6 +90,98 @@ class TestStructureAnalysisWithUniverse(UniverseUsingTestCase):
             {"1-2-3-6-7": 1.0, "5-6-7": 1.0},
             compute_mean_end_to_end_distances([self.testUniverse], 2),
         )
+
+    def test_compute_fraction_of_bifunctional_reactive_sites(self):
+        """Test b2 calculation with monofunctional chains, empty/crosslinker-only, and solvent."""
+        # Empty and all-crosslinker networks should not raise ZeroDivisionError
+        self.assertEqual(
+            1.0, compute_fraction_of_bifunctional_reactive_sites(self.emptyUniverse, 2)
+        )
+        xlink_only = Universe(10, 10, 10)
+        xlink_only.add_atoms(
+            [1, 2], [2, 2], [0.0, 1.0], [0.0, 0.0], [0.0, 0.0], [0, 0], [0, 0], [0, 0]
+        )
+        self.assertEqual(
+            1.0, compute_fraction_of_bifunctional_reactive_sites(xlink_only, 2)
+        )
+
+        # Low-conversion network with solvent (type 4) and bifunctional chain (type 1)
+        low_conv = Universe(10, 10, 10)
+        low_conv.add_atoms(
+            [1, 2, 3, 4],
+            [2, 1, 1, 4],
+            [0.0, 1.0, 2.0, 5.0],
+            [0.0, 0.0, 0.0, 5.0],
+            [0.0, 0.0, 0.0, 5.0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+        )
+        low_conv.add_bonds([1, 2], [2, 3])
+        # With explicit functionality_per_type={1: 2, 2: 4, 4: 0}:
+        # solvent (4) and crosslinker (2) must not be marked monofunctional
+        self.assertEqual(
+            1.0,
+            compute_fraction_of_bifunctional_reactive_sites(
+                low_conv, 2, functionality_per_type={1: 2, 2: 4, 4: 0}
+            ),
+        )
+
+        # Network with 1 bifunctional chain (type 1) and 1 monofunctional chain (type 3)
+        # b2 = (2 * 1) / (1 + 2 * 1) = 2/3
+        mixed = Universe(10, 10, 10)
+        mixed.add_atoms(
+            [1, 2, 3, 4, 5, 6],
+            [2, 1, 1, 2, 3, 3],
+            [0.0, 1.0, 2.0, 3.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 1.0, 2.0],
+            [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            [0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0],
+        )
+        mixed.add_bonds([1, 2, 3, 1, 5], [2, 3, 4, 5, 6])
+        self.assertAlmostEqual(
+            2.0 / 3.0,
+            compute_fraction_of_bifunctional_reactive_sites(
+                mixed, 2, functionality_per_type={1: 2, 2: 4, 3: 1}
+            ),
+        )
+
+    def test_stoichiometric_imbalance_does_not_mutate_ignore_types(self):
+        """Test that compute_stoichiometric_imbalance does not mutate ignore_types."""
+        ignore = [3]
+        compute_stoichiometric_imbalance(
+            self.testUniverse, crosslinker_type=2, ignore_types=ignore
+        )
+        self.assertEqual([3], ignore)
+
+    def test_measure_weight_fraction_of_dangling_chains_unset_masses(self):
+        """Test measure_weight_fraction_of_dangling_chains with unset masses."""
+        universe = Universe(10, 10, 10)
+        universe.add_atoms(
+            [1, 2, 3, 4, 5],
+            [2, 1, 2, 1, 1],
+            [0.0, 1.0, 2.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 1.0, 2.0],
+            [0.0, 0.0, 0.0, 0.0, 0.0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+        )
+        universe.add_bonds([1, 2, 1, 4], [2, 3, 4, 5])
+        # Masses are unset; default mass 1.0 per atom => dangling chain [1, 4, 5] has 3 atoms out of 5
+        w_dang, n_dang = measure_weight_fraction_of_dangling_chains(universe, 2)
+        self.assertAlmostEqual(3.0 / 5.0, w_dang)
+        self.assertAlmostEqual(3.0 / 5.0, n_dang)
+
+    def test_compute_mean_end_to_end_vectors_missing_keys(self):
+        """Test that missing molecules in a subset of networks raises ValueError."""
+        with self.assertRaises(ValueError):
+            compute_mean_end_to_end_vectors(
+                [self.testUniverse, self.testUniverse, self.saturatedTestUniverse],
+                crosslinker_type=2,
+            )
 
 
 if __name__ == "__main__":
