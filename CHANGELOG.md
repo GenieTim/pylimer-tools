@@ -2,6 +2,18 @@
 
 ## main
 
+### Unified MEHP Architecture (`MEHPSimulator`, `MEHPNetwork`, `MEHPSolver`, `MEHPForceEvaluator`)
+- **Breaking Changes**:
+  - **Unified Simulator (`MEHPSimulator`)**: Removed `MEHPForceRelaxation`, `MEHPForceBalance`, and `MEHPForceBalance2` (`MEHPForceRelaxation.h/.cpp`, `MEHPForceBalance.h/.cpp`, `MEHPForceBalance2.h/.cpp`). All phantom force relaxation, fixed-entanglement linear/nonlinear force balance, and sliding slip-link relaxation workflows are now unified in `MEHPSimulator` (`pylimer_tools_cpp.MEHPSimulator`).
+  - **Canonical Network (`MEHPNetwork`)**: Removed `Network`, `ForceBalanceNetwork`, `SimplifiedBalanceNetwork`, `ForceBalance2Network`, `SimplifiedBalance2Network`, and `MEHPNetworkBuilders.h/.cpp`. Replaced by a single canonical `MEHPNetwork` (`pylimer_tools_cpp.MEHPNetwork`) with static builders `MEHPNetwork::fromUniverse` (`from_universe`), `MEHPNetwork::fromUniverseWithRandomEntanglements` (`from_universe_with_random_entanglements`), and `MEHPNetwork::fromCrosslinkerUniverse` (`from_crosslinker_universe`). All links are indexed uniformly in `[0, nrOfLinks)` and distinguished strictly by `linkIsEntanglement` (`link_is_entanglement`) rather than index-range assumptions.
+  - **Stateless Force Evaluators (`MEHPForceEvaluator`, `HookeanForceEvaluator`)**:
+    - Renamed `SimpleSpringMEHPForceEvaluator` to `HookeanForceEvaluator` (`pylimer_tools_cpp.HookeanForceEvaluator`).
+    - Redesigned `MEHPForceEvaluator` as a stateless constitutive interface (`isLinear` / `is_linear`, `getKappa` / `get_kappa`, `evaluateSpringEnergy` / `evaluate_spring_energy`, `evaluateSpringForce` / `evaluate_spring_force`, `evaluateSpringStiffness` / `evaluate_spring_stiffness`, `evaluateStressContribution` / `evaluate_stress_contribution`, `evaluateNetworkEnergyAndGradient` / `evaluate_network_energy_and_gradient`, `evaluateStressTensor` / `evaluate_stress_tensor`). Removed mutable `setNetwork` and `prepareForEvaluations` lifecycle hooks.
+  - **Typed Solver Strategies & Configs (`MEHPSolver`)**:
+    - Replaced ad-hoc `runForceRelaxation` / `run_force_relaxation` flag overloads with interchangeable `MEHPSolver` strategies (`LinearSystemMEHPSolver`, `SlipLinkRelaxationSolver`, `NonlinearOptimizationSolver`), typed solver configurations (`MEHPLinearSolverConfig`, `MEHPSlipLinkSolverConfig`, `MEHPNonlinearSolverConfig`), and a unified diagnostic result (`MEHPSolveResult`) passed to or returned from `MEHPSimulator::run`.
+    - Added strongly-typed `EntanglementMode` (`NONE`, `MERGED_LINKS`, `SPRING`), `SlipMode` (`FIXED`, `SLIDING`), and `NLoptAlgorithm` (`LD_MMA`, `LD_LBFGS`, `LD_SLSQP`, `LD_TNEWTON`, `LD_TNEWTON_RESTART`, `LD_TNEWTON_PRECOND`, `LD_TNEWTON_PRECOND_RESTART`, `LD_VAR1`, `LD_VAR2`, `LN_SBPLX`, `LN_BOBYQA`, `LN_NELDERMEAD`, `LN_COBYLA`, `LN_NEWUOA`, `LN_NEWUOA_BOUND`, `LN_PRAXIS`, `GN_DIRECT`, `GN_CRS2_LM`, `GD_STOGO`) enums in place of boolean flags (`entanglements_as_springs`, `disable_slipping`) and raw algorithm strings.
+  - **`MCUniverseGenerator` MEHP Factory Methods**: Replaced `getForceBalance` (`get_force_balance`), `getForceBalance2` (`get_force_balance2`), `getForceRelaxation` (`get_force_relaxation`), `convertToForceBalanceNetwork`, `convertToForceBalance2Network`, and `convertToForceRelaxationNetwork` with `getMEHPNetwork` (`get_mehp_network`) and `getMEHPSimulator` (`get_mehp_simulator`).
+
 ### Python Correctness, Type Safety, I/O & DataFrame Optimization Improvements
 - **Breaking & Behavioral Changes**:
   - `pylimer_tools.io.extract_thermo_data.read_one_group`: Now returns an in-memory `Optional[io.StringIO]` buffer (or `None` when no data was read) instead of writing a temporary file to disk and returning its file path string (or `""`).

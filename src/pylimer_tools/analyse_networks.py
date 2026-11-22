@@ -25,7 +25,15 @@ from pylimer_tools.io.bead_spring_parameter_provider import (
     get_supported_polymer_names,
 )
 from pylimer_tools.io.read_lammps_output_file import read_data_file
-from pylimer_tools_cpp import MEHPForceBalance2
+from pylimer_tools_cpp import (
+    EntanglementMode,
+    HookeanForceEvaluator,
+    MEHPLinearSolverConfig,
+    MEHPSimulator,
+    SLESolver,
+    SlipMode,
+    StructureSimplificationMode,
+)
 
 
 @click.command()
@@ -133,16 +141,22 @@ def cli(
         )
 
         # Conduct force balance analysis
-        mehp = MEHPForceBalance2(
+        mehp: MEHPSimulator = MEHPSimulator.construct_with_random_entanglements(
             universe,
+            int(params.get_entanglement_density() * universe.get_volume()),
+            params.get_sampling_cutoff(),
             crosslinker_type=crosslinker_type,
-            nr_of_entanglements_to_sample=int(
-                params.get_entanglement_density() * universe.get_volume()
-            ),
-            upper_sampling_cutoff=params.get_sampling_cutoff(),
+            entanglement_mode=EntanglementMode.MERGED_LINKS,
         )
+        mehp.set_force_evaluator(HookeanForceEvaluator(1.0))
 
-        mehp.run_force_relaxation()
+        solver_config: MEHPLinearSolverConfig = MEHPLinearSolverConfig()
+        solver_config.solver = SLESolver.DEFAULT
+        solver_config.slip_mode = SlipMode.FIXED
+        solver_config.simplification_mode = (
+            StructureSimplificationMode.NO_SIMPLIFICATION
+        )
+        mehp.run(solver_config)
 
         click.echo(
             "Shear Modulus [MPa]: {:.2f}".format(
@@ -161,9 +175,7 @@ def cli(
             "w_sol = {:.3f}, w_dang = {:.3f}, w_active = {:.3f}".format(
                 mehp.get_soluble_weight_fraction(),
                 mehp.get_dangling_weight_fraction(),
-                1
-                - mehp.get_soluble_weight_fraction()
-                - mehp.get_dangling_weight_fraction(),
+                mehp.get_active_weight_fraction(),
             )
         )
 

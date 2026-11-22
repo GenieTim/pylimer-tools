@@ -22,8 +22,15 @@ from pylimer_tools.io.bead_spring_parameter_provider import (
 )
 from pylimer_tools_cpp import (
     DataFileWriter,
+    EntanglementMode,
+    HookeanForceEvaluator,
     MCUniverseGenerator,
-    MEHPForceBalance2,
+    MEHPLinearSolverConfig,
+    MEHPNonlinearSolverConfig,
+    MEHPSimulator,
+    NLoptAlgorithm,
+    SLESolver,
+    SlipMode,
     Universe,
 )
 
@@ -240,24 +247,33 @@ def is_active_network(
         print(f"Error during structure generation for network activity assessment: {e}")
         return False
 
+    sim: MEHPSimulator = universe_generator.get_mehp_simulator(
+        entanglement_mode=EntanglementMode.NONE
+    )
+    assert isinstance(sim, MEHPSimulator), f"Expected MEHPSimulator, got {type(sim)}"
+    sim.set_force_evaluator(HookeanForceEvaluator(1.0))
+
     try:
-        fb = universe_generator.get_force_balance2()
-        assert isinstance(fb, MEHPForceBalance2), (
-            "Expected ForceBalance2, got {}".format(type(fb))
-        )
-        fb.run_force_relaxation()
+        linear_config: MEHPLinearSolverConfig = MEHPLinearSolverConfig()
+        linear_config.solver = SLESolver.DEFAULT
+        linear_config.slip_mode = SlipMode.FIXED
+        sim.run(linear_config)
     except Exception as e:
         print_with_time(
             colored(
-                "Error during force relaxation of FB2 to investigate whether network is active: {}".format(
-                    e
-                ),
+                f"Error during linear MEHP solve to investigate whether network is active: {e}",
                 "red",
             )
         )
-        fb = universe_generator.get_force_balance()
-        fb.run_force_relaxation()
-    return fb.get_nr_of_active_springs() > 1
+        sim = universe_generator.get_mehp_simulator(
+            entanglement_mode=EntanglementMode.NONE
+        )
+        sim.set_force_evaluator(HookeanForceEvaluator(1.0))
+        nonlinear_config: MEHPNonlinearSolverConfig = MEHPNonlinearSolverConfig()
+        nonlinear_config.algorithm = NLoptAlgorithm.LD_MMA
+        nonlinear_config.slip_mode = SlipMode.FIXED
+        sim.run(nonlinear_config)
+    return sim.get_nr_of_active_springs() > 1
 
 
 def generate_structure(

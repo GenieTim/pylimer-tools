@@ -1,5 +1,4 @@
 #include "MCUniverseGenerator.h"
-#include "../sim/MEHPNetworkBuilders.h"
 
 namespace pylimer_tools::utils {
 void
@@ -978,18 +977,11 @@ MCUniverseGenerator::linkStrandsToSolubleFraction(double targetSolubleFraction,
       }
 
       lastStep = currentStep;
-      const pylimer_tools::sim::mehp::ForceBalanceNetwork fbNet =
-        gen.convertToForceBalanceNetwork();
-
       // actually start force relaxation
-      pylimer_tools::sim::mehp::MEHPForceBalance2 forceBalance =
-        pylimer_tools::sim::mehp::MEHPForceBalance2(
-          fbNet,
-          Eigen::VectorXd::Ones(
-            static_cast<Eigen::Index>(fbNet.nrOfPartialSprings)));
-
-      forceBalance.configAssumeNetworkIsComplete(true);
-      forceBalance.runForceRelaxation();
+      pylimer_tools::sim::mehp::MEHPSimulator forceBalance =
+        gen.getMEHPSimulator({},
+                             pylimer_tools::sim::mehp::EntanglementMode::NONE);
+      (void)forceBalance.run();
 
       // finally, calculate the soluble fraction
       const double solubleFraction = forceBalance.getSolubleWeightFraction();
@@ -1142,19 +1134,17 @@ MCUniverseGenerator::removeSolubleFraction(const bool rescale)
     }
   }
 
-  pylimer_tools::sim::mehp::Network forceRelaxationNetwork =
-    this->convertToForceRelaxationNetwork();
-  pylimer_tools::sim::mehp::MEHPForceRelaxation forceRelaxer =
-    pylimer_tools::sim::mehp::MEHPForceRelaxation(forceRelaxationNetwork);
-
-  while (forceRelaxer.suggestsRerun()) {
-    forceRelaxer.runForceRelaxation("LD_MMA", 5000, 1e-12, 1e-9);
-  }
+  const pylimer_tools::sim::mehp::MEHPNetwork forceRelaxationNetwork =
+    this->getMEHPNetwork({}, pylimer_tools::sim::mehp::EntanglementMode::NONE);
+  pylimer_tools::sim::mehp::MEHPSimulator forceRelaxer(forceRelaxationNetwork);
+  forceRelaxer.configAssumeNetworkIsComplete(true);
+  (void)forceRelaxer.run();
 
   const std::pair<Eigen::ArrayXb, Eigen::ArrayXb> activeComponents =
-    forceRelaxer.findClusteredToActive();
-  Eigen::ArrayXb activeSprings = activeComponents.first;
-  Eigen::ArrayXb activeNodes = activeComponents.second;
+    forceRelaxer.getNetwork().findSpringsAndLinksClusteredToActive(
+      forceRelaxer.getCurrentDisplacements(), 1e-4, false);
+  const Eigen::ArrayXb& activeSprings = activeComponents.first;
+  const Eigen::ArrayXb& activeNodes = activeComponents.second;
 
   RUNTIME_EXP_IFN(activeNodes.count() > 0,
                   "No active nodes found during force relaxation. "
@@ -1206,40 +1196,30 @@ MCUniverseGenerator::removeSolubleFraction(const bool rescale)
   this->updateNeighbourListCoordinates();
 }
 
-pylimer_tools::sim::mehp::Network
-MCUniverseGenerator::convertToForceRelaxationNetwork() const
+pylimer_tools::sim::mehp::MEHPNetwork
+MCUniverseGenerator::getMEHPNetwork(
+  const pylimer_tools::topo::entanglement_detection::StrandPairEntanglements&
+    entanglements,
+  const pylimer_tools::sim::mehp::EntanglementMode entanglementMode,
+  const int crossLinkerType,
+  const bool removeDanglingChains,
+  const bool includeFreeChains) const
 {
-  return pylimer_tools::sim::mehp::buildForceRelaxationNetwork(
-    this->box, this->simplifiedUniverse);
-}
-
-pylimer_tools::sim::mehp::MEHPForceRelaxation
-MCUniverseGenerator::getForceRelaxation() const
-{
-  // first, convert to a useable structure for the force relaxation
-  const pylimer_tools::sim::mehp::Network forceRelaxationNetwork =
-    this->convertToForceRelaxationNetwork();
-
-  // actually start force relaxation
-  pylimer_tools::sim::mehp::MEHPForceRelaxation forceRelaxer =
-    pylimer_tools::sim::mehp::MEHPForceRelaxation(forceRelaxationNetwork);
-
-  return forceRelaxer;
-}
-
-pylimer_tools::sim::mehp::ForceBalanceNetwork
-MCUniverseGenerator::convertToForceBalanceNetwork() const
-{
-  const pylimer_tools::sim::mehp::ForceBalanceNetwork forceBalanceNetwork =
-    pylimer_tools::sim::mehp::buildForceBalanceNetwork(
-      this->box, this->simplifiedUniverse);
-
-  assert(static_cast<size_t>(
-           std::lround(forceBalanceNetwork.springsContourLength.sum())) -
-           forceBalanceNetwork.nrOfSprings + forceBalanceNetwork.nrOfLinks ==
-         this->getCurrentNrOfAtoms());
-
-  return forceBalanceNetwork;
+  pylimer_tools::sim::mehp::MEHPNetwork net =
+    pylimer_tools::sim::mehp::MEHPNetwork::fromCrosslinkerUniverse(
+      this->box,
+      this->simplifiedUniverse,
+      entanglements,
+      crossLinkerType,
+      entanglements.strandIdx1.empty()
+        ? pylimer_tools::sim::mehp::EntanglementMode::NONE
+        : entanglementMode,
+      removeDanglingChains,
+      includeFreeChains);
+  net.defaultBondLength = this->beadDistance;
+  net.defaultR02 = this->meanSquaredBeadDistance;
+  net.assumeComplete = true;
+  return net;
 }
 
 pylimer_tools::topo::entanglement_detection::StrandPairEntanglements
@@ -1294,64 +1274,49 @@ MCUniverseGenerator::sampleEntanglements(
                                       static_cast<int>(this->nMcSteps));
 }
 
-pylimer_tools::sim::mehp::ForceBalanceNetwork
-MCUniverseGenerator::convertToForceBalanceNetwork(
-  const pylimer_tools::topo::entanglement_detection::StrandPairEntanglements&
-    entanglements) const
-{
-  return this->getForceBalance(entanglements).getNetwork();
-}
-
-pylimer_tools::sim::mehp::ForceBalance2Network
-MCUniverseGenerator::convertToForceBalance2Network(
+pylimer_tools::sim::mehp::MEHPSimulator
+MCUniverseGenerator::getMEHPSimulator(
   const pylimer_tools::topo::entanglement_detection::StrandPairEntanglements&
     entanglements,
+  const pylimer_tools::sim::mehp::EntanglementMode entanglementMode,
+  std::shared_ptr<pylimer_tools::sim::mehp::MEHPForceEvaluator> evaluator,
+  const bool is2D,
   const int crossLinkerType,
-  const bool entanglementsAsSprings) const
+  const bool removeDanglingChains,
+  const bool includeFreeChains) const
 {
-  return pylimer_tools::sim::mehp::buildForceBalance2Network(
-    this->box,
-    this->simplifiedUniverse,
-    entanglements,
-    crossLinkerType,
-    entanglementsAsSprings);
+  const pylimer_tools::sim::mehp::MEHPNetwork net =
+    this->getMEHPNetwork(entanglements,
+                         entanglementMode,
+                         crossLinkerType,
+                         removeDanglingChains,
+                         includeFreeChains);
+  pylimer_tools::sim::mehp::MEHPSimulator sim(net, std::move(evaluator), is2D);
+  sim.validateNetwork();
+  return sim;
 }
 
-pylimer_tools::sim::mehp::MEHPForceBalance
-MCUniverseGenerator::getForceBalance() const
+pylimer_tools::sim::mehp::MEHPSimulator
+MCUniverseGenerator::getMEHPSimulator(
+  const size_t nrOfEntanglementsToSample,
+  const double upperCutoff,
+  const double lowerCutoff,
+  const size_t minimumNrOfEntanglements,
+  const double sameStrandCutoff,
+  const std::string& seed,
+  const bool filterDanglingAndSoluble,
+  const pylimer_tools::sim::mehp::EntanglementMode entanglementMode,
+  std::shared_ptr<pylimer_tools::sim::mehp::MEHPForceEvaluator> evaluator,
+  const bool is2D,
+  const int crossLinkerType) const
 {
-  const pylimer_tools::sim::mehp::ForceBalanceNetwork net =
-    this->convertToForceBalanceNetwork();
-
-  const Eigen::VectorXd springPartitions =
-    Eigen::VectorXd::Ones(static_cast<Eigen::Index>(net.nrOfSprings));
-  pylimer_tools::sim::mehp::MEHPForceBalance balance =
-    pylimer_tools::sim::mehp::MEHPForceBalance(net, springPartitions);
-  balance.configMeanBondLength(this->beadDistance);
-  assert(balance.validateNetwork());
-  return balance;
-}
-
-pylimer_tools::sim::mehp::MEHPForceBalance
-MCUniverseGenerator::getForceBalance(
-  const pylimer_tools::topo::entanglement_detection::StrandPairEntanglements&
-    entanglements) const
-{
-  pylimer_tools::sim::mehp::MEHPForceBalance balance = this->getForceBalance();
-  balance.addSlipLinks(entanglements);
-  assert(balance.validateNetwork());
-  return balance;
-}
-
-pylimer_tools::sim::mehp::MEHPForceBalance
-MCUniverseGenerator::getForceBalance(const size_t nrOfEntanglementsToSample,
-                                     const double upperCutoff,
-                                     const double lowerCutoff,
-                                     const size_t minimumNrOfEntanglements,
-                                     const double sameStrandCutoff,
-                                     const std::string& seed,
-                                     const bool filterDanglingAndSoluble) const
-{
+  if (entanglementMode == pylimer_tools::sim::mehp::EntanglementMode::NONE) {
+    return this->getMEHPSimulator({},
+                                  entanglementMode,
+                                  std::move(evaluator),
+                                  is2D,
+                                  crossLinkerType);
+  }
   const pylimer_tools::topo::entanglement_detection::StrandPairEntanglements
     entanglements = this->sampleEntanglements(nrOfEntanglementsToSample,
                                               upperCutoff,
@@ -1360,89 +1325,33 @@ MCUniverseGenerator::getForceBalance(const size_t nrOfEntanglementsToSample,
                                               sameStrandCutoff,
                                               seed,
                                               filterDanglingAndSoluble);
-  return this->getForceBalance(entanglements);
-}
-
-pylimer_tools::sim::mehp::MEHPForceBalance2
-MCUniverseGenerator::getForceBalance2() const
-{
-  return this->getForceBalance2(
-    pylimer_tools::topo::entanglement_detection::StrandPairEntanglements(),
-    2,
-    false);
-}
-
-pylimer_tools::sim::mehp::MEHPForceBalance2
-MCUniverseGenerator::getForceBalance2(
-  const pylimer_tools::topo::entanglement_detection::StrandPairEntanglements&
-    entanglements,
-  const int crossLinkerType,
-  const bool entanglementsAsSprings) const
-{
-  const pylimer_tools::sim::mehp::ForceBalance2Network net =
-    this->convertToForceBalance2Network(
-      entanglements, crossLinkerType, entanglementsAsSprings);
-  pylimer_tools::sim::mehp::MEHPForceBalance2 balance =
-    pylimer_tools::sim::mehp::MEHPForceBalance2(net);
-  balance.configMeanBondLength(this->beadDistance);
-  balance.configAssumeNetworkIsComplete(true);
-  assert(balance.validateNetwork());
-  return balance;
-}
-
-pylimer_tools::sim::mehp::MEHPForceBalance2
-MCUniverseGenerator::getForceBalance2(const size_t nrOfEntanglementsToSample,
-                                      const double upperCutoff,
-                                      const double lowerCutoff,
-                                      const size_t minimumNrOfEntanglements,
-                                      const double sameStrandCutoff,
-                                      const std::string& seed,
-                                      const bool filterDanglingAndSoluble,
-                                      const bool entanglementsAsSprings,
-                                      const int crossLinkerType) const
-{
-  const pylimer_tools::topo::entanglement_detection::StrandPairEntanglements
-    entanglements = this->sampleEntanglements(nrOfEntanglementsToSample,
-                                              upperCutoff,
-                                              lowerCutoff,
-                                              minimumNrOfEntanglements,
-                                              sameStrandCutoff,
-                                              seed,
-                                              filterDanglingAndSoluble);
-  return this->getForceBalance2(
-    entanglements, crossLinkerType, entanglementsAsSprings);
+  return this->getMEHPSimulator(
+    entanglements, entanglementMode, std::move(evaluator), is2D, crossLinkerType);
 }
 
 void
 MCUniverseGenerator::relaxCrosslinks()
 {
-  // first, convert to a useable structure for the force relaxation
-  pylimer_tools::sim::mehp::Network forceRelaxationNetwork =
-    this->convertToForceRelaxationNetwork();
+  pylimer_tools::sim::mehp::MEHPNetwork net = this->getMEHPNetwork(
+    {}, pylimer_tools::sim::mehp::EntanglementMode::NONE, 2, false, true);
+  net.assumeBoxLargeEnough = true;
+  pylimer_tools::sim::mehp::MEHPSimulator forceRelaxer(net);
+  pylimer_tools::sim::mehp::MEHPNonlinearSolverConfig config;
+  config.algorithm = pylimer_tools::sim::mehp::NLoptAlgorithm::LD_MMA;
+  config.maxNrOfSteps = 250000;
+  config.xtol = 1e-12;
+  config.ftol = 1e-9;
+  (void)forceRelaxer.run(config);
 
-  // actually start force relaxation
-  pylimer_tools::sim::mehp::MEHPForceRelaxation forceRelaxer =
-    pylimer_tools::sim::mehp::MEHPForceRelaxation(forceRelaxationNetwork);
-  forceRelaxer.configAssumeBoxLargeEnough(true);
-
-  while (forceRelaxer.suggestsRerun()) {
-    forceRelaxer.runForceRelaxation();
-  }
-
-  // copy results
-  forceRelaxationNetwork = forceRelaxer.getNetwork();
+  const Eigen::VectorXd relaxedCoords = forceRelaxer.getCoordinates();
   const size_t nCrosslinks = this->simplifiedUniverse.xlinkTypes.size();
-  // dangling strands lead to higher nr of nodes
-  RUNTIME_EXP_IFN(forceRelaxationNetwork.nrOfNodes >= nCrosslinks,
+  RUNTIME_EXP_IFN(forceRelaxer.getNrOfNodes() >= nCrosslinks,
                   "Expected force relaxation to preserve crosslinks.");
   for (size_t i = 0; i < nCrosslinks; ++i) {
     const Eigen::Index iIdx = static_cast<Eigen::Index>(i);
-    this->simplifiedUniverse.xlinkX[i] =
-      forceRelaxationNetwork.coordinates(3 * iIdx + 0);
-    this->simplifiedUniverse.xlinkY[i] =
-      forceRelaxationNetwork.coordinates(3 * iIdx + 1);
-    this->simplifiedUniverse.xlinkZ[i] =
-      forceRelaxationNetwork.coordinates(3 * iIdx + 2);
+    this->simplifiedUniverse.xlinkX[i] = relaxedCoords(3 * iIdx + 0);
+    this->simplifiedUniverse.xlinkY[i] = relaxedCoords(3 * iIdx + 1);
+    this->simplifiedUniverse.xlinkZ[i] = relaxedCoords(3 * iIdx + 2);
   }
   this->updateNeighbourListCoordinates();
 }

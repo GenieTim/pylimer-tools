@@ -1,8 +1,10 @@
 #include "../../src/pylimer_tools_cpp/entities/Universe.h"
 #include "../../src/pylimer_tools_cpp/entities/UniverseSequence.h"
-#include "../../src/pylimer_tools_cpp/sim/MEHPForceBalance.h"
-#include "../../src/pylimer_tools_cpp/sim/MEHPForceBalance2.h"
-#include "../../src/pylimer_tools_cpp/sim/MEHPForceRelaxation.h"
+#include "../../src/pylimer_tools_cpp/sim/MEHPForceEvaluator.h"
+#include "../../src/pylimer_tools_cpp/sim/MEHPLinearSystemSolver.h"
+#include "../../src/pylimer_tools_cpp/sim/MEHPNetwork.h"
+#include "../../src/pylimer_tools_cpp/sim/MEHPSimulator.h"
+#include "../../src/pylimer_tools_cpp/sim/MEHPSlipLinkRelaxationSolver.h"
 #include "../../src/pylimer_tools_cpp/utils/MCUniverseGenerator.h"
 #include "../../src/pylimer_tools_cpp/utils/StringUtils.h"
 #include <catch2/benchmark/catch_benchmark_all.hpp>
@@ -26,7 +28,7 @@ namespace pcm = pylimer_tools::sim::mehp;
 #endif
 
 TEST_CASE("Force Balance Benchmarks",
-          "[MEHPForceBalance2][benchmark][long][FBBenchmark]")
+          "[MEHPSimulator][benchmark][long][FBBenchmark]")
 {
   std::cout << "Running test \"Force Balance Benchmarks\"" << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
@@ -39,46 +41,25 @@ TEST_CASE("Force Balance Benchmarks",
   universeSeq.initializeFromDataSequence({ { largeInputFile } });
   pe::Universe universe = universeSeq.atIndex(0);
 
-  pcm::MEHPForceBalance referenceForceBalancer =
-    pcm::MEHPForceBalance(universe, 2);
-  referenceForceBalancer.configAssumeBoxLargeEnough(false);
+  const pcm::MEHPNetwork referenceNetwork = pcm::MEHPNetwork::fromUniverse(
+    universe, {}, 2, pcm::EntanglementMode::NONE, true, false, false);
+  pcm::MEHPSimulator referenceForceBalancer =
+    pcm::MEHPSimulator(referenceNetwork);
+  pcm::MEHPSlipLinkSolverConfig refConfig;
+  refConfig.slipMode = pcm::SlipMode::FIXED;
 
-  auto start_ref = std::chrono::high_resolution_clock::now();
+  const std::chrono::high_resolution_clock::time_point start_ref =
+    std::chrono::high_resolution_clock::now();
 
-  referenceForceBalancer.runForceRelaxation();
-  auto end_ref = std::chrono::high_resolution_clock::now();
-  auto duration_ref =
+  referenceForceBalancer.run(refConfig);
+  const std::chrono::high_resolution_clock::time_point end_ref =
+    std::chrono::high_resolution_clock::now();
+  const std::chrono::microseconds duration_ref =
     std::chrono::duration_cast<std::chrono::microseconds>(end_ref - start_ref);
-  std::cout << "Reference Time (FB1) to beat: "
+  std::cout << "Reference Time (SlipLink) to beat: "
             << std::duration_to_string(duration_ref) << " " << std::endl;
 
-  // BENCHMARK_ADVANCED("MEHP LD_MMA " +
-  //                    largeInputFile)(Catch::Benchmark::Chronometer meter)
-  // {
-  //   pcm::MEHPForceRelaxation forceRelaxer =
-  //     pcm::MEHPForceRelaxation(universe, 2);
-  //   forceRelaxer.configAssumeBoxLargeEnough(false);
-
-  //   meter.measure([&forceRelaxer, &referenceForceBalancer] {
-  //     forceRelaxer.runForceRelaxation("LD_MMA");
-
-  //     CHECK_THAT(
-  //       forceRelaxer.getGamma(),
-  //       Catch::Matchers::WithinRel(referenceForceBalancer.getGamma(),
-  //       1e-2));
-  //     return forceRelaxer.getNrOfIterations();
-  //   });
-  // };
-
-  for (pcm::SLESolver solverChoice :
-       // { // pcm::SIMPLICIAL_LLT,
-       //   pcm::SIMPLICIAL_LDLT,
-       //   //                                    pcm::SPARSE_LU,
-       //   //                                    pcm::SPARSE_QR,
-       //   pcm::CONJUGATE_GRADIENT,
-       //   pcm::CONJUGATE_GRADIENT_IDENTITY,
-       //   pcm::LEAST_SQUARES_CONJUGATE_GRADIENT,
-       //   pcm::BICGSTAB }
+  for (const pcm::SLESolver solverChoice :
        pylimer_tools::sim::mehp::allSLESolvers) {
 
     // need to exclude some very slow cases
@@ -86,19 +67,18 @@ TEST_CASE("Force Balance Benchmarks",
       continue;
     }
 
-    pcm::MEHPForceBalance2
-      forceBalancer = // pcm::MEHPForceBalance2(universe, 2);
-      pcm::MEHPForceBalance2(universe,
-                             referenceForceBalancer.getNetwork(),
-                             referenceForceBalancer.getSpringPartitions(),
-                             false);
-    auto start = std::chrono::high_resolution_clock::now();
+    pcm::MEHPSimulator forceBalancer = pcm::MEHPSimulator(referenceNetwork);
+    pcm::MEHPLinearSolverConfig linearConfig;
+    linearConfig.solver = solverChoice;
+    linearConfig.simplificationMode =
+      pcm::StructureSimplificationMode::NO_SIMPLIFICATION;
+    linearConfig.inactiveRemovalCutoff = 1e-3;
+
+    const std::chrono::high_resolution_clock::time_point start =
+      std::chrono::high_resolution_clock::now();
 
     try {
-      forceBalancer.runForceRelaxation(
-        pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
-        1e-3,
-        solverChoice);
+      forceBalancer.run(linearConfig);
     } catch (const std::exception& e) {
       std::cerr << "Exception for solver " << pcm::SLESolverNames[solverChoice]
                 << " (" << solverChoice << "): " << e.what() << std::endl;
@@ -108,18 +88,19 @@ TEST_CASE("Force Balance Benchmarks",
     CHECK_THAT(
       forceBalancer.getGamma(),
       Catch::Matchers::WithinRel(referenceForceBalancer.getGamma(), 1e-4));
-    auto end = std::chrono::high_resolution_clock::now();
-    auto duration =
+    const std::chrono::high_resolution_clock::time_point end =
+      std::chrono::high_resolution_clock::now();
+    const std::chrono::microseconds duration =
       std::chrono::duration_cast<std::chrono::microseconds>(end - start);
 
-    std::cout << "Solver (FB2): " << pcm::SLESolverNames[solverChoice] << " ("
-              << solverChoice
+    std::cout << "Solver (Linear): " << pcm::SLESolverNames[solverChoice]
+              << " (" << solverChoice
               << "), Time: " << std::duration_to_string(duration) << std::endl;
   }
 }
 
 TEST_CASE("Force Balance Benchmarks randomly functionalized",
-          "[MEHPForceBalance][MEHPForceBalance2][benchmark][long][FBBenchmark]")
+          "[MEHPSimulator][benchmark][long][FBBenchmark]")
 {
   std::cout
     << "Running test \"Force Balance Benchmarks randomly functionalized\""
@@ -148,43 +129,26 @@ TEST_CASE("Force Balance Benchmarks randomly functionalized",
 
   pe::Universe universe = generator.getUniverse();
 
-  pcm::MEHPForceBalance referenceForceBalancer = pcm::MEHPForceBalance(
-    universe,
-    2); // using a different crosslinkerType here makes things faster
-  referenceForceBalancer.configAssumeBoxLargeEnough(false);
+  const pcm::MEHPNetwork referenceNetwork = pcm::MEHPNetwork::fromUniverse(
+    universe, {}, 2, pcm::EntanglementMode::NONE, true, false, false);
+  pcm::MEHPSimulator referenceForceBalancer =
+    pcm::MEHPSimulator(referenceNetwork);
+  pcm::MEHPSlipLinkSolverConfig refConfig;
+  refConfig.slipMode = pcm::SlipMode::FIXED;
 
-  auto start_ref = std::chrono::high_resolution_clock::now();
+  const std::chrono::high_resolution_clock::time_point start_ref =
+    std::chrono::high_resolution_clock::now();
 
-  referenceForceBalancer.runForceRelaxation();
-  auto end_ref = std::chrono::high_resolution_clock::now();
-  auto duration_ref =
+  referenceForceBalancer.run(refConfig);
+  const std::chrono::high_resolution_clock::time_point end_ref =
+    std::chrono::high_resolution_clock::now();
+  const std::chrono::microseconds duration_ref =
     std::chrono::duration_cast<std::chrono::microseconds>(end_ref - start_ref);
-  std::cout << "Reference Time (FB1) to beat: "
+  std::cout << "Reference Time (SlipLink) to beat: "
             << std::duration_to_string(duration_ref) << " " << std::endl;
   CHECK(referenceForceBalancer.getNrOfActiveNodes(1e-1) == 0);
 
-  // BENCHMARK_ADVANCED("MEHP LD_MMA " +
-  //                    largeInputFile)(Catch::Benchmark::Chronometer meter)
-  // {
-  //   pcm::MEHPForceRelaxation forceRelaxer =
-  //     pcm::MEHPForceRelaxation(universe, 2);
-
-  //   meter.measure([&forceRelaxer, &referenceForceBalancer] {
-  //     forceRelaxer.runForceRelaxation("LD_MMA");
-  //     CHECK(forceRelaxer.getGamma() == referenceForceBalancer.getGamma());
-  //     return forceRelaxer.getNrOfIterations();
-  //   });
-  // };
-
-  for (pcm::SLESolver solverChoice :
-       // { // pcm::SIMPLICIAL_LLT,
-       //   pcm::SIMPLICIAL_LDLT,
-       //   //                                    pcm::SPARSE_LU,
-       //   //                                    pcm::SPARSE_QR,
-       //   pcm::CONJUGATE_GRADIENT,
-       //   pcm::CONJUGATE_GRADIENT_IDENTITY,
-       //   pcm::LEAST_SQUARES_CONJUGATE_GRADIENT,
-       //   pcm::BICGSTAB }
+  for (const pcm::SLESolver solverChoice :
        pylimer_tools::sim::mehp::allSLESolvers) {
 
     // need to exclude some very slow cases
@@ -192,26 +156,26 @@ TEST_CASE("Force Balance Benchmarks randomly functionalized",
       continue;
     }
 
-    pcm::MEHPForceBalance2
-      forceBalancer = // pcm::MEHPForceBalance2(universe, 2);
-      pcm::MEHPForceBalance2(universe,
-                             referenceForceBalancer.getNetwork(),
-                             referenceForceBalancer.getSpringPartitions(),
-                             false);
-    auto start = std::chrono::high_resolution_clock::now();
+    pcm::MEHPSimulator forceBalancer = pcm::MEHPSimulator(referenceNetwork);
+    pcm::MEHPLinearSolverConfig linearConfig;
+    linearConfig.solver = solverChoice;
+    linearConfig.simplificationMode =
+      pcm::StructureSimplificationMode::NO_SIMPLIFICATION;
+    linearConfig.inactiveRemovalCutoff = 1e-3;
+
+    const std::chrono::high_resolution_clock::time_point start =
+      std::chrono::high_resolution_clock::now();
 
     try {
-      forceBalancer.runForceRelaxation(
-        pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
-        1e-3,
-        solverChoice);
+      forceBalancer.run(linearConfig);
     } catch (const std::exception& e) {
       std::cerr << "Exception for solver " << pcm::SLESolverNames[solverChoice]
                 << " (" << solverChoice << "): " << e.what() << std::endl;
       continue;
     }
-    auto end = std::chrono::high_resolution_clock::now();
-    auto duration =
+    const std::chrono::high_resolution_clock::time_point end =
+      std::chrono::high_resolution_clock::now();
+    const std::chrono::microseconds duration =
       std::chrono::duration_cast<std::chrono::microseconds>(end - start);
 
     CHECK_THAT(
@@ -219,8 +183,8 @@ TEST_CASE("Force Balance Benchmarks randomly functionalized",
       Catch::Matchers::WithinAbs(referenceForceBalancer.getGamma(), 1e-5));
     CHECK(forceBalancer.getNrOfActiveNodes() == 0);
 
-    std::cout << "Solver (FB2): " << pcm::SLESolverNames[solverChoice] << " ("
-              << solverChoice
+    std::cout << "Solver (Linear): " << pcm::SLESolverNames[solverChoice]
+              << " (" << solverChoice
               << "), Time: " << std::duration_to_string(duration) << std::endl;
   }
 }

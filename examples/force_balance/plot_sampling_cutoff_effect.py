@@ -41,9 +41,9 @@ import pylimer_tools_cpp as pt  # noqa: E402
 # %%
 # Varying ``upper_cutoff`` in Entanglement Sampling
 # -------------------------------------------------
-# Pass ``upper_cutoff`` to :meth:`~pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements`
-# and compare rigid links (``entanglements_as_springs=False``) vs. compliant springs
-# (``entanglements_as_springs=True``).
+# Passing ``upper_cutoff`` to :meth:`~pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements`
+# compares rigid links (``EntanglementMode.MERGED_LINKS``) vs. compliant springs
+# (``EntanglementMode.SPRING``).
 
 gen = pt.MCUniverseGenerator(18.0, 18.0, 18.0)
 gen.set_seed(42)
@@ -58,8 +58,8 @@ for r_cut in (1.2, 2.6):
         upper_cutoff=r_cut,
         seed=f"cut_{r_cut}",
     )
-    fb = gen.get_force_balance2(es, entanglements_as_springs=False)
-    fb.run_force_relaxation()
+    fb = gen.get_mehp_simulator(es, entanglement_mode=pt.EntanglementMode.MERGED_LINKS)
+    fb.run()
     print(f"r_cut={r_cut}: sampled={len(es)}, iterations={fb.get_nr_of_iterations()}")
 
 cache_path = get_example_cache_path("sampling_cutoff_effect_cache.npz", "force_balance")

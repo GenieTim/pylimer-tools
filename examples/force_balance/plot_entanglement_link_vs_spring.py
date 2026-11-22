@@ -2,18 +2,20 @@ r"""
 Entanglement Links vs. Springs
 ==============================
 
-In :class:`~pylimer_tools_cpp.MEHPForceBalance2` (:cite:t:`gusev_numerical_2019`, :cite:t:`bernhard_phantom_2025`),
-users can choose between two representations for sampled entanglements via ``entanglements_as_springs``:
+In :class:`~pylimer_tools_cpp.MEHPSimulator` with :class:`~pylimer_tools_cpp.LinearSystemMEHPSolver`
+(:cite:t:`gusev_numerical_2019`, :cite:t:`bernhard_phantom_2025`), users can choose between two representations
+for sampled entanglements via ``entanglement_mode``:
 
-1. **Entanglement Links** (``entanglements_as_springs=False``, default):
+1. **Entanglement Links** (``EntanglementMode.MERGED_LINKS``, default):
    The two entangled strand beads are merged into a single shared 4-functional junction node
    (:math:`\mathbf{r}_1 = \mathbf{r}_2`), introducing :math:`N_{\text{ent}}` extra nodes and 0 extra springs.
-2. **Entanglement Springs** (``entanglements_as_springs=True``):
+2. **Entanglement Springs** (``EntanglementMode.SPRING``):
    The two beads remain distinct and are coupled by an additional Hookean spring, introducing
    :math:`2 N_{\text{ent}}` extra nodes and :math:`N_{\text{ent}}` extra springs.
 
-In both cases, entanglements in ``MEHPForceBalance2`` **do not slip** along the chain contour
-(see :doc:`plot_slipping_vs_fixed_links` for dynamic contour slipping in ``MEHPForceBalance``).
+With :class:`~pylimer_tools_cpp.LinearSystemMEHPSolver`, entanglements **do not slip** along the chain
+contour (see :doc:`plot_slipping_vs_fixed_links` for dynamic contour slipping with
+:class:`~pylimer_tools_cpp.MEHPSlipLinkSolverConfig`).
 """
 
 from pathlib import Path
@@ -34,9 +36,9 @@ import pylimer_tools_cpp as pt  # noqa: E402
 # %%
 # Comparing Links vs. Springs on a Generated Network
 # --------------------------------------------------
-# Passing the same sampled entanglements to :meth:`~pylimer_tools_cpp.MCUniverseGenerator.get_force_balance2`
-# with ``entanglements_as_springs=False`` vs. ``True`` toggles between rigid merged junctions and
-# compliant Hookean entanglement springs.
+# Passing the same sampled entanglements to :meth:`~pylimer_tools_cpp.MCUniverseGenerator.get_mehp_simulator`
+# with ``EntanglementMode.MERGED_LINKS`` vs. ``EntanglementMode.SPRING`` toggles between
+# rigid merged junctions and compliant Hookean entanglement springs.
 
 gen = pt.MCUniverseGenerator(18.0, 18.0, 18.0)
 gen.set_seed(42)
@@ -52,11 +54,13 @@ es = gen.sample_entanglements(
     filtering_mode=pt.EntanglementFilteringMode.OMIT_INACTIVE,
 )
 
-fb_links = gen.get_force_balance2(es, entanglements_as_springs=False)
-fb_links.run_force_relaxation()
+fb_links = gen.get_mehp_simulator(
+    es, entanglement_mode=pt.EntanglementMode.MERGED_LINKS
+)
+fb_links.run()
 
-fb_springs = gen.get_force_balance2(es, entanglements_as_springs=True)
-fb_springs.run_force_relaxation()
+fb_springs = gen.get_mehp_simulator(es, entanglement_mode=pt.EntanglementMode.SPRING)
+fb_springs.run()
 
 print(
     f"Extra atoms — links: {fb_links.get_nr_of_extra_atoms()}, "

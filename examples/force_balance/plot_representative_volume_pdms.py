@@ -6,7 +6,8 @@ Representative Volume Study for PDMS Networks
 When predicting the equilibrium shear modulus :math:`G` of polymer networks via
 Monte Carlo network generation (:class:`~pylimer_tools_cpp.MCUniverseGenerator`),
 on-demand entanglement sampling (:meth:`~pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements`),
-and :class:`~pylimer_tools_cpp.MEHPForceBalance2`, the simulation box must be large
+and :class:`~pylimer_tools_cpp.MEHPSimulator` (:class:`~pylimer_tools_cpp.LinearSystemMEHPSolver`),
+the simulation box must be large
 enough to act as a **Representative Volume Element (RVE)**—avoiding both
 finite-size bias (e.g. periodic self-looping or insufficient topological
 sampling) and excessive sample-to-sample variance.
@@ -55,7 +56,8 @@ import pylimer_tools_cpp as pt  # noqa: E402
 # Using :func:`~pylimer_tools.io.bead_spring_parameter_provider.get_parameters_for_polymer`
 # with ``ParameterType.GAUSSIAN``, we parameterize a realistic PDMS box of side
 # length :math:`L = 25\,\text{nm}`, sample entanglements on demand, and evaluate
-# :math:`G` with :class:`~pylimer_tools_cpp.MEHPForceBalance2`.
+# :math:`G` with :class:`~pylimer_tools_cpp.MEHPSimulator`
+# (:class:`~pylimer_tools_cpp.MEHPLinearSolverConfig`).
 
 params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
 assert isinstance(params, Parameters)
@@ -86,8 +88,10 @@ es = gen.sample_entanglements(
     seed="demo_rve",
     filtering_mode=pt.EntanglementFilteringMode.OMIT_INACTIVE,
 )
-fb = gen.get_force_balance2(es, entanglements_as_springs=False)
-fb.run_force_relaxation(pt.StructureSimplificationMode.INACTIVE_THEN_X2F)
+fb = gen.get_mehp_simulator(es, entanglement_mode=pt.EntanglementMode.MERGED_LINKS)
+linear_cfg = pt.MEHPLinearSolverConfig()
+linear_cfg.simplification_mode = pt.StructureSimplificationMode.INACTIVE_THEN_X2F
+fb.run(linear_cfg)
 g_demo = gamma_conv * fb.get_gamma_factor(r02, nr_of_chains=1) / vol
 print(
     f"Demo PDMS box (L={box_l:.0f} nm, N_strands={n_strands}): "

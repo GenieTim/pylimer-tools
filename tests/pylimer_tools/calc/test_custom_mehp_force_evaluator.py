@@ -1,3 +1,4 @@
+import gc
 import os
 import sys
 import unittest
@@ -5,9 +6,14 @@ import unittest
 import numpy as np
 
 from pylimer_tools_cpp import (
+    Box,
+    HookeanForceEvaluator,
     MEHPForceEvaluator,
-    MEHPForceRelaxation,
-    SimpleSpringMEHPForceEvaluator,
+    MEHPNetwork,
+    MEHPNonlinearSolverConfig,
+    MEHPSimulator,
+    NLoptAlgorithm,
+    NonlinearOptimizationSolver,
 )
 
 if __name__ == "__main__":
@@ -16,169 +22,300 @@ if __name__ == "__main__":
 from tests.pylimer_tools.universeUsingTestCase import UniverseUsingTestCase
 
 
-class CustomForceEvaluator(MEHPForceEvaluator):
-    """A custom force evaluator that implements a simple harmonic spring."""
+class CustomHookeanEvaluator(MEHPForceEvaluator):
+    """Stateless custom evaluator implementing only per-spring energy and force."""
 
-    def __init__(self, kappa=1.0):
+    def __init__(self, kappa: float = 1.0) -> None:
         super().__init__()
-        self.kappa = kappa
+        self.kappa = float(kappa)
 
-    def evaluate_force_set_gradient(self, n, spring_distances, compute_gradient):
-        """
-        Evaluate force as 0.5 * kappa * sum(r_i^2 / N_i)
-        where r_i is the spring length and N_i is the contour length.
+    def get_kappa(self) -> float:
+        return self.kappa
 
-        Returns a tuple (force, gradient) where gradient is a list or None.
-        """
-        network = self.network
-        nr_springs = network.nr_of_springs
+    def evaluate_spring_energy(
+        self, spring_vec: np.ndarray, contour_length: float
+    ) -> float:
+        vec = np.asarray(spring_vec, dtype=np.float64)
+        return float(0.5 * self.kappa * np.dot(vec, vec) / contour_length)
 
-        # Compute force
-        force = 0.0
-        for i in range(nr_springs):
-            spring_vec = spring_distances[3 * i : 3 * i + 3]
-            r_squared = np.sum(spring_vec**2)
-            contour_length = network.spring_contour_length[i]
-            force += r_squared / contour_length
-        force *= 0.5 * self.kappa
+    def evaluate_spring_force(
+        self, spring_vec: np.ndarray, contour_length: float
+    ) -> np.ndarray:
+        vec = np.asarray(spring_vec, dtype=np.float64)
+        return (self.kappa / contour_length) * vec
 
-        # Compute gradient if required
-        gradient = None
-        if compute_gradient:
-            gradient = [0.0] * n
-            nrOfDim = 2 if self.is_2d else 3
 
-            for j in range(nr_springs):
-                a = network.spring_index_a[j]
-                b = network.spring_index_b[j]
-                contour_length = network.spring_contour_length[j]
+class VectorizedHookeanEvaluator(MEHPForceEvaluator):
+    """Stateless custom evaluator overriding vectorized network energy/gradient."""
 
-                for dir_idx in range(nrOfDim):
-                    spring_dist = spring_distances[3 * j + dir_idx]
-                    grad_term = spring_dist * self.kappa / contour_length
-                    gradient[3 * a + dir_idx] += grad_term
-                    gradient[3 * b + dir_idx] -= grad_term
+    def __init__(self, kappa: float = 1.0) -> None:
+        super().__init__()
+        self.kappa = float(kappa)
+        self.vectorized_call_count = 0
 
-        return (force, gradient)
+    def get_kappa(self) -> float:
+        return self.kappa
 
-    def evaluate_stress_contribution(self, spring_distances, i, j, spring_index):
-        """
-        Evaluate stress contribution for spring at given indices.
-        """
-        network = self.network
-        contour_length = network.spring_contour_length[spring_index]
-        return self.kappa * spring_distances[i] * spring_distances[j] / contour_length
+    def evaluate_spring_energy(
+        self, spring_vec: np.ndarray, contour_length: float
+    ) -> float:
+        vec = np.asarray(spring_vec, dtype=np.float64)
+        return float(0.5 * self.kappa * np.dot(vec, vec) / contour_length)
 
-    def prepare_for_evaluations(self):
-        """Prepare any necessary data before evaluations."""
-        pass
+    def evaluate_spring_force(
+        self, spring_vec: np.ndarray, contour_length: float
+    ) -> np.ndarray:
+        vec = np.asarray(spring_vec, dtype=np.float64)
+        return (self.kappa / contour_length) * vec
+
+    def evaluate_network_energy_and_gradient(
+        self,
+        net: MEHPNetwork,
+        spring_vectors: np.ndarray,
+        is_2d: bool,
+        compute_gradient: bool,
+    ) -> tuple[float, np.ndarray | None]:
+        self.vectorized_call_count += 1
+        nr_springs = net.nr_of_springs
+        vecs = (
+            np.asarray(spring_vectors, dtype=np.float64).reshape(nr_springs, 3).copy()
+        )
+        if is_2d:
+            vecs[:, 2] = 0.0
+        inv_n = 1.0 / np.asarray(net.spring_contour_length, dtype=np.float64)
+        energy = float(0.5 * self.kappa * np.sum(np.sum(vecs * vecs, axis=1) * inv_n))
+        if not compute_gradient:
+            return (energy, None)
+
+        forces = (self.kappa * inv_n)[:, None] * vecs
+        grad = np.zeros((net.nr_of_links, 3), dtype=np.float64)
+        idx_a = np.asarray(net.spring_index_a, dtype=np.int64)
+        idx_b = np.asarray(net.spring_index_b, dtype=np.int64)
+        valid = (idx_a >= 0) & (idx_b >= 0)
+        np.add.at(grad, idx_a[valid], -forces[valid])
+        np.add.at(grad, idx_b[valid], forces[valid])
+        if is_2d:
+            grad[:, 2] = 0.0
+        return (energy, grad.reshape(-1))
+
+
+class QuarticNonlinearEvaluator(MEHPForceEvaluator):
+    """Stateless anharmonic spring evaluator E = 0.5*k/N*r^2 + 0.25*a/N^3*r^4."""
+
+    def __init__(self, kappa: float = 1.0, alpha: float = 0.25) -> None:
+        super().__init__()
+        self.kappa = float(kappa)
+        self.alpha = float(alpha)
+
+    def get_kappa(self) -> float:
+        return self.kappa
+
+    def evaluate_spring_energy(
+        self, spring_vec: np.ndarray, contour_length: float
+    ) -> float:
+        vec = np.asarray(spring_vec, dtype=np.float64)
+        r2 = float(np.dot(vec, vec))
+        return 0.5 * self.kappa * r2 / contour_length + 0.25 * self.alpha * (
+            r2 * r2
+        ) / (contour_length**3)
+
+    def evaluate_spring_force(
+        self, spring_vec: np.ndarray, contour_length: float
+    ) -> np.ndarray:
+        vec = np.asarray(spring_vec, dtype=np.float64)
+        r2 = float(np.dot(vec, vec))
+        coeff = (self.kappa / contour_length) + (self.alpha * r2 / (contour_length**3))
+        return coeff * vec
 
 
 class TestCustomMEHPForceEvaluator(UniverseUsingTestCase):
-    def test_custom_force_evaluator_instantiation(self):
-        """Test that we can create a custom force evaluator."""
-        custom_evaluator = CustomForceEvaluator(kappa=1.5)
+    def test_custom_force_evaluator_instantiation(self) -> None:
+        """Test stateless custom force evaluator properties and single-spring methods."""
+        custom_evaluator = CustomHookeanEvaluator(kappa=1.5)
         self.assertIsInstance(custom_evaluator, MEHPForceEvaluator)
-        self.assertFalse(custom_evaluator.is_2d)
+        self.assertFalse(custom_evaluator.is_linear())
+        self.assertAlmostEqual(custom_evaluator.get_kappa(), 1.5)
 
-    def test_custom_force_evaluator_with_relaxation(self):
-        """Test that custom force evaluator works with MEHPForceRelaxation."""
-        custom_evaluator = CustomForceEvaluator(kappa=1.0)
+        spring_vec = np.array([1.2, -0.4, 0.8])
+        contour_length = 4.0
+        builtin = HookeanForceEvaluator(1.5)
 
-        # Create force relaxation with custom evaluator
-        force_relaxer = MEHPForceRelaxation(
-            self.testUniverse,
-            crosslinker_type=2,
-            is_2d=False,
-            force_evaluator=custom_evaluator,
+        self.assertAlmostEqual(
+            custom_evaluator.evaluate_spring_energy(spring_vec, contour_length),
+            builtin.evaluate_spring_energy(spring_vec, contour_length),
         )
-
-        # Run the relaxation
-        force_relaxer.run_force_relaxation(
-            algorithm="LD_LBFGS",
-            max_nr_of_steps=1000,
-            x_tolerance=1e-12,
-            f_tolerance=1e-9,
-        )
-
-        # Check that simulation ran
-        self.assertGreater(force_relaxer.get_nr_of_iterations(), 0)
-
-        # Check that we can get results
-        nr_springs = force_relaxer.get_nr_of_springs()
-        self.assertGreater(nr_springs, 0)
-
-        spring_lengths = force_relaxer.get_spring_lengths()
-        self.assertEqual(len(spring_lengths), nr_springs)
-
-    def test_custom_vs_builtin_evaluator(self):
-        """Test that custom evaluator gives same results as built-in for same force law."""
-        kappa = 1.0
-
-        # Run with custom evaluator
-        custom_evaluator = CustomForceEvaluator(kappa=kappa)
-        force_relaxer_custom = MEHPForceRelaxation(
-            self.testUniverse,
-            crosslinker_type=2,
-            is_2d=False,
-            force_evaluator=custom_evaluator,
-        )
-        force_relaxer_custom.run_force_relaxation(
-            algorithm="LD_LBFGS",
-            max_nr_of_steps=5000,
-            x_tolerance=1e-12,
-            f_tolerance=1e-9,
-        )
-
-        # Run with built-in evaluator
-        builtin_evaluator = SimpleSpringMEHPForceEvaluator(kappa=kappa)
-        force_relaxer_builtin = MEHPForceRelaxation(
-            self.testUniverse,
-            crosslinker_type=2,
-            is_2d=False,
-            force_evaluator=builtin_evaluator,
-        )
-        force_relaxer_builtin.run_force_relaxation(
-            algorithm="LD_LBFGS",
-            max_nr_of_steps=5000,
-            x_tolerance=1e-12,
-            f_tolerance=1e-9,
-        )
-
-        # Compare results - spring lengths should be very close
-        custom_lengths = np.array(force_relaxer_custom.get_spring_lengths())
-        builtin_lengths = np.array(force_relaxer_builtin.get_spring_lengths())
-
-        # They should be nearly identical
         np.testing.assert_allclose(
-            custom_lengths, builtin_lengths, rtol=1e-4, atol=1e-6
+            custom_evaluator.evaluate_spring_force(spring_vec, contour_length),
+            builtin.evaluate_spring_force(spring_vec, contour_length),
+        )
+        np.testing.assert_allclose(
+            custom_evaluator.evaluate_spring_stiffness(spring_vec, contour_length),
+            builtin.evaluate_spring_stiffness(spring_vec, contour_length),
+            atol=1e-7,
+        )
+        self.assertAlmostEqual(
+            custom_evaluator.evaluate_stress_contribution(
+                spring_vec, 0, 2, contour_length
+            ),
+            builtin.evaluate_stress_contribution(spring_vec, 0, 2, contour_length),
         )
 
-        # Compare gamma factors
-        custom_gamma = force_relaxer_custom.get_gamma_factor()
-        builtin_gamma = force_relaxer_builtin.get_gamma_factor()
+    def test_custom_force_evaluator_with_simulator(self) -> None:
+        """Test stateless custom force evaluator works with MEHPSimulator."""
+        custom_evaluator = CustomHookeanEvaluator(kappa=1.0)
+        net = MEHPNetwork.from_universe(self.testUniverse)
+        sim = MEHPSimulator(net, custom_evaluator, False)
 
-        self.assertAlmostEqual(custom_gamma, builtin_gamma, places=4)
+        config = MEHPNonlinearSolverConfig()
+        config.algorithm = NLoptAlgorithm.LD_LBFGS
+        config.max_nr_of_steps = 1000
+        config.xtol = 1e-12
+        config.ftol = 1e-9
 
-    def test_set_force_evaluator(self):
-        """Test that we can set a force evaluator after creation."""
-        # Create with default evaluator
-        force_relaxer = MEHPForceRelaxation(self.testUniverse)
+        result = sim.run(config)
 
-        # Set custom evaluator
-        custom_evaluator = CustomForceEvaluator(kappa=2.0)
-        force_relaxer.set_force_evaluator(custom_evaluator)
+        self.assertTrue(sim.get_simulation_has_run())
+        self.assertGreater(result.nr_of_iterations, 0)
+        self.assertGreater(sim.get_nr_of_iterations(), 0)
 
-        # Run simulation
-        force_relaxer.run_force_relaxation(
-            algorithm="LD_LBFGS",
-            max_nr_of_steps=1000,
-            x_tolerance=1e-12,
-            f_tolerance=1e-9,
+        nr_springs = sim.get_nr_of_springs()
+        self.assertGreater(nr_springs, 0)
+        self.assertEqual(len(sim.get_spring_lengths()), nr_springs)
+
+    def test_custom_vs_builtin_evaluator(self) -> None:
+        """Test that stateless custom evaluator matches HookeanForceEvaluator."""
+        kappa = 1.0
+        config = MEHPNonlinearSolverConfig()
+        config.algorithm = NLoptAlgorithm.LD_LBFGS
+        config.max_nr_of_steps = 5000
+        config.xtol = 1e-12
+        config.ftol = 1e-12
+
+        net_custom = MEHPNetwork.from_universe(self.testUniverse)
+        sim_custom = MEHPSimulator(
+            net_custom, CustomHookeanEvaluator(kappa=kappa), False
+        )
+        sim_custom.run(config)
+
+        net_builtin = MEHPNetwork.from_universe(self.testUniverse)
+        sim_builtin = MEHPSimulator(net_builtin, HookeanForceEvaluator(kappa), False)
+        sim_builtin.run(config)
+
+        np.testing.assert_allclose(
+            np.array(sim_custom.get_spring_lengths()),
+            np.array(sim_builtin.get_spring_lengths()),
+            rtol=1e-4,
+            atol=1e-6,
+        )
+        self.assertAlmostEqual(
+            sim_custom.get_gamma_factor(), sim_builtin.get_gamma_factor(), places=4
+        )
+        self.assertAlmostEqual(
+            sim_custom.get_energy(), sim_builtin.get_energy(), places=6
+        )
+        np.testing.assert_allclose(
+            sim_custom.get_stress_tensor(),
+            sim_builtin.get_stress_tensor(),
+            rtol=1e-4,
+            atol=1e-6,
         )
 
-        # Should complete successfully
-        self.assertGreater(force_relaxer.get_nr_of_iterations(), 0)
+    def test_vectorized_network_energy_and_gradient_override(self) -> None:
+        """Test overriding evaluate_network_energy_and_gradient in Python."""
+        kappa = 1.5
+        vec_eval = VectorizedHookeanEvaluator(kappa=kappa)
+        builtin_eval = HookeanForceEvaluator(kappa)
+
+        net = MEHPNetwork.from_universe(self.saturatedTestUniverse)
+        sim_ref = MEHPSimulator(net, builtin_eval, False)
+        sim_ref.deform_to(Box(11.5, 9.5, 10.2))
+        spring_vecs = sim_ref.get_spring_vectors()
+        deformed_net = sim_ref.get_network()
+
+        for is_2d in (False, True):
+            e_vec, g_vec = vec_eval.evaluate_network_energy_and_gradient(
+                deformed_net, spring_vecs, is_2d, True
+            )
+            e_ref, g_ref = builtin_eval.evaluate_network_energy_and_gradient(
+                deformed_net, spring_vecs, is_2d, True
+            )
+            self.assertAlmostEqual(e_vec, e_ref, places=10)
+            self.assertIsNotNone(g_vec)
+            self.assertIsNotNone(g_ref)
+            np.testing.assert_allclose(g_vec, g_ref, rtol=1e-10, atol=1e-10)
+
+            e_vec_ng, g_vec_ng = vec_eval.evaluate_network_energy_and_gradient(
+                deformed_net, spring_vecs, is_2d, False
+            )
+            self.assertAlmostEqual(e_vec_ng, e_ref, places=10)
+            self.assertIsNone(g_vec_ng)
+
+        vec_eval.vectorized_call_count = 0
+        sim_vec = MEHPSimulator(deformed_net, vec_eval, False)
+        config = MEHPNonlinearSolverConfig()
+        config.algorithm = NLoptAlgorithm.LD_LBFGS
+        config.max_nr_of_steps = 5000
+        config.xtol = 1e-12
+        config.ftol = 1e-12
+        sim_vec.run(NonlinearOptimizationSolver(config))
+
+        self.assertGreater(vec_eval.vectorized_call_count, 0)
+
+        sim_ref.run()
+        self.assertAlmostEqual(sim_vec.get_energy(), sim_ref.get_energy(), places=6)
+        self.assertAlmostEqual(
+            sim_vec.get_gamma_factor(), sim_ref.get_gamma_factor(), places=4
+        )
+        np.testing.assert_allclose(
+            sim_vec.get_stress_tensor(),
+            sim_ref.get_stress_tensor(),
+            rtol=1e-4,
+            atol=1e-6,
+        )
+
+    def test_set_force_evaluator_and_stateless_reuse(self) -> None:
+        """Test set_force_evaluator and reusing one stateless evaluator across simulators."""
+        sim1 = MEHPSimulator(self.testUniverse)
+        shared_evaluator = CustomHookeanEvaluator(kappa=2.0)
+        sim1.set_force_evaluator(shared_evaluator)
+        self.assertAlmostEqual(sim1.get_force_evaluator().get_kappa(), 2.0)
+
+        sim2 = MEHPSimulator(self.saturatedTestUniverse)
+        sim2.set_force_evaluator(shared_evaluator)
+
+        sim1.run()
+        sim2.run()
+
+        self.assertGreater(sim1.get_nr_of_iterations(), 0)
+        self.assertGreater(sim2.get_nr_of_iterations(), 0)
+
+    def test_nonlinear_custom_evaluator_and_lifetime(self) -> None:
+        """Test genuine nonlinear evaluator, stiffness finite differences, and lifetime."""
+        evaluator = QuarticNonlinearEvaluator(kappa=1.2, alpha=0.5)
+        spring_vec = np.array([1.5, -0.5, 0.25])
+        contour_length = 2.0
+        stiffness = evaluator.evaluate_spring_stiffness(spring_vec, contour_length)
+        r2 = float(np.dot(spring_vec, spring_vec))
+        expected_stiffness = (
+            1.2 / contour_length + 0.5 * r2 / (contour_length**3)
+        ) * np.eye(3) + (2.0 * 0.5 / (contour_length**3)) * np.outer(
+            spring_vec, spring_vec
+        )
+        np.testing.assert_allclose(stiffness, expected_stiffness, rtol=1e-5, atol=1e-6)
+
+        def build_sim() -> MEHPSimulator:
+            net = MEHPNetwork.from_universe(self.saturatedTestUniverse)
+            return MEHPSimulator(net, QuarticNonlinearEvaluator(kappa=1.2, alpha=0.5))
+
+        sim = build_sim()
+        gc.collect()
+        sim.deform_to(Box(11.0, 10.0, 10.0))
+        res = sim.run()
+        self.assertTrue(sim.get_simulation_has_run())
+        self.assertGreater(res.nr_of_iterations, 0)
+        self.assertGreater(sim.get_energy(), 0.0)
+        stress = sim.get_stress_tensor()
+        np.testing.assert_allclose(stress, stress.T, atol=1e-12)
 
 
 if __name__ == "__main__":

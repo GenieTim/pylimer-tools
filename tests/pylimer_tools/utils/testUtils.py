@@ -108,8 +108,9 @@ class TestUtilFunctions(PandasComparingTestCase):
 
     def test_mc_universe_generator_streaming_stats(self):
         from pylimer_tools_cpp import (
-            MEHPForceRelaxation,
             MCUniverseGenerator,
+            MEHPNetwork,
+            MEHPSimulator,
             StrandCategory,
             sample_strand_beads_on_demand,
         )
@@ -173,9 +174,17 @@ class TestUtilFunctions(PandasComparingTestCase):
         coords0 = sample_strand_beads_on_demand(box, cu, 0, cu.strand_seeds[0], 3)
         self.assertEqual(len(coords0), 3 * cu.beads_in_strand[0])
 
-        fr_cu = MEHPForceRelaxation(box, cu)
-        fr_gen = gen.get_force_relaxation()
-        self.assertEqual(fr_cu.get_nr_of_springs(), fr_gen.get_nr_of_springs())
+        net_cu = MEHPNetwork.from_crosslinker_universe(box, cu)
+        net_gen = gen.get_mehp_network()
+        self.assertEqual(net_cu.nr_of_springs, net_gen.nr_of_springs)
+        self.assertEqual(net_cu.nr_of_strands, net_gen.nr_of_strands)
+        self.assertEqual(net_cu.nr_of_nodes, net_gen.nr_of_nodes)
+
+        sim_cu = MEHPSimulator(box, cu)
+        sim_gen = gen.get_mehp_simulator()
+        self.assertEqual(sim_cu.get_nr_of_springs(), sim_gen.get_nr_of_springs())
+        self.assertEqual(sim_cu.get_nr_of_strands(), sim_gen.get_nr_of_strands())
+        self.assertEqual(sim_cu.get_nr_of_nodes(), sim_gen.get_nr_of_nodes())
 
 
 if __name__ == "__main__":

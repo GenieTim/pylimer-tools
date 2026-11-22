@@ -4,9 +4,7 @@
 #include "../../src/pylimer_tools_cpp/entities/Universe.h"
 #include "../../src/pylimer_tools_cpp/entities/UniverseSequence.h"
 #include "../../src/pylimer_tools_cpp/io/DataFileWriter.h"
-#include "../../src/pylimer_tools_cpp/sim/MEHPForceBalance.h"
-#include "../../src/pylimer_tools_cpp/sim/MEHPForceBalance2.h"
-#include "../../src/pylimer_tools_cpp/sim/MEHPForceRelaxation.h"
+#include "../../src/pylimer_tools_cpp/sim/MEHPSimulator.h"
 #include "../../src/pylimer_tools_cpp/utils/MCUniverseGenerator.h"
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
@@ -325,8 +323,7 @@ TEST_CASE("MCUniverseGenerator can generate without primary loops",
 }
 
 TEST_CASE("Universe can crosslink up to w_sol",
-          "[generator][MCUniverseGenerator][MEHPForceRelaxation]["
-          "MEHPForceBalance][MEHPForceBalance2][long]")
+          "[generator][MCUniverseGenerator][MEHPSimulator][long]")
 {
   std::cout << "Running test \"Universe can crosslink up to w_sol\""
             << std::endl;
@@ -356,22 +353,32 @@ TEST_CASE("Universe can crosslink up to w_sol",
   auto clusters = universe.getClusters();
   CHECK(clusters.size() < 20);
 
-  pylimer_tools::sim::mehp::MEHPForceRelaxation forceRelaxer =
-    pylimer_tools::sim::mehp::MEHPForceRelaxation(universe);
+  pylimer_tools::sim::mehp::MEHPSimulator forceRelaxer =
+    pylimer_tools::sim::mehp::MEHPSimulator(
+      universe,
+      {},
+      2,
+      pylimer_tools::sim::mehp::EntanglementMode::NONE,
+      nullptr,
+      false,
+      false,
+      false,
+      true);
 
-  while (forceRelaxer.suggestsRerun()) {
-    forceRelaxer.runForceRelaxation();
-  }
+  forceRelaxer.run(pylimer_tools::sim::mehp::MEHPNonlinearSolverConfig{});
 
   CHECK_THAT(
     0.1,
     Catch::Matchers::WithinAbs(forceRelaxer.getSolubleWeightFraction(), 0.05));
 
-  pylimer_tools::sim::mehp::MEHPForceRelaxation forceRelaxer2 =
-    generator.getForceRelaxation();
+  pylimer_tools::sim::mehp::MEHPSimulator forceRelaxer2 =
+    generator.getMEHPSimulator(
+      {}, pylimer_tools::sim::mehp::EntanglementMode::NONE);
+  forceRelaxer2.configAssumeBoxLargeEnough(true);
 
-  pylimer_tools::sim::mehp::MEHPForceBalance forceBalance =
-    generator.getForceBalance();
+  pylimer_tools::sim::mehp::MEHPSimulator forceBalance =
+    generator.getMEHPSimulator(
+      {}, pylimer_tools::sim::mehp::EntanglementMode::NONE);
   forceBalance.configAssumeBoxLargeEnough(true);
 
   // compare structures before running optimization procedures
@@ -379,8 +386,8 @@ TEST_CASE("Universe can crosslink up to w_sol",
         forceRelaxer2.getNrOfSprings());
   CHECK(static_cast<size_t>(forceBalance.getNrOfSprings()) ==
         forceRelaxer.getNrOfSprings() + nFreeStrands);
-  Eigen::VectorXd fbVecs = forceBalance.getCurrentPartialSpringDistances();
-  Eigen::VectorXd frVecs = forceRelaxer2.getCurrentSpringDistances();
+  Eigen::VectorXd fbVecs = forceBalance.getSpringVectors();
+  Eigen::VectorXd frVecs = forceRelaxer2.getSpringVectors();
   REQUIRE(fbVecs.size() == 3 * forceBalance.getNrOfSprings());
   CHECK(frVecs.isApprox(fbVecs));
   CHECK_THAT(
@@ -391,18 +398,16 @@ TEST_CASE("Universe can crosslink up to w_sol",
     Catch::Matchers::WithinRel(forceRelaxer2.getGammaFactor(1.), 0.01));
 
   // run force relaxation
-  while (forceRelaxer2.suggestsRerun()) {
-    forceRelaxer2.runForceRelaxation();
-  }
+  forceRelaxer2.run(pylimer_tools::sim::mehp::MEHPNonlinearSolverConfig{});
 
   CHECK_THAT(
     forceRelaxer2.countActiveClusteredAtoms(),
     Catch::Matchers::WithinAbs(forceRelaxer.countActiveClusteredAtoms(), 1));
 
-  // also run force balance
-  forceBalance.runForceRelaxation();
+  // also run slip-link balance
+  forceBalance.run(pylimer_tools::sim::mehp::MEHPSlipLinkSolverConfig{});
 
-  CHECK(forceBalance.validateNetwork());
+  CHECK_NOTHROW(forceBalance.validateNetwork());
   CHECK(static_cast<size_t>(forceBalance.getNrOfSprings()) ==
         forceRelaxer.getNrOfSprings() + nFreeStrands);
   CHECK_THAT(forceBalance.getGammaFactor(1.),
@@ -411,10 +416,10 @@ TEST_CASE("Universe can crosslink up to w_sol",
     forceBalance.getNrOfActiveSprings(1e-2),
     Catch::Matchers::WithinAbs(forceRelaxer.getNrOfActiveSprings(1e-2), 1));
 
-  // and finally force balance 2
-  pylimer_tools::sim::mehp::MEHPForceBalance2 forceBalance2 =
-    pylimer_tools::sim::mehp::MEHPForceBalance2(universe);
-  forceBalance2.runForceRelaxation();
+  // and finally linear system solver
+  pylimer_tools::sim::mehp::MEHPSimulator forceBalance2 =
+    pylimer_tools::sim::mehp::MEHPSimulator(universe);
+  forceBalance2.run();
   CHECK_THAT(forceBalance2.getSolubleWeightFraction(),
              Catch::Matchers::WithinAbs(0.1, 0.05));
   double activeClusteredAtomsFromUniverse =
@@ -427,9 +432,10 @@ TEST_CASE("Universe can crosslink up to w_sol",
   CHECK_THAT(activeClusteredAtomsFromUniverse,
              Catch::Matchers::WithinRel(activeClusteredAtomsFromNetwork, 0.01));
 
-  pylimer_tools::sim::mehp::MEHPForceBalance2 forceBalance2Generator =
-    generator.getForceBalance2();
-  forceBalance2Generator.runForceRelaxation();
+  pylimer_tools::sim::mehp::MEHPSimulator forceBalance2Generator =
+    generator.getMEHPSimulator(
+      {}, pylimer_tools::sim::mehp::EntanglementMode::NONE);
+  forceBalance2Generator.run();
   CHECK_THAT(forceBalance2Generator.getSolubleWeightFraction(),
              Catch::Matchers::WithinRel(
                forceBalance2.getSolubleWeightFraction(), 0.005));
@@ -445,7 +451,7 @@ TEST_CASE("Universe can crosslink up to w_sol",
     Eigen::ArrayXi::Constant(forceBalance2Generator.getNrOfStrands(), -1);
   Eigen::Index minIndexWithoutCluster = 0;
   int currentClusterIdx = 0;
-  pylimer_tools::sim::mehp::ForceBalance2Network net2 =
+  pylimer_tools::sim::mehp::MEHPNetwork net2 =
     forceBalance2Generator.getNetwork();
   while ((clusterIndicesPerLink < 0).any()) {
     while (clusterIndicesPerLink[minIndexWithoutCluster] >= 0) {
@@ -527,43 +533,39 @@ TEST_CASE("Generator can return force balance and relaxation",
   REQUIRE(universe.getAtomsOfType(2).size() == 100);
   REQUIRE(universe.getAtomsOfType(1).size() == 200 * 19);
 
-  pylimer_tools::sim::mehp::ForceBalanceNetwork fbNet =
-    generator.convertToForceBalanceNetwork();
-  pylimer_tools::sim::mehp::Network frNet =
-    generator.convertToForceRelaxationNetwork();
+  const pylimer_tools::sim::mehp::MEHPNetwork fbNet =
+    generator.getMEHPNetwork(
+      {}, pylimer_tools::sim::mehp::EntanglementMode::NONE);
+  const pylimer_tools::sim::mehp::MEHPNetwork frNet =
+    generator.getMEHPNetwork(
+      {}, pylimer_tools::sim::mehp::EntanglementMode::NONE);
 
   REQUIRE(fbNet.nrOfSprings == frNet.nrOfSprings);
   REQUIRE(fbNet.coordinates.isApprox(frNet.coordinates));
   REQUIRE(fbNet.springIndexA.isApprox(frNet.springIndexA));
   REQUIRE(fbNet.springIndexB.isApprox(frNet.springIndexB));
-  REQUIRE(fbNet.springPartIndexA.isApprox(frNet.springIndexA));
-  REQUIRE(fbNet.springPartIndexB.isApprox(frNet.springIndexB));
-  REQUIRE(
-    fbNet.springPartCoordinateIndexA.isApprox(frNet.springCoordinateIndexA));
-  REQUIRE(
-    fbNet.springPartCoordinateIndexB.isApprox(frNet.springCoordinateIndexB));
-  REQUIRE(fbNet.springPartBoxOffset.isApprox(frNet.springBoxOffset));
+  REQUIRE(fbNet.springCoordinateIndexA.isApprox(frNet.springCoordinateIndexA));
+  REQUIRE(fbNet.springCoordinateIndexB.isApprox(frNet.springCoordinateIndexB));
+  REQUIRE(fbNet.springBoxOffset.isApprox(frNet.springBoxOffset));
   REQUIRE(fbNet.vol == frNet.vol);
   for (size_t dir = 0; dir < 3; dir++) {
-    REQUIRE(fbNet.L[0] == frNet.L[0]);
+    REQUIRE(fbNet.L[dir] == frNet.L[dir]);
   }
 
-  pylimer_tools::sim::mehp::MEHPForceRelaxation forceRelaxer2 =
-    generator.getForceRelaxation();
+  pylimer_tools::sim::mehp::MEHPSimulator forceRelaxer2 =
+    generator.getMEHPSimulator(
+      {}, pylimer_tools::sim::mehp::EntanglementMode::NONE);
   forceRelaxer2.configAssumeBoxLargeEnough(true);
 
-  pylimer_tools::sim::mehp::MEHPForceBalance forceBalance =
-    generator.getForceBalance();
+  pylimer_tools::sim::mehp::MEHPSimulator forceBalance =
+    generator.getMEHPSimulator(
+      {}, pylimer_tools::sim::mehp::EntanglementMode::NONE);
   forceBalance.configAssumeBoxLargeEnough(true);
   // compare structures before running optimization procedures
   CHECK(static_cast<size_t>(forceBalance.getNrOfSprings()) ==
         forceRelaxer2.getNrOfSprings());
-  Eigen::VectorXd fbVecs = forceBalance.getCurrentPartialSpringDistances();
-  Eigen::VectorXd fbVecs2 = forceBalance.getCurrentSpringDistances();
-  REQUIRE(fbVecs.isApprox(fbVecs2));
-  Eigen::VectorXd frVecs = forceRelaxer2.getCurrentSpringDistances();
-  Eigen::VectorXd frVecs2 = forceRelaxer2.getSpringDistances();
-  REQUIRE(frVecs.isApprox(frVecs2));
+  Eigen::VectorXd fbVecs = forceBalance.getSpringVectors();
+  Eigen::VectorXd frVecs = forceRelaxer2.getSpringVectors();
   REQUIRE(fbVecs.size() == 3 * forceBalance.getNrOfSprings());
   REQUIRE(frVecs.size() == 3 * forceBalance.getNrOfSprings());
   CHECK(frVecs.isApprox(fbVecs));
@@ -575,14 +577,12 @@ TEST_CASE("Generator can return force balance and relaxation",
     Catch::Matchers::WithinRel(forceRelaxer2.getGammaFactor(1.), 0.01));
 
   // run force relaxation
-  while (forceRelaxer2.suggestsRerun()) {
-    forceRelaxer2.runForceRelaxation();
-  }
+  forceRelaxer2.run(pylimer_tools::sim::mehp::MEHPNonlinearSolverConfig{});
 
-  // also run force balance
-  forceBalance.runForceRelaxation();
+  // also run slip-link balance
+  forceBalance.run(pylimer_tools::sim::mehp::MEHPSlipLinkSolverConfig{});
 
-  CHECK(forceBalance.validateNetwork());
+  CHECK_NOTHROW(forceBalance.validateNetwork());
   CHECK(static_cast<size_t>(forceBalance.getNrOfSprings()) ==
         forceRelaxer2.getNrOfSprings());
   CHECK_THAT(
@@ -663,39 +663,37 @@ TEST_CASE("MCUniverseGenerator uses correct force relaxation network",
   CHECK(generator.getCurrentNrOfAtoms() == universe.getNrOfAtoms());
   CHECK(generator.getCurrentNrOfBonds() == universe.getNrOfBonds());
 
-  size_t nFreeStrands = 0;
-  for (const pe::Molecule& mol : universe.getChainsWithCrosslinker(2)) {
-    nFreeStrands += mol.getType() == pe::MoleculeType::FREE_CHAIN;
-  }
+  pylimer_tools::sim::mehp::MEHPSimulator relaxer =
+    pylimer_tools::sim::mehp::MEHPSimulator(
+      universe,
+      {},
+      2,
+      pylimer_tools::sim::mehp::EntanglementMode::NONE,
+      nullptr,
+      false,
+      true,
+      false,
+      true);
 
-  pylimer_tools::sim::mehp::MEHPForceRelaxation relaxer =
-    pylimer_tools::sim::mehp::MEHPForceRelaxation(
-      universe, 2, false, nullptr, 1.0, false, false);
-  relaxer.configAssumeBoxLargeEnough(true);
-
-  pylimer_tools::sim::mehp::MEHPForceRelaxation relaxerFromGenerator =
-    pylimer_tools::sim::mehp::MEHPForceRelaxation(
-      generator.convertToForceRelaxationNetwork());
+  pylimer_tools::sim::mehp::MEHPSimulator relaxerFromGenerator =
+    generator.getMEHPSimulator(
+      {}, pylimer_tools::sim::mehp::EntanglementMode::NONE);
   relaxerFromGenerator.configAssumeBoxLargeEnough(true);
 
   // comparison only after running force relaxation,
   // since the box offsets, single nodes and stuff is relevant before that
-  // CHECK(relaxer.countActiveClusteredAtoms() ==
-  //       Catch::Approx(relaxerFromGenerator.countActiveClusteredAtoms()));
-  // CHECK(relaxer.getNrOfNodes() == relaxerFromGenerator.getNrOfNodes());
-  CHECK(relaxer.getNrOfSprings() + nFreeStrands ==
-        relaxerFromGenerator.getNrOfSprings());
+  CHECK(relaxer.getNrOfSprings() == relaxerFromGenerator.getNrOfSprings());
 
-  relaxer.runForceRelaxation();
-  relaxerFromGenerator.runForceRelaxation();
+  relaxer.run(pylimer_tools::sim::mehp::MEHPNonlinearSolverConfig{});
+  relaxerFromGenerator.run(
+    pylimer_tools::sim::mehp::MEHPNonlinearSolverConfig{});
 
   CHECK(relaxer.countActiveClusteredAtoms() ==
         Catch::Approx(relaxerFromGenerator.countActiveClusteredAtoms()));
   // cannot compare, since each strand end becomes a node in the from-universe
   // generation
   // CHECK(relaxer.getNrOfNodes() == relaxerFromGenerator.getNrOfNodes());
-  CHECK(relaxer.getNrOfSprings() + nFreeStrands ==
-        relaxerFromGenerator.getNrOfSprings());
+  CHECK(relaxer.getNrOfSprings() == relaxerFromGenerator.getNrOfSprings());
 }
 
 TEST_CASE("MUniverseGenerator can generate with crosslink chains",
@@ -827,14 +825,15 @@ TEST_CASE("MCUniverseGenerator can generate with monofunctional chains",
 
   generator.relaxCrosslinks();
 
-  pylimer_tools::sim::mehp::MEHPForceBalance2 fb2 =
-    generator.getForceBalance2();
-  fb2.runForceRelaxation();
+  pylimer_tools::sim::mehp::MEHPSimulator fb2 = generator.getMEHPSimulator(
+    {}, pylimer_tools::sim::mehp::EntanglementMode::NONE);
+  fb2.run();
   CHECK(fb2.getNrOfActiveSprings() == 0);
   CHECK(fb2.getNrOfActiveStrands() == 0);
 
-  pylimer_tools::sim::mehp::MEHPForceBalance fb = generator.getForceBalance();
-  fb.runForceRelaxation();
+  pylimer_tools::sim::mehp::MEHPSimulator fb = generator.getMEHPSimulator(
+    {}, pylimer_tools::sim::mehp::EntanglementMode::NONE);
+  fb.run(pylimer_tools::sim::mehp::MEHPSlipLinkSolverConfig{});
   CHECK(fb.getNrOfActiveSprings() == 0);
 }
 
@@ -872,18 +871,25 @@ TEST_CASE("Randomly functionalized chains collapse",
   }
 
   // first with "incorrect" spring type
-  pylimer_tools::sim::mehp::MEHPForceBalance forceBalanceEasy =
-    pylimer_tools::sim::mehp::MEHPForceBalance(universe, 6);
+  pylimer_tools::sim::mehp::MEHPSimulator forceBalanceEasy =
+    pylimer_tools::sim::mehp::MEHPSimulator(universe, {}, 6);
   CHECK(forceBalanceEasy.getNrOfSprings() == 0);
 
-  forceBalanceEasy.runForceRelaxation();
+  forceBalanceEasy.run(pylimer_tools::sim::mehp::MEHPSlipLinkSolverConfig{});
 
   CHECK_THAT(forceBalanceEasy.getSolubleWeightFraction(),
              Catch::Matchers::WithinAbs(1.0, 0.001));
 
   // then, with many short springs
-  pylimer_tools::sim::mehp::MEHPForceBalance forceBalance =
-    pylimer_tools::sim::mehp::MEHPForceBalance(universe);
+  pylimer_tools::sim::mehp::MEHPSimulator forceBalance =
+    pylimer_tools::sim::mehp::MEHPSimulator(
+      universe,
+      {},
+      2,
+      pylimer_tools::sim::mehp::EntanglementMode::MERGED_LINKS,
+      nullptr,
+      false,
+      true);
 
   pylimer_tools::sim::OutputConfiguration outputConfig;
   outputConfig.intValues = { pylimer_tools::sim::ComputedIntValues::STEP };
@@ -901,7 +907,10 @@ TEST_CASE("Randomly functionalized chains collapse",
   {
     forceBalance.configAssumeBoxLargeEnough(true);
     CHECK(forceBalance.getResidual() > 0.);
-    forceBalance.runForceRelaxation(50000, 1e-12);
+    pylimer_tools::sim::mehp::MEHPSlipLinkSolverConfig config;
+    config.maxNrOfSteps = 50000;
+    config.xtol = 1e-12;
+    forceBalance.run(config);
 
     CHECK_THAT(forceBalance.getSolubleWeightFraction(),
                Catch::Matchers::WithinAbs(1.0, 0.001));
@@ -912,7 +921,10 @@ TEST_CASE("Randomly functionalized chains collapse",
   {
     forceBalance.configAssumeBoxLargeEnough(false);
     CHECK(forceBalance.getResidual() > 0.);
-    forceBalance.runForceRelaxation(50000, 1e-12);
+    pylimer_tools::sim::mehp::MEHPSlipLinkSolverConfig config;
+    config.maxNrOfSteps = 50000;
+    config.xtol = 1e-12;
+    forceBalance.run(config);
 
     CHECK_THAT(forceBalance.getSolubleWeightFraction(),
                Catch::Matchers::WithinAbs(1.0, 0.001));
@@ -1194,30 +1206,33 @@ TEST_CASE(
   CHECK(universe.getAtomsOfType(3).size() == 107 * 212);
   CHECK(universe.getAtomsOfType(4).size() == 57 * 586);
 
-  pylimer_tools::sim::mehp::MEHPForceRelaxation forceRelaxer =
-    pylimer_tools::sim::mehp::MEHPForceRelaxation(
-      universe, 2, false, nullptr, 1.0, false, false);
-  forceRelaxer.configAssumeBoxLargeEnough(true);
+  pylimer_tools::sim::mehp::MEHPSimulator forceRelaxer =
+    pylimer_tools::sim::mehp::MEHPSimulator(
+      universe,
+      {},
+      2,
+      pylimer_tools::sim::mehp::EntanglementMode::NONE,
+      nullptr,
+      false,
+      false,
+      false,
+      true);
 
-  pylimer_tools::sim::mehp::MEHPForceRelaxation relaxerFromGenerator =
-    pylimer_tools::sim::mehp::MEHPForceRelaxation(
-      generator.convertToForceRelaxationNetwork());
+  pylimer_tools::sim::mehp::MEHPSimulator relaxerFromGenerator =
+    generator.getMEHPSimulator(
+      {}, pylimer_tools::sim::mehp::EntanglementMode::NONE);
   relaxerFromGenerator.configAssumeBoxLargeEnough(true);
 
-  // comparison only after running force relaxation,
-  // since the box offsets, single nodes and stuff is relevant before that
-  // CHECK(relaxer.countActiveClusteredAtoms() ==
-  //       Catch::Approx(relaxerFromGenerator.countActiveClusteredAtoms()));
-  // CHECK(forceRelaxer.getNrOfNodes() == relaxerFromGenerator.getNrOfNodes());
   CHECK(forceRelaxer.getNrOfSprings() + nFreeStrands ==
         relaxerFromGenerator.getNrOfSprings());
 
-  while (forceRelaxer.suggestsRerun()) {
-    forceRelaxer.runForceRelaxation("LD_MMA", 5000, 1e-11, 1e-8);
-  }
-  while (relaxerFromGenerator.suggestsRerun()) {
-    relaxerFromGenerator.runForceRelaxation("LD_MMA", 5000, 1e-11, 1e-8);
-  }
+  pylimer_tools::sim::mehp::MEHPNonlinearSolverConfig nlConfig;
+  nlConfig.algorithm = pylimer_tools::sim::mehp::NLoptAlgorithm::LD_MMA;
+  nlConfig.maxNrOfSteps = 5000;
+  nlConfig.xtol = 1e-11;
+  nlConfig.ftol = 1e-8;
+  forceRelaxer.run(nlConfig);
+  relaxerFromGenerator.run(nlConfig);
 
   CHECK_THAT(
     0.31,
@@ -1236,12 +1251,9 @@ TEST_CASE(
   CHECK(universe2.getNrOfAtoms() < universe.getNrOfAtoms());
   CHECK(generator.getCurrentNrOfAtoms() == universe2.getNrOfAtoms());
 
-  pylimer_tools::sim::mehp::MEHPForceRelaxation forceRelaxer2 =
-    pylimer_tools::sim::mehp::MEHPForceRelaxation(universe2);
-
-  while (forceRelaxer2.suggestsRerun()) {
-    forceRelaxer2.runForceRelaxation();
-  }
+  pylimer_tools::sim::mehp::MEHPSimulator forceRelaxer2 =
+    pylimer_tools::sim::mehp::MEHPSimulator(universe2);
+  forceRelaxer2.run(pylimer_tools::sim::mehp::MEHPNonlinearSolverConfig{});
 
   CHECK_THAT(
     0.,
@@ -1318,9 +1330,10 @@ TEST_CASE("Universe generator uses correct w_sol even for strange structures",
   generator.addStrands(chainLengths.size(), chainLengths, 1);
 
   {
-    pylimer_tools::sim::mehp::MEHPForceBalance2 fb2_initial =
-      generator.getForceBalance2();
-    fb2_initial.runForceRelaxation();
+    pylimer_tools::sim::mehp::MEHPSimulator fb2_initial =
+      generator.getMEHPSimulator(
+        {}, pylimer_tools::sim::mehp::EntanglementMode::NONE);
+    fb2_initial.run();
     CHECK_THAT(fb2_initial.getSolubleWeightFraction(),
                Catch::Matchers::WithinAbs(1.0, 0.05));
   }
@@ -1328,13 +1341,14 @@ TEST_CASE("Universe generator uses correct w_sol even for strange structures",
   generator.useZScoreMaxDistance(3., 1.107008);
   generator.linkStrandsToSolubleFraction(0.31);
 
-  const pylimer_tools::sim::mehp::ForceBalanceNetwork net1 =
-    generator.getForceBalance().getNetwork();
+  const pylimer_tools::sim::mehp::MEHPNetwork net1 =
+    generator.getMEHPNetwork(
+      {}, pylimer_tools::sim::mehp::EntanglementMode::NONE);
 
   const pe::Universe universe = generator.getUniverse();
 
-  double nBondsInStrands = net1.springsContourLength.sum();
-  double nStrands = net1.springsContourLength.size();
+  double nBondsInStrands = net1.springContourLength.sum();
+  double nStrands = net1.springContourLength.size();
   CHECK(nStrands == net1.nrOfSprings);
   CHECK(nBondsInStrands - nStrands + net1.nrOfLinks == universe.getNrOfAtoms());
   CHECK(nBondsInStrands == universe.getNrOfBonds());
@@ -1343,21 +1357,20 @@ TEST_CASE("Universe generator uses correct w_sol even for strange structures",
 
   {
     // SCOPE 1:
-    INFO("Force Balance 2 based on Universe");
-    pylimer_tools::sim::mehp::MEHPForceBalance2 forceBalance =
-      pylimer_tools::sim::mehp::MEHPForceBalance2(universe);
+    INFO("Linear solver based on Universe");
+    pylimer_tools::sim::mehp::MEHPSimulator forceBalance(universe);
 
-    forceBalance.runForceRelaxation();
-    CHECK(forceBalance.inferNrOfAtomsFromNetwork() == universe.getNrOfAtoms());
+    forceBalance.run();
+    CHECK(forceBalance.getNetwork().inferNrOfAtomsFromNetwork() ==
+          universe.getNrOfAtoms());
 
     CHECK_THAT(forceBalance.getSolubleWeightFraction(),
                Catch::Matchers::WithinAbs(0.31, 0.05));
-    const pylimer_tools::sim::mehp::ForceBalance2Network net2 =
+    const pylimer_tools::sim::mehp::MEHPNetwork& net2 =
       forceBalance.getNetwork();
     CHECK(net2.springContourLength.sum() - net2.nrOfSprings + net2.nrOfLinks ==
           universe.getNrOfAtoms());
-    CHECK(forceBalance.inferNrOfAtomsFromNetwork(net2) ==
-          universe.getNrOfAtoms());
+    CHECK(net2.inferNrOfAtomsFromNetwork() == universe.getNrOfAtoms());
     forceBalance.configAssumeNetworkIsComplete(true);
     CHECK_THAT(forceBalance.getSolubleWeightFraction(),
                Catch::Matchers::WithinAbs(0.31, 0.05));
@@ -1365,68 +1378,47 @@ TEST_CASE("Universe generator uses correct w_sol even for strange structures",
 
   {
     // SCOPE 2:
-    INFO("Force Balance 2 based on force balance 1 network from generator");
+    INFO("Linear solver based on network from generator");
 
-    pylimer_tools::sim::mehp::MEHPForceBalance2 forceBalance =
-      pylimer_tools::sim::mehp::MEHPForceBalance2(
-        net1, generator.getForceBalance().getSpringPartitions());
+    pylimer_tools::sim::mehp::MEHPSimulator forceBalance(net1);
     forceBalance.configAssumeNetworkIsComplete(true);
 
-    forceBalance.runForceRelaxation();
+    forceBalance.run();
     CHECK_THAT(forceBalance.getSolubleWeightFraction(),
                Catch::Matchers::WithinAbs(0.31, 0.05));
   }
 
   {
     // SCOPE 3:
-    INFO("Force Balance 2 based on force relaxation network from generator");
+    INFO("Nonlinear solver based on network from generator");
 
-    pylimer_tools::sim::mehp::MEHPForceBalance2 forceBalance =
-      pylimer_tools::sim::mehp::MEHPForceBalance2(
-        generator.getForceRelaxation().getNetwork());
-
-    forceBalance.runForceRelaxation();
-    CHECK_THAT(forceBalance.getSolubleWeightFraction(),
-               Catch::Matchers::WithinAbs(0.31, 0.05));
-  }
-
-  {
-    // SCOPE 4:
-    INFO("Force Relaxation based on network from generator");
-
-    pylimer_tools::sim::mehp::MEHPForceRelaxation forceRelaxer =
-      generator.getForceRelaxation();
+    pylimer_tools::sim::mehp::MEHPSimulator forceRelaxer =
+      generator.getMEHPSimulator(
+        {}, pylimer_tools::sim::mehp::EntanglementMode::NONE);
     forceRelaxer.configAssumeBoxLargeEnough(false);
     forceRelaxer.configAssumeNetworkIsComplete(true);
 
-    while (forceRelaxer.suggestsRerun()) {
-      forceRelaxer.runForceRelaxation();
-    }
+    forceRelaxer.run(pylimer_tools::sim::mehp::MEHPNonlinearSolverConfig{});
 
     CHECK_THAT(forceRelaxer.getSolubleWeightFraction(),
                Catch::Matchers::WithinAbs(0.31, 0.05));
 
     INFO("Now with assuming box large enough");
     forceRelaxer.configAssumeBoxLargeEnough(true);
-    while (forceRelaxer.suggestsRerun()) {
-      forceRelaxer.runForceRelaxation();
-    }
+    forceRelaxer.run(pylimer_tools::sim::mehp::MEHPNonlinearSolverConfig{});
 
     CHECK_THAT(forceRelaxer.getSolubleWeightFraction(),
                Catch::Matchers::WithinAbs(0.31, 0.05));
   }
 
   {
-    // SCOPE 5:
-    INFO("Force Relaxation based on Universe");
+    // SCOPE 4:
+    INFO("Nonlinear solver based on Universe");
 
-    pylimer_tools::sim::mehp::MEHPForceRelaxation forceRelaxer =
-      pylimer_tools::sim::mehp::MEHPForceRelaxation(universe, 2);
+    pylimer_tools::sim::mehp::MEHPSimulator forceRelaxer(universe);
     forceRelaxer.configAssumeBoxLargeEnough(false);
 
-    while (forceRelaxer.suggestsRerun()) {
-      forceRelaxer.runForceRelaxation();
-    }
+    forceRelaxer.run(pylimer_tools::sim::mehp::MEHPNonlinearSolverConfig{});
 
     CHECK_THAT(forceRelaxer.getSolubleWeightFraction(),
                Catch::Matchers::WithinAbs(0.31, 0.05));
@@ -1872,10 +1864,9 @@ TEST_CASE("linkStrandsToStrandsToConversion also works with free strands",
   }
 }
 
-TEST_CASE(
-  "MCUniverseGenerator on-demand entanglements bypass Universe to "
-  "MEHPForceBalance and MEHPForceBalance2",
-  "[generator][MCUniverseGenerator][EntanglementDetector][MEHPForceBalance2]")
+TEST_CASE("MCUniverseGenerator on-demand entanglements bypass Universe to "
+          "MEHPSimulator",
+          "[generator][MCUniverseGenerator][EntanglementDetector][MEHPSimulator]")
 {
   pu::MCUniverseGenerator generator(25.0, 25.0, 25.0);
   generator.setSeed(424242);
@@ -1897,58 +1888,64 @@ TEST_CASE(
   REQUIRE(entanglements.size() >= 20);
   CHECK(entanglements.size() <= 60);
 
-  SECTION("MEHPForceBalance (v1) direct from generator with entanglements")
+  SECTION("MEHPSimulator slip-link solver direct from generator with entanglements")
   {
-    pylimer_tools::sim::mehp::MEHPForceBalance fb =
-      generator.getForceBalance(entanglements);
-    CHECK(fb.validateNetwork());
-    CHECK(fb.getNrOfSprings() == 150 + 15 + 10);
-    CHECK(static_cast<size_t>(fb.getNrOfPartialSprings()) ==
-          static_cast<size_t>(fb.getNrOfSprings()) + 2 * entanglements.size());
+    pylimer_tools::sim::mehp::MEHPSimulator fb = generator.getMEHPSimulator(
+      entanglements, pylimer_tools::sim::mehp::EntanglementMode::MERGED_LINKS);
+    CHECK_NOTHROW(fb.validateNetwork());
+    CHECK(fb.getNrOfStrands() == 150 + 15 + 10);
+    CHECK(fb.getNrOfSprings() ==
+          fb.getNrOfStrands() + 2 * entanglements.size());
 
-    fb.runForceRelaxation(5000, 1e-9);
-    CHECK(fb.validateNetwork());
+    pylimer_tools::sim::mehp::MEHPSlipLinkSolverConfig slConfig;
+    slConfig.maxNrOfSteps = 5000;
+    slConfig.xtol = 1e-9;
+    fb.run(slConfig);
+    CHECK_NOTHROW(fb.validateNetwork());
     CHECK(fb.getGammaFactor(1.0) > 0.0);
     CHECK(fb.getActiveWeightFraction() > 0.0);
     CHECK(fb.getSolubleWeightFraction() > 0.0);
   }
 
-  SECTION("MEHPForceBalance::randomlyAddSliplinks without Universe")
+  SECTION("MEHPSimulator::randomlyAddSlipLinks without Universe")
   {
-    pylimer_tools::sim::mehp::MEHPForceBalance fb = generator.getForceBalance();
-    const size_t added = fb.randomlyAddSliplinks(30, 2.5, 0.0, 10, 42);
+    pylimer_tools::sim::mehp::MEHPSimulator fb = generator.getMEHPSimulator(
+      {}, pylimer_tools::sim::mehp::EntanglementMode::NONE);
+    const size_t added = fb.randomlyAddSlipLinks(30, 2.5, 10, 3.0, "42");
     CHECK(added >= 10);
-    CHECK(fb.validateNetwork());
+    CHECK_NOTHROW(fb.validateNetwork());
   }
 
-  SECTION("MEHPForceBalance2 with entanglements as merged links (no Universe)")
+  SECTION("MEHPSimulator with entanglements as merged links (no Universe)")
   {
-    pylimer_tools::sim::mehp::MEHPForceBalance2 fb2 =
-      generator.getForceBalance2(entanglements, 2, false);
+    pylimer_tools::sim::mehp::MEHPSimulator fb2 = generator.getMEHPSimulator(
+      entanglements, pylimer_tools::sim::mehp::EntanglementMode::MERGED_LINKS);
     CHECK_NOTHROW(fb2.validateNetwork());
-    CHECK(fb2.inferNrOfAtomsFromNetwork() == expectedAtoms);
+    CHECK(fb2.getNetwork().inferNrOfAtomsFromNetwork() == expectedAtoms);
     CHECK(fb2.getNumExtraAtoms() == entanglements.size());
     CHECK(fb2.getNumExtraBonds() == 0);
 
-    // Compare weight fractions and gamma with Universe-constructed
-    // MEHPForceBalance2
+    // Compare weight fractions and gamma with Universe-constructed MEHPSimulator
     const pylimer_tools::topo::entanglement_detection::AtomPairEntanglements
       atomPairs = entanglements.toAtomPairEntanglements(
         generator.getCrosslinkerUniverse());
     pe::Universe universe = generator.getUniverse();
     CHECK(universe.getNrOfAtoms() == expectedAtoms);
 
-    pylimer_tools::sim::mehp::MEHPForceBalance2 fb2Univ(
-      universe, atomPairs, 2, false, false);
+    pylimer_tools::sim::mehp::MEHPSimulator fb2Univ(
+      universe,
+      atomPairs,
+      2,
+      pylimer_tools::sim::mehp::EntanglementMode::MERGED_LINKS);
     CHECK_NOTHROW(fb2Univ.validateNetwork());
 
     // Run both with INACTIVE_THEN_X2F simplification
-    fb2.runForceRelaxation(
-      pylimer_tools::sim::mehp::StructureSimplificationMode::INACTIVE_THEN_X2F,
-      1e-7);
-    fb2Univ.runForceRelaxation(
-      pylimer_tools::sim::mehp::StructureSimplificationMode::INACTIVE_THEN_X2F,
-      1e-7);
+    pylimer_tools::sim::mehp::MEHPLinearSolverConfig linearConfig;
+    linearConfig.simplificationMode =
+      pylimer_tools::sim::mehp::StructureSimplificationMode::INACTIVE_THEN_X2F;
+    linearConfig.inactiveRemovalCutoff = 1e-7;
+    fb2.run(linearConfig);
+    fb2Univ.run(linearConfig);
 
     CHECK_NOTHROW(fb2.validateNetwork());
     CHECK_THAT(
@@ -1965,12 +1962,13 @@ TEST_CASE(
       Catch::Matchers::WithinRel(fb2Univ.getGammaFactors(1.0).sum(), 1e-4));
   }
 
-  SECTION("MEHPForceBalance2 with entanglements as springs (no Universe)")
+  SECTION("MEHPSimulator with entanglements as springs (no Universe)")
   {
-    pylimer_tools::sim::mehp::MEHPForceBalance2 fb2Springs =
-      generator.getForceBalance2(entanglements, 2, true);
+    pylimer_tools::sim::mehp::MEHPSimulator fb2Springs =
+      generator.getMEHPSimulator(
+        entanglements, pylimer_tools::sim::mehp::EntanglementMode::SPRING);
     CHECK_NOTHROW(fb2Springs.validateNetwork());
-    CHECK(fb2Springs.inferNrOfAtomsFromNetwork() == expectedAtoms);
+    CHECK(fb2Springs.getNetwork().inferNrOfAtomsFromNetwork() == expectedAtoms);
     CHECK(fb2Springs.getNumExtraAtoms() == 2 * entanglements.size());
     CHECK(fb2Springs.getNumExtraBonds() == entanglements.size());
 
@@ -1978,15 +1976,15 @@ TEST_CASE(
       atomPairs = entanglements.toAtomPairEntanglements(
         generator.getCrosslinkerUniverse());
     pe::Universe universe = generator.getUniverse();
-    pylimer_tools::sim::mehp::MEHPForceBalance2 fb2UnivSprings(
-      universe, atomPairs, 2, false, true);
+    pylimer_tools::sim::mehp::MEHPSimulator fb2UnivSprings(
+      universe, atomPairs, 2, pylimer_tools::sim::mehp::EntanglementMode::SPRING);
 
-    fb2Springs.runForceRelaxation(
-      pylimer_tools::sim::mehp::StructureSimplificationMode::INACTIVE_THEN_X2F,
-      1e-7);
-    fb2UnivSprings.runForceRelaxation(
-      pylimer_tools::sim::mehp::StructureSimplificationMode::INACTIVE_THEN_X2F,
-      1e-7);
+    pylimer_tools::sim::mehp::MEHPLinearSolverConfig linearConfig;
+    linearConfig.simplificationMode =
+      pylimer_tools::sim::mehp::StructureSimplificationMode::INACTIVE_THEN_X2F;
+    linearConfig.inactiveRemovalCutoff = 1e-7;
+    fb2Springs.run(linearConfig);
+    fb2UnivSprings.run(linearConfig);
 
     CHECK_NOTHROW(fb2Springs.validateNetwork());
     CHECK_THAT(fb2Springs.getSolubleWeightFraction(),
@@ -2063,18 +2061,29 @@ TEST_CASE(
     CHECK(entBool.size() == entMode.size());
   }
 
-  SECTION("MEHPForceBalance2 with on-demand entanglements")
+  SECTION("MEHPSimulator with on-demand entanglements")
   {
-    pylimer_tools::sim::mehp::MEHPForceBalance2 fb2 =
-      generator.getForceBalance2(
-        60, 2.5, 0.2, 20, 3.0, "od_seed_123", true, false, 2);
+    pylimer_tools::sim::mehp::MEHPSimulator fb2 = generator.getMEHPSimulator(
+      60,
+      2.5,
+      0.2,
+      20,
+      3.0,
+      "od_seed_123",
+      true,
+      pylimer_tools::sim::mehp::EntanglementMode::MERGED_LINKS,
+      nullptr,
+      false,
+      2);
     CHECK_NOTHROW(fb2.validateNetwork());
-    CHECK(fb2.inferNrOfAtomsFromNetwork() == expectedAtoms);
+    CHECK(fb2.getNetwork().inferNrOfAtomsFromNetwork() == expectedAtoms);
     CHECK(fb2.getNumExtraAtoms() >= 20);
 
-    fb2.runForceRelaxation(
-      pylimer_tools::sim::mehp::StructureSimplificationMode::INACTIVE_THEN_X2F,
-      1e-7);
+    pylimer_tools::sim::mehp::MEHPLinearSolverConfig linearConfig;
+    linearConfig.simplificationMode =
+      pylimer_tools::sim::mehp::StructureSimplificationMode::INACTIVE_THEN_X2F;
+    linearConfig.inactiveRemovalCutoff = 1e-7;
+    fb2.run(linearConfig);
     CHECK_NOTHROW(fb2.validateNetwork());
     CHECK(fb2.getGammaFactor(1.0) > 0.0);
     CHECK(fb2.getActiveWeightFraction() > 0.0);
@@ -2332,25 +2341,13 @@ TEST_CASE("MCUniverseGenerator streaming stats match Universe and "
   CHECK(uCu.strandFrom.size() == cu.strandFrom.size());
   const pylimer_tools::sim::mehp::CrosslinkerUniverse cuActive =
     gen.getCrosslinkerUniverse();
-  pylimer_tools::sim::mehp::MEHPForceBalance fbFromCu(uActive.getBox(),
-                                                      cuActive);
-  pylimer_tools::sim::mehp::MEHPForceBalance fbFromGen = gen.getForceBalance();
-  CHECK(fbFromCu.getNrOfSprings() == fbFromGen.getNrOfSprings());
-  CHECK(fbFromCu.getNrOfLinks() == fbFromGen.getNrOfLinks());
-
-  pylimer_tools::sim::mehp::MEHPForceBalance2 fb2FromCu(uActive.getBox(),
-                                                        cuActive);
-  pylimer_tools::sim::mehp::MEHPForceBalance2 fb2FromGen =
-    gen.getForceBalance2();
-  CHECK(fb2FromCu.getNrOfSprings() == fb2FromGen.getNrOfSprings());
-  CHECK(fb2FromCu.getNrOfLinks() == fb2FromGen.getNrOfLinks());
-
-  pylimer_tools::sim::mehp::MEHPForceRelaxation frFromCu(uActive.getBox(),
-                                                         cuActive);
-  pylimer_tools::sim::mehp::MEHPForceRelaxation frFromGen =
-    gen.getForceRelaxation();
-  CHECK(frFromCu.getNrOfSprings() == frFromGen.getNrOfSprings());
-  CHECK(frFromCu.getNrOfNodes() == frFromGen.getNrOfNodes());
+  pylimer_tools::sim::mehp::MEHPSimulator simFromCu(
+    uActive.getBox(), cuActive);
+  pylimer_tools::sim::mehp::MEHPSimulator simFromGen = gen.getMEHPSimulator(
+    {}, pylimer_tools::sim::mehp::EntanglementMode::NONE);
+  CHECK(simFromCu.getNrOfSprings() == simFromGen.getNrOfSprings());
+  CHECK(simFromCu.getNrOfLinks() == simFromGen.getNrOfLinks());
+  CHECK(simFromCu.getNrOfNodes() == simFromGen.getNrOfNodes());
 }
 
 TEST_CASE("On-demand entanglement sampling is spatially uniform across cells",
@@ -2402,17 +2399,29 @@ TEST_CASE("On-demand entanglement sampling is spatially uniform across cells",
     CHECK(c > 100);
   }
 
-  // Verify modulus matches discrete Universe-based MEHPForceBalance2
-  pylimer_tools::sim::mehp::MEHPForceBalance2 fbOd =
-    gen.getForceBalance2(ents, 2, false);
-  fbOd.runForceRelaxation(
-    pylimer_tools::sim::mehp::StructureSimplificationMode::INACTIVE_THEN_X2F);
+  // Verify modulus matches discrete Universe-based MEHPSimulator
+  pylimer_tools::sim::mehp::MEHPSimulator fbOd = gen.getMEHPSimulator(
+    ents, pylimer_tools::sim::mehp::EntanglementMode::MERGED_LINKS);
+  pylimer_tools::sim::mehp::MEHPLinearSolverConfig odConfig;
+  odConfig.simplificationMode =
+    pylimer_tools::sim::mehp::StructureSimplificationMode::INACTIVE_THEN_X2F;
+  fbOd.run(odConfig);
 
   const pe::Universe u = gen.getUniverse();
-  pylimer_tools::sim::mehp::MEHPForceBalance2 fbDisc(
-    u, nEnt, cutoff, 0.0, 0, 3.0, "disc_test_seed", 2, false, true, false);
-  fbDisc.runForceRelaxation(
-    pylimer_tools::sim::mehp::StructureSimplificationMode::INACTIVE_THEN_X2F);
+  pylimer_tools::sim::mehp::MEHPSimulator fbDisc =
+    pylimer_tools::sim::mehp::MEHPSimulator::constructWithRandomEntanglements(
+      u,
+      nEnt,
+      cutoff,
+      0.0,
+      0,
+      3.0,
+      "disc_test_seed",
+      2,
+      pylimer_tools::sim::mehp::EntanglementMode::MERGED_LINKS,
+      true,
+      true);
+  fbDisc.run(odConfig);
 
   const double sumGammaOd = fbOd.getGammaFactors(b * b).sum();
   const double sumGammaDisc = fbDisc.getGammaFactors(b * b).sum();

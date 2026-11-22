@@ -1,6 +1,8 @@
 """
 This module is deprecated.
-Use :class:`pylimer_tools_cpp.MEHPForceBalance` or :class:`pylimer_tools_cpp.MEHPForceRelaxation` instead.
+Use :class:`pylimer_tools_cpp.MEHPSimulator` (with e.g.
+:class:`pylimer_tools_cpp.HookeanForceEvaluator` or
+:class:`pylimer_tools_cpp.NonGaussianSpringForceEvaluator`) instead.
 
 In principle, it offers comparable functionality, but without the force minimization - the networks you pass
 to these methods should be minimized first.
@@ -10,7 +12,7 @@ to these methods should be minimized first.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Sequence, Union
+from typing import TYPE_CHECKING, Sequence
 
 import numpy as np
 
@@ -18,7 +20,7 @@ from pylimer_tools.calc.structure_analysis import compute_mean_end_to_end_distan
 from pylimer_tools_cpp import MoleculeType
 
 if TYPE_CHECKING:
-    from pylimer_tools_cpp import Universe
+    from pylimer_tools_cpp import Molecule, Universe
 
 
 def predict_shear_modulus(
@@ -37,8 +39,8 @@ def predict_shear_modulus(
     .. caution::
 
         With high certainty, you should not use this function,
-        and instead the `MEHPForceBalance`, `MEHPForceBalance2`
-        or `MEHPForceRelaxation` classes from `pylimer_tools_cpp`.
+        and instead use :class:`~pylimer_tools_cpp.MEHPSimulator`
+        from ``pylimer_tools_cpp``.
 
     :param networks: The polymer systems to predict the shear modulus for
     :type networks: Sequence[Universe]
@@ -54,24 +56,24 @@ def predict_shear_modulus(
     :return: The estimated shear modulus in pressure units
     :rtype: float
     """
-    gamma = compute_topological_factor(networks, crosslinker_type, total_mass)
-    nu = 0
+    gamma: float = compute_topological_factor(networks, crosslinker_type, total_mass)
+    nu: float = 0.0
     for network in networks:
         nu += (
             len(network.get_molecules(crosslinker_type))
             / (network.get_volume())
             / len(networks)
         )
-    return gamma * nu * k_boltzmann * temperature
+    return float(gamma * nu * k_boltzmann * temperature)
 
 
 def compute_cycle_rank(
-    networks: Union[Sequence[Universe], None] = None,
-    nu: Union[float, None] = None,
-    mu: Union[float, None] = None,
-    abs_tol: Union[float, None] = 1,
+    networks: Sequence[Universe] | None = None,
+    nu: float | None = None,
+    mu: float | None = None,
+    abs_tol: float | None = 1,
     rel_tol: float = 1,
-    crosslinker_type: int = 2,
+    crosslinker_type: int | None = 2,
 ) -> float:
     """
     Compute the cycle rank (:math:`\\chi`).
@@ -85,22 +87,22 @@ def compute_cycle_rank(
     .. caution::
 
         With high certainty, you should not use this function,
-        and instead the `MEHPForceBalance`, `MEHPForceBalance2`
-        or `MEHPForceRelaxation` classes from `pylimer_tools_cpp`.
+        and instead use :class:`~pylimer_tools_cpp.MEHPSimulator`
+        from ``pylimer_tools_cpp``.
 
     :param networks: The networks to calculate the cycle rank for
-    :type networks: Union[Sequence[Universe], None]
+    :type networks: Sequence[Universe] | None
     :param nu: Number of elastically effective (active) strands per unit volume
-    :type nu: Union[float, None]
+    :type nu: float | None
     :param mu: Number density of the elastically effective crosslinks
-    :type mu: Union[float, None]
+    :type mu: float | None
     :param abs_tol: The absolute tolerance to categorize a chain as active (min. end-to-end distance).
                     Set to None to use only rel_tol
-    :type abs_tol: float
+    :type abs_tol: float | None
     :param rel_tol: The relative tolerance to categorize a chain as active (0: all, 1: none)
     :type rel_tol: float
     :param crosslinker_type: The atom type of the crosslinkers/junctions
-    :type crosslinker_type: int
+    :type crosslinker_type: int | None
 
     :return: The cycle rank (:math:`\\xi = \\nu_{eff} - \\mu_{eff}`) in units of 1/Volume
     :rtype: float
@@ -122,12 +124,12 @@ def compute_cycle_rank(
             networks, abs_tol, rel_tol, crosslinker_type
         )
 
-    return nu - mu
+    return float(nu - mu)
 
 
 def compute_effective_nr_density_of_network(
     networks: Sequence[Universe],
-    abs_tol: Union[float, None] = 1,
+    abs_tol: float | None = 1,
     rel_tol: float = 1,
     crosslinker_type: int = 2,
 ) -> float:
@@ -146,14 +148,14 @@ def compute_effective_nr_density_of_network(
     .. caution::
 
         With high certainty, you should not use this function,
-        and instead the `MEHPForceBalance`, `MEHPForceBalance2`
-        or `MEHPForceRelaxation` classes from `pylimer_tools_cpp`.
+        and instead use :class:`~pylimer_tools_cpp.MEHPSimulator`
+        from ``pylimer_tools_cpp``.
 
     :param networks: The networks to compute :math:`\\nu_{eff}` for
     :type networks: Sequence[Universe]
     :param abs_tol: The absolute tolerance to categorize a chain as active (min. end-to-end distance).
                     Set to None to use only rel_tol
-    :type abs_tol: float
+    :type abs_tol: float | None
     :param rel_tol: The relative tolerance to categorize a chain as active (0: all, 1: none)
     :type rel_tol: float
     :param crosslinker_type: The atom type of the crosslinkers/junctions
@@ -163,26 +165,28 @@ def compute_effective_nr_density_of_network(
     :rtype: float
     """
     if len(networks) == 0:
-        return 0
+        return 0.0
 
     # get the mean end to end distances
     r_taus = compute_mean_end_to_end_distances(networks, crosslinker_type)
     if len(r_taus) < 1:
         return 0.0
-    r_taus = np.array(list(r_taus.values()))
-    r_tau_max = np.max(r_taus)
+    r_tau_values: np.ndarray = np.array(list(r_taus.values()), dtype=float)
+    r_tau_max = float(np.max(r_tau_values))
 
     # process additional input parameters
     if abs_tol is None:
         abs_tol = r_tau_max
 
     # count how many effective strands there are
-    num_effective = np.array(
-        [r_tau > abs_tol or r_tau > rel_tol * r_tau_max for r_tau in r_taus]
-    ).sum()
+    num_effective = int(
+        np.array(
+            [r_tau > abs_tol or r_tau > rel_tol * r_tau_max for r_tau in r_tau_values]
+        ).sum()
+    )
     mean_volume = compute_mean_universe_volume(networks)
 
-    return num_effective / mean_volume
+    return float(num_effective / mean_volume)
 
 
 def compute_mean_universe_volume(
@@ -205,9 +209,9 @@ def compute_mean_universe_volume(
     if len(networks) < 1:
         raise ValueError("Must have at least one network")
     # compute the mean volume of the universes
-    mean_volume = 0
-    divisor = 1 / len(networks)
-    network_size = networks[0].get_nr_of_atoms()
+    mean_volume: float = 0.0
+    divisor: float = 1.0 / len(networks)
+    network_size: int = networks[0].get_nr_of_atoms()
     for network in networks:
         if not accept_different_sizes and network.get_nr_of_atoms() != network_size:
             raise NotImplementedError(
@@ -217,14 +221,14 @@ def compute_mean_universe_volume(
                 )
             )
         mean_volume += network.get_volume() * divisor
-    return mean_volume
+    return float(mean_volume)
 
 
 def compute_effective_nr_density_of_junctions(
     networks: Sequence[Universe],
-    abs_tol: Union[float, None] = 0,
+    abs_tol: float | None = 0,
     rel_tol: float = 1,
-    crosslinker_type: int = 2,
+    crosslinker_type: int | None = 2,
     min_num_effective_strands: int = 2,
 ) -> float:
     """
@@ -239,11 +243,11 @@ def compute_effective_nr_density_of_junctions(
     :type networks: Sequence[Universe]
     :param abs_tol: The absolute tolerance to categorize a chain as active (min. end-to-end distance).
                     Set to None to use only rel_tol
-    :type abs_tol: float
+    :type abs_tol: float | None
     :param rel_tol: The relative tolerance to categorize a chain as active (0: all, 1: none)
     :type rel_tol: float
     :param crosslinker_type: The atom type of the crosslinkers/junctions
-    :type crosslinker_type: int
+    :type crosslinker_type: int | None
     :param min_num_effective_strands: The number of elastically effective strands to qualify a junction as such
     :type min_num_effective_strands: int
 
@@ -258,24 +262,24 @@ def compute_effective_nr_density_of_junctions(
     mean_volume = compute_mean_universe_volume(networks)
 
     if min_num_effective_strands == 0:
-        return len(networks[0].get_atoms_by_type(crosslinker_type)) / mean_volume
+        return float(len(networks[0].get_atoms_by_type(crosslinker_type)) / mean_volume)
 
     # get the mean end to end distances
     r_taus = compute_mean_end_to_end_distances(networks, crosslinker_type)
     if len(r_taus) < 1:
         return 0.0
-    r_tau_max = max(r_taus.values())
+    r_tau_max = float(max(r_taus.values()))
 
     # process additional input parameters
     if abs_tol is None:
         abs_tol = r_tau_max
 
-    key_to_molecule = {}
+    key_to_molecule: dict[str, Molecule] = {}
     for molecule in list(networks)[0].get_chains_with_crosslinker(crosslinker_type):
         key_to_molecule[molecule.get_key()] = molecule
 
     # count how many active connections each junction has
-    junction_activity = {}
+    junction_activity: dict[int, int] = {}
     for key in r_taus:
         crosslinkers = key_to_molecule[key].get_atoms_by_type(crosslinker_type)
         assert len(crosslinkers) == 2
@@ -294,8 +298,8 @@ def compute_effective_nr_density_of_junctions(
             for key in junction_activity
         ]
     )
-    num_effective_junctions = effective_junctions.sum()
-    return num_effective_junctions / mean_volume
+    num_effective_junctions = int(effective_junctions.sum())
+    return float(num_effective_junctions / mean_volume)
 
 
 def compute_topological_factor(
@@ -333,7 +337,7 @@ def compute_topological_factor(
     r_taus = compute_mean_end_to_end_distances(networks, crosslinker_type)
 
     # find the topological factor
-    gamma_sum = 0
+    gamma_sum: float = 0.0
     network = networks[0]  # this is where the second assumption is made
     chains_to_process = network.get_chains_with_crosslinker(crosslinker_type)
     for molecule in chains_to_process:
@@ -360,4 +364,4 @@ def compute_topological_factor(
             r_taus[key] * r_taus[key] / ((n_atoms - 2) * b_mol * b_mol)
         )  # -2: remove crosslinkers again (assumption 3)
 
-    return gamma_sum / total_mass
+    return float(gamma_sum / total_mass)

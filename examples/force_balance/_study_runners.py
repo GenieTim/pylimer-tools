@@ -79,8 +79,8 @@ def _simulate_link_vs_spring_single_repeat(
 
         if n_target == 0:
             # Bare unentangled crosslinker network
-            fb_bare = gen.get_force_balance2()
-            fb_bare.run_force_relaxation()
+            fb_bare = gen.get_mehp_simulator()
+            fb_bare.run()
             g_pa = (gamma_conv * fb_bare.get_gamma_factor(r02) / vol) * 1e6
             g_links[i] = g_pa
             g_springs[i] = g_pa
@@ -99,19 +99,23 @@ def _simulate_link_vs_spring_single_repeat(
             )
 
             # 1. Entanglement Links (merged junction nodes)
-            fb_l = gen.get_force_balance2(
-                es, crosslinker_type=2, entanglements_as_springs=False
+            fb_l = gen.get_mehp_simulator(
+                es,
+                entanglement_mode=pt.EntanglementMode.MERGED_LINKS,
+                crosslinker_type=2,
             )
             extra_links[i] = fb_l.get_nr_of_extra_atoms()
-            fb_l.run_force_relaxation()
+            fb_l.run()
             g_links[i] = (gamma_conv * fb_l.get_gamma_factor(r02) / vol) * 1e6
 
             # 2. Entanglement Springs (explicit Hookean coupling springs)
-            fb_s = gen.get_force_balance2(
-                es, crosslinker_type=2, entanglements_as_springs=True
+            fb_s = gen.get_mehp_simulator(
+                es,
+                entanglement_mode=pt.EntanglementMode.SPRING,
+                crosslinker_type=2,
             )
             extra_springs[i] = fb_s.get_nr_of_extra_atoms()
-            fb_s.run_force_relaxation()
+            fb_s.run()
             g_springs[i] = (gamma_conv * fb_s.get_gamma_factor(r02) / vol) * 1e6
 
     return r, g_links, g_springs, extra_links, extra_springs
@@ -271,8 +275,12 @@ def _simulate_slipping_vs_fixed_single_repeat(
 
         if n_target == 0:
             # Bare unentangled crosslinker network
-            fb = gen.get_force_balance()
-            fb.run_force_relaxation(max_nr_of_steps=5000, disable_slipping=True)
+            fb = gen.get_mehp_simulator()
+            fb.run(
+                pt.MEHPSlipLinkSolverConfig(
+                    max_nr_of_steps=5000, slip_mode=pt.SlipMode.FIXED
+                )
+            )
             g_pa = (gamma_conv * np.sum(fb.get_gamma_factors(r02)) / vol) * 1e6
             it = fb.get_nr_of_iterations()
             g_fixed[i] = g_pa
@@ -291,17 +299,25 @@ def _simulate_slipping_vs_fixed_single_repeat(
                 filtering_mode=EntanglementFilteringMode.OMIT_INACTIVE,
             )
 
-            # 1. Fixed Entanglement Links (disable_slipping=True)
-            fb_fixed = gen.get_force_balance(es)
-            fb_fixed.run_force_relaxation(max_nr_of_steps=5000, disable_slipping=True)
+            # 1. Fixed Entanglement Links (slip_mode=SlipMode.FIXED)
+            fb_fixed = gen.get_mehp_simulator(es)
+            fb_fixed.run(
+                pt.MEHPSlipLinkSolverConfig(
+                    max_nr_of_steps=5000, slip_mode=pt.SlipMode.FIXED
+                )
+            )
             g_fixed[i] = (
                 gamma_conv * np.sum(fb_fixed.get_gamma_factors(r02)) / vol
             ) * 1e6
             iter_fixed[i] = fb_fixed.get_nr_of_iterations()
 
-            # 2. Dynamic Slipping Links (disable_slipping=False)
-            fb_slip = gen.get_force_balance(es)
-            fb_slip.run_force_relaxation(max_nr_of_steps=5000, disable_slipping=False)
+            # 2. Dynamic Slipping Links (slip_mode=SlipMode.SLIDING)
+            fb_slip = gen.get_mehp_simulator(es)
+            fb_slip.run(
+                pt.MEHPSlipLinkSolverConfig(
+                    max_nr_of_steps=5000, slip_mode=pt.SlipMode.SLIDING
+                )
+            )
             g_slip[i] = (
                 gamma_conv * np.sum(fb_slip.get_gamma_factors(r02)) / vol
             ) * 1e6
@@ -479,20 +495,20 @@ def _simulate_polydispersity_single_repeat(
         gen.link_strands_to_conversion(crosslinker_conversion=conversion)
 
         # 1. Total Entangled Shear Modulus (with static entanglement links)
-        fb_ent = gen.get_force_balance2(
+        fb_ent = gen.get_mehp_simulator(
             nr_of_entanglements_to_sample=int(ent_density * vol),
             upper_cutoff=cutoff,
-            entanglements_as_springs=False,
+            entanglement_mode=pt.EntanglementMode.MERGED_LINKS,
             seed=str(seed + 31 * i),
         )
-        fb_ent.run_force_relaxation()
+        fb_ent.run()
         g_total[i] = gamma_conv * np.sum(fb_ent.get_gamma_factors(r02)) / vol
         w_active[i] = fb_ent.get_active_weight_fraction()
         w_dangling[i] = fb_ent.get_dangling_weight_fraction()
 
         # 2. Phantom Shear Modulus (unentangled network baseline)
-        fb_ph = gen.get_force_balance2()
-        fb_ph.run_force_relaxation()
+        fb_ph = gen.get_mehp_simulator()
+        fb_ph.run()
         g_phantom[i] = gamma_conv * np.sum(fb_ph.get_gamma_factors(r02)) / vol
 
     return r, g_total, g_phantom, w_active, w_dangling
@@ -663,28 +679,28 @@ def _simulate_sampling_cutoff_single_repeat(
 
     for i, c in enumerate(cutoffs):
         # Rigid Entanglement Links
-        fb_l = gen_std.get_force_balance2(
+        fb_l = gen_std.get_mehp_simulator(
             nr_of_entanglements_to_sample=n_ent_std,
             upper_cutoff=c,
-            entanglements_as_springs=False,
+            entanglement_mode=pt.EntanglementMode.MERGED_LINKS,
             seed=f"link_{seed}_{c}",
         )
-        assert fb_l.validate_network()
-        res_links[i] = fb_l.get_displacement_residual_norm()
-        fb_l.run_force_relaxation()
+        fb_l.validate_network()
+        res_links[i] = fb_l.get_residual_norm()
+        fb_l.run()
         g_links[i] = gamma_conv * np.sum(fb_l.get_gamma_factors(r02_mag)) / vol_std
         iter_links[i] = fb_l.get_nr_of_iterations()
 
         # Compliant Entanglement Springs
-        fb_s = gen_std.get_force_balance2(
+        fb_s = gen_std.get_mehp_simulator(
             nr_of_entanglements_to_sample=n_ent_std,
             upper_cutoff=c,
-            entanglements_as_springs=True,
+            entanglement_mode=pt.EntanglementMode.SPRING,
             seed=f"spring_{seed}_{c}",
         )
-        assert fb_s.validate_network()
-        res_springs[i] = fb_s.get_displacement_residual_norm()
-        fb_s.run_force_relaxation()
+        fb_s.validate_network()
+        res_springs[i] = fb_s.get_residual_norm()
+        fb_s.run()
         g_springs[i] = gamma_conv * np.sum(fb_s.get_gamma_factors(r02_mag)) / vol_std
         iter_springs[i] = fb_s.get_nr_of_iterations()
 
@@ -706,13 +722,13 @@ def _simulate_sampling_cutoff_single_repeat(
 
     g_n30 = np.zeros(n_cutoffs)
     for i, c in enumerate(cutoffs):
-        fb = gen_n30.get_force_balance2(
+        fb = gen_n30.get_mehp_simulator(
             nr_of_entanglements_to_sample=n_ent_n30,
             upper_cutoff=c,
-            entanglements_as_springs=False,
+            entanglement_mode=pt.EntanglementMode.MERGED_LINKS,
             seed=f"n30_{seed}_{c}",
         )
-        fb.run_force_relaxation()
+        fb.run()
         g_n30[i] = gamma_conv * np.sum(fb.get_gamma_factors(r02_mag)) / vol_n30
 
     # N = 70 (Entanglement-dominated)
@@ -730,13 +746,13 @@ def _simulate_sampling_cutoff_single_repeat(
 
     g_n70 = np.zeros(n_cutoffs)
     for i, c in enumerate(cutoffs):
-        fb = gen_n70.get_force_balance2(
+        fb = gen_n70.get_mehp_simulator(
             nr_of_entanglements_to_sample=n_ent_n70,
             upper_cutoff=c,
-            entanglements_as_springs=False,
+            entanglement_mode=pt.EntanglementMode.MERGED_LINKS,
             seed=f"n70_{seed}_{c}",
         )
-        fb.run_force_relaxation()
+        fb.run()
         g_n70[i] = gamma_conv * np.sum(fb.get_gamma_factors(r02_mag)) / vol_n70
 
     # -------------------------------------------------------------
@@ -754,13 +770,13 @@ def _simulate_sampling_cutoff_single_repeat(
 
     g_p82 = np.zeros(n_cutoffs)
     for i, c in enumerate(cutoffs):
-        fb = gen_p82.get_force_balance2(
+        fb = gen_p82.get_mehp_simulator(
             nr_of_entanglements_to_sample=n_ent_std,
             upper_cutoff=c,
-            entanglements_as_springs=False,
+            entanglement_mode=pt.EntanglementMode.MERGED_LINKS,
             seed=f"p82_{seed}_{c}",
         )
-        fb.run_force_relaxation()
+        fb.run()
         g_p82[i] = gamma_conv * np.sum(fb.get_gamma_factors(r02_mag)) / vol_std
 
     # Stoichiometric Imbalance: r = 0.75 (xlinks = round(0.75 * 0.5 *
@@ -780,13 +796,13 @@ def _simulate_sampling_cutoff_single_repeat(
 
     g_r75 = np.zeros(n_cutoffs)
     for i, c in enumerate(cutoffs):
-        fb = gen_r75.get_force_balance2(
+        fb = gen_r75.get_mehp_simulator(
             nr_of_entanglements_to_sample=n_ent_r75,
             upper_cutoff=c,
-            entanglements_as_springs=False,
+            entanglement_mode=pt.EntanglementMode.MERGED_LINKS,
             seed=f"r75_{seed}_{c}",
         )
-        fb.run_force_relaxation()
+        fb.run()
         g_r75[i] = gamma_conv * np.sum(fb.get_gamma_factors(r02_mag)) / vol_r75
 
     # -------------------------------------------------------------
@@ -1084,9 +1100,11 @@ def _simulate_inactive_removal_single_repeat(
         )
 
         # 1. Unfiltered + No Simplification
-        fb1 = gen.get_force_balance2(es_unf)
-        fb1.run_force_relaxation(
-            simplification_mode=pt.StructureSimplificationMode.NO_SIMPLIFICATION
+        fb1 = gen.get_mehp_simulator(es_unf)
+        fb1.run(
+            pt.MEHPLinearSolverConfig(
+                simplification_mode=pt.StructureSimplificationMode.NO_SIMPLIFICATION
+            )
         )
         g_unf_nosimp[i] = (gamma_conv * np.sum(fb1.get_gamma_factors(r02)) / vol) * 1e6
         sp_unf_nosimp[i] = fb1.network.nr_of_springs
@@ -1094,10 +1112,12 @@ def _simulate_inactive_removal_single_repeat(
         iter_unf_nosimp[i] = fb1.get_nr_of_iterations()
 
         # 2. Unfiltered + INACTIVE_ONLY
-        fb2 = gen.get_force_balance2(es_unf)
-        fb2.run_force_relaxation(
-            simplification_mode=pt.StructureSimplificationMode.INACTIVE_ONLY,
-            inactive_removal_cutoff=inactive_cutoff,
+        fb2 = gen.get_mehp_simulator(es_unf)
+        fb2.run(
+            pt.MEHPLinearSolverConfig(
+                simplification_mode=pt.StructureSimplificationMode.INACTIVE_ONLY,
+                inactive_removal_cutoff=inactive_cutoff,
+            )
         )
         g_unf_inact[i] = (gamma_conv * np.sum(fb2.get_gamma_factors(r02)) / vol) * 1e6
         sp_unf_inact[i] = fb2.network.nr_of_springs
@@ -1105,10 +1125,12 @@ def _simulate_inactive_removal_single_repeat(
         iter_unf_inact[i] = fb2.get_nr_of_iterations()
 
         # 3. Unfiltered + INACTIVE_THEN_X2F
-        fb3 = gen.get_force_balance2(es_unf)
-        fb3.run_force_relaxation(
-            simplification_mode=pt.StructureSimplificationMode.INACTIVE_THEN_X2F,
-            inactive_removal_cutoff=inactive_cutoff,
+        fb3 = gen.get_mehp_simulator(es_unf)
+        fb3.run(
+            pt.MEHPLinearSolverConfig(
+                simplification_mode=pt.StructureSimplificationMode.INACTIVE_THEN_X2F,
+                inactive_removal_cutoff=inactive_cutoff,
+            )
         )
         g_unf_x2f[i] = (gamma_conv * np.sum(fb3.get_gamma_factors(r02)) / vol) * 1e6
         sp_unf_x2f[i] = fb3.network.nr_of_springs
@@ -1116,9 +1138,11 @@ def _simulate_inactive_removal_single_repeat(
         iter_unf_x2f[i] = fb3.get_nr_of_iterations()
 
         # 4. Filtered + No Simplification
-        fb4 = gen.get_force_balance2(es_filt)
-        fb4.run_force_relaxation(
-            simplification_mode=pt.StructureSimplificationMode.NO_SIMPLIFICATION
+        fb4 = gen.get_mehp_simulator(es_filt)
+        fb4.run(
+            pt.MEHPLinearSolverConfig(
+                simplification_mode=pt.StructureSimplificationMode.NO_SIMPLIFICATION
+            )
         )
         g_filt_nosimp[i] = (gamma_conv * np.sum(fb4.get_gamma_factors(r02)) / vol) * 1e6
         sp_filt_nosimp[i] = fb4.network.nr_of_springs
@@ -1126,10 +1150,12 @@ def _simulate_inactive_removal_single_repeat(
         iter_filt_nosimp[i] = fb4.get_nr_of_iterations()
 
         # 5. Filtered + INACTIVE_THEN_X2F
-        fb5 = gen.get_force_balance2(es_filt)
-        fb5.run_force_relaxation(
-            simplification_mode=pt.StructureSimplificationMode.INACTIVE_THEN_X2F,
-            inactive_removal_cutoff=inactive_cutoff,
+        fb5 = gen.get_mehp_simulator(es_filt)
+        fb5.run(
+            pt.MEHPLinearSolverConfig(
+                simplification_mode=pt.StructureSimplificationMode.INACTIVE_THEN_X2F,
+                inactive_removal_cutoff=inactive_cutoff,
+            )
         )
         g_filt_x2f[i] = (gamma_conv * np.sum(fb5.get_gamma_factors(r02)) / vol) * 1e6
         sp_filt_x2f[i] = fb5.network.nr_of_springs
@@ -1466,7 +1492,13 @@ if mode == "discrete":
     )
     n_sampled = len(ents.pairs_of_atoms)
     t_sample = time.perf_counter()
-    fb = pt.MEHPForceBalance2(u, ents, 2, False, False)
+    fb = pt.MEHPSimulator(
+        u,
+        ents,
+        crosslinker_type=2,
+        entanglement_mode=pt.EntanglementMode.MERGED_LINKS,
+        is_2d=False,
+    )
 else:
     t_universe = t_setup
     es = gen.sample_entanglements(
@@ -1475,7 +1507,9 @@ else:
     n_sampled = len(es.alpha_1)
     t_sample = time.perf_counter()
     # Phase 2: force balance construction
-    fb = gen.get_force_balance2(es, 2, False)
+    fb = gen.get_mehp_simulator(
+        es, entanglement_mode=pt.EntanglementMode.MERGED_LINKS, crosslinker_type=2
+    )
 fb.validate_network()
 t1 = time.perf_counter()
 
@@ -1745,14 +1779,14 @@ def run_distribution_comparison(
 # confidence intervals.
 
 
-def _count_active_entanglements(fb: pt.MEHPForceBalance2) -> int:
+def _count_active_entanglements(fb: pt.MEHPSimulator) -> int:
     """Count the number of active load-bearing entanglements in the network."""
     net = fb.network
     if hasattr(net, "spring_is_entanglement") and net.spring_is_entanglement.any():
         return int(net.spring_is_entanglement.sum())
     count = 0
     for i in range(net.nr_of_links):
-        if net.link_is_entanglement[i] and len(net.strands_of_link[i]) >= 2:
+        if net.link_is_entanglement[i] and len(net.strand_indices_of_link[i]) >= 2:
             count += 1
     return count
 
@@ -1808,13 +1842,17 @@ def _simulate_conversion_sweep_single_repeat(
         # (this constructor filters entanglements by default, i.e. it is
         # equivalent to the "Filtered" variants below)
         u = gen.get_universe()
-        fb_disc = pt.MEHPForceBalance2(
+        fb_disc = pt.MEHPSimulator.construct_with_random_entanglements(
             u,
             nr_of_entanglements_to_sample=n_ent,
             upper_sampling_cutoff=cutoff,
-            entanglements_as_springs=False,
+            entanglement_mode=pt.EntanglementMode.MERGED_LINKS,
         )
-        fb_disc.run_force_relaxation(pt.StructureSimplificationMode.INACTIVE_THEN_X2F)
+        fb_disc.run(
+            pt.MEHPLinearSolverConfig(
+                simplification_mode=pt.StructureSimplificationMode.INACTIVE_THEN_X2F
+            )
+        )
         g_d[i] = gamma_conv * np.sum(fb_disc.get_gamma_factors(r02)) / vol
         w_d[i] = fb_disc.get_active_weight_fraction()
         n_d[i] = _count_active_entanglements(fb_disc)
@@ -1829,9 +1867,15 @@ def _simulate_conversion_sweep_single_repeat(
             f"seed_od_f_{seed}",
             pt.EntanglementFilteringMode.OMIT_INACTIVE,
         )
-        fb_od_filt = gen.get_force_balance2(es_od_filt, 2, False)
-        fb_od_filt.run_force_relaxation(
-            pt.StructureSimplificationMode.INACTIVE_THEN_X2F
+        fb_od_filt = gen.get_mehp_simulator(
+            es_od_filt,
+            entanglement_mode=pt.EntanglementMode.MERGED_LINKS,
+            crosslinker_type=2,
+        )
+        fb_od_filt.run(
+            pt.MEHPLinearSolverConfig(
+                simplification_mode=pt.StructureSimplificationMode.INACTIVE_THEN_X2F
+            )
         )
         g_odf[i] = gamma_conv * np.sum(fb_od_filt.get_gamma_factors(r02)) / vol
         w_odf[i] = fb_od_filt.get_active_weight_fraction()
@@ -1847,9 +1891,15 @@ def _simulate_conversion_sweep_single_repeat(
             f"seed_od_u_{seed}",
             pt.EntanglementFilteringMode.NONE,
         )
-        fb_od_unfilt = gen.get_force_balance2(es_od_unfilt, 2, False)
-        fb_od_unfilt.run_force_relaxation(
-            pt.StructureSimplificationMode.INACTIVE_THEN_X2F
+        fb_od_unfilt = gen.get_mehp_simulator(
+            es_od_unfilt,
+            entanglement_mode=pt.EntanglementMode.MERGED_LINKS,
+            crosslinker_type=2,
+        )
+        fb_od_unfilt.run(
+            pt.MEHPLinearSolverConfig(
+                simplification_mode=pt.StructureSimplificationMode.INACTIVE_THEN_X2F
+            )
         )
         g_odu[i] = gamma_conv * np.sum(fb_od_unfilt.get_gamma_factors(r02)) / vol
         w_odu[i] = fb_od_unfilt.get_active_weight_fraction()
@@ -2086,13 +2136,23 @@ def _run_single_pdms_rve_point(
         seed=f"rve_{seed}",
         filtering_mode=EntanglementFilteringMode.OMIT_INACTIVE,
     )
-    fb_ent = gen.get_force_balance2(es, entanglements_as_springs=False)
-    fb_ent.run_force_relaxation(pt.StructureSimplificationMode.INACTIVE_THEN_X2F)
+    fb_ent = gen.get_mehp_simulator(
+        es, entanglement_mode=pt.EntanglementMode.MERGED_LINKS
+    )
+    fb_ent.run(
+        pt.MEHPLinearSolverConfig(
+            simplification_mode=pt.StructureSimplificationMode.INACTIVE_THEN_X2F
+        )
+    )
     g_total = float(gamma_conv * fb_ent.get_gamma_factor(r02, nr_of_chains=1) / vol)
     w_active = float(fb_ent.get_active_weight_fraction())
 
-    fb_ph = gen.get_force_balance2()
-    fb_ph.run_force_relaxation(pt.StructureSimplificationMode.INACTIVE_THEN_X2F)
+    fb_ph = gen.get_mehp_simulator()
+    fb_ph.run(
+        pt.MEHPLinearSolverConfig(
+            simplification_mode=pt.StructureSimplificationMode.INACTIVE_THEN_X2F
+        )
+    )
     g_phantom = float(gamma_conv * fb_ph.get_gamma_factor(r02, nr_of_chains=1) / vol)
 
     n_atoms = n_strands * strand_len + n_xlinks

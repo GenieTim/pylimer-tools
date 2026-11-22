@@ -4,8 +4,14 @@
 #include "../utils/ExtraEigenTypes.h"
 #include "../utils/utilityMacros.h"
 #include <Eigen/Dense>
+#include <array>
+#include <cctype>
 #include <set>
+#include <stdexcept>
+#include <string>
+#include <string_view>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 namespace pylimer_tools::sim::mehp {
@@ -135,6 +141,149 @@ inline const SLESolver allSLESolvers[] = {
 #undef X
 };
 
+/**
+ * @brief Representation of topological entanglements in an MEHP network.
+ */
+enum class EntanglementMode
+{
+  NONE,         ///< Phantom network (crosslinks only)
+  MERGED_LINKS, ///< Entanglement links lie directly on strand contour (no extra spring)
+  SPRING        ///< Entangled beads coupled by compliant Hookean spring (springIsEntanglement[s] == true)
+};
+
+/**
+ * @brief Mobility of entanglement links along polymer strands.
+ */
+enum class SlipMode
+{
+  FIXED,  ///< Entanglement links remain fixed at initial strand positions
+  SLIDING ///< Entanglement links can slide along polymer strands
+};
+
+/**
+ * @brief Supported NLopt optimization algorithms for MEHP force relaxation.
+ */
+enum class NLoptAlgorithm
+{
+  LD_MMA,
+  LD_LBFGS,
+  LD_SLSQP,
+  LD_TNEWTON,
+  LD_TNEWTON_RESTART,
+  LD_TNEWTON_PRECOND,
+  LD_TNEWTON_PRECOND_RESTART,
+  LD_VAR1,
+  LD_VAR2,
+  LN_SBPLX,
+  LN_BOBYQA,
+  LN_NELDERMEAD,
+  LN_COBYLA,
+  LN_NEWUOA,
+  LN_NEWUOA_BOUND,
+  LN_PRAXIS,
+  GN_DIRECT,
+  GN_CRS2_LM,
+  GD_STOGO
+};
+
+namespace detail {
+inline constexpr std::array<std::pair<NLoptAlgorithm, std::string_view>, 19>
+  kNLoptAlgorithmNames = { {
+    { NLoptAlgorithm::LD_MMA, "LD_MMA" },
+    { NLoptAlgorithm::LD_LBFGS, "LD_LBFGS" },
+    { NLoptAlgorithm::LD_SLSQP, "LD_SLSQP" },
+    { NLoptAlgorithm::LD_TNEWTON, "LD_TNEWTON" },
+    { NLoptAlgorithm::LD_TNEWTON_RESTART, "LD_TNEWTON_RESTART" },
+    { NLoptAlgorithm::LD_TNEWTON_PRECOND, "LD_TNEWTON_PRECOND" },
+    { NLoptAlgorithm::LD_TNEWTON_PRECOND_RESTART,
+      "LD_TNEWTON_PRECOND_RESTART" },
+    { NLoptAlgorithm::LD_VAR1, "LD_VAR1" },
+    { NLoptAlgorithm::LD_VAR2, "LD_VAR2" },
+    { NLoptAlgorithm::LN_SBPLX, "LN_SBPLX" },
+    { NLoptAlgorithm::LN_BOBYQA, "LN_BOBYQA" },
+    { NLoptAlgorithm::LN_NELDERMEAD, "LN_NELDERMEAD" },
+    { NLoptAlgorithm::LN_COBYLA, "LN_COBYLA" },
+    { NLoptAlgorithm::LN_NEWUOA, "LN_NEWUOA" },
+    { NLoptAlgorithm::LN_NEWUOA_BOUND, "LN_NEWUOA_BOUND" },
+    { NLoptAlgorithm::LN_PRAXIS, "LN_PRAXIS" },
+    { NLoptAlgorithm::GN_DIRECT, "GN_DIRECT" },
+    { NLoptAlgorithm::GN_CRS2_LM, "GN_CRS2_LM" },
+    { NLoptAlgorithm::GD_STOGO, "GD_STOGO" },
+  } };
+} // namespace detail
+
+/**
+ * @brief Convert an @ref NLoptAlgorithm enumerator to its canonical string name.
+ *
+ * @param alg The NLopt algorithm enumerator.
+ * @return Canonical string representation (e.g. "LD_LBFGS").
+ * @throws std::invalid_argument if @p alg is not a valid enumerator.
+ */
+[[nodiscard]] inline std::string
+nloptAlgorithmToString(const NLoptAlgorithm alg)
+{
+  for (const std::pair<NLoptAlgorithm, std::string_view>& entry :
+       detail::kNLoptAlgorithmNames) {
+    if (entry.first == alg) {
+      return std::string(entry.second);
+    }
+  }
+  throw std::invalid_argument(
+    "Unknown NLoptAlgorithm enumerator with integer value " +
+    std::to_string(static_cast<int>(alg)) + ".");
+}
+
+/**
+ * @brief Parse an @ref NLoptAlgorithm enumerator from a string name.
+ *
+ * Accepts canonical names (case-insensitive) with an optional "NLOPT_" prefix.
+ *
+ * @param name Algorithm name string.
+ * @return Matching @ref NLoptAlgorithm enumerator.
+ * @throws std::invalid_argument if @p name does not match any supported algorithm.
+ */
+[[nodiscard]] inline NLoptAlgorithm
+nloptAlgorithmFromString(const std::string_view name)
+{
+  std::string normalized;
+  normalized.reserve(name.size());
+  for (const char ch : name) {
+    normalized.push_back(
+      static_cast<char>(std::toupper(static_cast<unsigned char>(ch))));
+  }
+  constexpr std::string_view nloptPrefix = "NLOPT_";
+  std::string_view lookup = normalized;
+  if (lookup.starts_with(nloptPrefix)) {
+    lookup.remove_prefix(nloptPrefix.size());
+  }
+  for (const std::pair<NLoptAlgorithm, std::string_view>& entry :
+       detail::kNLoptAlgorithmNames) {
+    if (entry.second == lookup) {
+      return entry.first;
+    }
+  }
+  throw std::invalid_argument("Unknown NLopt algorithm: '" +
+                              std::string(name) + "'.");
+}
+
+/**
+ * @brief Metadata describing a spring removed during bond/strand breaking.
+ */
+struct BrokenSpringInfo
+{
+  size_t idxA = 0;
+  size_t idxB = 0;
+  double multiplier = 0.0;
+
+#ifdef CEREALIZABLE
+  template<class Archive>
+  void serialize(Archive& ar)
+  {
+    ar(idxA, idxB, multiplier);
+  }
+#endif
+};
+
 // typedef Eigen::Array<Eigen::ArrayXi, Eigen::Dynamic, 1> ArrayXArrayXi;
 typedef std::vector<std::vector<size_t>> ArrayXArrayXi;
 typedef std::vector<std::set<size_t>> ArrayXArrayXiUnique;
@@ -177,218 +326,6 @@ struct CrosslinkerUniverse
   }
 #endif
 };
-
-// improved structures using Eigen
-struct Network
-{
-  std::array<double, 3> L = { 0., 0., 0. }; /* box sizes */
-  double vol;                               /* box volume */
-  double meanSpringContourLength;           /* mean N */
-  size_t nrOfNodes = 0;                     /* number of nodes */
-  size_t nrOfSprings = 0;                   /* number of springs */
-  size_t nrOfLoops = 0;                     /* loops */
-  // coordinates & connectivity
-  Eigen::VectorXd coordinates;
-  Eigen::VectorXd springsContourLength; /* the N for each spring */
-  Eigen::ArrayXi oldAtomIds;
-  Eigen::ArrayXi springCoordinateIndexA;
-  Eigen::ArrayXi springCoordinateIndexB;
-  Eigen::ArrayXi springIndexA;
-  Eigen::ArrayXi springIndexB;
-  Eigen::VectorXd springBoxOffset;
-
-  ArrayXArrayXi springIndicesOfLinks; // maps link -> springs
-  // interesting properties
-  Eigen::ArrayXb springIsActive;
-  Eigen::ArrayXi moleculeIdxToSpring;
-
-  // config
-  bool assumeBoxLargeEnough =
-    false; /* whether traditional PBC can be applied or not */
-  bool assumeComplete = false; /* whether dangling & free chains are included */
-};
-
-struct ForceBalanceNetwork
-{
-  // TODO: some info is redundant.
-  // adjust code to support one way of storing things only
-  std::array<double, 3> L = { 0., 0., 0. };        /* box sizes */
-  std::array<double, 3> boxHalfs = { 0., 0., 0. }; /* half box sizes */
-  double vol = 0.0;                                /* box volume */
-  double meanSpringContourLength = 0.0;            /* mean N */
-  size_t nrOfLinks = 0; /* number of links, = nrOfNodes + nrOfSlipLinks */
-  size_t nrOfNodes = 0; /* number of crosslinkers */
-  size_t nrOfSprings = 0;
-  size_t nrOfPartialSprings = 0;
-  size_t nrOfSpringsWithPartition = 0;
-  bool isUpToDate = true;
-  // coordinates & connectivity
-  Eigen::VectorXd coordinates;
-  Eigen::VectorXd springsContourLength; /* the N for each spring */
-  Eigen::ArrayXi springsType;           // gives each spring a type. Needed for
-  // entanglements modelled as springs
-  ArrayXArrayXi springIndicesOfLinks;    // maps link -> springs
-  ArrayXArrayXi linkIndicesOfSprings;    // maps spring -> links
-  Eigen::ArrayXb partialSpringIsPartial; // indicates whether a spring
-  // involves a slip-link
-  // local to global: from the 2D structures to the 1D Eigen vector
-  // equivalent to "partial spring indices of spring"
-  ArrayXArrayXi localToGlobalSpringIndex;
-  // map the "local", partial, spring indices to the full-length springs
-  std::unordered_map<size_t, size_t> oldAtomIdToSpringIndex;
-
-  Eigen::ArrayXb linkIsSliplink;
-  Eigen::ArrayXi
-    nrOfCrosslinkSwapsEndured; // count for slip-links how many crosslinkers
-  // they swapped around
-
-  // partial springs
-  Eigen::ArrayXi springPartCoordinateIndexA;
-  Eigen::ArrayXi springPartCoordinateIndexB;
-  Eigen::ArrayXi springPartIndexA;
-  Eigen::ArrayXi springPartIndexB;
-  Eigen::VectorXd springPartBoxOffset;
-  Eigen::ArrayXi partialToFullSpringIndex;
-
-  // these may be empty, or not, depending on the method used
-  // to determine the slip-links
-  ArrayXArrayXi loops;           // each loop just records its spring idx
-  ArrayXArrayXi loopsOfSliplink; // each slip-link has two loops, ideally
-
-  // old stuff used for conversion. Does not include slip-links
-  Eigen::ArrayXi springCoordinateIndexA;
-  Eigen::ArrayXi springCoordinateIndexB;
-  Eigen::ArrayXi oldAtomIds;
-  Eigen::ArrayXi oldAtomTypes;
-  std::vector<size_t> springToMoleculeIds; // maps
-  Eigen::ArrayXb springIsActive;
-  Eigen::ArrayXi springIndexA;
-  Eigen::ArrayXi springIndexB;
-};
-
-#ifdef CEREALIZABLE
-
-template<class Archive>
-void
-serialize(Archive& ar, ForceBalanceNetwork& fbn)
-{
-  // Box properties
-  ar(fbn.L, fbn.boxHalfs, fbn.vol);
-
-  // Network properties
-  ar(fbn.meanSpringContourLength,
-     fbn.nrOfLinks,
-     fbn.nrOfNodes,
-     fbn.nrOfSprings,
-     fbn.nrOfPartialSprings,
-     fbn.nrOfSpringsWithPartition,
-     fbn.isUpToDate);
-
-  // Coordinates and connectivity
-  ar(fbn.coordinates, fbn.springsContourLength, fbn.springsType);
-
-  // Mapping structures
-  ar(fbn.springIndicesOfLinks,
-     fbn.linkIndicesOfSprings,
-     fbn.partialSpringIsPartial,
-     fbn.localToGlobalSpringIndex,
-     fbn.oldAtomIdToSpringIndex);
-
-  // Link properties
-  ar(fbn.linkIsSliplink, fbn.nrOfCrosslinkSwapsEndured);
-
-  // Partial spring properties
-  ar(fbn.springPartCoordinateIndexA,
-     fbn.springPartCoordinateIndexB,
-     fbn.springPartIndexA,
-     fbn.springPartIndexB,
-     fbn.springPartBoxOffset,
-     fbn.partialToFullSpringIndex);
-
-  // Loop information
-  ar(fbn.loops, fbn.loopsOfSliplink);
-
-  // Old stuff used for conversion
-  ar(fbn.springCoordinateIndexA,
-     fbn.springCoordinateIndexB,
-     fbn.oldAtomIds,
-     fbn.oldAtomTypes,
-     fbn.springToMoleculeIds,
-     fbn.springIsActive,
-     fbn.springIndexA,
-     fbn.springIndexB);
-}
-
-#endif
-
-struct ForceBalance2Network
-{
-  // TODO: some info is redundant.
-  // adjust code to support one way of storing things only
-  std::array<double, 3> L = { 0., 0., 0. };        /* box sizes */
-  std::array<double, 3> boxHalfs = { 0., 0., 0. }; /* half box sizes */
-  size_t nrOfLinks = 0; /* number of links, = nrOfNodes + nrOfSlipLinks */
-  size_t nrOfNodes = 0; /* number of crosslinkers */
-  size_t nrOfStrands = 0;
-  size_t nrOfSprings = 0;
-  // coordinates & connectivity
-  Eigen::VectorXd coordinates;
-  Eigen::VectorXd springContourLength; // the N for each spring
-  Eigen::ArrayXb
-    springIsEntanglement; // Needed for entanglements modelled as springs
-  ArrayXArrayXi strandIndicesOfLink; // maps link -> strands
-  ArrayXArrayXi linkIndicesOfStrand; // maps strands -> links
-  ArrayXArrayXi springIndicesOfStrand;
-  // map the "local", partial, spring indices to the full-length springs
-  Eigen::ArrayXb linkIsEntanglement; // whether a link is a "crosslink" or an
-  // "entanglement-link"
-
-  // partial springs
-  Eigen::ArrayXi springCoordinateIndexA;
-  Eigen::ArrayXi springCoordinateIndexB;
-  Eigen::ArrayXi springIndexA;
-  Eigen::ArrayXi springIndexB;
-  Eigen::VectorXd springBoxOffset;    // the "PBC" for each spring
-  Eigen::ArrayXi strandIndexOfSpring; // the mapping from spring to strand
-
-  Eigen::ArrayXi oldAtomIds;
-  Eigen::ArrayXi oldAtomTypes;
-};
-
-#ifdef CEREALIZABLE
-
-template<class Archive>
-void
-serialize(Archive& ar, ForceBalance2Network& fbn)
-{
-  // Box properties
-  ar(fbn.L, fbn.boxHalfs);
-
-  // Network properties
-  ar(fbn.nrOfLinks, fbn.nrOfNodes, fbn.nrOfStrands, fbn.nrOfSprings);
-
-  // Coordinates and connectivity
-  ar(fbn.coordinates,
-     fbn.springContourLength,
-     fbn.springIsEntanglement,
-     fbn.strandIndicesOfLink,
-     fbn.linkIndicesOfStrand,
-     fbn.springIndicesOfStrand,
-     fbn.linkIsEntanglement);
-
-  // Partial springs
-  ar(fbn.springCoordinateIndexA,
-     fbn.springCoordinateIndexB,
-     fbn.springIndexA,
-     fbn.springIndexB,
-     fbn.springBoxOffset,
-     fbn.strandIndexOfSpring);
-
-  // Old atom info
-  ar(fbn.oldAtomIds, fbn.oldAtomTypes);
-}
-
-#endif
 }
 
 #endif

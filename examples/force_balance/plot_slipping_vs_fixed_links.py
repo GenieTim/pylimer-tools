@@ -2,13 +2,16 @@ r"""
 Slipping vs. Fixed Entanglement Links
 =====================================
 
-In :class:`~pylimer_tools_cpp.MEHPForceBalance` (:cite:t:`gusev_numerical_2019`, :cite:t:`bernhard_phantom_2025`),
-entanglement links can either remain frozen at their initial contour positions (``disable_slipping=True``)
-or slide dynamically along the polymer strands to balance contour tension (``disable_slipping=False``).
+In :class:`~pylimer_tools_cpp.MEHPSimulator` (:cite:t:`gusev_numerical_2019`, :cite:t:`bernhard_phantom_2025`)
+with :class:`~pylimer_tools_cpp.SlipLinkRelaxationSolver` (:class:`~pylimer_tools_cpp.MEHPSlipLinkSolverConfig`),
+entanglement links can either remain frozen at their initial contour positions
+(:attr:`~pylimer_tools_cpp.SlipMode.FIXED`) or slide dynamically along the polymer
+strands to balance contour tension (:attr:`~pylimer_tools_cpp.SlipMode.SLIDING`).
 
 Dynamic contour slipping artificially softens the network modulus by relaxing affine tension
-and increases solver iterations 2–3x. Consequently, :class:`~pylimer_tools_cpp.MEHPForceBalance2`
-fixes entanglement positions by design.
+and increases solver iterations 2–3x. Consequently, :class:`~pylimer_tools_cpp.LinearSystemMEHPSolver`
+(and :class:`~pylimer_tools_cpp.NonlinearOptimizationSolver`) require :attr:`~pylimer_tools_cpp.SlipMode.FIXED`
+by design.
 """
 
 from pathlib import Path
@@ -30,11 +33,11 @@ from _study_runners import run_slipping_vs_fixed_simulation  # noqa: E402
 import pylimer_tools_cpp as pt  # noqa: E402
 
 # %%
-# Toggling Dynamic Slipping in ``MEHPForceBalance``
-# -------------------------------------------------
-# On a generated network, ``disable_slipping=True`` freezes the sampled contour fractions,
-# whereas ``disable_slipping=False`` updates them iteratively during force
-# relaxation.
+# Toggling Dynamic Slipping in ``MEHPSimulator``
+# ----------------------------------------------
+# On a generated network, ``SlipMode.FIXED`` freezes the sampled contour fractions,
+# whereas ``SlipMode.SLIDING`` updates them iteratively during force
+# relaxation via :class:`~pylimer_tools_cpp.MEHPSlipLinkSolverConfig`.
 
 gen = pt.MCUniverseGenerator(18.0, 18.0, 18.0)
 gen.set_seed(42)
@@ -50,11 +53,21 @@ es = gen.sample_entanglements(
     filtering_mode=pt.EntanglementFilteringMode.OMIT_INACTIVE,
 )
 
-fb_fixed = gen.get_force_balance(es)
-fb_fixed.run_force_relaxation(max_nr_of_steps=5000, disable_slipping=True)
+fixed_cfg = pt.MEHPSlipLinkSolverConfig()
+fixed_cfg.max_nr_of_steps = 5000
+fixed_cfg.slip_mode = pt.SlipMode.FIXED
 
-fb_slip = gen.get_force_balance(es)
-fb_slip.run_force_relaxation(max_nr_of_steps=5000, disable_slipping=False)
+fb_fixed = gen.get_mehp_simulator(
+    es, entanglement_mode=pt.EntanglementMode.MERGED_LINKS
+)
+fb_fixed.run(fixed_cfg)
+
+slip_cfg = pt.MEHPSlipLinkSolverConfig()
+slip_cfg.max_nr_of_steps = 5000
+slip_cfg.slip_mode = pt.SlipMode.SLIDING
+
+fb_slip = gen.get_mehp_simulator(es, entanglement_mode=pt.EntanglementMode.MERGED_LINKS)
+fb_slip.run(slip_cfg)
 
 print(
     f"Iterations — fixed: {fb_fixed.get_nr_of_iterations()}, "

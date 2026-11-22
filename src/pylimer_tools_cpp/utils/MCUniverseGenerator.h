@@ -4,9 +4,7 @@
 #include "../entities/Box.h"
 #include "../entities/EigenNeighbourList.h"
 #include "../entities/Universe.h"
-#include "../sim/MEHPForceBalance.h"
-#include "../sim/MEHPForceBalance2.h"
-#include "../sim/MEHPForceRelaxation.h"
+#include "../sim/MEHPSimulator.h"
 #include "../sim/MEHPUtilityStructures.h"
 #include "../topo/EntanglementDetector.h"
 #include "../utils/BoolUtils.h"
@@ -587,82 +585,82 @@ public:
       filteringMode) const;
 
   /**
-   * @brief Convert the current simplified universe into a force relaxation
-   * network
+   * @brief Build a canonical @ref pylimer_tools::sim::mehp::MEHPNetwork from
+   * the current simplified universe and optional sampled entanglements.
    *
-   * @return pylimer_tools::sim::mehp::Network
+   * @param entanglements Optional pre-sampled strand-pair entanglements
+   * @param entanglementMode Entanglement representation mode
+   * @param crossLinkerType Atom type identifying crosslinkers
+   * @param removeDanglingChains Omit dangling chains when true
+   * @param includeFreeChains Include free/soluble chains when true
+   * @return pylimer_tools::sim::mehp::MEHPNetwork
    */
-  pylimer_tools::sim::mehp::Network convertToForceRelaxationNetwork() const;
-
-  pylimer_tools::sim::mehp::MEHPForceRelaxation getForceRelaxation() const;
-
-  /**
-   * @brief Convert the current simplified universe to a useable structure for
-   * the force balance
-   *
-   * @return pylimer_tools::sim::mehp::ForceBalanceNetwork
-   */
-  pylimer_tools::sim::mehp::ForceBalanceNetwork convertToForceBalanceNetwork()
-    const;
-
-  /**
-   * @brief Convert the current simplified universe and sampled entanglements to
-   * a useable structure for MEHPForceBalance without constructing a Universe
-   *
-   * @param entanglements
-   * @return pylimer_tools::sim::mehp::ForceBalanceNetwork
-   */
-  pylimer_tools::sim::mehp::ForceBalanceNetwork convertToForceBalanceNetwork(
-    const pylimer_tools::topo::entanglement_detection::StrandPairEntanglements&
-      entanglements) const;
-
-  /**
-   * @brief Convert the current simplified universe and sampled entanglements to
-   * a useable structure for MEHPForceBalance2 without constructing a Universe
-   *
-   * @param entanglements
-   * @param crossLinkerType
-   * @param entanglementsAsSprings
-   * @return pylimer_tools::sim::mehp::ForceBalance2Network
-   */
-  pylimer_tools::sim::mehp::ForceBalance2Network convertToForceBalance2Network(
+  [[nodiscard]] pylimer_tools::sim::mehp::MEHPNetwork getMEHPNetwork(
     const pylimer_tools::topo::entanglement_detection::StrandPairEntanglements&
       entanglements = {},
+    pylimer_tools::sim::mehp::EntanglementMode entanglementMode =
+      pylimer_tools::sim::mehp::EntanglementMode::MERGED_LINKS,
     int crossLinkerType = 2,
-    bool entanglementsAsSprings = false) const;
+    bool removeDanglingChains = false,
+    bool includeFreeChains = true) const;
 
-  pylimer_tools::sim::mehp::MEHPForceBalance getForceBalance() const;
-
-  pylimer_tools::sim::mehp::MEHPForceBalance getForceBalance(
+  /**
+   * @brief Construct a unified @ref pylimer_tools::sim::mehp::MEHPSimulator
+   * from the current simplified universe and optional pre-sampled entanglements.
+   *
+   * @param entanglements Optional pre-sampled strand-pair entanglements
+   * @param entanglementMode Entanglement representation mode
+   * @param evaluator Optional constitutive force evaluator (defaults to
+   *        HookeanForceEvaluator(1.0) when null)
+   * @param is2D Treat system as 2D when true
+   * @param crossLinkerType Atom type identifying crosslinkers
+   * @param removeDanglingChains Omit dangling chains when true
+   * @param includeFreeChains Include free/soluble chains when true
+   * @return pylimer_tools::sim::mehp::MEHPSimulator
+   */
+  [[nodiscard]] pylimer_tools::sim::mehp::MEHPSimulator getMEHPSimulator(
     const pylimer_tools::topo::entanglement_detection::StrandPairEntanglements&
-      entanglements) const;
+      entanglements = {},
+    pylimer_tools::sim::mehp::EntanglementMode entanglementMode =
+      pylimer_tools::sim::mehp::EntanglementMode::MERGED_LINKS,
+    std::shared_ptr<pylimer_tools::sim::mehp::MEHPForceEvaluator> evaluator =
+      nullptr,
+    bool is2D = false,
+    int crossLinkerType = 2,
+    bool removeDanglingChains = false,
+    bool includeFreeChains = true) const;
 
-  pylimer_tools::sim::mehp::MEHPForceBalance getForceBalance(
+  /**
+   * @brief Sample random entanglements from the simplified universe and
+   * construct a unified @ref pylimer_tools::sim::mehp::MEHPSimulator.
+   *
+   * @param nrOfEntanglementsToSample Target number of entanglements to sample
+   * @param upperCutoff Upper pair sampling cutoff
+   * @param lowerCutoff Lower pair sampling cutoff
+   * @param minimumNrOfEntanglements Minimum entanglements required if possible
+   * @param sameStrandCutoff Minimum chemical distance for same-strand pairs
+   * @param seed PRNG seed string (empty uses generator seed)
+   * @param filterDanglingAndSoluble Omit entanglements on inactive strands
+   * @param entanglementMode Entanglement representation mode
+   * @param evaluator Optional constitutive force evaluator (defaults to
+   *        HookeanForceEvaluator(1.0) when null)
+   * @param is2D Treat system as 2D when true
+   * @param crossLinkerType Atom type identifying crosslinkers
+   * @return pylimer_tools::sim::mehp::MEHPSimulator
+   */
+  [[nodiscard]] pylimer_tools::sim::mehp::MEHPSimulator getMEHPSimulator(
     size_t nrOfEntanglementsToSample,
     double upperCutoff,
-    double lowerCutoff = 0.,
+    double lowerCutoff = 0.0,
     size_t minimumNrOfEntanglements = 0,
-    double sameStrandCutoff = 3.,
-    const std::string& seed = "",
-    bool filterDanglingAndSoluble = true) const;
-
-  pylimer_tools::sim::mehp::MEHPForceBalance2 getForceBalance2() const;
-
-  pylimer_tools::sim::mehp::MEHPForceBalance2 getForceBalance2(
-    const pylimer_tools::topo::entanglement_detection::StrandPairEntanglements&
-      entanglements,
-    int crossLinkerType = 2,
-    bool entanglementsAsSprings = false) const;
-
-  pylimer_tools::sim::mehp::MEHPForceBalance2 getForceBalance2(
-    size_t nrOfEntanglementsToSample,
-    double upperCutoff,
-    double lowerCutoff = 0.,
-    size_t minimumNrOfEntanglements = 0,
-    double sameStrandCutoff = 3.,
+    double sameStrandCutoff = 3.0,
     const std::string& seed = "",
     bool filterDanglingAndSoluble = true,
-    bool entanglementsAsSprings = false,
+    pylimer_tools::sim::mehp::EntanglementMode entanglementMode =
+      pylimer_tools::sim::mehp::EntanglementMode::MERGED_LINKS,
+    std::shared_ptr<pylimer_tools::sim::mehp::MEHPForceEvaluator> evaluator =
+      nullptr,
+    bool is2D = false,
     int crossLinkerType = 2) const;
 
   /**

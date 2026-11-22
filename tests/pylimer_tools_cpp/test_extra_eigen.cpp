@@ -13,7 +13,7 @@
 #include <filesystem>
 #endif
 
-TEST_CASE("Eigen behaves as required", "[analysis][MEHPForceBalance][Eigen]")
+TEST_CASE("Eigen behaves as required", "[analysis][MEHPSimulator][Eigen]")
 {
   std::cout << "Running test \"Eigen behaves as required\"" << std::endl;
   SECTION("Summation works with repeated indices")
