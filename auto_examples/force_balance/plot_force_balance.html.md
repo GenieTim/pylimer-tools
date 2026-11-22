@@ -99,8 +99,8 @@ gz = (
 ```
 
 ```none
-Final residual (should be close to 0): 8.851873909890503e-07
-Shear Modulus [MPa]: 0.0208
+Final residual (should be close to 0): 9.839973441737702e-07
+Shear Modulus [MPa]: 0.0386
 ```
 
 <!-- GENERATED FROM PYTHON SOURCE LINES 91-96 -->
@@ -182,7 +182,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.298 seconds)
+**Total running time of the script:** (0 minutes 0.389 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-force-balance-py"></a>
 

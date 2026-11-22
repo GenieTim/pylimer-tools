@@ -443,7 +443,7 @@ This allows you to perform tasks directly from the terminal without writing Pyth
 You must specify either –target-p (crosslinker conversion) or –target-wsol
 (soluble fraction), but not both.</p>
 <dl class="simple">
-<dt>Example:</dt><dd><p>pylimer-generate-network –polymer-name PDMS –parameter-type GAUSSIAN –target-p 0.8 –n-chains-crosslinks 100 –target-file network.dat</p>
+<dt>Example:</dt><dd><p>pylimer-generate-network –polymer-name PDMS –parameter-type GAUSSIAN –target-p 0.8 –n-chains-crosslinkers 100 –target-file network.dat</p>
 </dd>
 </dl>
 <p class="rubric">Usage</p>
@@ -457,7 +457,7 @@ You must specify either –target-p (crosslinker conversion) or –target-wsol
 <dd><p>Name of the polymer to generate the network for</p>
 <dl class="field-list simple">
 <dt class="field-odd">Options<span class="colon">:</span></dt>
-<dd class="field-odd"><p>ptfe | app348 | sbr | app | peo | aphma | pi20 | pi50 | ipp | pib | pib413 | pdms | aps | cispi | pi34 | spp | cispbd | pe413 | apma | pet | pc | apoa | apams | pi75 | pe | apva | pbd98 | ips | pbd20 | pom | apea | app413 | app463 | pi7 | apmma | p6n</p>
+<dd class="field-odd"><p>ips | app | pi7 | pe413 | peo | apva | apma | pet | aps | p6n | pib413 | pi75 | spp | pi34 | app348 | cispi | pc | pi50 | pbd98 | ptfe | pom | pe | sbr | pdms | pi20 | pbd20 | cispbd | apmma | apoa | ipp | apea | app413 | pib | app463 | aphma | apams</p>
 </dd>
 </dl>
 </dd></dl>
@@ -617,7 +617,18 @@ You must specify either –target-p (crosslinker conversion) or –target-wsol
 <dd><p>Name of the polymer to use for parameter retrieval.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Options<span class="colon">:</span></dt>
-<dd class="field-odd"><p>ptfe | app348 | sbr | app | peo | aphma | pi20 | pi50 | ipp | pib | pib413 | pdms | aps | cispi | pi34 | spp | cispbd | pe413 | apma | pet | pc | apoa | apams | pi75 | pe | apva | pbd98 | ips | pbd20 | pom | apea | app413 | app463 | pi7 | apmma | p6n</p>
+<dd class="field-odd"><p>ips | app | pi7 | pe413 | peo | apva | apma | pet | aps | p6n | pib413 | pi75 | spp | pi34 | app348 | cispi | pc | pi50 | pbd98 | ptfe | pom | pe | sbr | pdms | pi20 | pbd20 | cispbd | apmma | apoa | ipp | apea | app413 | pib | app463 | aphma | apams</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-pylimer-analyse-networks-parameter-type">
+<span class="sig-name descname"><span class="pre">--parameter-type</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;parameter_type&gt;</span></span><a class="headerlink" href="#cmdoption-pylimer-analyse-networks-parameter-type" title="Link to this definition">¶</a></dt>
+<dd><p>Type of parameters to use for the polymer model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Options<span class="colon">:</span></dt>
+<dd class="field-odd"><p>GAUSSIAN | KG_LJ | KUHN</p>
 </dd>
 </dl>
 </dd></dl>

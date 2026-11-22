@@ -46,7 +46,7 @@ print(f"1 'lj' pressure in Pascal: {pressure_lj_pa:.2f} Pa")
 ```
 
 ```none
-/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/site-packages/pylimer_tools/io/unit_styles.py:176: UserWarning: LJ unit styles are derived. Reference used: https://doi.org/10.1021/acs.macromol.9b02428
+/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/site-packages/pylimer_tools/io/unit_styles.py:182: UserWarning: LJ unit styles are derived. Reference used: https://doi.org/10.1021/acs.macromol.9b02428
   warnings.warn(
 1 'real' pressure (atm) in Pascal: 101325.00 Pa
 1 'lj' pressure in Pascal: 17600000.00 Pa
@@ -89,7 +89,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.239 seconds)
+**Total running time of the script:** (0 minutes 0.314 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-unit-conversion-py"></a>
 

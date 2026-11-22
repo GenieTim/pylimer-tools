@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:38.840** total execution time for 9 files **from auto_examples/network_generator**:
+**00:52.176** total execution time for 9 files **from auto_examples/network_generator**:
 
 .. container::
 
@@ -33,29 +33,29 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_monte_carlo_configuration.py` (``plot_monte_carlo_configuration.py``)
-     - 00:23.808
+     - 00:31.732
      - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_vulcanized_network.py` (``plot_vulcanized_network.py``)
-     - 00:14.148
+     - 00:19.318
      - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_custom_crosslinking_callback.py` (``plot_custom_crosslinking_callback.py``)
-     - 00:00.261
+     - 00:00.338
      - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_polydisperse_system.py` (``plot_polydisperse_system.py``)
-     - 00:00.236
+     - 00:00.302
      - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_tetra_peg_network.py` (``plot_tetra_peg_network.py``)
-     - 00:00.100
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_network_generator_plot_multi_component_system.py` (``plot_multi_component_system.py``)
-     - 00:00.077
+     - 00:00.125
      - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_add_angles.py` (``plot_add_angles.py``)
-     - 00:00.073
+     - 00:00.103
      - 0.0
-   * - :ref:`sphx_glr_auto_examples_network_generator_plot_save_network.py` (``plot_save_network.py``)
-     - 00:00.072
+   * - :ref:`sphx_glr_auto_examples_network_generator_plot_multi_component_system.py` (``plot_multi_component_system.py``)
+     - 00:00.098
      - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_simple_crosslinked_network.py` (``plot_simple_crosslinked_network.py``)
-     - 00:00.065
+     - 00:00.091
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_network_generator_plot_save_network.py` (``plot_save_network.py``)
+     - 00:00.068
      - 0.0

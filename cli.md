@@ -16,7 +16,7 @@ You must specify either –target-p (crosslinker conversion) or –target-wsol
 (soluble fraction), but not both.
 
 Example:
-: pylimer-generate-network –polymer-name PDMS –parameter-type GAUSSIAN –target-p 0.8 –n-chains-crosslinks 100 –target-file network.dat
+: pylimer-generate-network –polymer-name PDMS –parameter-type GAUSSIAN –target-p 0.8 –n-chains-crosslinkers 100 –target-file network.dat
 
 ### Usage
 
@@ -31,7 +31,7 @@ pylimer-generate-network [OPTIONS]
 Name of the polymer to generate the network for
 
 * **Options:**
-  ipp | pet | pi50 | app | aphma | pc | ips | cispbd | pi7 | app413 | app348 | apoa | pe413 | ptfe | peo | apea | pi20 | app463 | p6n | pdms | aps | apva | pi34 | pi75 | pbd20 | apmma | apams | cispi | pe | pom | sbr | pbd98 | spp | pib413 | pib | apma
+  pom | pe | pe413 | apams | aphma | p6n | cispbd | ips | aps | pdms | sbr | spp | pi20 | pc | pi50 | pi7 | pi75 | apoa | pbd20 | cispi | pet | app413 | pbd98 | app463 | peo | apma | pib | pi34 | app348 | ptfe | apva | app | apea | pib413 | apmma | ipp
 
 ### --parameter-type <parameter_type>
 
@@ -142,7 +142,14 @@ pylimer-analyse-networks [OPTIONS] [FILES]...
 Name of the polymer to use for parameter retrieval.
 
 * **Options:**
-  ipp | pet | pi50 | app | aphma | pc | ips | cispbd | pi7 | app413 | app348 | apoa | pe413 | ptfe | peo | apea | pi20 | app463 | p6n | pdms | aps | apva | pi34 | pi75 | pbd20 | apmma | apams | cispi | pe | pom | sbr | pbd98 | spp | pib413 | pib | apma
+  pom | pe | pe413 | apams | aphma | p6n | cispbd | ips | aps | pdms | sbr | spp | pi20 | pc | pi50 | pi7 | pi75 | apoa | pbd20 | cispi | pet | app413 | pbd98 | app463 | peo | apma | pib | pi34 | app348 | ptfe | apva | app | apea | pib413 | apmma | ipp
+
+### --parameter-type <parameter_type>
+
+Type of parameters to use for the polymer model.
+
+* **Options:**
+  GAUSSIAN | KG_LJ | KUHN
 
 ### Arguments
 

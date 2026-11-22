@@ -9079,7 +9079,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 3.174 seconds)
+**Total running time of the script:** (0 minutes 4.282 seconds)
 
 <a id="sphx-glr-download-auto-examples-dpd-simulations-plot-dpd-simulation-py"></a>
 
@@ -9098,7 +9098,7 @@ plt.show()
 
 # Computation times
 
-**00:03.174** total execution time for 1 file **from auto_examples/dpd_simulations**:
+**00:04.282** total execution time for 1 file **from auto_examples/dpd_simulations**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -9115,7 +9115,7 @@ $(document).ready( function () {
 
 | Example                                                                                                                                                 | Time      |   Mem (MB) |
 |---------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [DPD Simulations](auto_examples/dpd_simulations/plot_dpd_simulation.html.md#sphx-glr-auto-examples-dpd-simulations-plot-dpd-simulation-py) (`plot_dpd_simulation.py`) | 00:03.174 |          0 |
+| [DPD Simulations](auto_examples/dpd_simulations/plot_dpd_simulation.html.md#sphx-glr-auto-examples-dpd-simulations-plot-dpd-simulation-py) (`plot_dpd_simulation.py`) | 00:04.282 |          0 |
 
 
 # auto_examples/force_balance/index.html.md
@@ -9321,7 +9321,7 @@ plot_link_vs_spring_modulus(data)
 plot_link_vs_spring_dof(data)
 ```
 
-**Total running time of the script:** (0 minutes 0.251 seconds)
+**Total running time of the script:** (0 minutes 0.312 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-entanglement-link-vs-spring-py"></a>
 
@@ -9544,7 +9544,7 @@ print(format_benchmark_footnote(data))
 Measured on: Apple M3 Pro (12 cores), 36 GB RAM, Mac15,7, macOS 27.2.1 (arm64), Python 3.13.18 (cached 2026-11-17).
 ```
 
-**Total running time of the script:** (0 minutes 0.972 seconds)
+**Total running time of the script:** (0 minutes 1.237 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-entanglement-sampling-comparison-py"></a>
 
@@ -9708,8 +9708,8 @@ plt.show()
 ```
 
 ```none
-Final residual (should be close to 0): 8.293346237241509e-09
-Shear Modulus from Equilibrium [MPa]:  0.05439198488840575
+Final residual (should be close to 0): 2.498259704732998e-08
+Shear Modulus from Equilibrium [MPa]:  0.02974606553785756
 ```
 
 <!-- GENERATED FROM PYTHON SOURCE LINES 138-141 -->
@@ -9718,7 +9718,7 @@ Rather than using the nominal stress, you can also use the
 stress tensor directly to compute the shear modulus.
 Therewith, you could try to investigate e.g. the Mooney-Rivlin behaviour.
 
-**Total running time of the script:** (0 minutes 0.154 seconds)
+**Total running time of the script:** (0 minutes 0.202 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-fb-deformation-exp-py"></a>
 
@@ -9834,8 +9834,8 @@ gz = (
 ```
 
 ```none
-Final residual (should be close to 0): 8.851873909890503e-07
-Shear Modulus [MPa]: 0.0208
+Final residual (should be close to 0): 9.839973441737702e-07
+Shear Modulus [MPa]: 0.0386
 ```
 
 <!-- GENERATED FROM PYTHON SOURCE LINES 91-96 -->
@@ -9917,7 +9917,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.298 seconds)
+**Total running time of the script:** (0 minutes 0.389 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-force-balance-py"></a>
 
@@ -10208,7 +10208,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.265 seconds)
+**Total running time of the script:** (0 minutes 0.358 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-force-balance-2-py"></a>
 
@@ -10419,7 +10419,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 2.076 seconds)
+**Total running time of the script:** (0 minutes 2.894 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-force-relaxation-py"></a>
 
@@ -10559,7 +10559,7 @@ plot_inactive_topological_fractions(data)
 plot_inactive_solver_complexity(data)
 ```
 
-**Total running time of the script:** (0 minutes 0.471 seconds)
+**Total running time of the script:** (0 minutes 0.634 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-inactive-removal-and-sampling-py"></a>
 
@@ -10686,7 +10686,7 @@ plot_polydispersity_modulus(data)
 plot_polydispersity_fractions(data)
 ```
 
-**Total running time of the script:** (0 minutes 0.215 seconds)
+**Total running time of the script:** (0 minutes 0.282 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-polydispersity-study-py"></a>
 
@@ -10894,7 +10894,7 @@ uncertainty below 1–2%.
 plot_rve_sample_count_study(data)
 ```
 
-**Total running time of the script:** (0 minutes 1.841 seconds)
+**Total running time of the script:** (0 minutes 2.263 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-representative-volume-pdms-py"></a>
 
@@ -11039,7 +11039,7 @@ plot_cutoff_pair_distance_distribution(data)
 plot_cutoff_solver_iterations(data)
 ```
 
-**Total running time of the script:** (0 minutes 0.516 seconds)
+**Total running time of the script:** (0 minutes 0.667 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-sampling-cutoff-effect-py"></a>
 
@@ -11155,7 +11155,7 @@ plot_slipping_vs_fixed_modulus(data)
 plot_slipping_vs_fixed_iterations(data)
 ```
 
-**Total running time of the script:** (0 minutes 0.281 seconds)
+**Total running time of the script:** (0 minutes 0.343 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-slipping-vs-fixed-links-py"></a>
 
@@ -11174,7 +11174,7 @@ plot_slipping_vs_fixed_iterations(data)
 
 # Computation times
 
-**00:07.342** total execution time for 11 files **from auto_examples/force_balance**:
+**00:09.582** total execution time for 11 files **from auto_examples/force_balance**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -11191,17 +11191,17 @@ $(document).ready( function () {
 
 | Example                                                                                                                                                                                                     | Time      |   Mem (MB) |
 |-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [MEHP Force Relaxation](auto_examples/force_balance/plot_force_relaxation.html.md#sphx-glr-auto-examples-force-balance-plot-force-relaxation-py) (`plot_force_relaxation.py`)                                             | 00:02.076 |          0 |
-| [Representative Volume Study for PDMS Networks](auto_examples/force_balance/plot_representative_volume_pdms.html.md#sphx-glr-auto-examples-force-balance-plot-representative-volume-pdms-py) (`plot_representative_volume_pdms.py`) | 00:01.841 |          0 |
-| [Entanglement Sampling Methods](auto_examples/force_balance/plot_entanglement_sampling_comparison.html.md#sphx-glr-auto-examples-force-balance-plot-entanglement-sampling-comparison-py) (`plot_entanglement_sampling_comparison.py`)     | 00:00.972 |          0 |
-| [Sampling Cut-Off Effect](auto_examples/force_balance/plot_sampling_cutoff_effect.html.md#sphx-glr-auto-examples-force-balance-plot-sampling-cutoff-effect-py) (`plot_sampling_cutoff_effect.py`)                               | 00:00.516 |          0 |
-| [Inactive Removal & Sampling](auto_examples/force_balance/plot_inactive_removal_and_sampling.html.md#sphx-glr-auto-examples-force-balance-plot-inactive-removal-and-sampling-py) (`plot_inactive_removal_and_sampling.py`)             | 00:00.471 |          0 |
-| [Force Balance](auto_examples/force_balance/plot_force_balance.html.md#sphx-glr-auto-examples-force-balance-plot-force-balance-py) (`plot_force_balance.py`)                                                           | 00:00.298 |          0 |
-| [Slipping vs. Fixed Entanglement Links](auto_examples/force_balance/plot_slipping_vs_fixed_links.html.md#sphx-glr-auto-examples-force-balance-plot-slipping-vs-fixed-links-py) (`plot_slipping_vs_fixed_links.py`)               | 00:00.281 |          0 |
-| [Force Balance 2](auto_examples/force_balance/plot_force_balance_2.html.md#sphx-glr-auto-examples-force-balance-plot-force-balance-2-py) (`plot_force_balance_2.py`)                                                     | 00:00.265 |          0 |
-| [Entanglement Links vs. Springs](auto_examples/force_balance/plot_entanglement_link_vs_spring.html.md#sphx-glr-auto-examples-force-balance-plot-entanglement-link-vs-spring-py) (`plot_entanglement_link_vs_spring.py`)              | 00:00.251 |          0 |
-| [Polydispersity Study](auto_examples/force_balance/plot_polydispersity_study.html.md#sphx-glr-auto-examples-force-balance-plot-polydispersity-study-py) (`plot_polydispersity_study.py`)                                      | 00:00.215 |          0 |
-| [Deformation Experiment](auto_examples/force_balance/plot_fb_deformation_exp.html.md#sphx-glr-auto-examples-force-balance-plot-fb-deformation-exp-py) (`plot_fb_deformation_exp.py`)                                        | 00:00.154 |          0 |
+| [MEHP Force Relaxation](auto_examples/force_balance/plot_force_relaxation.html.md#sphx-glr-auto-examples-force-balance-plot-force-relaxation-py) (`plot_force_relaxation.py`)                                             | 00:02.894 |          0 |
+| [Representative Volume Study for PDMS Networks](auto_examples/force_balance/plot_representative_volume_pdms.html.md#sphx-glr-auto-examples-force-balance-plot-representative-volume-pdms-py) (`plot_representative_volume_pdms.py`) | 00:02.263 |          0 |
+| [Entanglement Sampling Methods](auto_examples/force_balance/plot_entanglement_sampling_comparison.html.md#sphx-glr-auto-examples-force-balance-plot-entanglement-sampling-comparison-py) (`plot_entanglement_sampling_comparison.py`)     | 00:01.237 |          0 |
+| [Sampling Cut-Off Effect](auto_examples/force_balance/plot_sampling_cutoff_effect.html.md#sphx-glr-auto-examples-force-balance-plot-sampling-cutoff-effect-py) (`plot_sampling_cutoff_effect.py`)                               | 00:00.667 |          0 |
+| [Inactive Removal & Sampling](auto_examples/force_balance/plot_inactive_removal_and_sampling.html.md#sphx-glr-auto-examples-force-balance-plot-inactive-removal-and-sampling-py) (`plot_inactive_removal_and_sampling.py`)             | 00:00.634 |          0 |
+| [Force Balance](auto_examples/force_balance/plot_force_balance.html.md#sphx-glr-auto-examples-force-balance-plot-force-balance-py) (`plot_force_balance.py`)                                                           | 00:00.389 |          0 |
+| [Force Balance 2](auto_examples/force_balance/plot_force_balance_2.html.md#sphx-glr-auto-examples-force-balance-plot-force-balance-2-py) (`plot_force_balance_2.py`)                                                     | 00:00.358 |          0 |
+| [Slipping vs. Fixed Entanglement Links](auto_examples/force_balance/plot_slipping_vs_fixed_links.html.md#sphx-glr-auto-examples-force-balance-plot-slipping-vs-fixed-links-py) (`plot_slipping_vs_fixed_links.py`)               | 00:00.343 |          0 |
+| [Entanglement Links vs. Springs](auto_examples/force_balance/plot_entanglement_link_vs_spring.html.md#sphx-glr-auto-examples-force-balance-plot-entanglement-link-vs-spring-py) (`plot_entanglement_link_vs_spring.py`)              | 00:00.312 |          0 |
+| [Polydispersity Study](auto_examples/force_balance/plot_polydispersity_study.html.md#sphx-glr-auto-examples-force-balance-plot-polydispersity-study-py) (`plot_polydispersity_study.py`)                                      | 00:00.282 |          0 |
+| [Deformation Experiment](auto_examples/force_balance/plot_fb_deformation_exp.html.md#sphx-glr-auto-examples-force-balance-plot-fb-deformation-exp-py) (`plot_fb_deformation_exp.py`)                                        | 00:00.202 |          0 |
 
 
 # auto_examples/index.html.md
@@ -11867,7 +11867,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.073 seconds)
+**Total running time of the script:** (0 minutes 0.103 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-add-angles-py"></a>
 
@@ -12046,7 +12046,7 @@ ax.legend()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.261 seconds)
+**Total running time of the script:** (0 minutes 0.338 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-custom-crosslinking-callback-py"></a>
 
@@ -12176,11 +12176,11 @@ plt.show()
 ```
 
 ```none
-Time without max distance:  18.64 seconds
-Time with z-score max distance: 5.04 seconds
+Time without max distance:  24.66 seconds
+Time with z-score max distance: 6.91 seconds
 ```
 
-**Total running time of the script:** (0 minutes 23.808 seconds)
+**Total running time of the script:** (0 minutes 31.732 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-monte-carlo-configuration-py"></a>
 
@@ -12294,11 +12294,11 @@ writer.write_to_file("generated_structures/multi_component_polymer_network.data"
 ```
 
 ```none
-Starting network generation at 2026-11-19 13:22:31.855938
+Starting network generation at 2026-11-22 07:52:14.655934
 Adding crosslinkers...
 Adding solvent chains...
 Adding and linking polymer strands...
-Network generation completed at 2026-11-19 13:22:31.857409
+Network generation completed at 2026-11-22 07:52:14.657571
 ```
 
 <!-- GENERATED FROM PYTHON SOURCE LINES 89-92 -->
@@ -12348,7 +12348,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.077 seconds)
+**Total running time of the script:** (0 minutes 0.098 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-multi-component-system-py"></a>
 
@@ -12466,7 +12466,7 @@ plt.title("Distribution of Strand Lengths in Polydisperse Network")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.236 seconds)
+**Total running time of the script:** (0 minutes 0.302 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-polydisperse-system-py"></a>
 
@@ -12568,7 +12568,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.072 seconds)
+**Total running time of the script:** (0 minutes 0.068 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-save-network-py"></a>
 
@@ -12692,7 +12692,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.065 seconds)
+**Total running time of the script:** (0 minutes 0.091 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-simple-crosslinked-network-py"></a>
 
@@ -12876,7 +12876,7 @@ print("Network saved to 'generated_structures/tetra_peg_network.data'")
 ```
 
 ```none
-Starting tetra-PEG network generation at 2026-11-19 13:22:32.548320
+Starting tetra-PEG network generation at 2026-11-22 07:52:15.411803
 System parameters:
   Box size: 80.0³
   Star crosslinkers: 150
@@ -12896,7 +12896,7 @@ System after strand-strand linking:
   Final strand conversion: 0.822
 Relaxing crosslink positions...
 Generating final universe with bead coordinates...
-Network generation completed at 2026-11-19 13:22:32.561620
+Network generation completed at 2026-11-22 07:52:15.429460
 Final network statistics:
   Total atoms: 12900
   Total bonds: 12985
@@ -12964,7 +12964,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.100 seconds)
+**Total running time of the script:** (0 minutes 0.125 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-tetra-peg-network-py"></a>
 
@@ -13104,7 +13104,7 @@ plt.title("Distribution of Strand Lengths in Vulcanized Network")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 14.148 seconds)
+**Total running time of the script:** (0 minutes 19.318 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-vulcanized-network-py"></a>
 
@@ -13123,7 +13123,7 @@ plt.show()
 
 # Computation times
 
-**00:38.840** total execution time for 9 files **from auto_examples/network_generator**:
+**00:52.176** total execution time for 9 files **from auto_examples/network_generator**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -13140,15 +13140,15 @@ $(document).ready( function () {
 
 | Example                                                                                                                                                                                             | Time      |   Mem (MB) |
 |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [Monte Carlo Configuration](auto_examples/network_generator/plot_monte_carlo_configuration.html.md#sphx-glr-auto-examples-network-generator-plot-monte-carlo-configuration-py) (`plot_monte_carlo_configuration.py`)           | 00:23.808 |          0 |
-| [Generate Vulcanized Networks](auto_examples/network_generator/plot_vulcanized_network.html.md#sphx-glr-auto-examples-network-generator-plot-vulcanized-network-py) (`plot_vulcanized_network.py`)                      | 00:14.148 |          0 |
-| [Custom Crosslinking Callbacks](auto_examples/network_generator/plot_custom_crosslinking_callback.html.md#sphx-glr-auto-examples-network-generator-plot-custom-crosslinking-callback-py) (`plot_custom_crosslinking_callback.py`) | 00:00.261 |          0 |
-| [Polydisperse Network](auto_examples/network_generator/plot_polydisperse_system.html.md#sphx-glr-auto-examples-network-generator-plot-polydisperse-system-py) (`plot_polydisperse_system.py`)                            | 00:00.236 |          0 |
-| [Tetra-PEG Network Generation](auto_examples/network_generator/plot_tetra_peg_network.html.md#sphx-glr-auto-examples-network-generator-plot-tetra-peg-network-py) (`plot_tetra_peg_network.py`)                        | 00:00.100 |          0 |
-| [Multi-Component System](auto_examples/network_generator/plot_multi_component_system.html.md#sphx-glr-auto-examples-network-generator-plot-multi-component-system-py) (`plot_multi_component_system.py`)                    | 00:00.077 |          0 |
-| [Adding Topology Information](auto_examples/network_generator/plot_add_angles.html.md#sphx-glr-auto-examples-network-generator-plot-add-angles-py) (`plot_add_angles.py`)                                       | 00:00.073 |          0 |
-| [Save Generated Network](auto_examples/network_generator/plot_save_network.html.md#sphx-glr-auto-examples-network-generator-plot-save-network-py) (`plot_save_network.py`)                                        | 00:00.072 |          0 |
-| [Simple Crosslinked Network](auto_examples/network_generator/plot_simple_crosslinked_network.html.md#sphx-glr-auto-examples-network-generator-plot-simple-crosslinked-network-py) (`plot_simple_crosslinked_network.py`)        | 00:00.065 |          0 |
+| [Monte Carlo Configuration](auto_examples/network_generator/plot_monte_carlo_configuration.html.md#sphx-glr-auto-examples-network-generator-plot-monte-carlo-configuration-py) (`plot_monte_carlo_configuration.py`)           | 00:31.732 |          0 |
+| [Generate Vulcanized Networks](auto_examples/network_generator/plot_vulcanized_network.html.md#sphx-glr-auto-examples-network-generator-plot-vulcanized-network-py) (`plot_vulcanized_network.py`)                      | 00:19.318 |          0 |
+| [Custom Crosslinking Callbacks](auto_examples/network_generator/plot_custom_crosslinking_callback.html.md#sphx-glr-auto-examples-network-generator-plot-custom-crosslinking-callback-py) (`plot_custom_crosslinking_callback.py`) | 00:00.338 |          0 |
+| [Polydisperse Network](auto_examples/network_generator/plot_polydisperse_system.html.md#sphx-glr-auto-examples-network-generator-plot-polydisperse-system-py) (`plot_polydisperse_system.py`)                            | 00:00.302 |          0 |
+| [Tetra-PEG Network Generation](auto_examples/network_generator/plot_tetra_peg_network.html.md#sphx-glr-auto-examples-network-generator-plot-tetra-peg-network-py) (`plot_tetra_peg_network.py`)                        | 00:00.125 |          0 |
+| [Adding Topology Information](auto_examples/network_generator/plot_add_angles.html.md#sphx-glr-auto-examples-network-generator-plot-add-angles-py) (`plot_add_angles.py`)                                       | 00:00.103 |          0 |
+| [Multi-Component System](auto_examples/network_generator/plot_multi_component_system.html.md#sphx-glr-auto-examples-network-generator-plot-multi-component-system-py) (`plot_multi_component_system.py`)                    | 00:00.098 |          0 |
+| [Simple Crosslinked Network](auto_examples/network_generator/plot_simple_crosslinked_network.html.md#sphx-glr-auto-examples-network-generator-plot-simple-crosslinked-network-py) (`plot_simple_crosslinked_network.py`)        | 00:00.091 |          0 |
+| [Save Generated Network](auto_examples/network_generator/plot_save_network.html.md#sphx-glr-auto-examples-network-generator-plot-save-network-py) (`plot_save_network.py`)                                        | 00:00.068 |          0 |
 
 
 # auto_examples/normal_mode_analysis/index.html.md
@@ -13359,10 +13359,10 @@ data = load_or_compute_cache(cache_path, run_kpm_vs_exact_pdms_study)
 Demo PDMS box (L=12 nm, N_atoms=3819, N_ent=84):
 Method   | Time [s] |  Speedup | Mean Rel. Err. G' [%] | Max Rel. Err. G' [%]
 -----------------------------------------------------------------------------
-Exact    |    6.435 |     1.0x |                  0.00 |                 0.00
-KPM      |    0.085 |    75.3x |                  2.69 |                 9.99
-SLQ      |    0.029 |   223.6x |                  0.68 |                 4.79
-Hybrid   |    0.085 |    75.9x |                  0.64 |                 1.80
+Exact    |    8.803 |     1.0x |                  0.00 |                 0.00
+KPM      |    0.118 |    74.9x |                  2.69 |                 9.99
+SLQ      |    0.038 |   230.5x |                  0.68 |                 4.79
+Hybrid   |    0.112 |    78.9x |                  0.64 |                 1.80
 Loading cached example data from kpm_vs_exact_pdms_cache.npz...
 ```
 
@@ -13534,7 +13534,7 @@ print(format_benchmark_footnote(data))
 Measured on: Apple M3 Pro (12 cores), 36 GB RAM, Mac15,7, macOS 27.2.1 (arm64), Python 3.13.18 (cached 2026-11-17).
 ```
 
-**Total running time of the script:** (0 minutes 8.473 seconds)
+**Total running time of the script:** (0 minutes 11.535 seconds)
 
 <a id="sphx-glr-download-auto-examples-normal-mode-analysis-plot-kpm-vs-exact-pdms-py"></a>
 
@@ -13689,10 +13689,10 @@ print(summary_df.to_string(index=False))
 
 ```none
 Method Time [s] Speedup Mean Rel. Err. G' [%] Max Rel. Err. G' [%] Mean Rel. Err. G'' [%] Max Rel. Err. G'' [%]
- Exact   12.326    1.0x                  0.00                 0.00                   0.00                  0.00
-   KPM    0.052  238.7x                 20.36                87.70                   8.35                 54.80
-   SLQ    0.037  337.0x                  2.06                41.07                   1.03                  6.64
-Hybrid    0.153   80.6x                  0.44                 1.38                   0.49                  1.41
+ Exact   16.276    1.0x                  0.00                 0.00                   0.00                  0.00
+   KPM    0.070  232.7x                 20.36                87.70                   8.35                 54.80
+   SLQ    0.048  341.7x                  2.06                41.07                   1.03                  6.64
+Hybrid    0.203   80.3x                  0.44                 1.38                   0.49                  1.41
 ```
 
 <!-- GENERATED FROM PYTHON SOURCE LINES 124-131 -->
@@ -13731,7 +13731,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 13.012 seconds)
+**Total running time of the script:** (0 minutes 17.208 seconds)
 
 <a id="sphx-glr-download-auto-examples-normal-mode-analysis-plot-normal-mode-analysis-py"></a>
 
@@ -13750,7 +13750,7 @@ plt.show()
 
 # Computation times
 
-**00:21.485** total execution time for 2 files **from auto_examples/normal_mode_analysis**:
+**00:28.743** total execution time for 2 files **from auto_examples/normal_mode_analysis**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -13767,8 +13767,8 @@ $(document).ready( function () {
 
 | Example                                                                                                                                                                                                           | Time      |   Mem (MB) |
 |-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [Normal Mode Analysis (NMA)](auto_examples/normal_mode_analysis/plot_normal_mode_analysis.html.md#sphx-glr-auto-examples-normal-mode-analysis-plot-normal-mode-analysis-py) (`plot_normal_mode_analysis.py`)                               | 00:13.012 |          0 |
-| [KPM vs. Full Eigenvalue Normal Mode Analysis for PDMS Networks](auto_examples/normal_mode_analysis/plot_kpm_vs_exact_pdms.html.md#sphx-glr-auto-examples-normal-mode-analysis-plot-kpm-vs-exact-pdms-py) (`plot_kpm_vs_exact_pdms.py`) | 00:08.473 |          0 |
+| [Normal Mode Analysis (NMA)](auto_examples/normal_mode_analysis/plot_normal_mode_analysis.html.md#sphx-glr-auto-examples-normal-mode-analysis-plot-normal-mode-analysis-py) (`plot_normal_mode_analysis.py`)                               | 00:17.208 |          0 |
+| [KPM vs. Full Eigenvalue Normal Mode Analysis for PDMS Networks](auto_examples/normal_mode_analysis/plot_kpm_vs_exact_pdms.html.md#sphx-glr-auto-examples-normal-mode-analysis-plot-kpm-vs-exact-pdms-py) (`plot_kpm_vs_exact_pdms.py`) | 00:11.535 |          0 |
 
 
 # auto_examples/readers_writers/index.html.md
@@ -13953,7 +13953,7 @@ plt.show()
 To convert it back to the molecule index relating to their current connectivity,
 simply repeat the process with `config_molecule_idx_for_swap(False)`
 
-**Total running time of the script:** (0 minutes 0.081 seconds)
+**Total running time of the script:** (0 minutes 0.111 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-convert-for-bond-swapping-py"></a>
 
@@ -14058,7 +14058,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.127 seconds)
+**Total running time of the script:** (0 minutes 0.183 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-convert-trajectory-to-frame-py"></a>
 
@@ -14132,7 +14132,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.067 seconds)
+**Total running time of the script:** (0 minutes 0.089 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-correlated-averages-reader-py"></a>
 
@@ -14261,7 +14261,7 @@ If your data files don’t hint the atom style in the line that starts with “A
 you should specify it manually, see [`read()`](api/pylimer_tools_cpp.DataFileReader.html.md#pylimer_tools_cpp.DataFileReader.read)
 and [`set_data_file_atom_style()`](api/pylimer_tools_cpp.UniverseSequence.html.md#pylimer_tools_cpp.UniverseSequence.set_data_file_atom_style).
 
-**Total running time of the script:** (0 minutes 0.203 seconds)
+**Total running time of the script:** (0 minutes 0.284 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-data-file-reader-py"></a>
 
@@ -14420,7 +14420,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.081 seconds)
+**Total running time of the script:** (0 minutes 0.110 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-data-file-writer-py"></a>
 
@@ -14521,7 +14521,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.053 seconds)
+**Total running time of the script:** (0 minutes 0.068 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-dump-file-reader-py"></a>
 
@@ -14590,7 +14590,7 @@ plt.title(f"Density Distribution at Step {final_timestep}")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.038 seconds)
+**Total running time of the script:** (0 minutes 0.190 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-histogram-reader-py"></a>
 
@@ -14682,7 +14682,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.061 seconds)
+**Total running time of the script:** (0 minutes 0.081 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-log-thermo-file-reader-py"></a>
 
@@ -22211,8 +22211,8 @@ Processing frame 74310 with 32 atoms
 Processing frame 74320 with 32 atoms
 
 --- Memory Usage Report ---
-Memory before processing: 962.36 MB
-Memory after processing:  962.36 MB
+Memory before processing: 962.78 MB
+Memory after processing:  962.78 MB
 Memory used by script:    0.00 MB
 ```
 
@@ -22242,7 +22242,7 @@ print(f"Dump file size:           {dump_file_size / (1024 * 1024):.2f} MB")
 Dump file size:           83.32 MB
 ```
 
-**Total running time of the script:** (0 minutes 1.847 seconds)
+**Total running time of the script:** (0 minutes 2.580 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-memory-efficient-dump-file-reading-py"></a>
 
@@ -22326,7 +22326,7 @@ plt.ylabel("Time [s]")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.031 seconds)
+**Total running time of the script:** (0 minutes 0.038 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-performance-caching-py"></a>
 
@@ -22400,7 +22400,7 @@ plt.ylabel("Temperature")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.031 seconds)
+**Total running time of the script:** (0 minutes 0.040 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-pylimer-tools-output-reader-py"></a>
 
@@ -22497,7 +22497,7 @@ for timestep, group in sectioned_data.groupby("TimeStep"):
     print(f"Timestep {timestep}: {len(group)} data points")
 ```
 
-**Total running time of the script:** (0 minutes 0.059 seconds)
+**Total running time of the script:** (0 minutes 0.083 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-time-averaged-data-reader-py"></a>
 
@@ -22560,7 +22560,7 @@ print(f"1 'lj' pressure in Pascal: {pressure_lj_pa:.2f} Pa")
 ```
 
 ```none
-/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/site-packages/pylimer_tools/io/unit_styles.py:176: UserWarning: LJ unit styles are derived. Reference used: https://doi.org/10.1021/acs.macromol.9b02428
+/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/site-packages/pylimer_tools/io/unit_styles.py:182: UserWarning: LJ unit styles are derived. Reference used: https://doi.org/10.1021/acs.macromol.9b02428
   warnings.warn(
 1 'real' pressure (atm) in Pascal: 101325.00 Pa
 1 'lj' pressure in Pascal: 17600000.00 Pa
@@ -22603,7 +22603,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.239 seconds)
+**Total running time of the script:** (0 minutes 0.314 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-unit-conversion-py"></a>
 
@@ -22622,7 +22622,7 @@ plt.show()
 
 # Computation times
 
-**00:02.919** total execution time for 13 files **from auto_examples/readers_writers**:
+**00:04.171** total execution time for 13 files **from auto_examples/readers_writers**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -22639,19 +22639,19 @@ $(document).ready( function () {
 
 | Example                                                                                                                                                                                                    | Time      |   Mem (MB) |
 |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [Streaming Dump File Reader](auto_examples/readers_writers/plot_memory_efficient_dump_file_reading.html.md#sphx-glr-auto-examples-readers-writers-plot-memory-efficient-dump-file-reading-py) (`plot_memory_efficient_dump_file_reading.py`) | 00:01.847 |          0 |
-| [Unit Conversion](auto_examples/readers_writers/plot_unit_conversion.html.md#sphx-glr-auto-examples-readers-writers-plot-unit-conversion-py) (`plot_unit_conversion.py`)                                                  | 00:00.239 |          0 |
-| [Data File Reader](auto_examples/readers_writers/plot_data_file_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-data-file-reader-py) (`plot_data_file_reader.py`)                                               | 00:00.203 |          0 |
-| [Extract Trajectory Frame](auto_examples/readers_writers/plot_convert_trajectory_to_frame.html.md#sphx-glr-auto-examples-readers-writers-plot-convert-trajectory-to-frame-py) (`plot_convert_trajectory_to_frame.py`)                 | 00:00.127 |          0 |
-| [Convert for Bond Swapping](auto_examples/readers_writers/plot_convert_for_bond_swapping.html.md#sphx-glr-auto-examples-readers-writers-plot-convert-for-bond-swapping-py) (`plot_convert_for_bond_swapping.py`)                    | 00:00.081 |          0 |
-| [Data File Writer](auto_examples/readers_writers/plot_data_file_writer.html.md#sphx-glr-auto-examples-readers-writers-plot-data-file-writer-py) (`plot_data_file_writer.py`)                                               | 00:00.081 |          0 |
-| [Correlated Averages Reader](auto_examples/readers_writers/plot_correlated_averages_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-correlated-averages-reader-py) (`plot_correlated_averages_reader.py`)                 | 00:00.067 |          0 |
-| [Log & Thermo File Reader](auto_examples/readers_writers/plot_log_thermo_file_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-log-thermo-file-reader-py) (`plot_log_thermo_file_reader.py`)                           | 00:00.061 |          0 |
-| [Time-Averaged Data Reader](auto_examples/readers_writers/plot_time_averaged_data_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-time-averaged-data-reader-py) (`plot_time_averaged_data_reader.py`)                    | 00:00.059 |          0 |
-| [Dump File Reader](auto_examples/readers_writers/plot_dump_file_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-dump-file-reader-py) (`plot_dump_file_reader.py`)                                               | 00:00.053 |          0 |
-| [Histogram Reader](auto_examples/readers_writers/plot_histogram_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-histogram-reader-py) (`plot_histogram_reader.py`)                                               | 00:00.038 |          0 |
-| [pylimer-tools Output Reader](auto_examples/readers_writers/plot_pylimer_tools_output_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-pylimer-tools-output-reader-py) (`plot_pylimer_tools_output_reader.py`)              | 00:00.031 |          0 |
-| [Performance and Caching](auto_examples/readers_writers/plot_performance_caching.html.md#sphx-glr-auto-examples-readers-writers-plot-performance-caching-py) (`plot_performance_caching.py`)                                  | 00:00.031 |          0 |
+| [Streaming Dump File Reader](auto_examples/readers_writers/plot_memory_efficient_dump_file_reading.html.md#sphx-glr-auto-examples-readers-writers-plot-memory-efficient-dump-file-reading-py) (`plot_memory_efficient_dump_file_reading.py`) | 00:02.580 |          0 |
+| [Unit Conversion](auto_examples/readers_writers/plot_unit_conversion.html.md#sphx-glr-auto-examples-readers-writers-plot-unit-conversion-py) (`plot_unit_conversion.py`)                                                  | 00:00.314 |          0 |
+| [Data File Reader](auto_examples/readers_writers/plot_data_file_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-data-file-reader-py) (`plot_data_file_reader.py`)                                               | 00:00.284 |          0 |
+| [Histogram Reader](auto_examples/readers_writers/plot_histogram_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-histogram-reader-py) (`plot_histogram_reader.py`)                                               | 00:00.190 |          0 |
+| [Extract Trajectory Frame](auto_examples/readers_writers/plot_convert_trajectory_to_frame.html.md#sphx-glr-auto-examples-readers-writers-plot-convert-trajectory-to-frame-py) (`plot_convert_trajectory_to_frame.py`)                 | 00:00.183 |          0 |
+| [Convert for Bond Swapping](auto_examples/readers_writers/plot_convert_for_bond_swapping.html.md#sphx-glr-auto-examples-readers-writers-plot-convert-for-bond-swapping-py) (`plot_convert_for_bond_swapping.py`)                    | 00:00.111 |          0 |
+| [Data File Writer](auto_examples/readers_writers/plot_data_file_writer.html.md#sphx-glr-auto-examples-readers-writers-plot-data-file-writer-py) (`plot_data_file_writer.py`)                                               | 00:00.110 |          0 |
+| [Correlated Averages Reader](auto_examples/readers_writers/plot_correlated_averages_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-correlated-averages-reader-py) (`plot_correlated_averages_reader.py`)                 | 00:00.089 |          0 |
+| [Time-Averaged Data Reader](auto_examples/readers_writers/plot_time_averaged_data_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-time-averaged-data-reader-py) (`plot_time_averaged_data_reader.py`)                    | 00:00.083 |          0 |
+| [Log & Thermo File Reader](auto_examples/readers_writers/plot_log_thermo_file_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-log-thermo-file-reader-py) (`plot_log_thermo_file_reader.py`)                           | 00:00.081 |          0 |
+| [Dump File Reader](auto_examples/readers_writers/plot_dump_file_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-dump-file-reader-py) (`plot_dump_file_reader.py`)                                               | 00:00.068 |          0 |
+| [pylimer-tools Output Reader](auto_examples/readers_writers/plot_pylimer_tools_output_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-pylimer-tools-output-reader-py) (`plot_pylimer_tools_output_reader.py`)              | 00:00.040 |          0 |
+| [Performance and Caching](auto_examples/readers_writers/plot_performance_caching.html.md#sphx-glr-auto-examples-readers-writers-plot-performance-caching-py) (`plot_performance_caching.py`)                                  | 00:00.038 |          0 |
 
 
 # auto_examples/rouse_simulations/index.html.md
@@ -23334,7 +23334,7 @@ Stochastic Rouse chain (N=16, tau_1=26.02):
   CM MSD at t=tau_1: 8.900 (exact 6*D_CM*tau_1 = 9.758)
 ```
 
-**Total running time of the script:** (0 minutes 0.928 seconds)
+**Total running time of the script:** (0 minutes 1.311 seconds)
 
 <a id="sphx-glr-download-auto-examples-rouse-simulations-plot-rouse-brownian-simulation-py"></a>
 
@@ -23811,7 +23811,7 @@ plt.show()
 Crosslinked network (N=38, edges=40): mean relative error of <|r_i - r_CM|^2> vs (3 kB T / k) L^+_ii = 4.63%
 ```
 
-**Total running time of the script:** (0 minutes 1.814 seconds)
+**Total running time of the script:** (0 minutes 2.452 seconds)
 
 <a id="sphx-glr-download-auto-examples-rouse-simulations-plot-rouse-topologies-and-resistance-py"></a>
 
@@ -23830,7 +23830,7 @@ Crosslinked network (N=38, edges=40): mean relative error of <|r_i - r_CM|^2> vs
 
 # Computation times
 
-**00:02.742** total execution time for 2 files **from auto_examples/rouse_simulations**:
+**00:03.763** total execution time for 2 files **from auto_examples/rouse_simulations**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -23847,8 +23847,8 @@ $(document).ready( function () {
 
 | Example                                                                                                                                                                                                                                              | Time      |   Mem (MB) |
 |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [Polymer Architectures & Resistance-Fluctuation Duality in Rouse Dynamics](auto_examples/rouse_simulations/plot_rouse_topologies_and_resistance.html.md#sphx-glr-auto-examples-rouse-simulations-plot-rouse-topologies-and-resistance-py) (`plot_rouse_topologies_and_resistance.py`) | 00:01.814 |          0 |
-| [Rouse & Brownian Dynamics Simulation](auto_examples/rouse_simulations/plot_rouse_brownian_simulation.html.md#sphx-glr-auto-examples-rouse-simulations-plot-rouse-brownian-simulation-py) (`plot_rouse_brownian_simulation.py`)                                                 | 00:00.928 |          0 |
+| [Polymer Architectures & Resistance-Fluctuation Duality in Rouse Dynamics](auto_examples/rouse_simulations/plot_rouse_topologies_and_resistance.html.md#sphx-glr-auto-examples-rouse-simulations-plot-rouse-topologies-and-resistance-py) (`plot_rouse_topologies_and_resistance.py`) | 00:02.452 |          0 |
+| [Rouse & Brownian Dynamics Simulation](auto_examples/rouse_simulations/plot_rouse_brownian_simulation.html.md#sphx-glr-auto-examples-rouse-simulations-plot-rouse-brownian-simulation-py) (`plot_rouse_brownian_simulation.py`)                                                 | 00:01.311 |          0 |
 
 
 # auto_examples/sg_execution_times.html.md
@@ -24043,7 +24043,7 @@ plt.ylabel("Count")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.034 seconds)
+**Total running time of the script:** (0 minutes 0.046 seconds)
 
 <a id="sphx-glr-download-auto-examples-structure-analysis-plot-decompose-structure-py"></a>
 
@@ -24139,7 +24139,7 @@ plt.ylabel("Frequency")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.059 seconds)
+**Total running time of the script:** (0 minutes 0.083 seconds)
 
 <a id="sphx-glr-download-auto-examples-structure-analysis-plot-end-to-end-distribution-py"></a>
 
@@ -24231,7 +24231,7 @@ shortest_loop = universe.find_minimal_order_loop_from(loop_start=1, loop_step1=1
 print(f"Shortest loop involving atom 1: {shortest_loop}")
 ```
 
-**Total running time of the script:** (0 minutes 0.062 seconds)
+**Total running time of the script:** (0 minutes 0.086 seconds)
 
 <a id="sphx-glr-download-auto-examples-structure-analysis-plot-loop-analysis-py"></a>
 
@@ -24899,19 +24899,19 @@ plt.show()
 ```none
 Loaded polymer network: 4590 atoms, 4600 bonds, 3 connected components (largest: 4542 atoms).
 Evaluated 1540 crosslinker pairs (56 crosslinkers):
-  Individual solves: 36.12 ms
-  Batched multi-RHS: 26.27 ms (speedup: 1.38x)
+  Individual solves: 47.23 ms
+  Batched multi-RHS: 36.05 ms (speedup: 1.31x)
   Max difference:    0.00e+00
 
 All-pairs & Kirchhoff benchmarks on 300-node crosslinked ring:
-  Pairwise loop (44,850 pairs):   85.24 ms
-  All-pairs chunk_size=1:         0.32 ms
-  All-pairs chunk_size=128:       0.48 ms (vs loop: 178.9x, vs chunk=1: 0.66x, max diff: 0.00e+00)
-  Kirchhoff spectral (O(N^3)):    8.10 ms
-  Kirchhoff fast (chunked):       0.40 ms (speedup: 20.4x, |diff|: 1.80e-07)
+  Pairwise loop (44,850 pairs):   117.50 ms
+  All-pairs chunk_size=1:         0.45 ms
+  All-pairs chunk_size=128:       0.56 ms (vs loop: 211.1x, vs chunk=1: 0.80x, max diff: 0.00e+00)
+  Kirchhoff spectral (O(N^3)):    11.29 ms
+  Kirchhoff fast (chunked):       0.57 ms (speedup: 20.0x, |diff|: 1.80e-07)
 ```
 
-**Total running time of the script:** (0 minutes 0.850 seconds)
+**Total running time of the script:** (0 minutes 1.184 seconds)
 
 <a id="sphx-glr-download-auto-examples-structure-analysis-plot-resistance-distance-analysis-py"></a>
 
@@ -25021,7 +25021,7 @@ plt.ylabel("Count")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.036 seconds)
+**Total running time of the script:** (0 minutes 0.048 seconds)
 
 <a id="sphx-glr-download-auto-examples-structure-analysis-plot-structure-analysis-py"></a>
 
@@ -25040,7 +25040,7 @@ plt.show()
 
 # Computation times
 
-**00:01.041** total execution time for 5 files **from auto_examples/structure_analysis**:
+**00:01.447** total execution time for 5 files **from auto_examples/structure_analysis**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -25057,11 +25057,11 @@ $(document).ready( function () {
 
 | Example                                                                                                                                                                                                                        | Time      |   Mem (MB) |
 |--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [Topological Resistance Distance & Commute Time Analysis](auto_examples/structure_analysis/plot_resistance_distance_analysis.html.md#sphx-glr-auto-examples-structure-analysis-plot-resistance-distance-analysis-py) (`plot_resistance_distance_analysis.py`) | 00:00.850 |          0 |
-| [Loop Finding and Analysis](auto_examples/structure_analysis/plot_loop_analysis.html.md#sphx-glr-auto-examples-structure-analysis-plot-loop-analysis-py) (`plot_loop_analysis.py`)                                                             | 00:00.062 |          0 |
-| [End-to-End Distribution](auto_examples/structure_analysis/plot_end_to_end_distribution.html.md#sphx-glr-auto-examples-structure-analysis-plot-end-to-end-distribution-py) (`plot_end_to_end_distribution.py`)                                           | 00:00.059 |          0 |
-| [Extract Synthesis Parameters](auto_examples/structure_analysis/plot_structure_analysis.html.md#sphx-glr-auto-examples-structure-analysis-plot-structure-analysis-py) (`plot_structure_analysis.py`)                                                | 00:00.036 |          0 |
-| [Decompose/Split Structure](auto_examples/structure_analysis/plot_decompose_structure.html.md#sphx-glr-auto-examples-structure-analysis-plot-decompose-structure-py) (`plot_decompose_structure.py`)                                                 | 00:00.034 |          0 |
+| [Topological Resistance Distance & Commute Time Analysis](auto_examples/structure_analysis/plot_resistance_distance_analysis.html.md#sphx-glr-auto-examples-structure-analysis-plot-resistance-distance-analysis-py) (`plot_resistance_distance_analysis.py`) | 00:01.184 |          0 |
+| [Loop Finding and Analysis](auto_examples/structure_analysis/plot_loop_analysis.html.md#sphx-glr-auto-examples-structure-analysis-plot-loop-analysis-py) (`plot_loop_analysis.py`)                                                             | 00:00.086 |          0 |
+| [End-to-End Distribution](auto_examples/structure_analysis/plot_end_to_end_distribution.html.md#sphx-glr-auto-examples-structure-analysis-plot-end-to-end-distribution-py) (`plot_end_to_end_distribution.py`)                                           | 00:00.083 |          0 |
+| [Extract Synthesis Parameters](auto_examples/structure_analysis/plot_structure_analysis.html.md#sphx-glr-auto-examples-structure-analysis-plot-structure-analysis-py) (`plot_structure_analysis.py`)                                                | 00:00.048 |          0 |
+| [Decompose/Split Structure](auto_examples/structure_analysis/plot_decompose_structure.html.md#sphx-glr-auto-examples-structure-analysis-plot-decompose-structure-py) (`plot_decompose_structure.py`)                                                 | 00:00.046 |          0 |
 
 
 # auto_examples/trajectory_analysis/index.html.md
@@ -25241,7 +25241,7 @@ msd_result = tidynamics.msd(
  )
 ```
 
-**Total running time of the script:** (2 minutes 29.611 seconds)
+**Total running time of the script:** (3 minutes 34.207 seconds)
 
 <a id="sphx-glr-download-auto-examples-trajectory-analysis-plot-trajectory-analysis-py"></a>
 
@@ -25260,7 +25260,7 @@ msd_result = tidynamics.msd(
 
 # Computation times
 
-**02:29.611** total execution time for 1 file **from auto_examples/trajectory_analysis**:
+**03:34.207** total execution time for 1 file **from auto_examples/trajectory_analysis**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -25277,7 +25277,7 @@ $(document).ready( function () {
 
 | Example                                                                                                                                                                   | Time      |   Mem (MB) |
 |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [Trajectory Analysis](auto_examples/trajectory_analysis/plot_trajectory_analysis.html.md#sphx-glr-auto-examples-trajectory-analysis-plot-trajectory-analysis-py) (`plot_trajectory_analysis.py`) | 02:29.611 |          0 |
+| [Trajectory Analysis](auto_examples/trajectory_analysis/plot_trajectory_analysis.html.md#sphx-glr-auto-examples-trajectory-analysis-plot-trajectory-analysis-py) (`plot_trajectory_analysis.py`) | 03:34.207 |          0 |
 
 
 # cli.html.md
@@ -25300,7 +25300,7 @@ You must specify either –target-p (crosslinker conversion) or –target-wsol
 (soluble fraction), but not both.
 
 Example:
-: pylimer-generate-network –polymer-name PDMS –parameter-type GAUSSIAN –target-p 0.8 –n-chains-crosslinks 100 –target-file network.dat
+: pylimer-generate-network –polymer-name PDMS –parameter-type GAUSSIAN –target-p 0.8 –n-chains-crosslinkers 100 –target-file network.dat
 
 ### Usage
 
@@ -25315,7 +25315,7 @@ pylimer-generate-network [OPTIONS]
 Name of the polymer to generate the network for
 
 * **Options:**
-  ipp | pet | pi50 | app | aphma | pc | ips | cispbd | pi7 | app413 | app348 | apoa | pe413 | ptfe | peo | apea | pi20 | app463 | p6n | pdms | aps | apva | pi34 | pi75 | pbd20 | apmma | apams | cispi | pe | pom | sbr | pbd98 | spp | pib413 | pib | apma
+  pom | pe | pe413 | apams | aphma | p6n | cispbd | ips | aps | pdms | sbr | spp | pi20 | pc | pi50 | pi7 | pi75 | apoa | pbd20 | cispi | pet | app413 | pbd98 | app463 | peo | apma | pib | pi34 | app348 | ptfe | apva | app | apea | pib413 | apmma | ipp
 
 ### --parameter-type <parameter_type>
 
@@ -25426,7 +25426,14 @@ pylimer-analyse-networks [OPTIONS] [FILES]...
 Name of the polymer to use for parameter retrieval.
 
 * **Options:**
-  ipp | pet | pi50 | app | aphma | pc | ips | cispbd | pi7 | app413 | app348 | apoa | pe413 | ptfe | peo | apea | pi20 | app463 | p6n | pdms | aps | apva | pi34 | pi75 | pbd20 | apmma | apams | cispi | pe | pom | sbr | pbd98 | spp | pib413 | pib | apma
+  pom | pe | pe413 | apams | aphma | p6n | cispbd | ips | aps | pdms | sbr | spp | pi20 | pc | pi50 | pi7 | pi75 | apoa | pbd20 | cispi | pet | app413 | pbd98 | app463 | peo | apma | pib | pi34 | app348 | ptfe | apva | app | apea | pib413 | apmma | ipp
+
+### --parameter-type <parameter_type>
+
+Type of parameters to use for the polymer model.
+
+* **Options:**
+  GAUSSIAN | KG_LJ | KUHN
 
 ### Arguments
 
@@ -26031,7 +26038,7 @@ Use [`pylimer_tools_cpp.MEHPForceBalance`](api/pylimer_tools_cpp.MEHPForceBalanc
 In principle, it offers comparable functionality, but without the force minimization - the networks you pass
 to these methods should be minimized first.
 
-### pylimer_tools.calc.mehp_utilities.compute_cycle_rank(networks: Sequence[[Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe)] | [None](https://docs.python.org/3/builtins/constants.html#None) = None, nu: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, mu: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, abs_tol: [float](https://docs.python.org/3/builtins/functions.html#float) = 1, rel_tol: [float](https://docs.python.org/3/builtins/functions.html#float) = 1, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2) → [float](https://docs.python.org/3/builtins/functions.html#float)
+### pylimer_tools.calc.mehp_utilities.compute_cycle_rank(networks: Sequence[[Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe)] | [None](https://docs.python.org/3/builtins/constants.html#None) = None, nu: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, mu: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, abs_tol: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = 1, rel_tol: [float](https://docs.python.org/3/builtins/functions.html#float) = 1, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Compute the cycle rank ($\chi$).
 Assumes the precursor-chains to be bifunctional.
@@ -26059,7 +26066,7 @@ or MEHPForceRelaxation classes from pylimer_tools_cpp.
 * **Return type:**
   [float](https://docs.python.org/3/builtins/functions.html#float)
 
-### pylimer_tools.calc.mehp_utilities.compute_effective_nr_density_of_junctions(networks: Sequence[[Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe)], abs_tol: [float](https://docs.python.org/3/builtins/functions.html#float) = 0, rel_tol: [float](https://docs.python.org/3/builtins/functions.html#float) = 1, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2, min_num_effective_strands=2) → [float](https://docs.python.org/3/builtins/functions.html#float)
+### pylimer_tools.calc.mehp_utilities.compute_effective_nr_density_of_junctions(networks: Sequence[[Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe)], abs_tol: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = 0, rel_tol: [float](https://docs.python.org/3/builtins/functions.html#float) = 1, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2, min_num_effective_strands: [int](https://docs.python.org/3/builtins/functions.html#int) = 2) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Compute the number density of the elastically effective crosslinks,
 defined as the ones that connect at least min_num_effective_strands elastically effective strands.
@@ -26080,7 +26087,7 @@ Source:
 * **Return type:**
   [float](https://docs.python.org/3/builtins/functions.html#float)
 
-### pylimer_tools.calc.mehp_utilities.compute_effective_nr_density_of_network(networks: Sequence[[Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe)], abs_tol: [float](https://docs.python.org/3/builtins/functions.html#float) = 1, rel_tol: [float](https://docs.python.org/3/builtins/functions.html#float) = 1, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2) → [float](https://docs.python.org/3/builtins/functions.html#float)
+### pylimer_tools.calc.mehp_utilities.compute_effective_nr_density_of_network(networks: Sequence[[Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe)], abs_tol: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = 1, rel_tol: [float](https://docs.python.org/3/builtins/functions.html#float) = 1, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Compute the effective number density $\nu_{eff}$ of a network.
 Assumes the precursor-chains to be bifunctional.
@@ -26145,7 +26152,7 @@ Source:
 * **Return type:**
   [float](https://docs.python.org/3/builtins/functions.html#float)
 
-### pylimer_tools.calc.mehp_utilities.predict_shear_modulus(networks: Sequence[[Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe)], temperature: [float](https://docs.python.org/3/builtins/functions.html#float) = 1, k_boltzmann: [float](https://docs.python.org/3/builtins/functions.html#float) = 1, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2, total_mass=1) → [float](https://docs.python.org/3/builtins/functions.html#float)
+### pylimer_tools.calc.mehp_utilities.predict_shear_modulus(networks: Sequence[[Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe)], temperature: [float](https://docs.python.org/3/builtins/functions.html#float) = 1, k_boltzmann: [float](https://docs.python.org/3/builtins/functions.html#float) = 1, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2, total_mass: [float](https://docs.python.org/3/builtins/functions.html#float) = 1) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Predict the shear modulus using ANT Analysis.
 
@@ -26185,19 +26192,21 @@ Not all systems are supported yet.
 In particular, for most methods, only A_f and B_2 is supported.
 Also, the systems are mostly assumed to be end-linked and monodisperse.
 
-### pylimer_tools.calc.miller_macosko_theory.compute_entanglement_modulus(g_e_1: [pint.Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity), temperature: [pint.Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity), network: [Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2, p: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, r: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, f: [int](https://docs.python.org/3/builtins/functions.html#int) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, b2: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, beta: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None) → [pint.Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity)
+### pylimer_tools.calc.miller_macosko_theory.compute_entanglement_modulus(g_e_1: [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity), temperature: [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, network: [Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2, p: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, r: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, f: [int](https://docs.python.org/3/builtins/functions.html#int) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, b2: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, beta: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None) → [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity)
 
 Compute MMT’s entanglement contribution to the equilibrium shear modulus, given by
 $k_B T \epsilon_e T_e$.
 
 * **Parameters:**
   * **g_e_1** – The melt entanglement modulus $G_e(1) = k_B T \epsilon_e$
-  * **temperature** – The temperatures; defaults to room temperature (25 °C)
+  * **temperature** – Unused (kept for API compatibility; temperature is already included in `g_e_1`)
   * **network** – The polymer network to do the computation for
   * **crosslinker_type** – The type of the junctions/crosslinkers to select them in the network
   * **p** – The crosslinker conversion
   * **r** – The stoichiometric imbalance
   * **f** – The functionality of the crosslinkers
+  * **b2** – The mole fraction of reactive sites in B2 among all reactive sites
+    in a mixture of B1 and B2
   * **beta** – $P(F_b^{out})$, optional
 * **Returns:**
   $T_e \cdot G_e(1)$
@@ -26261,7 +26270,7 @@ you would need to implement these formulas yourselves.
 * **Returns:**
   beta: $P(F_B)$
 
-### pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition(network: [Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, ureg: [pint.UnitRegistry](https://pint.readthedocs.io/en/stable/api/base.html#pint.UnitRegistry) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, unit_style: [None](https://docs.python.org/3/builtins/constants.html#None) | [UnitStyle](pylimer_tools.io.html.md#pylimer_tools.io.unit_styles.UnitStyle) = None, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, r: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, p: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, f: [int](https://docs.python.org/3/builtins/functions.html#int) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, nu: [pint.Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, temperature: [pint.Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, functionality_per_type: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, g_e_1: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, b2: [float](https://docs.python.org/3/builtins/functions.html#float) = 1.0) → Tuple[[pint.Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity), [pint.Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity), [pint.Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity), [pint.Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity)]
+### pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition(network: [Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, ureg: [UnitRegistry](https://pint.readthedocs.io/en/stable/api/base.html#pint.UnitRegistry) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, unit_style: [None](https://docs.python.org/3/builtins/constants.html#None) | [UnitStyle](pylimer_tools.io.html.md#pylimer_tools.io.unit_styles.UnitStyle) = None, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, r: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, p: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, f: [int](https://docs.python.org/3/builtins/functions.html#int) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, nu: [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, temperature: [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, functionality_per_type: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, g_e_1: [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, b2: [float](https://docs.python.org/3/builtins/functions.html#float) = 1.0) → [Tuple](https://docs.python.org/3/library/typing.html#typing.Tuple)[[Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity), [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity), [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity), [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity)]
 
 Compute four different estimates of the plateau modulus, using MMT, ANM and PNM.
 
@@ -26405,7 +26414,7 @@ Source:
   * **b2** – The mole fraction of reactive sites in B2 among all reactive sites
     in a mixture of B1 and B2
 * **Returns:**
-  weightFraction $$\Phi_d = w_p$$: weightDangling/weightTotal
+  weightFraction $\Phi_d = w_p$: weightDangling/weightTotal
 
 ### pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material(network: [Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2, functionality_per_type: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, weight_fractions: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, r: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, p: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, b2: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
@@ -26434,7 +26443,7 @@ Source:
 Use MMT to compute the weight fraction of soluble material using
 
 $$
-`W_{sol} = w_A_f P(F_A^{out})^f + w_B_g [rpP(F_A^{out})^{f-1}+1-rp]^g`
+W_{sol} = w_{A_f} P(F_A^{out})^f + w_{B_g} [rpP(F_A^{out})^{f-1}+1-rp]^g
 
 $$
 
@@ -26455,7 +26464,7 @@ Source:
 : - Venkataraman *et al.* [[VCC+89](acknowledgements.html.md#id19)]
 
 * **Parameters:**
-  * **r** – The stoichiometric imbalance of reactants (see: #compute_stoichiometric_imbalance)
+  * **r** – The stoichiometric imbalance of reactants (see: [`compute_stoichiometric_imbalance()`](pylimer_tools.calc.html.md#pylimer_tools.calc.structure_analysis.compute_stoichiometric_imbalance))
   * **f** – functionality of the crosslinkers
   * **b2** – The mole fraction of reactive sites in B2 among all reactive sites
     in a mixture of B1 and B2
@@ -26467,7 +26476,7 @@ Source:
 Compute the maximum crosslinker conversion possible given a stoichiometric inbalance.
 
 * **Parameters:**
-  * **r** – The stoichiometric imbalance of reactants (see: #compute_stoichiometric_imbalance)
+  * **r** – The stoichiometric imbalance of reactants (see: [`compute_stoichiometric_imbalance()`](pylimer_tools.calc.html.md#pylimer_tools.calc.structure_analysis.compute_stoichiometric_imbalance))
   * **f** – functionality of the crosslinkers
   * **b2** – The mole fraction of reactive sites in B2 among all reactive sites
     in a mixture of B1 and B2. Since r already includes the number of active sites, this argument
@@ -26475,33 +26484,43 @@ Compute the maximum crosslinker conversion possible given a stoichiometric inbal
 * **Returns:**
   p_max: The maximum crosslinker conversion possible
 
-### pylimer_tools.calc.miller_macosko_theory.predict_number_density_of_junction_points(network: [Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2, functionality_per_type: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict) | [None](https://docs.python.org/3/builtins/constants.html#None) = None) → [float](https://docs.python.org/3/builtins/functions.html#float)
+### pylimer_tools.calc.miller_macosko_theory.predict_number_density_of_junction_points(network: [Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2, functionality_per_type: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, b2: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, crosslinker_number_density: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
-Compute the number density of network strands using MMT
+Compute the number density of junction points using MMT.
 
 Source:
 : - Aoyama *et al.* [[AYU21](acknowledgements.html.md#id13)] (see supporting information for formulae)
 
 * **Parameters:**
-  * **network** – The network to compute the weight fraction for
+  * **network** – The network to compute the number density for
   * **crosslinker_type** – The atom type to use to split the molecules
   * **functionality_per_type** – a dictionary with key: type, and value: functionality of this atom type.
+  * **b2** – The mole fraction of reactive sites in B2 among all reactive sites
+    in a mixture of B1 and B2
+  * **crosslinker_number_density** – The initial number density of crosslinkers $[A_f]_0$.
+    If `None`, falls back to `weight_fractions[crosslinker_type]` for backwards compatibility
+    (deprecated; will be required or derived from `network` in a future release).
 * **Returns:**
   mu: The predicted number density of junction points
 
-### pylimer_tools.calc.miller_macosko_theory.predict_number_density_of_network_strands(network: [Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2, functionality_per_type: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, r: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, p: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None) → [float](https://docs.python.org/3/builtins/functions.html#float)
+### pylimer_tools.calc.miller_macosko_theory.predict_number_density_of_network_strands(network: [Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2, functionality_per_type: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, r: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, p: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, b2: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, crosslinker_number_density: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
-Compute the number density of network strands using MMT
+Compute the number density of network strands using MMT.
 
 Source:
 : - Aoyama *et al.* [[AYU21](acknowledgements.html.md#id13)] (see supporting information for formulae)
 
 * **Parameters:**
-  * **network** – The network to compute the weight fraction for
+  * **network** – The network to compute the number density for
   * **crosslinker_type** – The atom type to use to split the molecules
   * **functionality_per_type** – a dictionary with key: type, and value: functionality of this atom type.
   * **r** – The stoichiometric imbalance
   * **p** – The extent of reaction in terms of the crosslinkers
+  * **b2** – The mole fraction of reactive sites in B2 among all reactive sites
+    in a mixture of B1 and B2
+  * **crosslinker_number_density** – The initial number density of crosslinkers $[A_f]_0$.
+    If `None`, falls back to `weight_fractions[crosslinker_type]` for backwards compatibility
+    (deprecated; will be required or derived from `network` in a future release).
 * **Returns:**
   nu: The predicted number density of network strands
 
@@ -26751,7 +26770,7 @@ are counted as soluble
 * **Return type:**
   [float](https://docs.python.org/3/builtins/functions.html#float)
 
-### pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_backbone(network: [Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe), crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2)
+### pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_backbone(network: [Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe), crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Compute the weight fraction of network backbone in infinite network
 
@@ -27151,14 +27170,14 @@ Returns a list of supported polymer names based on the Everaers et al. data.
 
 ## pylimer_tools.io.extract_thermo_data module
 
-### pylimer_tools.io.extract_thermo_data.detect_headers(file: [str](https://docs.python.org/3/builtins/stdtypes.html#str), max_nr_of_lines_to_read: [int](https://docs.python.org/3/builtins/functions.html#int) = 1500, use_cache: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [List](https://docs.python.org/3/library/typing.html#typing.List)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]
+### pylimer_tools.io.extract_thermo_data.detect_headers(file: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [PathLike](https://docs.python.org/3/library/os.html#os.PathLike)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)], max_nr_of_lines_to_read: [int](https://docs.python.org/3/builtins/functions.html#int) = 1500, use_cache: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [List](https://docs.python.org/3/library/typing.html#typing.List)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 Read max_nr_of_lines_to_read lines from the given file and return all possible header lines.
 
 Some assumptions are made regarding the columns, e.g., that 75% of them start with a character.
 
 * **Parameters:**
-  * **file** ([*str*](https://docs.python.org/3/builtins/stdtypes.html#str)) – The file to search for header lines
+  * **file** (*PathLike*) – The file to search for header lines
   * **max_nr_of_lines_to_read** ([*int*](https://docs.python.org/3/builtins/functions.html#int)) – The number of lines to read in search for header lines.
     Use a negative number to read the whole file.
   * **use_cache** ([*bool*](https://docs.python.org/3/builtins/functions.html#bool)) – Whether to read the result from cache or not.
@@ -27168,7 +27187,7 @@ Some assumptions are made regarding the columns, e.g., that 75% of them start wi
 * **Return type:**
   List[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
-### pylimer_tools.io.extract_thermo_data.extract_thermo_params(file, header: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [List](https://docs.python.org/3/library/typing.html#typing.List)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)] | [None](https://docs.python.org/3/builtins/constants.html#None) = 'Step Temp E_pair E_mol TotEng Press', texts_to_read: [int](https://docs.python.org/3/builtins/functions.html#int) = 50, min_line_len: [int](https://docs.python.org/3/builtins/functions.html#int) = 5, use_cache: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True, lines_to_read_to_detect_header: [int](https://docs.python.org/3/builtins/functions.html#int) = 100000, lines_to_read_till_header: [float](https://docs.python.org/3/builtins/functions.html#float) = -1) → [DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame)
+### pylimer_tools.io.extract_thermo_data.extract_thermo_params(file: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [PathLike](https://docs.python.org/3/library/os.html#os.PathLike)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)], header: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [List](https://docs.python.org/3/library/typing.html#typing.List)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)] | [None](https://docs.python.org/3/builtins/constants.html#None) = 'Step Temp E_pair E_mol TotEng Press', texts_to_read: [int](https://docs.python.org/3/builtins/functions.html#int) = 50, min_line_len: [int](https://docs.python.org/3/builtins/functions.html#int) = 5, use_cache: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True, lines_to_read_to_detect_header: [int](https://docs.python.org/3/builtins/functions.html#int) = 100000, lines_to_read_till_header: [float](https://docs.python.org/3/builtins/functions.html#float) = -1) → [DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame)
 
 Extract the thermodynamic outputs produced for this simulation,
 i.e., in LAMMPS, by the thermo command.
@@ -27211,7 +27230,7 @@ Compose a cache file suffix in such a way, that it distinguishes different therm
 * **Return type:**
   [str](https://docs.python.org/3/builtins/stdtypes.html#str)
 
-### pylimer_tools.io.extract_thermo_data.read_multi_section_separated_value_file(file: [str](https://docs.python.org/3/builtins/stdtypes.html#str), separator: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, use_cache: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True, comment: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, skip_err: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame)
+### pylimer_tools.io.extract_thermo_data.read_multi_section_separated_value_file(file: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [PathLike](https://docs.python.org/3/library/os.html#os.PathLike)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)], separator: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, use_cache: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True, comment: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, skip_err: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame)
 
 Reads a file with multiple sections that have different headers throughout the file.
 
@@ -27219,10 +27238,10 @@ This function handles files with multiple data sections that may have different 
 It automatically detects the separator if not specified and combines all sections into a single DataFrame.
 
 * **Parameters:**
-  * **file** ([*str*](https://docs.python.org/3/builtins/stdtypes.html#str)) – Path to the file to read
-  * **separator** (*Union* *[*[*str*](https://docs.python.org/3/builtins/stdtypes.html#str) *,* *None* *]*) – Character used to separate values in the file (auto-detected if None)
+  * **file** (*PathLike*) – Path to the file to read
+  * **separator** (*Optional* *[*[*str*](https://docs.python.org/3/builtins/stdtypes.html#str) *]*) – Character used to separate values in the file (auto-detected if None)
   * **use_cache** ([*bool*](https://docs.python.org/3/builtins/functions.html#bool)) – Whether to use cached results if available
-  * **comment** (*Union* *[*[*str*](https://docs.python.org/3/builtins/stdtypes.html#str) *,* *None* *]*) – Character indicating the start of comments (e.g., “#”)
+  * **comment** (*Optional* *[*[*str*](https://docs.python.org/3/builtins/stdtypes.html#str) *]*) – Character indicating the start of comments (e.g., “#”)
   * **skip_err** ([*bool*](https://docs.python.org/3/builtins/functions.html#bool)) – Whether to skip errors when processing sections
 * **Returns:**
   Combined DataFrame containing all data from the file
@@ -27233,20 +27252,20 @@ It automatically detects the separator if not specified and combines all section
 Particularly useful for reading output files from the DPDSimulator or other
 multi-section files where the structure may change between sections.
 
-### pylimer_tools.io.extract_thermo_data.read_one_group(fp, header, min_line_len=4, additional_lines_skip=0, lines_to_read_till_header=1000.0) → [str](https://docs.python.org/3/builtins/stdtypes.html#str)
+### pylimer_tools.io.extract_thermo_data.read_one_group(fp: [IO](https://docs.python.org/3/library/typing.html#typing.IO)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)], header: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [List](https://docs.python.org/3/library/typing.html#typing.List)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)], min_line_len: [int](https://docs.python.org/3/builtins/functions.html#int) = 4, additional_lines_skip: [int](https://docs.python.org/3/builtins/functions.html#int) = 0, lines_to_read_till_header: [float](https://docs.python.org/3/builtins/functions.html#float) = 1000.0) → [StringIO](https://docs.python.org/3/library/io.html#io.StringIO) | [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Read one group of csv lines from the file.
 
 * **Parameters:**
-  * **fp** (*file object*) – The file pointer to the file to read from
-  * **header** ([*str*](https://docs.python.org/3/builtins/stdtypes.html#str) *or* [*list*](https://docs.python.org/3/builtins/stdtypes.html#list)) – The header of the CSV (where to start reading at)
+  * **fp** (*IO* *[*[*str*](https://docs.python.org/3/builtins/stdtypes.html#str) *]*) – The file pointer to the file to read from
+  * **header** (*Union* *[*[*str*](https://docs.python.org/3/builtins/stdtypes.html#str) *,* *List* *[*[*str*](https://docs.python.org/3/builtins/stdtypes.html#str) *]* *]*) – The header of the CSV (where to start reading at)
   * **min_line_len** ([*int*](https://docs.python.org/3/builtins/functions.html#int)) – The minimal length of a line to be accepted as data
   * **additional_lines_skip** ([*int*](https://docs.python.org/3/builtins/functions.html#int)) – Number of lines to skip after reading the header
   * **lines_to_read_till_header** ([*float*](https://docs.python.org/3/builtins/functions.html#float)) – Maximum number of lines to read until finding the header
 * **Returns:**
-  The filename of a temporary CSV file, or empty string if no data was read
+  An in-memory StringIO CSV buffer, or None if no data was read
 * **Return type:**
-  [str](https://docs.python.org/3/builtins/stdtypes.html#str)
+  Optional[[io.StringIO](https://docs.python.org/3/library/io.html#io.StringIO)]
 
 ## pylimer_tools.io.polymer_data module
 
@@ -27289,10 +27308,15 @@ needed for polymer properties data.
 
 Initialize with list of polymer dictionaries and column names.
 
-#### \_\_getitem_\_(key: [int](https://docs.python.org/3/builtins/functions.html#int) | [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [List](https://docs.python.org/3/library/typing.html#typing.List)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]) → [List](https://docs.python.org/3/library/typing.html#typing.List)[[PolymerData](pylimer_tools.io.html.md#pylimer_tools.io.polymer_data.PolymerData)] | [PolymerDataFrame](pylimer_tools.io.html.md#pylimer_tools.io.polymer_data.PolymerDataFrame)
+#### \_\_getitem_\_(key: [str](https://docs.python.org/3/builtins/stdtypes.html#str)) → [List](https://docs.python.org/3/library/typing.html#typing.List)[[Any](https://docs.python.org/3/library/typing.html#typing.Any)]
 
-Access columns by name or list of names.
-Access rows by integer index.
+#### \_\_getitem_\_(key: [List](https://docs.python.org/3/library/typing.html#typing.List)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]) → [PolymerDataFrame](pylimer_tools.io.html.md#pylimer_tools.io.polymer_data.PolymerDataFrame)
+
+#### \_\_getitem_\_(key: [slice](https://docs.python.org/3/builtins/functions.html#slice)) → [PolymerDataFrame](pylimer_tools.io.html.md#pylimer_tools.io.polymer_data.PolymerDataFrame)
+
+#### \_\_getitem_\_(key: [int](https://docs.python.org/3/builtins/functions.html#int)) → [PolymerData](pylimer_tools.io.html.md#pylimer_tools.io.polymer_data.PolymerData)
+
+Access columns by name or list of names, or rows by integer index or slice.
 
 #### \_\_len_\_() → [int](https://docs.python.org/3/builtins/functions.html#int)
 
@@ -27314,13 +27338,13 @@ Get first n rows.
 
 Get index (row numbers).
 
-#### iterrows()
+#### iterrows() → [Iterator](https://docs.python.org/3/library/typing.html#typing.Iterator)[[Tuple](https://docs.python.org/3/library/typing.html#typing.Tuple)[[int](https://docs.python.org/3/builtins/functions.html#int), [PolymerData](pylimer_tools.io.html.md#pylimer_tools.io.polymer_data.PolymerData)]]
 
 Iterate over DataFrame rows as (index, Series) pairs.
 
 This mimics pandas.DataFrame.iterrows() behavior.
 
-#### itertuples(index: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True, name: [str](https://docs.python.org/3/builtins/stdtypes.html#str) = 'Pandas')
+#### itertuples(index: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True, name: [str](https://docs.python.org/3/builtins/stdtypes.html#str) = 'Pandas') → [Iterator](https://docs.python.org/3/library/typing.html#typing.Iterator)[[Tuple](https://docs.python.org/3/library/typing.html#typing.Tuple)[[Any](https://docs.python.org/3/library/typing.html#typing.Any), ...]]
 
 Iterate over DataFrame rows as named tuples.
 
@@ -27381,7 +27405,7 @@ JSON-based approach that doesn’t require external dependencies.
 
 This module provides a few functions to read output from pylimer_tools_cpp’s simulators.
 
-### pylimer_tools.io.read_pylimer_tools_output_file.read_avg_file(filename: [str](https://docs.python.org/3/builtins/stdtypes.html#str)) → [DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame)
+### pylimer_tools.io.read_pylimer_tools_output_file.read_avg_file(filename: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [PathLike](https://docs.python.org/3/library/os.html#os.PathLike)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]) → [DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame)
 
 Read an averages-output file from one of the simulators shipped with pylimer_tools.
 
@@ -27390,7 +27414,7 @@ handling multiple data sections and converting them to a pandas DataFrame.
 The function also caches results to improve performance on subsequent reads.
 
 * **Parameters:**
-  **filename** ([*str*](https://docs.python.org/3/builtins/stdtypes.html#str)) – Path to the averages file to read
+  **filename** (*PathLike*) – Path to the averages file to read
 * **Returns:**
   DataFrame containing the parsed averages data, grouped by OutputStep
 * **Return type:**
@@ -27412,7 +27436,7 @@ This module provides a few functions to read LAMMPS’ output files, including:
 - averaged data (from `fix ave/time...` or `fix ave/hist...`)
 - correlation data (from `fix ave/correlate/...`)
 
-### pylimer_tools.io.read_lammps_output_file.read_averages_file(filepath, use_cache: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True, sep=' ') → [DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame)
+### pylimer_tools.io.read_lammps_output_file.read_averages_file(filepath: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [PathLike](https://docs.python.org/3/library/os.html#os.PathLike)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)], use_cache: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True, sep: [str](https://docs.python.org/3/builtins/stdtypes.html#str) = ' ') → [DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame)
 
 Read a file written by a fix ave/time command.
 
@@ -27424,7 +27448,7 @@ Important assumption: The first 2 or 3 lines in the file are:
   - and then either data or potentially a second header, if it is a sectioned file (e.g., from a fix ave/time … vector)
 
 * **Parameters:**
-  * **filepath** ([*str*](https://docs.python.org/3/builtins/stdtypes.html#str)) – Path to the averages file
+  * **filepath** (*PathLike*) – Path to the averages file
   * **use_cache** ([*bool*](https://docs.python.org/3/builtins/functions.html#bool)) – Whether to use the cache to speed up reading & writing
   * **sep** ([*str*](https://docs.python.org/3/builtins/stdtypes.html#str)) – Delimiter used in the file (default is space)
 * **Returns:**
@@ -27434,12 +27458,12 @@ Important assumption: The first 2 or 3 lines in the file are:
 * **Raises:**
   [**FileNotFoundError**](https://docs.python.org/3/builtins/exceptions.html#FileNotFoundError) – If the averages file does not exist
 
-### pylimer_tools.io.read_lammps_output_file.read_correlation_file(filepath, group_key='Timestep', use_cache: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame)
+### pylimer_tools.io.read_lammps_output_file.read_correlation_file(filepath: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [PathLike](https://docs.python.org/3/library/os.html#os.PathLike)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)], group_key: [str](https://docs.python.org/3/builtins/stdtypes.html#str) = 'Timestep', use_cache: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame)
 
 Read a file written by a fix ave/correlate{/long} command.
 
 * **Parameters:**
-  * **filepath** ([*str*](https://docs.python.org/3/builtins/stdtypes.html#str)) – Path to the correlation file
+  * **filepath** (*PathLike*) – Path to the correlation file
   * **group_key** ([*str*](https://docs.python.org/3/builtins/stdtypes.html#str)) – The key that denotes a new section
   * **use_cache** ([*bool*](https://docs.python.org/3/builtins/functions.html#bool)) – Whether to use the cache to speed up reading & writing
 * **Returns:**
@@ -27450,13 +27474,13 @@ Read a file written by a fix ave/correlate{/long} command.
 * **Raises:**
   [**FileNotFoundError**](https://docs.python.org/3/builtins/exceptions.html#FileNotFoundError) – If the correlation file does not exist
 
-### pylimer_tools.io.read_lammps_output_file.read_data_file(structure_file: [str](https://docs.python.org/3/builtins/stdtypes.html#str), atom_style: [List](https://docs.python.org/3/library/typing.html#typing.List)[[AtomStyle](api/pylimer_tools_cpp.AtomStyle.html.md#pylimer_tools_cpp.AtomStyle)] | [None](https://docs.python.org/3/builtins/constants.html#None) = None) → [Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe)
+### pylimer_tools.io.read_lammps_output_file.read_data_file(structure_file: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [PathLike](https://docs.python.org/3/library/os.html#os.PathLike)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)], atom_style: [List](https://docs.python.org/3/library/typing.html#typing.List)[[AtomStyle](api/pylimer_tools_cpp.AtomStyle.html.md#pylimer_tools_cpp.AtomStyle)] | [None](https://docs.python.org/3/builtins/constants.html#None) = None) → [Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe)
 
 Read a file with LAMMPS’ data type of structure into a Universe.
 
 * **Parameters:**
-  * **structure_file** ([*str*](https://docs.python.org/3/builtins/stdtypes.html#str)) – Path to the structure file
-  * **atom_style** (*Union* *[**List* *[*[*AtomStyle*](api/pylimer_tools_cpp.AtomStyle.html.md#pylimer_tools_cpp.AtomStyle) *]* *,* *None* *]*) – The atom style(s) in the structure file (defaults to AtomStyle.Molecule if None)
+  * **structure_file** (*PathLike*) – Path to the structure file
+  * **atom_style** (*Optional* *[**List* *[*[*AtomStyle*](api/pylimer_tools_cpp.AtomStyle.html.md#pylimer_tools_cpp.AtomStyle) *]* *]*) – The atom style(s) in the structure file (defaults to AtomStyle.Molecule if None)
 * **Returns:**
   Universe object representing the molecular structure
 * **Return type:**
@@ -27464,27 +27488,27 @@ Read a file with LAMMPS’ data type of structure into a Universe.
 * **Raises:**
   [**FileNotFoundError**](https://docs.python.org/3/builtins/exceptions.html#FileNotFoundError) – If the structure file does not exist
 
-### pylimer_tools.io.read_lammps_output_file.read_dump_file(data_file, dump_file, atom_style: [List](https://docs.python.org/3/library/typing.html#typing.List)[[AtomStyle](api/pylimer_tools_cpp.AtomStyle.html.md#pylimer_tools_cpp.AtomStyle)] | [None](https://docs.python.org/3/builtins/constants.html#None) = None) → [UniverseSequence](api/pylimer_tools_cpp.UniverseSequence.html.md#pylimer_tools_cpp.UniverseSequence)
+### pylimer_tools.io.read_lammps_output_file.read_dump_file(data_file: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [PathLike](https://docs.python.org/3/library/os.html#os.PathLike)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)], dump_file: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [PathLike](https://docs.python.org/3/library/os.html#os.PathLike)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)], atom_style: [List](https://docs.python.org/3/library/typing.html#typing.List)[[AtomStyle](api/pylimer_tools_cpp.AtomStyle.html.md#pylimer_tools_cpp.AtomStyle)] | [None](https://docs.python.org/3/builtins/constants.html#None) = None) → [UniverseSequence](api/pylimer_tools_cpp.UniverseSequence.html.md#pylimer_tools_cpp.UniverseSequence)
 
 Read a file with LAMMPS’ dump of snapshots of structures into a Universe.
 
 * **Parameters:**
-  * **data_file** ([*str*](https://docs.python.org/3/builtins/stdtypes.html#str)) – Path to the LAMMPS data file containing structure information
-  * **dump_file** ([*str*](https://docs.python.org/3/builtins/stdtypes.html#str)) – Path to the LAMMPS dump file containing trajectory information
-  * **atom_style** (*Union* *[**List* *[*[*AtomStyle*](api/pylimer_tools_cpp.AtomStyle.html.md#pylimer_tools_cpp.AtomStyle) *]* *,* *None* *]*) – The atom style(s) used in the data file
+  * **data_file** (*PathLike*) – Path to the LAMMPS data file containing structure information
+  * **dump_file** (*PathLike*) – Path to the LAMMPS dump file containing trajectory information
+  * **atom_style** (*Optional* *[**List* *[*[*AtomStyle*](api/pylimer_tools_cpp.AtomStyle.html.md#pylimer_tools_cpp.AtomStyle) *]* *]*) – The atom style(s) used in the data file
 * **Returns:**
   Sequence of Universe objects representing the trajectory
 * **Return type:**
   [UniverseSequence](api/pylimer_tools_cpp.UniverseSequence.html.md#pylimer_tools_cpp.UniverseSequence)
 
-### pylimer_tools.io.read_lammps_output_file.read_histogram_file(filepath, use_cache: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame)
+### pylimer_tools.io.read_lammps_output_file.read_histogram_file(filepath: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [PathLike](https://docs.python.org/3/library/os.html#os.PathLike)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)], use_cache: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame)
 
 Read a file written by fix ave/hist or similar.
 
 This is a wrapper around read_sectioned_averages_file for histogram data.
 
 * **Parameters:**
-  * **filepath** ([*str*](https://docs.python.org/3/builtins/stdtypes.html#str)) – Path to the histogram file
+  * **filepath** (*PathLike*) – Path to the histogram file
   * **use_cache** ([*bool*](https://docs.python.org/3/builtins/functions.html#bool)) – Whether to use the cache to speed up reading & writing
 * **Returns:**
   DataFrame containing the parsed histogram data
@@ -27493,19 +27517,19 @@ This is a wrapper around read_sectioned_averages_file for histogram data.
 * **See:**
   [`read_sectioned_averages_file()`](pylimer_tools.io.html.md#pylimer_tools.io.read_lammps_output_file.read_sectioned_averages_file)
 
-### pylimer_tools.io.read_lammps_output_file.read_log_file(filepath, lines_to_read_to_detect_header=500000) → [DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame)
+### pylimer_tools.io.read_lammps_output_file.read_log_file(filepath: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [PathLike](https://docs.python.org/3/library/os.html#os.PathLike)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)], lines_to_read_to_detect_header: [int](https://docs.python.org/3/builtins/functions.html#int) = 500000) → [DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame)
 
 Read a LAMMPS’ log (thermo output) file.
 
 * **Parameters:**
-  * **filepath** ([*str*](https://docs.python.org/3/builtins/stdtypes.html#str)) – Path to the LAMMPS log file
+  * **filepath** (*PathLike*) – Path to the LAMMPS log file
   * **lines_to_read_to_detect_header** ([*int*](https://docs.python.org/3/builtins/functions.html#int)) – Maximum number of lines to read when detecting the header
 * **Returns:**
   DataFrame containing the parsed thermo data
 * **Return type:**
   pd.DataFrame
 
-### pylimer_tools.io.read_lammps_output_file.read_sectioned_averages_file(filepath, use_cache: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame)
+### pylimer_tools.io.read_lammps_output_file.read_sectioned_averages_file(filepath: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [PathLike](https://docs.python.org/3/library/os.html#os.PathLike)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)], use_cache: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame)
 
 Read a file written by a fix ave/time command with multiple sections.
 
@@ -27513,7 +27537,7 @@ Use the section delimiter columns together with pandas’ groupby()
 to restore the original sections.
 
 * **Parameters:**
-  * **filepath** ([*str*](https://docs.python.org/3/builtins/stdtypes.html#str)) – Path to the sectioned averages file
+  * **filepath** (*PathLike*) – Path to the sectioned averages file
   * **use_cache** ([*bool*](https://docs.python.org/3/builtins/functions.html#bool)) – Whether to use the cache to speed up reading & writing
 * **Returns:**
   DataFrame containing the parsed sectioned data
@@ -27525,7 +27549,7 @@ to restore the original sections.
 
 ## pylimer_tools.io.unit_styles module
 
-### *class* pylimer_tools.io.unit_styles.UnitStyle(unit_configuration: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict), ureg: [UnitRegistry](https://pint.readthedocs.io/en/stable/api/base.html#pint.UnitRegistry))
+### *class* pylimer_tools.io.unit_styles.UnitStyle(unit_configuration: [Dict](https://docs.python.org/3/library/typing.html#typing.Dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Any](https://docs.python.org/3/library/typing.html#typing.Any)], ureg: [UnitRegistry](https://pint.readthedocs.io/en/stable/api/base.html#pint.UnitRegistry))
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -27548,12 +27572,12 @@ lj_stress_to_si_conversion_factor = (1.*unit_style.pressure).to("MPa").magnitude
 Initialize a UnitStyle object.
 
 * **Parameters:**
-  * **unit_configuration** ([*dict*](https://docs.python.org/3/builtins/stdtypes.html#dict)) – Dictionary containing unit definitions
+  * **unit_configuration** (*Dict* *[*[*str*](https://docs.python.org/3/builtins/stdtypes.html#str) *,* *Any* *]*) – Dictionary containing unit definitions
   * **ureg** (*UnitRegistry*) – Pint unit registry to use for unit conversions
 
-#### \_\_getattr_\_(property: [str](https://docs.python.org/3/builtins/stdtypes.html#str))
+#### \_\_getattr_\_(property: [str](https://docs.python.org/3/builtins/stdtypes.html#str)) → [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity)
 
-Shorthand access for `get_base_unit_of()`.
+Shorthand access for [`get_base_unit_of()`](pylimer_tools.io.html.md#pylimer_tools.io.unit_styles.UnitStyle.get_base_unit_of).
 
 * **Parameters:**
   **property** ([*str*](https://docs.python.org/3/builtins/stdtypes.html#str)) – The property name to get the unit for
@@ -27569,7 +27593,7 @@ units = get_unit_style("lj")
 mass_with_units = mass_in_lj * units.mass
 ```
 
-#### get_base_unit_of(property: [str](https://docs.python.org/3/builtins/stdtypes.html#str))
+#### get_base_unit_of(property: [str](https://docs.python.org/3/builtins/stdtypes.html#str)) → [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity)
 
 Returns the conversion factor from the unit style to SI units.
 
@@ -27587,7 +27611,7 @@ units = get_unit_style("lj")
 mass_in_si = mass_in_lj * units.get_base_unit_of("mass")
 ```
 
-#### get_underlying_unit_registry()
+#### get_underlying_unit_registry() → [UnitRegistry](https://pint.readthedocs.io/en/stable/api/base.html#pint.UnitRegistry)
 
 Get the underlying Pint unit registry.
 
@@ -27606,16 +27630,16 @@ using the same UnitRegistry, such that they are compatible.
 
 Initialize the UnitStyleFactory with a new UnitRegistry.
 
-#### get_available_polymers() → [list](https://docs.python.org/3/builtins/stdtypes.html#list)
+#### get_available_polymers() → [List](https://docs.python.org/3/library/typing.html#typing.List)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 List all available polymers for which we have lj unit conversions.
 
 * **Returns:**
   List of polymer names
 * **Return type:**
-  [list](https://docs.python.org/3/builtins/stdtypes.html#list)
+  List[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
-#### get_everares_et_al_data()
+#### get_everares_et_al_data() → [PolymerDataFrame](pylimer_tools.io.html.md#pylimer_tools.io.polymer_data.PolymerDataFrame)
 
 Load the Everaers et al. (2020) unit properties data.
 
@@ -27624,7 +27648,7 @@ Load the Everaers et al. (2020) unit properties data.
 * **Return type:**
   [PolymerDataFrame](pylimer_tools.io.html.md#pylimer_tools.io.polymer_data.PolymerDataFrame)
 
-#### get_unit_registry()
+#### get_unit_registry() → [UnitRegistry](https://pint.readthedocs.io/en/stable/api/base.html#pint.UnitRegistry)
 
 Get the underlying unit registry.
 
@@ -27633,7 +27657,7 @@ Get the underlying unit registry.
 * **Return type:**
   UnitRegistry
 
-#### get_unit_style(unit_type: [str](https://docs.python.org/3/builtins/stdtypes.html#str), dimension: [int](https://docs.python.org/3/builtins/functions.html#int) = 3, \*\*kwargs) → [UnitStyle](pylimer_tools.io.html.md#pylimer_tools.io.unit_styles.UnitStyle)
+#### get_unit_style(unit_type: [str](https://docs.python.org/3/builtins/stdtypes.html#str), dimension: [int](https://docs.python.org/3/builtins/functions.html#int) = 3, \*\*kwargs: [Any](https://docs.python.org/3/library/typing.html#typing.Any)) → [UnitStyle](pylimer_tools.io.html.md#pylimer_tools.io.unit_styles.UnitStyle)
 
 Get a UnitStyle instance corresponding to the unit system requested.
 
@@ -27672,7 +27696,7 @@ LAMMPS and pylimer_tools in- and output files.
 
 ## pylimer_tools.utils.cache_utility module
 
-### pylimer_tools.utils.cache_utility.do_cache(obj, file: [str](https://docs.python.org/3/builtins/stdtypes.html#str), suffix: [str](https://docs.python.org/3/builtins/stdtypes.html#str), tmp_dir: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None) = None)
+### pylimer_tools.utils.cache_utility.do_cache(obj: [Any](https://docs.python.org/3/library/typing.html#typing.Any), file: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [PathLike](https://docs.python.org/3/library/os.html#os.PathLike)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)] | [Sequence](https://docs.python.org/3/library/typing.html#typing.Sequence)[[str](https://docs.python.org/3/builtins/stdtypes.html#str) | [PathLike](https://docs.python.org/3/library/os.html#os.PathLike)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]] | [None](https://docs.python.org/3/builtins/constants.html#None), suffix: [str](https://docs.python.org/3/builtins/stdtypes.html#str), tmp_dir: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [PathLike](https://docs.python.org/3/library/os.html#os.PathLike)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)] | [None](https://docs.python.org/3/builtins/constants.html#None) = None) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Store the object in the cache.
 
@@ -27683,7 +27707,7 @@ Store the object in the cache.
   * **suffix** – The file name’s suffix.
   * **tmp_dir** – The directory to store the cache in.
 
-### pylimer_tools.utils.cache_utility.get_cache_file_name(file: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [List](https://docs.python.org/3/library/typing.html#typing.List)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)] | [None](https://docs.python.org/3/builtins/constants.html#None), suffix: [str](https://docs.python.org/3/builtins/stdtypes.html#str), tmp_dir: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, old: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False)
+### pylimer_tools.utils.cache_utility.get_cache_file_name(file: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [PathLike](https://docs.python.org/3/library/os.html#os.PathLike)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)] | [Sequence](https://docs.python.org/3/library/typing.html#typing.Sequence)[[str](https://docs.python.org/3/builtins/stdtypes.html#str) | [PathLike](https://docs.python.org/3/library/os.html#os.PathLike)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]] | [None](https://docs.python.org/3/builtins/constants.html#None), suffix: [str](https://docs.python.org/3/builtins/stdtypes.html#str), tmp_dir: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [PathLike](https://docs.python.org/3/library/os.html#os.PathLike)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)] | [None](https://docs.python.org/3/builtins/constants.html#None) = None, old: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [str](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 Get the name and path of a cache file. Internal method.
 
@@ -27696,7 +27720,7 @@ Get the name and path of a cache file. Internal method.
 * **Returns:**
   The path to the cache file.
 
-### pylimer_tools.utils.cache_utility.is_current_cache(cache_file: [str](https://docs.python.org/3/builtins/stdtypes.html#str), dependencies: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [List](https://docs.python.org/3/library/typing.html#typing.List)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)])
+### pylimer_tools.utils.cache_utility.is_current_cache(cache_file: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [PathLike](https://docs.python.org/3/library/os.html#os.PathLike)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)], dependencies: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [PathLike](https://docs.python.org/3/library/os.html#os.PathLike)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)] | [Sequence](https://docs.python.org/3/library/typing.html#typing.Sequence)[[str](https://docs.python.org/3/builtins/stdtypes.html#str) | [PathLike](https://docs.python.org/3/library/os.html#os.PathLike)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]]) → [bool](https://docs.python.org/3/builtins/functions.html#bool)
 
 Determine whether the provided file is newer than all its dependencies.
 
@@ -27706,7 +27730,7 @@ Determine whether the provided file is newer than all its dependencies.
 * **Returns:**
   True if the file is newer than all its dependencies, False otherwise.
 
-### pylimer_tools.utils.cache_utility.load_cache(file: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [List](https://docs.python.org/3/library/typing.html#typing.List)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)] | [None](https://docs.python.org/3/builtins/constants.html#None), suffix: [str](https://docs.python.org/3/builtins/stdtypes.html#str), disable_warnings: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False, tmp_dir: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, anyway: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False)
+### pylimer_tools.utils.cache_utility.load_cache(file: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [PathLike](https://docs.python.org/3/library/os.html#os.PathLike)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)] | [Sequence](https://docs.python.org/3/library/typing.html#typing.Sequence)[[str](https://docs.python.org/3/builtins/stdtypes.html#str) | [PathLike](https://docs.python.org/3/library/os.html#os.PathLike)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]] | [None](https://docs.python.org/3/builtins/constants.html#None), suffix: [str](https://docs.python.org/3/builtins/stdtypes.html#str), disable_warnings: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False, tmp_dir: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [PathLike](https://docs.python.org/3/library/os.html#os.PathLike)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)] | [None](https://docs.python.org/3/builtins/constants.html#None) = None, anyway: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [Any](https://docs.python.org/3/library/typing.html#typing.Any)
 
 Load an object from cache, iff the cache is new enough.
 
@@ -27737,12 +27761,12 @@ This preserves the historical behavior of `errors='ignore'` from
 * **Return type:**
   pd.DataFrame
 
-### pylimer_tools.utils.data_utility.get_tail(data, percentage=0.2, min_n=25, max_percentage=0.5)
+### pylimer_tools.utils.data_utility.get_tail(data: T, percentage: [float](https://docs.python.org/3/builtins/functions.html#float) = 0.2, min_n: [int](https://docs.python.org/3/builtins/functions.html#int) = 25, max_percentage: [float](https://docs.python.org/3/builtins/functions.html#float) = 0.5) → T
 
-Extract the last few entries of a list
+Extract the last few entries of a list, DataFrame, or Series.
 
 * **Parameters:**
-  * **data** ([*list*](https://docs.python.org/3/builtins/stdtypes.html#list) *or* *pd.DataFrame* *or* *pd.Series*) – The list, DataFrame, or Series to extract the last few entries from
+  * **data** ([*list*](https://docs.python.org/3/builtins/stdtypes.html#list) *or* *pd.DataFrame* *or* *pd.Series* *or* *pl.DataFrame* *or* *pl.Series*) – The list, DataFrame, or Series to extract the last few entries from
   * **percentage** ([*float*](https://docs.python.org/3/builtins/functions.html#float)) – The percentage of entries to extract (default: 0.2)
   * **min_n** ([*int*](https://docs.python.org/3/builtins/functions.html#int)) – The minimum number of entries to extract (default: 25)
   * **max_percentage** ([*float*](https://docs.python.org/3/builtins/functions.html#float)) – The maximum percentage of entries to extract (default: 0.5)
@@ -27755,19 +27779,19 @@ The function returns a subset with at maximum max_percentage,
 at least min_n entries (assuming the initial data is as large),
 but ideally percentage many percentage of the last entries.
 
-### pylimer_tools.utils.data_utility.unify_data_stepsizes(data: [DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame), key: [str](https://docs.python.org/3/builtins/stdtypes.html#str), step_size: [int](https://docs.python.org/3/builtins/functions.html#int) = None, max_expected_step_size: [int](https://docs.python.org/3/builtins/functions.html#int) = 100) → [DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame)
+### pylimer_tools.utils.data_utility.unify_data_stepsizes(data: DataFrameLike, key: [str](https://docs.python.org/3/builtins/stdtypes.html#str), step_size: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, max_expected_step_size: [float](https://docs.python.org/3/builtins/functions.html#float) = 100) → DataFrameLike
 
 Get a DataFrame where all data points have the same step between the values in column given by key
 
 * **Parameters:**
-  * **data** (*pd.DataFrame*) – The DataFrame to unify the step-size for
+  * **data** (*pd.DataFrame* *or* *pl.DataFrame*) – The DataFrame to unify the step-size for (pandas or polars DataFrame)
   * **key** ([*str*](https://docs.python.org/3/builtins/stdtypes.html#str)) – The column name indicating the column containing the step-nr
-  * **step_size** ([*int*](https://docs.python.org/3/builtins/functions.html#int) *,* *optional*) – The step size to use for filtering (if None, computed automatically)
-  * **max_expected_step_size** ([*int*](https://docs.python.org/3/builtins/functions.html#int) *,* *default=100*) – Used to get a warning if the computed step-size is larger
+  * **step_size** (*Optional* *[*[*float*](https://docs.python.org/3/builtins/functions.html#float) *]*) – The step size to use for filtering (if None, computed automatically)
+  * **max_expected_step_size** ([*float*](https://docs.python.org/3/builtins/functions.html#float) *,* *default=100*) – Used to get a warning if the computed step-size is larger
 * **Returns:**
   A DataFrame with a consistent step-size
 * **Return type:**
-  pd.DataFrame
+  Same type as input data
 
 NOTE: this function is rather unstable, as it has a few assumptions:
 - steps are modulo stepsize. Breaks e.g. with steps start with 1 and go up by step_size.
@@ -27782,13 +27806,13 @@ Heavily inspired by the following sources:
 - [https://medium.com/bigdatarepublic/advanced-pandas-optimize-speed-and-memory-a654b53be6c2](https://medium.com/bigdatarepublic/advanced-pandas-optimize-speed-and-memory-a654b53be6c2)
 - [https://stackoverflow.com/questions/57531388/how-can-i-reduce-the-memory-of-a-pandas-dataframe](https://stackoverflow.com/questions/57531388/how-can-i-reduce-the-memory-of-a-pandas-dataframe)
 
-### pylimer_tools.utils.optimize_dataframe.optimize(df: [DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame), datetime_features: [List](https://docs.python.org/3/library/typing.html#typing.List)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)] = [])
+### pylimer_tools.utils.optimize_dataframe.optimize(df: [DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame), datetime_features: [Sequence](https://docs.python.org/3/library/typing.html#typing.Sequence)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)] | [None](https://docs.python.org/3/builtins/constants.html#None) = None) → [DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame)
 
 Optimize all types of all columns in a dataframe.
 
 * **Parameters:**
   * **df** (*pd.DataFrame*) – dataframe to reduce
-  * **datetime_features** (*List* *[*[*str*](https://docs.python.org/3/builtins/stdtypes.html#str) *]*) – list of column names that contain datetime data
+  * **datetime_features** (*Optional* *[**Sequence* *[*[*str*](https://docs.python.org/3/builtins/stdtypes.html#str) *]* *]*) – list of column names that contain datetime data
 * **Returns:**
   dataset with the column dtypes adjusted
 * **Return type:**
@@ -27816,26 +27840,26 @@ Optimize the integer point type entries.
 * **Return type:**
   pd.DataFrame
 
-### pylimer_tools.utils.optimize_dataframe.optimize_objects(df: [DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame), datetime_features: [List](https://docs.python.org/3/library/typing.html#typing.List)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]) → [DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame)
+### pylimer_tools.utils.optimize_dataframe.optimize_objects(df: [DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame), datetime_features: [Sequence](https://docs.python.org/3/library/typing.html#typing.Sequence)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)] | [None](https://docs.python.org/3/builtins/constants.html#None) = None) → [DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame)
 
-Optimize object type entries.
+Optimize object and string type entries.
 
 * **Parameters:**
   * **df** (*pd.DataFrame*) – dataframe to reduce
-  * **datetime_features** (*List* *[*[*str*](https://docs.python.org/3/builtins/stdtypes.html#str) *]*) – list of column names that contain datetime data
+  * **datetime_features** (*Optional* *[**Sequence* *[*[*str*](https://docs.python.org/3/builtins/stdtypes.html#str) *]* *]*) – list of column names that contain datetime data
 * **Returns:**
   dataset with the column dtypes adjusted
 * **Return type:**
   pd.DataFrame
 
-### pylimer_tools.utils.optimize_dataframe.reduce_mem_usage(df, obj_to_category=False, subset=None, inplace=True, print_stats=False)
+### pylimer_tools.utils.optimize_dataframe.reduce_mem_usage(df: [DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame), obj_to_category: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False, subset: [Sequence](https://docs.python.org/3/library/typing.html#typing.Sequence)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)] | [None](https://docs.python.org/3/builtins/constants.html#None) = None, inplace: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True, print_stats: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame)
 
 Iterate through all the columns of a dataframe and modify the data type to reduce memory usage.
 
 * **Parameters:**
   * **df** (*pd.DataFrame*) – dataframe to reduce
   * **obj_to_category** ([*bool*](https://docs.python.org/3/builtins/functions.html#bool)) – convert non-datetime related objects to category dtype
-  * **subset** (*List* *[*[*str*](https://docs.python.org/3/builtins/stdtypes.html#str) *] or* *None*) – subset of columns to analyse
+  * **subset** (*Optional* *[**Sequence* *[*[*str*](https://docs.python.org/3/builtins/stdtypes.html#str) *]* *]*) – subset of columns to analyse
   * **inplace** ([*bool*](https://docs.python.org/3/builtins/functions.html#bool)) – whether to modify the dataframe in place
   * **print_stats** ([*bool*](https://docs.python.org/3/builtins/functions.html#bool)) – whether to print memory usage statistics
 * **Returns:**

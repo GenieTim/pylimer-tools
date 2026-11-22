@@ -1044,19 +1044,19 @@ solves.</p>
 </span></pre></div></div>
 <img src="../../_images/sphx_glr_plot_resistance_distance_analysis_003.png" srcset="../../_images/sphx_glr_plot_resistance_distance_analysis_003.png" alt="Parallel Network Pathways Lower Resistance Below $d_{\mathrm{graph}}$, Crosslinker Resistance Distribution & Solver Speedup" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Loaded polymer network: 4590 atoms, 4600 bonds, 3 connected components (largest: 4542 atoms).
 Evaluated 1540 crosslinker pairs (56 crosslinkers):
-  Individual solves: 36.12 ms
-  Batched multi-RHS: 26.27 ms (speedup: 1.38x)
+  Individual solves: 47.23 ms
+  Batched multi-RHS: 36.05 ms (speedup: 1.31x)
   Max difference:    0.00e+00
 
 All-pairs &amp; Kirchhoff benchmarks on 300-node crosslinked ring:
-  Pairwise loop (44,850 pairs):   85.24 ms
-  All-pairs chunk_size=1:         0.32 ms
-  All-pairs chunk_size=128:       0.48 ms (vs loop: 178.9x, vs chunk=1: 0.66x, max diff: 0.00e+00)
-  Kirchhoff spectral (O(N^3)):    8.10 ms
-  Kirchhoff fast (chunked):       0.40 ms (speedup: 20.4x, |diff|: 1.80e-07)
+  Pairwise loop (44,850 pairs):   117.50 ms
+  All-pairs chunk_size=1:         0.45 ms
+  All-pairs chunk_size=128:       0.56 ms (vs loop: 211.1x, vs chunk=1: 0.80x, max diff: 0.00e+00)
+  Kirchhoff spectral (O(N^3)):    11.29 ms
+  Kirchhoff fast (chunked):       0.57 ms (speedup: 20.0x, |diff|: 1.80e-07)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.850 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.184 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-structure-analysis-plot-resistance-distance-analysis-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/6e97a52096dbb670ad83c28e1d77a6f9/plot_resistance_distance_analysis.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_resistance_distance_analysis.ipynb</span></code></a></p>

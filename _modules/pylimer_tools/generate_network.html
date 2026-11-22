@@ -413,7 +413,6 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Union</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">click</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">statistics</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">termcolor</span><span class="w"> </span><span class="kn">import</span> <span class="n">colored</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools.calc.structure_analysis</span><span class="w"> </span><span class="kn">import</span> <span class="n">compute_crosslinker_conversion</span>
@@ -746,14 +745,13 @@
         <span class="p">)</span>
     <span class="c1"># TODO: also check for w_sol instead</span>
 
-    <span class="n">bond_lengths</span> <span class="o">=</span> <span class="n">universe</span><span class="o">.</span><span class="n">compute_bond_lengths</span><span class="p">()</span>
+    <span class="n">bond_stats</span> <span class="o">=</span> <span class="n">universe</span><span class="o">.</span><span class="n">compute_bond_length_stats</span><span class="p">()</span>
     <span class="nb">print</span><span class="p">(</span>
-        <span class="s2">"Bond lengths, squared mean: </span><span class="si">{}</span><span class="s2">, mean: </span><span class="si">{}</span><span class="s2"> (median: </span><span class="si">{}</span><span class="s2">, max: </span><span class="si">{}</span><span class="s2">, min: </span><span class="si">{}</span><span class="s2">)"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="n">statistics</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">bl</span><span class="o">**</span><span class="mi">2</span> <span class="k">for</span> <span class="n">bl</span> <span class="ow">in</span> <span class="n">bond_lengths</span><span class="p">),</span>
-            <span class="n">statistics</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">bond_lengths</span><span class="p">),</span>
-            <span class="n">statistics</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">bond_lengths</span><span class="p">),</span>
-            <span class="nb">max</span><span class="p">(</span><span class="n">bond_lengths</span><span class="p">),</span>
-            <span class="nb">min</span><span class="p">(</span><span class="n">bond_lengths</span><span class="p">),</span>
+        <span class="s2">"Bond lengths, squared mean: </span><span class="si">{}</span><span class="s2">, mean: </span><span class="si">{}</span><span class="s2"> (max: </span><span class="si">{}</span><span class="s2">, min: </span><span class="si">{}</span><span class="s2">)"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">bond_stats</span><span class="o">.</span><span class="n">mean_squared_bond_length</span><span class="p">,</span>
+            <span class="n">bond_stats</span><span class="o">.</span><span class="n">mean_bond_length</span><span class="p">,</span>
+            <span class="n">bond_stats</span><span class="o">.</span><span class="n">max_bond_length</span><span class="p">,</span>
+            <span class="n">bond_stats</span><span class="o">.</span><span class="n">min_bond_length</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="p">)</span>
 
@@ -922,28 +920,28 @@
     <span class="n">help</span><span class="o">=</span><span class="s2">"Output file for the generated network"</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">cli</span><span class="p">(</span>
-    <span class="n">polymer_name</span><span class="p">,</span>
-    <span class="n">parameter_type</span><span class="p">,</span>
-    <span class="n">target_p</span><span class="p">,</span>
-    <span class="n">target_wsol</span><span class="p">,</span>
-    <span class="n">n_chains_crosslinkers</span><span class="p">,</span>
-    <span class="n">target_f</span><span class="p">,</span>
-    <span class="n">n_solvent_chains</span><span class="p">,</span>
-    <span class="n">n_beads_per_solvent_chain</span><span class="p">,</span>
-    <span class="n">n_chains_1</span><span class="p">,</span>
-    <span class="n">n_beads_per_chain_1</span><span class="p">,</span>
-    <span class="n">n_chains_2</span><span class="p">,</span>
-    <span class="n">n_beads_per_chain_2</span><span class="p">,</span>
-    <span class="n">n_mono_chains</span><span class="p">,</span>
-    <span class="n">n_mono_beads_per_chain</span><span class="p">,</span>
-    <span class="n">n_beads_per_xlink</span><span class="p">,</span>
-    <span class="n">remove_wsol</span><span class="p">,</span>
-    <span class="n">functionalize_discrete</span><span class="p">,</span>
-    <span class="n">disable_primary_loops</span><span class="p">,</span>
-    <span class="n">disable_secondary_loops</span><span class="p">,</span>
-    <span class="n">z_score_std_mult</span><span class="p">,</span>
-    <span class="n">target_file</span><span class="p">,</span>
-<span class="p">):</span>
+    <span class="n">polymer_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">parameter_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">target_p</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+    <span class="n">target_wsol</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+    <span class="n">n_chains_crosslinkers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">target_f</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">n_solvent_chains</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">n_beads_per_solvent_chain</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">n_chains_1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">n_beads_per_chain_1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">n_chains_2</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">n_beads_per_chain_2</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">n_mono_chains</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">n_mono_beads_per_chain</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">n_beads_per_xlink</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">remove_wsol</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">functionalize_discrete</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">disable_primary_loops</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">disable_secondary_loops</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">z_score_std_mult</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">target_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Generate a crosslinked polymer network using Monte Carlo procedure.</span>
 
@@ -952,7 +950,7 @@
 <span class="sd">    (soluble fraction), but not both.</span>
 
 <span class="sd">    Example:</span>
-<span class="sd">        pylimer-generate-network --polymer-name PDMS --parameter-type GAUSSIAN --target-p 0.8 --n-chains-crosslinks 100 --target-file network.dat</span>
+<span class="sd">        pylimer-generate-network --polymer-name PDMS --parameter-type GAUSSIAN --target-p 0.8 --n-chains-crosslinkers 100 --target-file network.dat</span>
 <span class="sd">    """</span>
     <span class="c1"># Validate mutually exclusive options</span>
     <span class="k">if</span> <span class="n">target_p</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">target_wsol</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>

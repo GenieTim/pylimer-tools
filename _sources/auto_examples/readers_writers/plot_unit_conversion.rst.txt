@@ -65,7 +65,7 @@ Convert `LAMMPS units <https://docs.lammps.org/units.html>`_ to SI or other unit
 
  .. code-block:: none
 
-    /opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/site-packages/pylimer_tools/io/unit_styles.py:176: UserWarning: LJ unit styles are derived. Reference used: https://doi.org/10.1021/acs.macromol.9b02428
+    /opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/site-packages/pylimer_tools/io/unit_styles.py:182: UserWarning: LJ unit styles are derived. Reference used: https://doi.org/10.1021/acs.macromol.9b02428
       warnings.warn(
     1 'real' pressure (atm) in Pascal: 101325.00 Pa
     1 'lj' pressure in Pascal: 17600000.00 Pa
@@ -126,7 +126,7 @@ LAMMPS styles:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.239 seconds)
+   **Total running time of the script:** (0 minutes 0.314 seconds)
 
 
 .. _sphx_glr_download_auto_examples_readers_writers_plot_unit_conversion.py:

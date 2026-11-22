@@ -730,16 +730,16 @@ solves.
 
     Loaded polymer network: 4590 atoms, 4600 bonds, 3 connected components (largest: 4542 atoms).
     Evaluated 1540 crosslinker pairs (56 crosslinkers):
-      Individual solves: 36.12 ms
-      Batched multi-RHS: 26.27 ms (speedup: 1.38x)
+      Individual solves: 47.23 ms
+      Batched multi-RHS: 36.05 ms (speedup: 1.31x)
       Max difference:    0.00e+00
 
     All-pairs & Kirchhoff benchmarks on 300-node crosslinked ring:
-      Pairwise loop (44,850 pairs):   85.24 ms
-      All-pairs chunk_size=1:         0.32 ms
-      All-pairs chunk_size=128:       0.48 ms (vs loop: 178.9x, vs chunk=1: 0.66x, max diff: 0.00e+00)
-      Kirchhoff spectral (O(N^3)):    8.10 ms
-      Kirchhoff fast (chunked):       0.40 ms (speedup: 20.4x, |diff|: 1.80e-07)
+      Pairwise loop (44,850 pairs):   117.50 ms
+      All-pairs chunk_size=1:         0.45 ms
+      All-pairs chunk_size=128:       0.56 ms (vs loop: 211.1x, vs chunk=1: 0.80x, max diff: 0.00e+00)
+      Kirchhoff spectral (O(N^3)):    11.29 ms
+      Kirchhoff fast (chunked):       0.57 ms (speedup: 20.0x, |diff|: 1.80e-07)
 
 
 
@@ -747,7 +747,7 @@ solves.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.850 seconds)
+   **Total running time of the script:** (0 minutes 1.184 seconds)
 
 
 .. _sphx_glr_download_auto_examples_structure_analysis_plot_resistance_distance_analysis.py:

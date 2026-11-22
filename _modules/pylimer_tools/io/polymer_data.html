@@ -407,9 +407,10 @@
 <span class="sd">without requiring pandas or openpyxl as runtime dependencies.</span>
 <span class="sd">"""</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">overload</span>
 
 
 <div class="viewcode-block" id="PolymerData">
@@ -473,7 +474,9 @@
 
 <div class="viewcode-block" id="PolymerDataFrame.itertuples">
 <a class="viewcode-back" href="../../../pylimer_tools.io.html#pylimer_tools.io.polymer_data.PolymerDataFrame.itertuples">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">itertuples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"Pandas"</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">itertuples</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"Pandas"</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Iterate over DataFrame rows as named tuples.</span>
 
@@ -482,7 +485,7 @@
         <span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">namedtuple</span>
 
         <span class="c1"># Create namedtuple class with the polymer properties</span>
-        <span class="n">PolymerTuple</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span>
+        <span class="n">PolymerTuple</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span>  <span class="c1"># type: ignore[misc]</span>
             <span class="n">name</span><span class="p">,</span> <span class="p">[</span><span class="s2">"Index"</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_columns</span> <span class="k">if</span> <span class="n">index</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_columns</span>
         <span class="p">)</span>
 
@@ -496,7 +499,7 @@
 
 <div class="viewcode-block" id="PolymerDataFrame.iterrows">
 <a class="viewcode-back" href="../../../pylimer_tools.io.html#pylimer_tools.io.polymer_data.PolymerDataFrame.iterrows">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">iterrows</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">iterrows</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">PolymerData</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Iterate over DataFrame rows as (index, Series) pairs.</span>
 
@@ -506,14 +509,25 @@
             <span class="k">yield</span> <span class="n">i</span><span class="p">,</span> <span class="n">PolymerData</span><span class="p">(</span><span class="n">polymer</span><span class="p">)</span></div>
 
 
+    <span class="nd">@overload</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span> <span class="o">...</span>
+
+    <span class="nd">@overload</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">"PolymerDataFrame"</span><span class="p">:</span> <span class="o">...</span>
+
+    <span class="nd">@overload</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">slice</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"PolymerDataFrame"</span><span class="p">:</span> <span class="o">...</span>
+
+    <span class="nd">@overload</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PolymerData</span><span class="p">:</span> <span class="o">...</span>
+
 <div class="viewcode-block" id="PolymerDataFrame.__getitem__">
 <a class="viewcode-back" href="../../../pylimer_tools.io.html#pylimer_tools.io.polymer_data.PolymerDataFrame.__getitem__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">PolymerData</span><span class="p">],</span> <span class="s2">"PolymerDataFrame"</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">slice</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">PolymerData</span><span class="p">,</span> <span class="s2">"PolymerDataFrame"</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Access columns by name or list of names.</span>
-<span class="sd">        Access rows by integer index.</span>
+<span class="sd">        Access columns by name or list of names, or rows by integer index or slice.</span>
 <span class="sd">        """</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">return</span> <span class="p">[</span><span class="n">polymer</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">polymer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_polymers</span><span class="p">]</span>
@@ -523,15 +537,19 @@
                 <span class="p">{</span><span class="n">col</span><span class="p">:</span> <span class="n">polymer</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">col</span><span class="p">)</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">key</span><span class="p">}</span> <span class="k">for</span> <span class="n">polymer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_polymers</span>
             <span class="p">]</span>
             <span class="k">return</span> <span class="n">PolymerDataFrame</span><span class="p">(</span><span class="n">filtered_polymers</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">PolymerDataFrame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_polymers</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_columns</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
             <span class="c1"># Row selection by index</span>
             <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">key</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_polymers</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">PolymerData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_polymers</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_polymers</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">key</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">PolymerData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_polymers</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s2">"Row index out of range"</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">"Key must be string, list of strings, or int, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+                <span class="sa">f</span><span class="s2">"Key must be string, list of strings, slice, or int, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span></div>
 
 
@@ -554,6 +572,8 @@
 <a class="viewcode-back" href="../../../pylimer_tools.io.html#pylimer_tools.io.polymer_data.PolymerDataFrame.head">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">head</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"PolymerDataFrame"</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Get first n rows."""</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">PolymerDataFrame</span><span class="p">([],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_columns</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">PolymerDataFrame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_polymers</span><span class="p">[:</span><span class="n">n</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_columns</span><span class="p">)</span></div>
 
 
@@ -561,6 +581,8 @@
 <a class="viewcode-back" href="../../../pylimer_tools.io.html#pylimer_tools.io.polymer_data.PolymerDataFrame.tail">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">tail</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"PolymerDataFrame"</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Get last n rows."""</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">PolymerDataFrame</span><span class="p">([],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_columns</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">PolymerDataFrame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_polymers</span><span class="p">[</span><span class="o">-</span><span class="n">n</span><span class="p">:],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_columns</span><span class="p">)</span></div>
 
 
@@ -640,6 +662,7 @@
 
 <div class="viewcode-block" id="load_everaers_et_al_data">
 <a class="viewcode-back" href="../../../pylimer_tools.io.html#pylimer_tools.io.polymer_data.load_everaers_et_al_data">[docs]</a>
+<span class="nd">@functools</span><span class="o">.</span><span class="n">lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">load_everaers_et_al_data</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">PolymerDataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Load the Everaers et al. (2020) unit properties data from JSON.</span>

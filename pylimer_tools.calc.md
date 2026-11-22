@@ -10,7 +10,7 @@ Use [`pylimer_tools_cpp.MEHPForceBalance`](api/pylimer_tools_cpp.MEHPForceBalanc
 In principle, it offers comparable functionality, but without the force minimization - the networks you pass
 to these methods should be minimized first.
 
-### pylimer_tools.calc.mehp_utilities.compute_cycle_rank(networks: Sequence[[Universe](api/pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe)] | [None](https://docs.python.org/3/builtins/constants.html#None) = None, nu: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, mu: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, abs_tol: [float](https://docs.python.org/3/builtins/functions.html#float) = 1, rel_tol: [float](https://docs.python.org/3/builtins/functions.html#float) = 1, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2) → [float](https://docs.python.org/3/builtins/functions.html#float)
+### pylimer_tools.calc.mehp_utilities.compute_cycle_rank(networks: Sequence[[Universe](api/pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe)] | [None](https://docs.python.org/3/builtins/constants.html#None) = None, nu: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, mu: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, abs_tol: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = 1, rel_tol: [float](https://docs.python.org/3/builtins/functions.html#float) = 1, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Compute the cycle rank ($\chi$).
 Assumes the precursor-chains to be bifunctional.
@@ -38,7 +38,7 @@ or MEHPForceRelaxation classes from pylimer_tools_cpp.
 * **Return type:**
   [float](https://docs.python.org/3/builtins/functions.html#float)
 
-### pylimer_tools.calc.mehp_utilities.compute_effective_nr_density_of_junctions(networks: Sequence[[Universe](api/pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe)], abs_tol: [float](https://docs.python.org/3/builtins/functions.html#float) = 0, rel_tol: [float](https://docs.python.org/3/builtins/functions.html#float) = 1, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2, min_num_effective_strands=2) → [float](https://docs.python.org/3/builtins/functions.html#float)
+### pylimer_tools.calc.mehp_utilities.compute_effective_nr_density_of_junctions(networks: Sequence[[Universe](api/pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe)], abs_tol: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = 0, rel_tol: [float](https://docs.python.org/3/builtins/functions.html#float) = 1, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2, min_num_effective_strands: [int](https://docs.python.org/3/builtins/functions.html#int) = 2) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Compute the number density of the elastically effective crosslinks,
 defined as the ones that connect at least min_num_effective_strands elastically effective strands.
@@ -59,7 +59,7 @@ Source:
 * **Return type:**
   [float](https://docs.python.org/3/builtins/functions.html#float)
 
-### pylimer_tools.calc.mehp_utilities.compute_effective_nr_density_of_network(networks: Sequence[[Universe](api/pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe)], abs_tol: [float](https://docs.python.org/3/builtins/functions.html#float) = 1, rel_tol: [float](https://docs.python.org/3/builtins/functions.html#float) = 1, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2) → [float](https://docs.python.org/3/builtins/functions.html#float)
+### pylimer_tools.calc.mehp_utilities.compute_effective_nr_density_of_network(networks: Sequence[[Universe](api/pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe)], abs_tol: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = 1, rel_tol: [float](https://docs.python.org/3/builtins/functions.html#float) = 1, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Compute the effective number density $\nu_{eff}$ of a network.
 Assumes the precursor-chains to be bifunctional.
@@ -124,7 +124,7 @@ Source:
 * **Return type:**
   [float](https://docs.python.org/3/builtins/functions.html#float)
 
-### pylimer_tools.calc.mehp_utilities.predict_shear_modulus(networks: Sequence[[Universe](api/pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe)], temperature: [float](https://docs.python.org/3/builtins/functions.html#float) = 1, k_boltzmann: [float](https://docs.python.org/3/builtins/functions.html#float) = 1, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2, total_mass=1) → [float](https://docs.python.org/3/builtins/functions.html#float)
+### pylimer_tools.calc.mehp_utilities.predict_shear_modulus(networks: Sequence[[Universe](api/pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe)], temperature: [float](https://docs.python.org/3/builtins/functions.html#float) = 1, k_boltzmann: [float](https://docs.python.org/3/builtins/functions.html#float) = 1, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2, total_mass: [float](https://docs.python.org/3/builtins/functions.html#float) = 1) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Predict the shear modulus using ANT Analysis.
 
@@ -164,19 +164,21 @@ Not all systems are supported yet.
 In particular, for most methods, only A_f and B_2 is supported.
 Also, the systems are mostly assumed to be end-linked and monodisperse.
 
-### pylimer_tools.calc.miller_macosko_theory.compute_entanglement_modulus(g_e_1: [pint.Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity), temperature: [pint.Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity), network: [Universe](api/pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2, p: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, r: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, f: [int](https://docs.python.org/3/builtins/functions.html#int) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, b2: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, beta: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None) → [pint.Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity)
+### pylimer_tools.calc.miller_macosko_theory.compute_entanglement_modulus(g_e_1: [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity), temperature: [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, network: [Universe](api/pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2, p: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, r: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, f: [int](https://docs.python.org/3/builtins/functions.html#int) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, b2: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, beta: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None) → [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity)
 
 Compute MMT’s entanglement contribution to the equilibrium shear modulus, given by
 $k_B T \epsilon_e T_e$.
 
 * **Parameters:**
   * **g_e_1** – The melt entanglement modulus $G_e(1) = k_B T \epsilon_e$
-  * **temperature** – The temperatures; defaults to room temperature (25 °C)
+  * **temperature** – Unused (kept for API compatibility; temperature is already included in `g_e_1`)
   * **network** – The polymer network to do the computation for
   * **crosslinker_type** – The type of the junctions/crosslinkers to select them in the network
   * **p** – The crosslinker conversion
   * **r** – The stoichiometric imbalance
   * **f** – The functionality of the crosslinkers
+  * **b2** – The mole fraction of reactive sites in B2 among all reactive sites
+    in a mixture of B1 and B2
   * **beta** – $P(F_b^{out})$, optional
 * **Returns:**
   $T_e \cdot G_e(1)$
@@ -240,7 +242,7 @@ you would need to implement these formulas yourselves.
 * **Returns:**
   beta: $P(F_B)$
 
-### pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition(network: [Universe](api/pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, ureg: [pint.UnitRegistry](https://pint.readthedocs.io/en/stable/api/base.html#pint.UnitRegistry) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, unit_style: [None](https://docs.python.org/3/builtins/constants.html#None) | [UnitStyle](pylimer_tools.io.md#pylimer_tools.io.unit_styles.UnitStyle) = None, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, r: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, p: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, f: [int](https://docs.python.org/3/builtins/functions.html#int) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, nu: [pint.Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, temperature: [pint.Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, functionality_per_type: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, g_e_1: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, b2: [float](https://docs.python.org/3/builtins/functions.html#float) = 1.0) → Tuple[[pint.Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity), [pint.Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity), [pint.Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity), [pint.Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity)]
+### pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition(network: [Universe](api/pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, ureg: [UnitRegistry](https://pint.readthedocs.io/en/stable/api/base.html#pint.UnitRegistry) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, unit_style: [None](https://docs.python.org/3/builtins/constants.html#None) | [UnitStyle](pylimer_tools.io.md#pylimer_tools.io.unit_styles.UnitStyle) = None, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, r: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, p: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, f: [int](https://docs.python.org/3/builtins/functions.html#int) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, nu: [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, temperature: [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, functionality_per_type: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, g_e_1: [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, b2: [float](https://docs.python.org/3/builtins/functions.html#float) = 1.0) → [Tuple](https://docs.python.org/3/library/typing.html#typing.Tuple)[[Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity), [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity), [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity), [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity)]
 
 Compute four different estimates of the plateau modulus, using MMT, ANM and PNM.
 
@@ -384,7 +386,7 @@ Source:
   * **b2** – The mole fraction of reactive sites in B2 among all reactive sites
     in a mixture of B1 and B2
 * **Returns:**
-  weightFraction $$\Phi_d = w_p$$: weightDangling/weightTotal
+  weightFraction $\Phi_d = w_p$: weightDangling/weightTotal
 
 ### pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material(network: [Universe](api/pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2, functionality_per_type: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, weight_fractions: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, r: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, p: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, b2: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
@@ -413,7 +415,7 @@ Source:
 Use MMT to compute the weight fraction of soluble material using
 
 $$
-`W_{sol} = w_A_f P(F_A^{out})^f + w_B_g [rpP(F_A^{out})^{f-1}+1-rp]^g`
+W_{sol} = w_{A_f} P(F_A^{out})^f + w_{B_g} [rpP(F_A^{out})^{f-1}+1-rp]^g
 
 $$
 
@@ -434,7 +436,7 @@ Source:
 : - Venkataraman *et al.* [[VCC+89](acknowledgements.md#id19)]
 
 * **Parameters:**
-  * **r** – The stoichiometric imbalance of reactants (see: #compute_stoichiometric_imbalance)
+  * **r** – The stoichiometric imbalance of reactants (see: [`compute_stoichiometric_imbalance()`](#pylimer_tools.calc.structure_analysis.compute_stoichiometric_imbalance))
   * **f** – functionality of the crosslinkers
   * **b2** – The mole fraction of reactive sites in B2 among all reactive sites
     in a mixture of B1 and B2
@@ -446,7 +448,7 @@ Source:
 Compute the maximum crosslinker conversion possible given a stoichiometric inbalance.
 
 * **Parameters:**
-  * **r** – The stoichiometric imbalance of reactants (see: #compute_stoichiometric_imbalance)
+  * **r** – The stoichiometric imbalance of reactants (see: [`compute_stoichiometric_imbalance()`](#pylimer_tools.calc.structure_analysis.compute_stoichiometric_imbalance))
   * **f** – functionality of the crosslinkers
   * **b2** – The mole fraction of reactive sites in B2 among all reactive sites
     in a mixture of B1 and B2. Since r already includes the number of active sites, this argument
@@ -454,33 +456,43 @@ Compute the maximum crosslinker conversion possible given a stoichiometric inbal
 * **Returns:**
   p_max: The maximum crosslinker conversion possible
 
-### pylimer_tools.calc.miller_macosko_theory.predict_number_density_of_junction_points(network: [Universe](api/pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2, functionality_per_type: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict) | [None](https://docs.python.org/3/builtins/constants.html#None) = None) → [float](https://docs.python.org/3/builtins/functions.html#float)
+### pylimer_tools.calc.miller_macosko_theory.predict_number_density_of_junction_points(network: [Universe](api/pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2, functionality_per_type: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, b2: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, crosslinker_number_density: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
-Compute the number density of network strands using MMT
+Compute the number density of junction points using MMT.
 
 Source:
 : - Aoyama *et al.* [[AYU21](acknowledgements.md#id13)] (see supporting information for formulae)
 
 * **Parameters:**
-  * **network** – The network to compute the weight fraction for
+  * **network** – The network to compute the number density for
   * **crosslinker_type** – The atom type to use to split the molecules
   * **functionality_per_type** – a dictionary with key: type, and value: functionality of this atom type.
+  * **b2** – The mole fraction of reactive sites in B2 among all reactive sites
+    in a mixture of B1 and B2
+  * **crosslinker_number_density** – The initial number density of crosslinkers $[A_f]_0$.
+    If `None`, falls back to `weight_fractions[crosslinker_type]` for backwards compatibility
+    (deprecated; will be required or derived from `network` in a future release).
 * **Returns:**
   mu: The predicted number density of junction points
 
-### pylimer_tools.calc.miller_macosko_theory.predict_number_density_of_network_strands(network: [Universe](api/pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2, functionality_per_type: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, r: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, p: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None) → [float](https://docs.python.org/3/builtins/functions.html#float)
+### pylimer_tools.calc.miller_macosko_theory.predict_number_density_of_network_strands(network: [Universe](api/pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2, functionality_per_type: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, r: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, p: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, b2: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, crosslinker_number_density: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
-Compute the number density of network strands using MMT
+Compute the number density of network strands using MMT.
 
 Source:
 : - Aoyama *et al.* [[AYU21](acknowledgements.md#id13)] (see supporting information for formulae)
 
 * **Parameters:**
-  * **network** – The network to compute the weight fraction for
+  * **network** – The network to compute the number density for
   * **crosslinker_type** – The atom type to use to split the molecules
   * **functionality_per_type** – a dictionary with key: type, and value: functionality of this atom type.
   * **r** – The stoichiometric imbalance
   * **p** – The extent of reaction in terms of the crosslinkers
+  * **b2** – The mole fraction of reactive sites in B2 among all reactive sites
+    in a mixture of B1 and B2
+  * **crosslinker_number_density** – The initial number density of crosslinkers $[A_f]_0$.
+    If `None`, falls back to `weight_fractions[crosslinker_type]` for backwards compatibility
+    (deprecated; will be required or derived from `network` in a future release).
 * **Returns:**
   nu: The predicted number density of network strands
 
@@ -730,7 +742,7 @@ are counted as soluble
 * **Return type:**
   [float](https://docs.python.org/3/builtins/functions.html#float)
 
-### pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_backbone(network: [Universe](api/pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe), crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2)
+### pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_backbone(network: [Universe](api/pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe), crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Compute the weight fraction of network backbone in infinite network
 

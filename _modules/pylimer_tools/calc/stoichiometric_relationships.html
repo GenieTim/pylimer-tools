@@ -518,7 +518,9 @@
     <span class="n">bifunctional_fraction</span><span class="p">,</span> <span class="n">monofunctional_fraction</span> <span class="o">=</span> <span class="n">compute_number_fractions</span><span class="p">(</span><span class="n">b2</span><span class="p">)</span>
 
     <span class="n">mass_bifunctional</span> <span class="o">=</span> <span class="n">bifunctional_fraction</span> <span class="o">*</span> <span class="n">mw_bifunctional</span><span class="o">.</span><span class="n">magnitude</span>
-    <span class="n">mass_monofunctional</span> <span class="o">=</span> <span class="n">monofunctional_fraction</span> <span class="o">*</span> <span class="n">mw_monofunctional</span><span class="o">.</span><span class="n">magnitude</span>
+    <span class="n">mass_monofunctional</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">monofunctional_fraction</span> <span class="o">*</span> <span class="n">mw_monofunctional</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">mw_bifunctional</span><span class="o">.</span><span class="n">units</span><span class="p">)</span><span class="o">.</span><span class="n">magnitude</span>
+    <span class="p">)</span>
     <span class="n">total_mass</span> <span class="o">=</span> <span class="n">mass_bifunctional</span> <span class="o">+</span> <span class="n">mass_monofunctional</span>
 
     <span class="n">w_bifunctional</span> <span class="o">=</span> <span class="n">mass_bifunctional</span> <span class="o">/</span> <span class="n">total_mass</span>

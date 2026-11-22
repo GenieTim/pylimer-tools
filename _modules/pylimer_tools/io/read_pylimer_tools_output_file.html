@@ -404,15 +404,19 @@
 <span class="sd">This module provides a few functions to read output from pylimer_tools_cpp's simulators.</span>
 <span class="sd">"""</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools.utils.cache_utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">do_cache</span><span class="p">,</span> <span class="n">load_cache</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools.utils.cache_utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">PathLike</span><span class="p">,</span> <span class="n">do_cache</span><span class="p">,</span> <span class="n">load_cache</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools.utils.data_utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_to_numeric_ignore_compat</span>
 
 
 <div class="viewcode-block" id="read_avg_file">
 <a class="viewcode-back" href="../../../pylimer_tools.io.html#pylimer_tools.io.read_pylimer_tools_output_file.read_avg_file">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">read_avg_file</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_avg_file</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="n">PathLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Read an averages-output file from one of the simulators shipped with pylimer_tools.</span>
 
@@ -421,7 +425,7 @@
 <span class="sd">    The function also caches results to improve performance on subsequent reads.</span>
 
 <span class="sd">    :param filename: Path to the averages file to read</span>
-<span class="sd">    :type filename: str</span>
+<span class="sd">    :type filename: PathLike</span>
 <span class="sd">    :return: DataFrame containing the parsed averages data, grouped by OutputStep</span>
 <span class="sd">    :rtype: pd.DataFrame</span>
 
@@ -430,11 +434,12 @@
 <span class="sd">    :note: The returned DataFrame is grouped by OutputStep, keeping only the last</span>
 <span class="sd">           entry for each step.</span>
 <span class="sd">    """</span>
-    <span class="n">cache</span> <span class="o">=</span> <span class="n">load_cache</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">"my-avg"</span><span class="p">)</span>
+    <span class="n">filename_str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">fspath</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="n">cache</span> <span class="o">=</span> <span class="n">load_cache</span><span class="p">(</span><span class="n">filename_str</span><span class="p">,</span> <span class="s2">"my-avg"</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">cache</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">cache</span>
     <span class="n">data_frames</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename_str</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">first_line_split</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="s2">"#"</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
         <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
@@ -453,7 +458,7 @@
     <span class="n">result</span> <span class="o">=</span> <span class="n">apply_to_numeric_ignore_compat</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"OutputStep"</span><span class="p">,</span> <span class="n">as_index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">last</span><span class="p">()</span>
     <span class="k">assert</span> <span class="ow">not</span> <span class="n">result</span><span class="p">[</span><span class="s2">"OutputStep"</span><span class="p">]</span><span class="o">.</span><span class="n">duplicated</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">()</span>
-    <span class="n">do_cache</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="s2">"my-avg"</span><span class="p">)</span>
+    <span class="n">do_cache</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">filename_str</span><span class="p">,</span> <span class="s2">"my-avg"</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">result</span></div>
 
 </pre></div>
