@@ -1849,6 +1849,12 @@ class Universe:
         
                     Atoms on pruned leaves, dangling branches, and soluble components will have false.
         
+                    .. note::
+                       Uses :func:`peel_topological_leaves` and is therefore purely topological
+                       (ignores coordinates and PBC). Local (non-PBC) primary loops and isolated
+                       multi-crosslinker cycles are still marked ``True``, while crosslinker-less
+                       PBC-spanning rings are marked ``False``.
+        
                     :param crosslinker_type: Type ID of crosslinker atoms (default: 2)
                     :return: Boolean vector of length get_nr_of_atoms() (indexed by vertex index)
         """
@@ -1865,6 +1871,17 @@ class Universe:
                     Peel 1-core dangling trees and subgraphs from the network topology.
         
                     Returns a boolean vector indicating for each strand whether it is ignored (pruned).
+        
+                    .. note::
+                       Purely topological (2-core peeling on crosslinker connectivity); it does not
+                       inspect coordinates or periodic boundary conditions (PBC). Crosslinker-less
+                       solvent rings are always pruned (even if PBC-spanning), whereas primary loops
+                       and multi-crosslinker cycles are always kept (even if local / non-PBC, since
+                       a primary loop can still become elastically active when an entanglement or
+                       slip-link is associated with it).
+                       Use :class:`~pylimer_tools_cpp.MEHPSimulator` with
+                       ``assume_box_large_enough=False`` to separate PBC-spanning (or entangled)
+                       active loops from local zero-tension loops.
         
                     :param crosslinker_type: Type ID of crosslinker atoms (default: 2)
                     :return: Vector of booleans where true means the strand is pruned/ignored
@@ -5318,6 +5335,22 @@ def peel_topological_leaves(crosslinker_universe: CrosslinkerUniverse) -> list[b
     """
         Peel 1-core dangling trees and subgraphs iteratively from the CrosslinkerUniverse topology.
         Returns a boolean vector indicating for each strand whether it is ignored (pruned).
+    
+        .. note::
+           This is a purely topological 2-core peeling on ``strand_from``/``strand_to`` and
+           does not account for coordinates or periodic boundary conditions (PBC):
+    
+           - Free/dangling strands (including crosslinker-less solvent rings) are always pruned,
+             even if they wrap across the PBC.
+           - Primary loops (``strand_from == strand_to >= 0``) and multi-crosslinker cycles are
+             always kept in the 2-core, even if they do not span the PBC (note that a
+             non-PBC primary loop can still become elastically active if an entanglement or
+             slip-link is associated with it, whereas in a phantom network without
+             entanglements it relaxes to zero tension).
+    
+           To distinguish PBC-spanning (or entangled) active loops from non-PBC
+           zero-tension loops, use :class:`~pylimer_tools_cpp.MEHPSimulator` with
+           ``assume_box_large_enough=False``.
     
         :param crosslinker_universe: The CrosslinkerUniverse representation.
         :return: Boolean vector of ignored/pruned strands.

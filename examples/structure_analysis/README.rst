@@ -35,6 +35,26 @@ Finally, to find the shortest loop a specific atom is involved in, you can use t
    There are exponentially many paths between two crosslinkers of a network,
    and you may run out of memory when using these functions, if your network is lattice-like.
 
+Topological Leaf Pruning & Active Core
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To identify the topologically active 2-core of a network (pruning dangling branches,
+1-core trees, and unconnected/free chains), you can use
+:func:`~pylimer_tools_cpp.Universe.peel_topological_leaves()` or
+:func:`~pylimer_tools_cpp.Universe.identify_active_atoms()`.
+
+.. note::
+
+   Topological leaf pruning operates purely on crosslinker connectivity
+   (``strand_from`` / ``strand_to``) and ignores atom coordinates and periodic
+   boundary conditions (PBC). As a result, it cannot distinguish a local
+   (non-PBC, zero-tension) loop from a PBC-spanning (elastically active) loop.
+   (Note that in an entangled network, even a non-PBC primary loop can become
+   elastically active if an entanglement or slip-link is associated with it.)
+   See :doc:`/auto_examples/structure_analysis/plot_topological_leaf_pruning_vs_pbc`
+   for a side-by-side comparison with PBC- and/or entanglement-aware force-balance relaxation
+   (:class:`~pylimer_tools_cpp.MEHPSimulator`).
+
 Topological Resistance Distance & Commute Times
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

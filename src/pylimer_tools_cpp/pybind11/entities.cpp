@@ -1568,6 +1568,17 @@ init_pylimer_bound_entities(py::module_& m)
 
             Returns a boolean vector indicating for each strand whether it is ignored (pruned).
 
+            .. note::
+               Purely topological (2-core peeling on crosslinker connectivity); it does not
+               inspect coordinates or periodic boundary conditions (PBC). Crosslinker-less
+               solvent rings are always pruned (even if PBC-spanning), whereas primary loops
+               and multi-crosslinker cycles are always kept (even if local / non-PBC, since
+               a primary loop can still become elastically active when an entanglement or
+               slip-link is associated with it).
+               Use :class:`~pylimer_tools_cpp.MEHPSimulator` with
+               ``assume_box_large_enough=False`` to separate PBC-spanning (or entangled)
+               active loops from local zero-tension loops.
+
             :param crosslinker_type: Type ID of crosslinker atoms (default: 2)
             :return: Vector of booleans where true means the strand is pruned/ignored
          )pbdoc",
@@ -1578,6 +1589,12 @@ init_pylimer_bound_entities(py::module_& m)
             Identify which atoms belong to the topologically active 2-core of the network.
 
             Atoms on pruned leaves, dangling branches, and soluble components will have false.
+
+            .. note::
+               Uses :func:`peel_topological_leaves` and is therefore purely topological
+               (ignores coordinates and PBC). Local (non-PBC) primary loops and isolated
+               multi-crosslinker cycles are still marked ``True``, while crosslinker-less
+               PBC-spanning rings are marked ``False``.
 
             :param crosslinker_type: Type ID of crosslinker atoms (default: 2)
             :return: Boolean vector of length get_nr_of_atoms() (indexed by vertex index)
