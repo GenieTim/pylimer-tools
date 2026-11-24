@@ -36,11 +36,10 @@ MCUniverseGenerator
       ~MCUniverseGenerator.get_current_nr_of_atoms
       ~MCUniverseGenerator.get_current_nr_of_bonds
       ~MCUniverseGenerator.get_current_strand_conversion
-      ~MCUniverseGenerator.get_force_balance
-      ~MCUniverseGenerator.get_force_balance2
-      ~MCUniverseGenerator.get_force_relaxation
       ~MCUniverseGenerator.get_mean_bead_distance
       ~MCUniverseGenerator.get_mean_squared_bead_distance
+      ~MCUniverseGenerator.get_mehp_network
+      ~MCUniverseGenerator.get_mehp_simulator
       ~MCUniverseGenerator.get_nr_of_atoms
       ~MCUniverseGenerator.get_nr_of_bonds
       ~MCUniverseGenerator.get_universe
@@ -89,11 +88,10 @@ MCUniverseGenerator
    .. automethod:: get_current_nr_of_atoms
    .. automethod:: get_current_nr_of_bonds
    .. automethod:: get_current_strand_conversion
-   .. automethod:: get_force_balance
-   .. automethod:: get_force_balance2
-   .. automethod:: get_force_relaxation
    .. automethod:: get_mean_bead_distance
    .. automethod:: get_mean_squared_bead_distance
+   .. automethod:: get_mehp_network
+   .. automethod:: get_mehp_simulator
    .. automethod:: get_nr_of_atoms
    .. automethod:: get_nr_of_bonds
    .. automethod:: get_universe

@@ -1,0 +1,35 @@
+MEHPLinearSolverConfig
+======================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: MEHPLinearSolverConfig
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~MEHPLinearSolverConfig.cg_fallback_max_iterations
+      ~MEHPLinearSolverConfig.gradient_descent_learning_rate
+      ~MEHPLinearSolverConfig.in_place_rebuild_threshold
+      ~MEHPLinearSolverConfig.inactive_removal_cutoff
+      ~MEHPLinearSolverConfig.max_iterations
+      ~MEHPLinearSolverConfig.residual_reduction
+      ~MEHPLinearSolverConfig.simplification_mode
+      ~MEHPLinearSolverConfig.slip_mode
+      ~MEHPLinearSolverConfig.solver
+      ~MEHPLinearSolverConfig.spring_breaking_length
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: cg_fallback_max_iterations
+   .. autoattribute:: gradient_descent_learning_rate
+   .. autoattribute:: in_place_rebuild_threshold
+   .. autoattribute:: inactive_removal_cutoff
+   .. autoattribute:: max_iterations
+   .. autoattribute:: residual_reduction
+   .. autoattribute:: simplification_mode
+   .. autoattribute:: slip_mode
+   .. autoattribute:: solver
+   .. autoattribute:: spring_breaking_length

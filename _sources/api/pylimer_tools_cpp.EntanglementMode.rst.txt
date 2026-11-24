@@ -1,0 +1,21 @@
+EntanglementMode
+================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: EntanglementMode
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~EntanglementMode.MERGED_LINKS
+      ~EntanglementMode.NONE
+      ~EntanglementMode.SPRING
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: MERGED_LINKS
+   .. autoattribute:: NONE
+   .. autoattribute:: SPRING

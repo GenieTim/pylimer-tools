@@ -72,9 +72,9 @@ Two distinct physical regimes emerge as :math:`r_{\text{cut}}` is varied:
 
 Varying ``upper_cutoff`` in Entanglement Sampling
 -------------------------------------------------
-Pass ``upper_cutoff`` to :meth:`~pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements`
-and compare rigid links (``entanglements_as_springs=False``) vs. compliant springs
-(``entanglements_as_springs=True``).
+Passing ``upper_cutoff`` to :meth:`~pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements`
+compares rigid links (``EntanglementMode.MERGED_LINKS``) vs. compliant springs
+(``EntanglementMode.SPRING``).
 
 .. GENERATED FROM PYTHON SOURCE LINES 47-68
 
@@ -94,8 +94,8 @@ and compare rigid links (``entanglements_as_springs=False``) vs. compliant sprin
             upper_cutoff=r_cut,
             seed=f"cut_{r_cut}",
         )
-        fb = gen.get_force_balance2(es, entanglements_as_springs=False)
-        fb.run_force_relaxation()
+        fb = gen.get_mehp_simulator(es, entanglement_mode=pt.EntanglementMode.MERGED_LINKS)
+        fb.run()
         print(f"r_cut={r_cut}: sampled={len(es)}, iterations={fb.get_nr_of_iterations()}")
 
     cache_path = get_example_cache_path("sampling_cutoff_effect_cache.npz", "force_balance")
@@ -109,8 +109,8 @@ and compare rigid links (``entanglements_as_springs=False``) vs. compliant sprin
 
  .. code-block:: none
 
-    r_cut=1.2: sampled=253, iterations=205
-    r_cut=2.6: sampled=241, iterations=169
+    r_cut=1.2: sampled=253, iterations=399
+    r_cut=2.6: sampled=241, iterations=333
     Loading cached example data from sampling_cutoff_effect_cache.npz...
 
 
@@ -237,7 +237,7 @@ and larger pre-strains require more relaxation iterations to converge.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.667 seconds)
+   **Total running time of the script:** (0 minutes 0.576 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_sampling_cutoff_effect.py:

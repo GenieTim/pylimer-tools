@@ -3,12 +3,12 @@ r"""
 Force Balance 2
 ===============
 
-:class:`~pylimer_tools_cpp.MEHPForceBalance2` is a modernized, high-performance
-implementation of the Maximum Entropy Homogenization Procedure (MEHP)
+:class:`~pylimer_tools_cpp.MEHPSimulator` paired with :class:`~pylimer_tools_cpp.LinearSystemMEHPSolver`
+provides a high-performance implementation of the Maximum Entropy Homogenization Procedure (MEHP)
 (:cite:t:`gusev_numerical_2019`, :cite:t:`bernhard_phantom_2025`).
 
-Unlike the first-generation :class:`~pylimer_tools_cpp.MEHPForceBalance`, Force Balance 2
-models topological entanglements using localized static entanglement links (instantaneous
+Unlike dynamic sliding slip-links (:class:`~pylimer_tools_cpp.MEHPSlipLinkSolverConfig`), the fixed-link
+linear solver models topological entanglements using localized static entanglement links (instantaneous
 tetrafunctional nodes) or Hookean entanglement springs, eliminating slipping along the
 polymer chain contour to improve numerical stability and physical fidelity.
 
@@ -32,7 +32,12 @@ from pylimer_tools.io.bead_spring_parameter_provider import (
     get_parameters_for_polymer,
 )
 from pylimer_tools.io.read_lammps_output_file import read_data_file
-from pylimer_tools_cpp import MEHPForceBalance2, Universe
+from pylimer_tools_cpp import (
+    EntanglementMode,
+    MEHPLinearSolverConfig,
+    MEHPSimulator,
+    Universe,
+)
 
 # %%
 # Polymer Parameters & Conversion Factors
@@ -88,29 +93,29 @@ vol = universe.get_volume()
 
 # 1. Entangled network simulation
 n_entanglements = int(params.get_entanglement_density() * vol)
-mehp_fb = MEHPForceBalance2(
+mehp_fb = MEHPSimulator.construct_with_random_entanglements(
     universe,
     nr_of_entanglements_to_sample=n_entanglements,
     upper_sampling_cutoff=params.get_sampling_cutoff(),
-    entanglements_as_springs=False,
+    entanglement_mode=EntanglementMode.MERGED_LINKS,
     seed="42",
 )
-mehp_fb.run_force_relaxation()
+mehp_fb.run(MEHPLinearSolverConfig())
 
 print(
-    f"Entangled final residual norm: {mehp_fb.get_displacement_residual_norm():.3e} "
+    f"Entangled final residual norm: {mehp_fb.get_residual_norm():.3e} "
     f"(iterations: {mehp_fb.get_nr_of_iterations()})"
 )
 
 # 2. Phantom network baseline simulation (0 entanglements)
-mehp_phantom = MEHPForceBalance2(
+mehp_phantom = MEHPSimulator.construct_with_random_entanglements(
     universe,
     nr_of_entanglements_to_sample=0,
     upper_sampling_cutoff=params.get_sampling_cutoff(),
-    entanglements_as_springs=False,
+    entanglement_mode=EntanglementMode.MERGED_LINKS,
     seed="42",
 )
-mehp_phantom.run_force_relaxation()
+mehp_phantom.run(MEHPLinearSolverConfig())
 
 # %%
 # Elastic Modulus & Directional Decomposition
@@ -131,17 +136,17 @@ phantom_modulus = gamma_conversion_factor * np.sum(phantom_gammas) / vol
 # Directional shear moduli to evaluate isotropy
 gx = (
     gamma_conversion_factor
-    * np.sum(mehp_fb.get_gamma_factors_in_dir(r02_slope_magnitude, 0))
+    * np.sum(mehp_fb.get_gamma_factors_in_dir(0, r02_slope_magnitude))
     / vol
 )
 gy = (
     gamma_conversion_factor
-    * np.sum(mehp_fb.get_gamma_factors_in_dir(r02_slope_magnitude, 1))
+    * np.sum(mehp_fb.get_gamma_factors_in_dir(1, r02_slope_magnitude))
     / vol
 )
 gz = (
     gamma_conversion_factor
-    * np.sum(mehp_fb.get_gamma_factors_in_dir(r02_slope_magnitude, 2))
+    * np.sum(mehp_fb.get_gamma_factors_in_dir(2, r02_slope_magnitude))
     / vol
 )
 

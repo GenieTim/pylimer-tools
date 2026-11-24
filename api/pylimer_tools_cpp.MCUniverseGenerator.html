@@ -20,7 +20,7 @@
 <link rel="manifest" href="/_static/favicon/site.webmanifest" />
 
 <link rel="alternate" type="text/markdown" href="pylimer_tools_cpp.MCUniverseGenerator.html.md">
-<link rel="describedby" href="llms.txt"><link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="MEHPForceBalance" href="pylimer_tools_cpp.MEHPForceBalance.html"><link rel="prev" title="LinkSwappingMode" href="pylimer_tools_cpp.LinkSwappingMode.html">
+<link rel="describedby" href="llms.txt"><link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="MEHPForceEvaluator" href="pylimer_tools_cpp.MEHPForceEvaluator.html"><link rel="prev" title="LinkSwappingMode" href="pylimer_tools_cpp.LinkSwappingMode.html">
 
     <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
         <title>MCUniverseGenerator - pylimer-tools</title>
@@ -233,16 +233,16 @@
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../auto_examples/force_balance/index.html">Force Balance, Maximum Entropy Homogenization Procedures</a><input aria-label="Toggle navigation of Force Balance, Maximum Entropy Homogenization Procedures" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_entanglement_link_vs_spring.html">Entanglement Links vs. Springs</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_slipping_vs_fixed_links.html">Slipping vs. Fixed Entanglement Links</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_sampling_cutoff_effect.html">Sampling Cut-Off Effect</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_slipping_vs_fixed_links.html">Slipping vs. Fixed Entanglement Links</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_inactive_removal_and_sampling.html">Inactive Removal &amp; Sampling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_entanglement_sampling_comparison.html">Entanglement Sampling Methods</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_representative_volume_pdms.html">Representative Volume Study for PDMS Networks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_fb_deformation_exp.html">Deformation Experiment</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_balance.html">Force Balance</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_balance_2.html">Force Balance 2</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_relaxation.html">MEHP Force Relaxation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_balance_2.html">Force Balance 2</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../auto_examples/network_generator/index.html">Network Generation</a><input aria-label="Toggle navigation of Network Generation" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
@@ -341,23 +341,32 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.DumpFileReader.html">DumpFileReader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.EndToEndStats.html">EndToEndStats</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.EntanglementFilteringMode.html">EntanglementFilteringMode</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.EntanglementMode.html">EntanglementMode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.ExitReason.html">ExitReason</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.HookeanForceEvaluator.html">HookeanForceEvaluator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.HybridConfig.html">HybridConfig</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.KPMConfig.html">KPMConfig</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.LazyUniverseSequenceIterator.html">LazyUniverseSequenceIterator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.LinearMaxDistanceProvider.html">LinearMaxDistanceProvider</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.LinearSystemMEHPSolver.html">LinearSystemMEHPSolver</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.LinkSwappingMode.html">LinkSwappingMode</a></li>
 <li class="toctree-l3 current current-page"><a class="current reference internal" href="#">MCUniverseGenerator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.MEHPForceBalance.html">MEHPForceBalance</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.MEHPForceBalance2.html">MEHPForceBalance2</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.MEHPForceEvaluator.html">MEHPForceEvaluator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.MEHPForceRelaxation.html">MEHPForceRelaxation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.MEHPLinearSolverConfig.html">MEHPLinearSolverConfig</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.MEHPNetwork.html">MEHPNetwork</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.MEHPNonlinearSolverConfig.html">MEHPNonlinearSolverConfig</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.MEHPSimulator.html">MEHPSimulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.MEHPSlipLinkSolverConfig.html">MEHPSlipLinkSolverConfig</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.MEHPSolveResult.html">MEHPSolveResult</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.MEHPSolver.html">MEHPSolver</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.MaxDistanceProvider.html">MaxDistanceProvider</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.Molecule.html">Molecule</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.MoleculeIterator.html">MoleculeIterator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.MoleculeType.html">MoleculeType</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.NLoptAlgorithm.html">NLoptAlgorithm</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.NoMaxDistanceProvider.html">NoMaxDistanceProvider</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html">NonGaussianSpringForceEvaluator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.NonlinearOptimizationSolver.html">NonlinearOptimizationSolver</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.NormalModeAnalyzer.html">NormalModeAnalyzer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.NormalModeSolver.html">NormalModeSolver</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.NormalModeSpectrum.html">NormalModeSpectrum</a></li>
@@ -368,10 +377,8 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.RouseSolverType.html">RouseSolverType</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SLESolver.html">SLESolver</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SLQConfig.html">SLQConfig</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html">SimpleSpringMEHPForceEvaluator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedBalance2Network.html">SimplifiedBalance2Network</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedBalanceNetwork.html">SimplifiedBalanceNetwork</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedNetwork.html">SimplifiedNetwork</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SlipLinkRelaxationSolver.html">SlipLinkRelaxationSolver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SlipMode.html">SlipMode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.StrandCategory.html">StrandCategory</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.StrandPairEntanglements.html">StrandPairEntanglements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.StructureSimplificationMode.html">StructureSimplificationMode</a></li>
@@ -540,76 +547,73 @@ Kuhn segment parameters conflicts with the generator producing Gaussian bond sta
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_current_strand_conversion" title="pylimer_tools_cpp.MCUniverseGenerator.get_current_strand_conversion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_current_strand_conversion</span></code></a>(self)</p></td>
 <td><p>Get the current conversion of strands, i.e., the fraction of strand ends that have been consumed.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_force_balance" title="pylimer_tools_cpp.MCUniverseGenerator.get_force_balance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_force_balance</span></code></a>(*args, **kwargs)</p></td>
-<td><p>Overloaded function.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_force_balance2" title="pylimer_tools_cpp.MCUniverseGenerator.get_force_balance2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_force_balance2</span></code></a>(*args, **kwargs)</p></td>
-<td><p>Overloaded function.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_force_relaxation" title="pylimer_tools_cpp.MCUniverseGenerator.get_force_relaxation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_force_relaxation</span></code></a>(self)</p></td>
-<td><p>Get an instance of the force relaxation procedure.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_mean_bead_distance" title="pylimer_tools_cpp.MCUniverseGenerator.get_mean_bead_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_mean_bead_distance</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_mean_bead_distance" title="pylimer_tools_cpp.MCUniverseGenerator.get_mean_bead_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_mean_bead_distance</span></code></a>(self)</p></td>
 <td><p>Get the currently configured mean bead distance.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_mean_squared_bead_distance" title="pylimer_tools_cpp.MCUniverseGenerator.get_mean_squared_bead_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_mean_squared_bead_distance</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_mean_squared_bead_distance" title="pylimer_tools_cpp.MCUniverseGenerator.get_mean_squared_bead_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_mean_squared_bead_distance</span></code></a>(self)</p></td>
 <td><p>Get the currently configured mean squared bead distance.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_nr_of_atoms" title="pylimer_tools_cpp.MCUniverseGenerator.get_nr_of_atoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_atoms</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_mehp_network" title="pylimer_tools_cpp.MCUniverseGenerator.get_mehp_network"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_mehp_network</span></code></a>(self[, entanglements, ...])</p></td>
+<td><p>Build a canonical MEHPNetwork from the current simplified universe and optional sampled entanglements.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_mehp_simulator" title="pylimer_tools_cpp.MCUniverseGenerator.get_mehp_simulator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_mehp_simulator</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Overloaded function.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_nr_of_atoms" title="pylimer_tools_cpp.MCUniverseGenerator.get_nr_of_atoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_atoms</span></code></a>(self)</p></td>
 <td><p>Get the current number of atoms that the universe would/will have.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_nr_of_bonds" title="pylimer_tools_cpp.MCUniverseGenerator.get_nr_of_bonds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_bonds</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_nr_of_bonds" title="pylimer_tools_cpp.MCUniverseGenerator.get_nr_of_bonds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_bonds</span></code></a>(self)</p></td>
 <td><p>Get the current number of bonds that the universe would/will have.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_universe" title="pylimer_tools_cpp.MCUniverseGenerator.get_universe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_universe</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_universe" title="pylimer_tools_cpp.MCUniverseGenerator.get_universe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_universe</span></code></a>(self)</p></td>
 <td><p>Fetch the current (or final) state of the universe.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.link_strand" title="pylimer_tools_cpp.MCUniverseGenerator.link_strand"><code class="xref py py-obj docutils literal notranslate"><span class="pre">link_strand</span></code></a>(self, strand_idx[, c_infinity])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.link_strand" title="pylimer_tools_cpp.MCUniverseGenerator.link_strand"><code class="xref py py-obj docutils literal notranslate"><span class="pre">link_strand</span></code></a>(self, strand_idx[, c_infinity])</p></td>
 <td><p>Link one particular strand to a crosslinker.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.link_strand_to" title="pylimer_tools_cpp.MCUniverseGenerator.link_strand_to"><code class="xref py py-obj docutils literal notranslate"><span class="pre">link_strand_to</span></code></a>(self, strand_idx, link_idx)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.link_strand_to" title="pylimer_tools_cpp.MCUniverseGenerator.link_strand_to"><code class="xref py py-obj docutils literal notranslate"><span class="pre">link_strand_to</span></code></a>(self, strand_idx, link_idx)</p></td>
 <td><p>Link a strand to a specific crosslinker.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.link_strand_to_strand" title="pylimer_tools_cpp.MCUniverseGenerator.link_strand_to_strand"><code class="xref py py-obj docutils literal notranslate"><span class="pre">link_strand_to_strand</span></code></a>(self[, c_infinity])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.link_strand_to_strand" title="pylimer_tools_cpp.MCUniverseGenerator.link_strand_to_strand"><code class="xref py py-obj docutils literal notranslate"><span class="pre">link_strand_to_strand</span></code></a>(self[, c_infinity])</p></td>
 <td><p>Link two free strand ends together directly.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.link_strands_callback" title="pylimer_tools_cpp.MCUniverseGenerator.link_strands_callback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">link_strands_callback</span></code></a>(self, linking_controller)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.link_strands_callback" title="pylimer_tools_cpp.MCUniverseGenerator.link_strands_callback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">link_strands_callback</span></code></a>(self, linking_controller)</p></td>
 <td><p>Link strands to crosslinkers using a custom callback function to control when to stop.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_conversion" title="pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_conversion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">link_strands_to_conversion</span></code></a>(self, ...[, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_conversion" title="pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_conversion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">link_strands_to_conversion</span></code></a>(self, ...[, ...])</p></td>
 <td><p>Actually link the previously added strands to the previously added crosslinkers, until a certain crosslink conversion is reached.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_soluble_fraction" title="pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_soluble_fraction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">link_strands_to_soluble_fraction</span></code></a>(self, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_soluble_fraction" title="pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_soluble_fraction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">link_strands_to_soluble_fraction</span></code></a>(self, ...)</p></td>
 <td><p>Actually link the previously added strands to the previously added crosslinkers, until a certain soluble fraction is reached.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_strands_to_conversion" title="pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_strands_to_conversion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">link_strands_to_strands_to_conversion</span></code></a>(self, ...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_strands_to_conversion" title="pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_strands_to_conversion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">link_strands_to_strands_to_conversion</span></code></a>(self, ...)</p></td>
 <td><p>Link free strand ends to each other until target conversion is reached.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.relax_crosslinks" title="pylimer_tools_cpp.MCUniverseGenerator.relax_crosslinks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">relax_crosslinks</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.relax_crosslinks" title="pylimer_tools_cpp.MCUniverseGenerator.relax_crosslinks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">relax_crosslinks</span></code></a>(self)</p></td>
 <td><p>Run force relaxation with the crosslinkers and their strands, to have the crosslinks in their statistically most probable position.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.remove_soluble_fraction" title="pylimer_tools_cpp.MCUniverseGenerator.remove_soluble_fraction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_soluble_fraction</span></code></a>(self[, rescale_box])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.remove_soluble_fraction" title="pylimer_tools_cpp.MCUniverseGenerator.remove_soluble_fraction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_soluble_fraction</span></code></a>(self[, rescale_box])</p></td>
 <td><p>Remove soluble fraction (as determined by phantom force relaxation) of the strands and crosslinks.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements" title="pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sample_entanglements</span></code></a>(self, ...[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements" title="pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sample_entanglements</span></code></a>(self, ...[, ...])</p></td>
 <td><p>Sample entanglements directly from the generator's CrosslinkerUniverse using per-strand bounding boxes and on-demand Brownian bridge bead resampling without constructing a full Universe.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance" title="pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_bead_distance</span></code></a>(self, distance[, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance" title="pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_bead_distance</span></code></a>(self, distance[, ...])</p></td>
 <td><p>Set the mean distance between beads when doing MC stepping.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.set_mean_squared_bead_distance" title="pylimer_tools_cpp.MCUniverseGenerator.set_mean_squared_bead_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_mean_squared_bead_distance</span></code></a>(self, ...[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.set_mean_squared_bead_distance" title="pylimer_tools_cpp.MCUniverseGenerator.set_mean_squared_bead_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_mean_squared_bead_distance</span></code></a>(self, ...[, ...])</p></td>
 <td><p>Set the mean squared distance between beads.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.set_seed" title="pylimer_tools_cpp.MCUniverseGenerator.set_seed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_seed</span></code></a>(self, seed)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.set_seed" title="pylimer_tools_cpp.MCUniverseGenerator.set_seed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_seed</span></code></a>(self, seed)</p></td>
 <td><p>Set the seed for the random generator.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.use_linear_max_distance" title="pylimer_tools_cpp.MCUniverseGenerator.use_linear_max_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">use_linear_max_distance</span></code></a>(self, multiplier)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.use_linear_max_distance" title="pylimer_tools_cpp.MCUniverseGenerator.use_linear_max_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">use_linear_max_distance</span></code></a>(self, multiplier)</p></td>
 <td><p>Converts the <span class="math notranslate nohighlight">\(N\)</span> to a maximum distance within which to sample.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.use_zscore_max_distance" title="pylimer_tools_cpp.MCUniverseGenerator.use_zscore_max_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">use_zscore_max_distance</span></code></a>(self, std_multiplier)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.use_zscore_max_distance" title="pylimer_tools_cpp.MCUniverseGenerator.use_zscore_max_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">use_zscore_max_distance</span></code></a>(self, std_multiplier)</p></td>
 <td><p>Converts the <span class="math notranslate nohighlight">\(N\)</span> to a maximum distance within which to sample.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.validate" title="pylimer_tools_cpp.MCUniverseGenerator.validate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.validate" title="pylimer_tools_cpp.MCUniverseGenerator.validate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code></a>(self)</p></td>
 <td><p>Check whether the internal state of the generator is valid.</p></td>
 </tr>
 </tbody>
@@ -1001,160 +1005,6 @@ that have been linked to strands.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.get_force_balance">
-<span class="sig-name descname"><span class="pre">get_force_balance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.get_force_balance" title="Link to this definition">¶</a></dt>
-<dd><p>Overloaded function.</p>
-<ol class="arabic">
-<li><p>get_force_balance(self: pylimer_tools_cpp.MCUniverseGenerator) -&gt; pylimer_tools_cpp.MEHPForceBalance</p>
-<blockquote>
-<div><p>Get an instance of the force balance procedure.
-This is a useful shorthand e.g. to skip the sampling of beads within in the strands.</p>
-<dl class="field-list simple">
-<dt class="field-odd">return<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Configured MEHPForceBalance instance.</p>
-</dd>
-</dl>
-</div></blockquote>
-</li>
-<li><p>get_force_balance(self: pylimer_tools_cpp.MCUniverseGenerator, entanglements: pylimer_tools_cpp.StrandPairEntanglements) -&gt; pylimer_tools_cpp.MEHPForceBalance</p>
-<blockquote>
-<div><p>Get an instance of the force balance procedure with pre-sampled entanglements,
-bypassing the creation of a Universe.</p>
-<dl class="field-list simple">
-<dt class="field-odd">param entanglements<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Sampled StrandPairEntanglements.</p>
-</dd>
-<dt class="field-even">return<span class="colon">:</span></dt>
-<dd class="field-even"><p>Configured MEHPForceBalance instance.</p>
-</dd>
-</dl>
-</div></blockquote>
-</li>
-<li><p>get_force_balance(self: pylimer_tools_cpp.MCUniverseGenerator, nr_of_entanglements_to_sample: typing.SupportsInt | typing.SupportsIndex, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_entanglements: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3.0, seed: str = ‘’, filtering_mode: pylimer_tools_cpp.EntanglementFilteringMode = EntanglementFilteringMode.OMIT_INACTIVE) -&gt; pylimer_tools_cpp.MEHPForceBalance</p>
-<blockquote>
-<div><p>Sample entanglements and return a configured MEHPForceBalance instance,
-bypassing the creation of a Universe.</p>
-<dl class="field-list simple">
-<dt class="field-odd">param nr_of_entanglements_to_sample<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Target number of entanglements to sample.</p>
-</dd>
-<dt class="field-even">param upper_cutoff<span class="colon">:</span></dt>
-<dd class="field-even"><p>Upper cutoff distance between entangled beads.</p>
-</dd>
-<dt class="field-odd">param lower_cutoff<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Lower cutoff distance between entangled beads (default: 0.0).</p>
-</dd>
-<dt class="field-even">param minimum_nr_of_entanglements<span class="colon">:</span></dt>
-<dd class="field-even"><p>Minimum number of entanglements required (default: 0).</p>
-</dd>
-<dt class="field-odd">param same_strand_cutoff<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Minimum contour separation on the same strand (default: 3.0).</p>
-</dd>
-<dt class="field-even">param seed<span class="colon">:</span></dt>
-<dd class="field-even"><p>Optional random seed (uses generator RNG if empty).</p>
-</dd>
-<dt class="field-odd">param filtering_mode<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Filtering mode for entanglements (default: EntanglementFilteringMode.OMIT_INACTIVE).</p>
-</dd>
-<dt class="field-even">return<span class="colon">:</span></dt>
-<dd class="field-even"><p>Configured MEHPForceBalance instance.</p>
-</dd>
-</dl>
-</div></blockquote>
-</li>
-</ol>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.get_force_balance2">
-<span class="sig-name descname"><span class="pre">get_force_balance2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.get_force_balance2" title="Link to this definition">¶</a></dt>
-<dd><p>Overloaded function.</p>
-<ol class="arabic">
-<li><p>get_force_balance2(self: pylimer_tools_cpp.MCUniverseGenerator) -&gt; pylimer_tools_cpp.MEHPForceBalance2</p>
-<blockquote>
-<div><p>Get an instance of the force balance procedure.
-This is a useful shorthand e.g. to skip the sampling of beads within in the strands.</p>
-<dl class="field-list simple">
-<dt class="field-odd">return<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Configured MEHPForceBalance2 instance.</p>
-</dd>
-</dl>
-</div></blockquote>
-</li>
-<li><p>get_force_balance2(self: pylimer_tools_cpp.MCUniverseGenerator, entanglements: pylimer_tools_cpp.StrandPairEntanglements, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, entanglements_as_springs: bool = False) -&gt; pylimer_tools_cpp.MEHPForceBalance2</p>
-<blockquote>
-<div><p>Get an instance of the MEHPForceBalance2 procedure with pre-sampled entanglements,
-bypassing the creation of a Universe.</p>
-<dl class="field-list simple">
-<dt class="field-odd">param entanglements<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Sampled StrandPairEntanglements.</p>
-</dd>
-<dt class="field-even">param crosslinker_type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Crosslinker atom type (default: 2).</p>
-</dd>
-<dt class="field-odd">param entanglements_as_springs<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Whether to represent entanglements as springs between two split nodes (default: False).</p>
-</dd>
-<dt class="field-even">return<span class="colon">:</span></dt>
-<dd class="field-even"><p>Configured MEHPForceBalance2 instance.</p>
-</dd>
-</dl>
-</div></blockquote>
-</li>
-<li><p>get_force_balance2(self: pylimer_tools_cpp.MCUniverseGenerator, nr_of_entanglements_to_sample: typing.SupportsInt | typing.SupportsIndex, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_entanglements: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3.0, seed: str = ‘’, filtering_mode: pylimer_tools_cpp.EntanglementFilteringMode = EntanglementFilteringMode.OMIT_INACTIVE, entanglements_as_springs: bool = False, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2) -&gt; pylimer_tools_cpp.MEHPForceBalance2</p>
-<blockquote>
-<div><p>Sample entanglements and return a configured MEHPForceBalance2 instance,
-bypassing the creation of a Universe.</p>
-<dl class="field-list simple">
-<dt class="field-odd">param nr_of_entanglements_to_sample<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Target number of entanglements to sample.</p>
-</dd>
-<dt class="field-even">param upper_cutoff<span class="colon">:</span></dt>
-<dd class="field-even"><p>Upper cutoff distance between entangled beads.</p>
-</dd>
-<dt class="field-odd">param lower_cutoff<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Lower cutoff distance between entangled beads (default: 0.0).</p>
-</dd>
-<dt class="field-even">param minimum_nr_of_entanglements<span class="colon">:</span></dt>
-<dd class="field-even"><p>Minimum number of entanglements required (default: 0).</p>
-</dd>
-<dt class="field-odd">param same_strand_cutoff<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Minimum contour separation on the same strand (default: 3.0).</p>
-</dd>
-<dt class="field-even">param seed<span class="colon">:</span></dt>
-<dd class="field-even"><p>Optional random seed (uses generator RNG if empty).</p>
-</dd>
-<dt class="field-odd">param filtering_mode<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Filtering mode for entanglements (default: EntanglementFilteringMode.OMIT_INACTIVE).</p>
-</dd>
-<dt class="field-even">param entanglements_as_springs<span class="colon">:</span></dt>
-<dd class="field-even"><p>Whether to represent entanglements as springs between two split nodes (default: False).</p>
-</dd>
-<dt class="field-odd">param crosslinker_type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Crosslinker atom type (default: 2).</p>
-</dd>
-<dt class="field-even">return<span class="colon">:</span></dt>
-<dd class="field-even"><p>Configured MEHPForceBalance2 instance.</p>
-</dd>
-</dl>
-</div></blockquote>
-</li>
-</ol>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.get_force_relaxation">
-<span class="sig-name descname"><span class="pre">get_force_relaxation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation" title="pylimer_tools_cpp.MEHPForceRelaxation"><span class="pre">pylimer_tools_cpp.MEHPForceRelaxation</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.get_force_relaxation" title="Link to this definition">¶</a></dt>
-<dd><p>Get an instance of the force relaxation procedure.
-This is a useful shorthand e.g. to skip the sampling of beads within in the strands.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Configured MEHPForceRelaxation instance.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.get_mean_bead_distance">
 <span class="sig-name descname"><span class="pre">get_mean_bead_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.get_mean_bead_distance" title="Link to this definition">¶</a></dt>
 <dd><p>Get the currently configured mean bead distance.</p>
@@ -1174,6 +1024,110 @@ This is a useful shorthand e.g. to skip the sampling of beads within in the stra
 <dd class="field-odd"><p>The currently configured mean squared distance between beads</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.get_mehp_network">
+<span class="sig-name descname"><span class="pre">get_mehp_network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">entanglements</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.StrandPairEntanglements.html#pylimer_tools_cpp.StrandPairEntanglements" title="pylimer_tools_cpp.StrandPairEntanglements"><span class="pre">pylimer_tools_cpp.StrandPairEntanglements</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">StrandPairEntanglements()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entanglement_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.EntanglementMode.html#pylimer_tools_cpp.EntanglementMode" title="pylimer_tools_cpp.EntanglementMode"><span class="pre">pylimer_tools_cpp.EntanglementMode</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">EntanglementMode.MERGED_LINKS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinker_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsInt" title="(in Python v3.15)"><span class="pre">SupportsInt</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsIndex" title="(in Python v3.15)"><span class="pre">SupportsIndex</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_dangling_chains</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_free_chains</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="pylimer_tools_cpp.MEHPNetwork.html#pylimer_tools_cpp.MEHPNetwork" title="pylimer_tools_cpp.MEHPNetwork"><span class="pre">pylimer_tools_cpp.MEHPNetwork</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.get_mehp_network" title="Link to this definition">¶</a></dt>
+<dd><p>Build a canonical MEHPNetwork from the current simplified universe and optional sampled entanglements.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.get_mehp_network.params.entanglements"></span><strong>entanglements</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_mehp_network.params.entanglements">¶</a> – Optional pre-sampled strand-pair entanglements.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.get_mehp_network.params.entanglement_mode"></span><strong>entanglement_mode</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_mehp_network.params.entanglement_mode">¶</a> – Entanglement representation mode (default: EntanglementMode.MERGED_LINKS).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.get_mehp_network.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_mehp_network.params.crosslinker_type">¶</a> – Atom type identifying crosslinkers (default: 2).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.get_mehp_network.params.remove_dangling_chains"></span><strong>remove_dangling_chains</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_mehp_network.params.remove_dangling_chains">¶</a> – Omit dangling chains when True (default: False).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.get_mehp_network.params.include_free_chains"></span><strong>include_free_chains</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_mehp_network.params.include_free_chains">¶</a> – Include free/soluble chains when True (default: True).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Configured MEHPNetwork instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.get_mehp_simulator">
+<span class="sig-name descname"><span class="pre">get_mehp_simulator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.get_mehp_simulator" title="Link to this definition">¶</a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic">
+<li><p>get_mehp_simulator(self: pylimer_tools_cpp.MCUniverseGenerator, entanglements: pylimer_tools_cpp.StrandPairEntanglements = StrandPairEntanglements(), entanglement_mode: pylimer_tools_cpp.EntanglementMode = EntanglementMode.MERGED_LINKS, force_evaluator: pylimer_tools_cpp.MEHPForceEvaluator = None, is_2d: bool = False, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, remove_dangling_chains: bool = False, include_free_chains: bool = True) -&gt; pylimer_tools_cpp.MEHPSimulator</p>
+<blockquote>
+<div><p>Construct a unified MEHPSimulator from the current simplified universe and optional pre-sampled entanglements,
+bypassing the creation of a Universe.</p>
+<dl class="field-list simple">
+<dt class="field-odd">param entanglements<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Optional pre-sampled strand-pair entanglements.</p>
+</dd>
+<dt class="field-even">param entanglement_mode<span class="colon">:</span></dt>
+<dd class="field-even"><p>Entanglement representation mode (default: EntanglementMode.MERGED_LINKS).</p>
+</dd>
+<dt class="field-odd">param force_evaluator<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Optional constitutive force evaluator (defaults to HookeanForceEvaluator(1.0) when None).</p>
+</dd>
+<dt class="field-even">param is_2d<span class="colon">:</span></dt>
+<dd class="field-even"><p>Treat system as 2D when True (default: False).</p>
+</dd>
+<dt class="field-odd">param crosslinker_type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Atom type identifying crosslinkers (default: 2).</p>
+</dd>
+<dt class="field-even">param remove_dangling_chains<span class="colon">:</span></dt>
+<dd class="field-even"><p>Omit dangling chains when True (default: False).</p>
+</dd>
+<dt class="field-odd">param include_free_chains<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Include free/soluble chains when True (default: True).</p>
+</dd>
+<dt class="field-even">return<span class="colon">:</span></dt>
+<dd class="field-even"><p>Configured MEHPSimulator instance.</p>
+</dd>
+</dl>
+</div></blockquote>
+</li>
+<li><p>get_mehp_simulator(self: pylimer_tools_cpp.MCUniverseGenerator, nr_of_entanglements_to_sample: typing.SupportsInt | typing.SupportsIndex, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_entanglements: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3.0, seed: str = ‘’, filter_dangling_and_soluble: bool = True, entanglement_mode: pylimer_tools_cpp.EntanglementMode = EntanglementMode.MERGED_LINKS, force_evaluator: pylimer_tools_cpp.MEHPForceEvaluator = None, is_2d: bool = False, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2) -&gt; pylimer_tools_cpp.MEHPSimulator</p>
+<blockquote>
+<div><p>Sample random entanglements from the simplified universe and construct a unified MEHPSimulator,
+bypassing the creation of a Universe.</p>
+<dl class="field-list simple">
+<dt class="field-odd">param nr_of_entanglements_to_sample<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Target number of entanglements to sample.</p>
+</dd>
+<dt class="field-even">param upper_cutoff<span class="colon">:</span></dt>
+<dd class="field-even"><p>Upper pair sampling cutoff.</p>
+</dd>
+<dt class="field-odd">param lower_cutoff<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Lower pair sampling cutoff (default: 0.0).</p>
+</dd>
+<dt class="field-even">param minimum_nr_of_entanglements<span class="colon">:</span></dt>
+<dd class="field-even"><p>Minimum entanglements required if possible (default: 0).</p>
+</dd>
+<dt class="field-odd">param same_strand_cutoff<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Minimum chemical distance for same-strand pairs (default: 3.0).</p>
+</dd>
+<dt class="field-even">param seed<span class="colon">:</span></dt>
+<dd class="field-even"><p>PRNG seed string (empty uses generator seed).</p>
+</dd>
+<dt class="field-odd">param filter_dangling_and_soluble<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Omit entanglements on inactive strands (default: True).</p>
+</dd>
+<dt class="field-even">param entanglement_mode<span class="colon">:</span></dt>
+<dd class="field-even"><p>Entanglement representation mode (default: EntanglementMode.MERGED_LINKS).</p>
+</dd>
+<dt class="field-odd">param force_evaluator<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Optional constitutive force evaluator (defaults to HookeanForceEvaluator(1.0) when None).</p>
+</dd>
+<dt class="field-even">param is_2d<span class="colon">:</span></dt>
+<dd class="field-even"><p>Treat system as 2D when True (default: False).</p>
+</dd>
+<dt class="field-odd">param crosslinker_type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Atom type identifying crosslinkers (default: 2).</p>
+</dd>
+<dt class="field-even">return<span class="colon">:</span></dt>
+<dd class="field-even"><p>Configured MEHPSimulator instance.</p>
+</dd>
+</dl>
+</div></blockquote>
+</li>
+</ol>
 </dd></dl>
 
 <dl class="py method">
@@ -1474,12 +1428,12 @@ Should in principle always be valid when called from Python; if not, there is a 
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="pylimer_tools_cpp.MEHPForceBalance.html">
+          <a class="next-page" href="pylimer_tools_cpp.MEHPForceEvaluator.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">MEHPForceBalance</div>
+                <div class="title">MEHPForceEvaluator</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -1552,11 +1506,10 @@ Should in principle always be valid when called from Python; if not, there is a 
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_current_nr_of_atoms"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.get_current_nr_of_atoms()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_current_nr_of_bonds"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.get_current_nr_of_bonds()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_current_strand_conversion"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.get_current_strand_conversion()</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_force_balance"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.get_force_balance()</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_force_balance2"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.get_force_balance2()</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_force_relaxation"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.get_force_relaxation()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_mean_bead_distance"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.get_mean_bead_distance()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_mean_squared_bead_distance"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.get_mean_squared_bead_distance()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_mehp_network"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.get_mehp_network()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_mehp_simulator"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.get_mehp_simulator()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_nr_of_atoms"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.get_nr_of_atoms()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_nr_of_bonds"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.get_nr_of_bonds()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_universe"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.get_universe()</span></code></a></li>

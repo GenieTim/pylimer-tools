@@ -1,0 +1,19 @@
+SlipMode
+========
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: SlipMode
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~SlipMode.FIXED
+      ~SlipMode.SLIDING
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: FIXED
+   .. autoattribute:: SLIDING

@@ -167,7 +167,7 @@ print("Network saved to 'generated_structures/tetra_peg_network.data'")
 ```
 
 ```none
-Starting tetra-PEG network generation at 2026-11-22 07:52:15.411803
+Starting tetra-PEG network generation at 2026-11-24 07:48:18.854164
 System parameters:
   Box size: 80.0³
   Star crosslinkers: 150
@@ -187,7 +187,7 @@ System after strand-strand linking:
   Final strand conversion: 0.822
 Relaxing crosslink positions...
 Generating final universe with bead coordinates...
-Network generation completed at 2026-11-22 07:52:15.429460
+Network generation completed at 2026-11-24 07:48:18.875073
 Final network statistics:
   Total atoms: 12900
   Total bonds: 12985
@@ -255,7 +255,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.125 seconds)
+**Total running time of the script:** (0 minutes 0.120 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-tetra-peg-network-py"></a>
 

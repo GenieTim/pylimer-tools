@@ -15,7 +15,8 @@ to download the full example code.
 When predicting the equilibrium shear modulus $G$ of polymer networks via
 Monte Carlo network generation ([`MCUniverseGenerator`](../../api/pylimer_tools_cpp.MCUniverseGenerator.html.md#pylimer_tools_cpp.MCUniverseGenerator)),
 on-demand entanglement sampling ([`sample_entanglements()`](../../api/pylimer_tools_cpp.MCUniverseGenerator.html.md#pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements)),
-and [`MEHPForceBalance2`](../../api/pylimer_tools_cpp.MEHPForceBalance2.html.md#pylimer_tools_cpp.MEHPForceBalance2), the simulation box must be large
+and [`MEHPSimulator`](../../api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator) ([`LinearSystemMEHPSolver`](../../api/pylimer_tools_cpp.LinearSystemMEHPSolver.html.md#pylimer_tools_cpp.LinearSystemMEHPSolver)),
+the simulation box must be large
 enough to act as a **Representative Volume Element (RVE)**—avoiding both
 finite-size bias (e.g. periodic self-looping or insufficient topological
 sampling) and excessive sample-to-sample variance.
@@ -32,7 +33,7 @@ $\sim 3\times 10^6$ beads), varying:
 3. **Stoichiometric imbalance** $r = f N_{\text{xlinks}} / (2 N_{\text{strands}})$, and
 4. **Number of independent samples** $n_{\text{samples}}$ needed for a target precision.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 26-52 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 27-53 -->
 ```Python
 from pathlib import Path
 import sys
@@ -60,16 +61,17 @@ from pylimer_tools.io.bead_spring_parameter_provider import (  # noqa: E402
 import pylimer_tools_cpp as pt  # noqa: E402
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 53-59 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 54-61 -->
 
 ## Single PDMS Realization with On-Demand Entanglement Sampling
 
 Using [`get_parameters_for_polymer()`](../../pylimer_tools.io.html.md#pylimer_tools.io.bead_spring_parameter_provider.get_parameters_for_polymer)
 with `ParameterType.GAUSSIAN`, we parameterize a realistic PDMS box of side
 length $L = 25\,\text{nm}$, sample entanglements on demand, and evaluate
-$G$ with [`MEHPForceBalance2`](../../api/pylimer_tools_cpp.MEHPForceBalance2.html.md#pylimer_tools_cpp.MEHPForceBalance2).
+$G$ with [`MEHPSimulator`](../../api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator)
+([`MEHPLinearSolverConfig`](../../api/pylimer_tools_cpp.MEHPLinearSolverConfig.html.md#pylimer_tools_cpp.MEHPLinearSolverConfig)).
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 59-102 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 61-106 -->
 ```Python
 params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
 assert isinstance(params, Parameters)
@@ -100,8 +102,10 @@ es = gen.sample_entanglements(
     seed="demo_rve",
     filtering_mode=pt.EntanglementFilteringMode.OMIT_INACTIVE,
 )
-fb = gen.get_force_balance2(es, entanglements_as_springs=False)
-fb.run_force_relaxation(pt.StructureSimplificationMode.INACTIVE_THEN_X2F)
+fb = gen.get_mehp_simulator(es, entanglement_mode=pt.EntanglementMode.MERGED_LINKS)
+linear_cfg = pt.MEHPLinearSolverConfig()
+linear_cfg.simplification_mode = pt.StructureSimplificationMode.INACTIVE_THEN_X2F
+fb.run(linear_cfg)
 g_demo = gamma_conv * fb.get_gamma_factor(r02, nr_of_chains=1) / vol
 print(
     f"Demo PDMS box (L={box_l:.0f} nm, N_strands={n_strands}): "
@@ -119,7 +123,7 @@ Demo PDMS box (L=25 nm, N_strands=346): G = 0.2404 MPa, w_active = 0.899
 Loading cached example data from representative_volume_pdms_cache.npz...
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 103-114 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 107-118 -->
 
 ## Effect of Chain Length ($N$)
 
@@ -133,12 +137,12 @@ $G$ and exhibit large sample-to-sample variance. Normalizing by
 $L / R_0$ shows that a box size of $L \gtrsim 3\text{--}4\,R_0$
 reduces the coefficient of variation (CV) below 2–5%.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 114-117 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 118-121 -->
 ```Python
 plot_rve_chain_length_study(data)
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 118-127 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 122-131 -->
 
 ## Effect of Cross-link Conversion ($p$)
 
@@ -150,12 +154,12 @@ connectivity fluctuations grow, inflating both the finite-size bias in small
 boxes and the sample-to-sample CV by roughly an order of magnitude compared
 to well-cross-linked networks ($p \ge 0.925$).
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 127-130 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 131-134 -->
 ```Python
 plot_rve_conversion_study(data)
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 131-141 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 135-145 -->
 
 ## Effect of Stoichiometric Imbalance ($r$)
 
@@ -168,12 +172,12 @@ scatter. By contrast, excess cross-linker ($r = 1.25$, corresponding to
 95% strand conversion) preserves a high active fraction and converges nearly as
 fast as the stoichiometric reference ($r = 1.00$).
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 141-144 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 145-148 -->
 ```Python
 plot_rve_stoichiometry_study(data)
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 145-155 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 149-159 -->
 
 ## Number of Samples vs. Representative Volume
 
@@ -186,12 +190,12 @@ cannot eliminate systematic finite-size bias. Choosing $L \ge 56\,\text{nm}$
 independent realizations keeps both finite-size bias and statistical
 uncertainty below 1–2%.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 155-157 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 159-161 -->
 ```Python
 plot_rve_sample_count_study(data)
 ```
 
-**Total running time of the script:** (0 minutes 2.263 seconds)
+**Total running time of the script:** (0 minutes 2.013 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-representative-volume-pdms-py"></a>
 

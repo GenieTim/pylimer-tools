@@ -52,7 +52,7 @@ And should return one of the BackTrackStatus values:
         ParameterType,
         get_parameters_for_polymer,
     )
-    from pylimer_tools_cpp import BackTrackStatus, MCUniverseGenerator, MEHPForceBalance2
+    from pylimer_tools_cpp import BackTrackStatus, MCUniverseGenerator, MEHPSimulator
 
 
 
@@ -69,7 +69,7 @@ Example 1: Stop at Conversion OR Soluble Fraction
 Using a callback allows for more complex logic, such as
 stopping the process based on multiple criteria as illustrated here.
 
-.. GENERATED FROM PYTHON SOURCE LINES 41-126
+.. GENERATED FROM PYTHON SOURCE LINES 41-124
 
 .. code-block:: Python
 
@@ -128,11 +128,9 @@ stopping the process based on multiple criteria as illustrated here.
             if (step % 10 == 0) or (
                 math.isclose(prev_wsol, target_wsol, rel_tol=1e-1, abs_tol=5e-2)
             ):
-                fb2 = gen.get_force_balance2()
-                assert isinstance(fb2, MEHPForceBalance2), (
-                    "Force balance must be MEHPForceBalance2"
-                )
-                fb2.run_force_relaxation()
+                fb2 = gen.get_mehp_simulator()
+                assert isinstance(fb2, MEHPSimulator), "Force balance must be MEHPSimulator"
+                fb2.run()
                 current_wsol = fb2.get_soluble_weight_fraction()
             else:
                 current_wsol = prev_wsol
@@ -172,7 +170,7 @@ stopping the process based on multiple criteria as illustrated here.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 127-132
+.. GENERATED FROM PYTHON SOURCE LINES 125-130
 
 Visualizing the Results
 -----------------------
@@ -180,7 +178,7 @@ Visualizing the Results
 Let's plot the evolution of crosslinker conversion
 and soluble fraction over the steps.
 
-.. GENERATED FROM PYTHON SOURCE LINES 132-143
+.. GENERATED FROM PYTHON SOURCE LINES 130-141
 
 .. code-block:: Python
 
@@ -210,7 +208,7 @@ and soluble fraction over the steps.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.338 seconds)
+   **Total running time of the script:** (0 minutes 0.354 seconds)
 
 
 .. _sphx_glr_download_auto_examples_network_generator_plot_custom_crosslinking_callback.py:

@@ -1,0 +1,31 @@
+SlipLinkRelaxationSolver
+========================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: SlipLinkRelaxationSolver
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~SlipLinkRelaxationSolver.config
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~SlipLinkRelaxationSolver.get_config
+      ~SlipLinkRelaxationSolver.set_config
+      ~SlipLinkRelaxationSolver.solve
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: config
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: get_config
+   .. automethod:: set_config
+   .. automethod:: solve

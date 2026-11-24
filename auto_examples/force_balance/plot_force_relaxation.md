@@ -12,13 +12,14 @@ to download the full example code.
 
 # MEHP Force Relaxation
 
-This example demonstrates how to use
-the “original” MEHP implementation (see Gusev [[Gus19](../../acknowledgements.md#id8)])
+This example demonstrates how to use the unified
+[`MEHPSimulator`](../../api/pylimer_tools_cpp.MEHPSimulator.md#pylimer_tools_cpp.MEHPSimulator) with interchangeable constitutive
+[`MEHPForceEvaluator`](../../api/pylimer_tools_cpp.MEHPForceEvaluator.md#pylimer_tools_cpp.MEHPForceEvaluator) models and
+[`MEHPSolver`](../../api/pylimer_tools_cpp.MEHPSolver.md#pylimer_tools_cpp.MEHPSolver) strategies (see Gusev [[Gus19](../../acknowledgements.md#id8)])
 without slip-links or entanglements.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 10-144 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 12-127 -->
 ```Python
-import os
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -30,59 +31,43 @@ from pylimer_tools.io.bead_spring_parameter_provider import (
 )
 from pylimer_tools.io.read_lammps_output_file import read_data_file
 from pylimer_tools_cpp import (
-    MEHPForceRelaxation,
-    NonGaussianSpringForceEvaluator,
-    SimpleSpringMEHPForceEvaluator,
-    Universe,
+    EntanglementMode,
+    HookeanForceEvaluator,
     MEHPForceEvaluator,
+    MEHPNetwork,
+    MEHPNonlinearSolverConfig,
+    MEHPSimulator,
+    NLoptAlgorithm,
+    NonGaussianSpringForceEvaluator,
+    NonlinearOptimizationSolver,
+    Universe,
 )
 
 
-# Example: Custom Force Evaluator (see also tests)
-# This particular example is insofar a bad example, as it is already
-# implemented faster (no Python<>C++ back & forth every time) in the
-# SimpleSpringMEHPForceEvaluator.
+# Example: Stateless Custom Force Evaluator (see also tests)
+# This particular example is only illustrative, as the harmonic spring law is
+# already implemented faster in C++ by HookeanForceEvaluator.
 class CustomForceEvaluator(MEHPForceEvaluator):
-    """
-    A custom force evaluator that implements a simple harmonic spring.
-    """
+    """A stateless custom force evaluator implementing a simple harmonic spring."""
 
-    def __init__(self, kappa=1.0):
+    def __init__(self, kappa: float = 1.0) -> None:
         super().__init__()
-        self.kappa = kappa
+        self.kappa = float(kappa)
 
-    def evaluate_force_set_gradient(self, n, spring_distances, compute_gradient):
-        network = self.network
-        nr_springs = network.nr_of_springs
-        force = 0.0
-        for i in range(nr_springs):
-            spring_vec = spring_distances[3 * i : 3 * i + 3]
-            r_squared = np.sum(spring_vec**2)
-            contour_length = network.spring_contour_length[i]
-            force += r_squared / contour_length
-        force *= 0.5 * self.kappa
-        gradient = None
-        if compute_gradient:
-            gradient = [0.0] * n
-            nrOfDim = 2 if self.is_2d else 3
-            for j in range(nr_springs):
-                a = network.spring_index_a[j]
-                b = network.spring_index_b[j]
-                contour_length = network.spring_contour_length[j]
-                for dir_idx in range(nrOfDim):
-                    spring_dist = spring_distances[3 * j + dir_idx]
-                    grad_term = spring_dist * self.kappa / contour_length
-                    gradient[3 * a + dir_idx] += grad_term
-                    gradient[3 * b + dir_idx] -= grad_term
-        return (force, gradient)
+    def get_kappa(self) -> float:
+        return self.kappa
 
-    def evaluate_stress_contribution(self, spring_distances, i, j, spring_index):
-        network = self.network
-        contour_length = network.spring_contour_length[spring_index]
-        return self.kappa * spring_distances[i] * spring_distances[j] / contour_length
+    def evaluate_spring_energy(
+        self, spring_vec: np.ndarray, contour_length: float
+    ) -> float:
+        vec = np.asarray(spring_vec, dtype=np.float64)
+        return float(0.5 * self.kappa * np.dot(vec, vec) / contour_length)
 
-    def prepare_for_evaluations(self):
-        pass
+    def evaluate_spring_force(
+        self, spring_vec: np.ndarray, contour_length: float
+    ) -> np.ndarray:
+        vec = np.asarray(spring_vec, dtype=np.float64)
+        return (self.kappa / contour_length) * vec
 
 
 # Load your network (replace with your file)
@@ -112,62 +97,60 @@ gamma_conversion_factor = (
     (kbt / ((params.get("distance_units")) ** 3)).to("MPa").magnitude
 )
 
-# 1. MEHPForceRelaxation with linear force potential
-mehp_relax = MEHPForceRelaxation(universe)
-force_evaluator = SimpleSpringMEHPForceEvaluator()
-mehp_relax.set_force_evaluator(force_evaluator)
-while mehp_relax.requires_another_run():
-    mehp_relax.run_force_relaxation()
+base_net = MEHPNetwork.from_universe(universe, entanglement_mode=EntanglementMode.NONE)
+
+# 1. MEHPSimulator with Hookean (linear) force evaluator and default linear solver
+sim_linear = MEHPSimulator(base_net, HookeanForceEvaluator())
+sim_linear.run()
 shear_modulus_linear = (
     gamma_conversion_factor
-    * np.sum(mehp_relax.get_gamma_factors(r02_slope_magnitude))
+    * np.sum(sim_linear.get_gamma_factors(r02_slope_magnitude))
     / universe.get_volume()
 )
-print(f"Phantom Shear Modulus [MPa] (Linear): {shear_modulus_linear:.4f}")
+print(f"Phantom Shear Modulus [MPa] (Hookean): {shear_modulus_linear:.4f}")
 
-# 2. MEHPForceRelaxation with Langevin force potential
-mehp_relax = MEHPForceRelaxation(universe)
-force_evaluator = NonGaussianSpringForceEvaluator()
-mehp_relax.set_force_evaluator(force_evaluator)
-while mehp_relax.requires_another_run():
-    mehp_relax.run_force_relaxation()
+# 2. MEHPSimulator with Langevin (non-Gaussian) force evaluator and nonlinear solver
+nonlinear_cfg = MEHPNonlinearSolverConfig()
+nonlinear_cfg.algorithm = NLoptAlgorithm.LD_MMA
+sim_langevin = MEHPSimulator(base_net, NonGaussianSpringForceEvaluator())
+sim_langevin.run(nonlinear_cfg)
 shear_modulus_langevin = (
     gamma_conversion_factor
-    * np.sum(mehp_relax.get_gamma_factors(r02_slope_magnitude))
+    * np.sum(sim_langevin.get_gamma_factors(r02_slope_magnitude))
     / universe.get_volume()
 )
 print(f"Phantom Shear Modulus [MPa] (Langevin): {shear_modulus_langevin:.4f}")
 
-# 3. MEHPForceRelaxation with Custom Force Evaluator
+# 3. MEHPSimulator with Custom Python Force Evaluator and explicit solver strategy
+lbfgs_cfg = MEHPNonlinearSolverConfig()
+lbfgs_cfg.algorithm = NLoptAlgorithm.LD_LBFGS
 custom_evaluator = CustomForceEvaluator(kappa=1.0)
-mehp_relax = MEHPForceRelaxation(universe)
-mehp_relax.set_force_evaluator(custom_evaluator)
-while mehp_relax.requires_another_run():
-    mehp_relax.run_force_relaxation()
+sim_custom = MEHPSimulator(base_net, custom_evaluator)
+sim_custom.run(NonlinearOptimizationSolver(lbfgs_cfg))
 shear_modulus_custom = (
     gamma_conversion_factor
-    * np.sum(mehp_relax.get_gamma_factors(r02_slope_magnitude))
+    * np.sum(sim_custom.get_gamma_factors(r02_slope_magnitude))
     / universe.get_volume()
 )
 print(f"Phantom Shear Modulus [MPa] (Custom Evaluator): {shear_modulus_custom:.4f}")
 ```
 
 ```none
-Phantom Shear Modulus [MPa] (Linear): 0.0061
+Phantom Shear Modulus [MPa] (Hookean): 0.0061
 Phantom Shear Modulus [MPa] (Langevin): 0.0061
 Phantom Shear Modulus [MPa] (Custom Evaluator): 0.0061
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 145-149 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 128-132 -->
 
 ## Comparison of Force Evaluators
 
 We visualize the predicted equilibrium phantom shear modulus for each
 force evaluator.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 149-175 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 132-158 -->
 ```Python
-labels = ["Simple Spring\n(Linear)", "Non-Gaussian\n(Langevin)", "Custom\n(Harmonic)"]
+labels = ["Hookean\n(Linear)", "Non-Gaussian\n(Langevin)", "Custom\n(Harmonic)"]
 moduli = [shear_modulus_linear, shear_modulus_langevin, shear_modulus_custom]
 colors = ["#4C72B0", "#55A868", "#DD8452"]
 
@@ -188,13 +171,13 @@ for bar in bars:
     )
 
 plt.ylabel("Phantom Shear Modulus [MPa]", fontsize=11)
-plt.title("Comparison of Force Evaluators in MEHP Force Relaxation", fontsize=12)
+plt.title("Comparison of Force Evaluators in MEHPSimulator", fontsize=12)
 plt.grid(True, axis="y", linestyle=":", alpha=0.6)
 plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 2.894 seconds)
+**Total running time of the script:** (0 minutes 0.216 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-force-relaxation-py"></a>
 

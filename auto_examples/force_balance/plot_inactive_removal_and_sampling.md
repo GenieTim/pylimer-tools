@@ -13,7 +13,7 @@ to download the full example code.
 # Inactive Removal & Sampling
 
 Networks below full conversion contain **dangling chains**, **sol fractions**, and **loops**.
-In [`MEHPForceBalance2`](../../api/pylimer_tools_cpp.MEHPForceBalance2.md#pylimer_tools_cpp.MEHPForceBalance2), entanglements do not slip off chain ends,
+In [`MEHPSimulator`](../../api/pylimer_tools_cpp.MEHPSimulator.md#pylimer_tools_cpp.MEHPSimulator) with fixed entanglements, links do not slip off chain ends,
 so two complementary controls prevent dangling arms from artificially stiffening the network:
 
 1. **Sampling-time topological filtering** ([`EntanglementFilteringMode`](../../api/pylimer_tools_cpp.EntanglementFilteringMode.md#pylimer_tools_cpp.EntanglementFilteringMode)):
@@ -55,7 +55,7 @@ At $p = 0.80$, comparing `EntanglementFilteringMode.NONE` + `NO_SIMPLIFICATION`
 against `OMIT_INACTIVE` + `INACTIVE_THEN_X2F` demonstrates how inactive pruning
 eliminates unphysical dead-end constraints and shrinks the linear system.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 44-77 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 44-85 -->
 ```Python
 gen = pt.MCUniverseGenerator(18.0, 18.0, 18.0)
 gen.set_seed(42)
@@ -67,8 +67,12 @@ gen.link_strands_to_conversion(0.80)
 es_unfilt = gen.sample_entanglements(
     250, upper_cutoff=2.6, seed="demo", filtering_mode=pt.EntanglementFilteringMode.NONE
 )
-fb_naive = gen.get_force_balance2(es_unfilt)
-fb_naive.run_force_relaxation(pt.StructureSimplificationMode.NO_SIMPLIFICATION)
+fb_naive = gen.get_mehp_simulator(es_unfilt)
+fb_naive.run(
+    pt.MEHPLinearSolverConfig(
+        simplification_mode=pt.StructureSimplificationMode.NO_SIMPLIFICATION
+    )
+)
 
 es_filt = gen.sample_entanglements(
     250,
@@ -76,8 +80,12 @@ es_filt = gen.sample_entanglements(
     seed="demo",
     filtering_mode=pt.EntanglementFilteringMode.OMIT_INACTIVE,
 )
-fb_clean = gen.get_force_balance2(es_filt)
-fb_clean.run_force_relaxation(pt.StructureSimplificationMode.INACTIVE_THEN_X2F)
+fb_clean = gen.get_mehp_simulator(es_filt)
+fb_clean.run(
+    pt.MEHPLinearSolverConfig(
+        simplification_mode=pt.StructureSimplificationMode.INACTIVE_THEN_X2F
+    )
+)
 
 print(
     f"Springs — naive: {fb_naive.get_nr_of_springs()}, "
@@ -91,11 +99,11 @@ data = load_or_compute_cache(cache_path, run_inactive_removal_and_sampling_simul
 ```
 
 ```none
-Springs — naive: 200, simplified: 69
+Springs — naive: 700, simplified: 257
 Loading cached example data from inactive_removal_and_sampling_cache.npz...
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 78-83 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 86-91 -->
 
 ## Shear Modulus Convergence & The Dangling-Chain Trap
 
@@ -103,13 +111,13 @@ Without filtering or simplification, pinned dangling chains inflate $G$ by hundr
 thousands of percent below $p \approx 0.90$. Either pre-filtering or solver-level
 inactive removal restores the true physical percolation curve.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 83-87 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 91-95 -->
 ```Python
 plot_inactive_modulus_convergence(data)
 plot_inactive_relative_error(data)
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 88-93 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 96-101 -->
 
 ## Topological Compression & Solver Complexity
 
@@ -117,13 +125,13 @@ plot_inactive_relative_error(data)
 active system size and solver iterations substantially near the gelation
 threshold.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 93-96 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 101-104 -->
 ```Python
 plot_inactive_topological_fractions(data)
 plot_inactive_solver_complexity(data)
 ```
 
-**Total running time of the script:** (0 minutes 0.634 seconds)
+**Total running time of the script:** (0 minutes 0.540 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-inactive-removal-and-sampling-py"></a>
 

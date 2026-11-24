@@ -12,20 +12,22 @@ to download the full example code.
 
 # Entanglement Links vs. Springs
 
-In [`MEHPForceBalance2`](../../api/pylimer_tools_cpp.MEHPForceBalance2.html.md#pylimer_tools_cpp.MEHPForceBalance2) (Gusev [[Gus19](../../acknowledgements.html.md#id8)], Bernhard and Gusev [[BG25](../../acknowledgements.html.md#id12)]),
-users can choose between two representations for sampled entanglements via `entanglements_as_springs`:
+In [`MEHPSimulator`](../../api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator) with [`LinearSystemMEHPSolver`](../../api/pylimer_tools_cpp.LinearSystemMEHPSolver.html.md#pylimer_tools_cpp.LinearSystemMEHPSolver)
+(Gusev [[Gus19](../../acknowledgements.html.md#id8)], Bernhard and Gusev [[BG25](../../acknowledgements.html.md#id12)]), users can choose between two representations
+for sampled entanglements via `entanglement_mode`:
 
-1. **Entanglement Links** (`entanglements_as_springs=False`, default):
+1. **Entanglement Links** (`EntanglementMode.MERGED_LINKS`, default):
    The two entangled strand beads are merged into a single shared 4-functional junction node
    ($\mathbf{r}_1 = \mathbf{r}_2$), introducing $N_{\text{ent}}$ extra nodes and 0 extra springs.
-2. **Entanglement Springs** (`entanglements_as_springs=True`):
+2. **Entanglement Springs** (`EntanglementMode.SPRING`):
    The two beads remain distinct and are coupled by an additional Hookean spring, introducing
    $2 N_{\text{ent}}$ extra nodes and $N_{\text{ent}}$ extra springs.
 
-In both cases, entanglements in `MEHPForceBalance2` **do not slip** along the chain contour
-(see [Slipping vs. Fixed Entanglement Links](plot_slipping_vs_fixed_links.html.md) for dynamic contour slipping in `MEHPForceBalance`).
+With [`LinearSystemMEHPSolver`](../../api/pylimer_tools_cpp.LinearSystemMEHPSolver.html.md#pylimer_tools_cpp.LinearSystemMEHPSolver), entanglements **do not slip** along the chain
+contour (see [Slipping vs. Fixed Entanglement Links](plot_slipping_vs_fixed_links.html.md) for dynamic contour slipping with
+[`MEHPSlipLinkSolverConfig`](../../api/pylimer_tools_cpp.MEHPSlipLinkSolverConfig.html.md#pylimer_tools_cpp.MEHPSlipLinkSolverConfig)).
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 18-34 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 20-36 -->
 ```Python
 from pathlib import Path
 import sys
@@ -43,15 +45,15 @@ from _study_runners import run_entanglement_link_vs_spring_simulation  # noqa: E
 import pylimer_tools_cpp as pt  # noqa: E402
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 35-40 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 37-42 -->
 
 ## Comparing Links vs. Springs on a Generated Network
 
-Passing the same sampled entanglements to [`get_force_balance2()`](../../api/pylimer_tools_cpp.MCUniverseGenerator.html.md#pylimer_tools_cpp.MCUniverseGenerator.get_force_balance2)
-with `entanglements_as_springs=False` vs. `True` toggles between rigid merged junctions and
-compliant Hookean entanglement springs.
+Passing the same sampled entanglements to [`get_mehp_simulator()`](../../api/pylimer_tools_cpp.MCUniverseGenerator.html.md#pylimer_tools_cpp.MCUniverseGenerator.get_mehp_simulator)
+with `EntanglementMode.MERGED_LINKS` vs. `EntanglementMode.SPRING` toggles between
+rigid merged junctions and compliant Hookean entanglement springs.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 40-71 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 42-75 -->
 ```Python
 gen = pt.MCUniverseGenerator(18.0, 18.0, 18.0)
 gen.set_seed(42)
@@ -67,11 +69,13 @@ es = gen.sample_entanglements(
     filtering_mode=pt.EntanglementFilteringMode.OMIT_INACTIVE,
 )
 
-fb_links = gen.get_force_balance2(es, entanglements_as_springs=False)
-fb_links.run_force_relaxation()
+fb_links = gen.get_mehp_simulator(
+    es, entanglement_mode=pt.EntanglementMode.MERGED_LINKS
+)
+fb_links.run()
 
-fb_springs = gen.get_force_balance2(es, entanglements_as_springs=True)
-fb_springs.run_force_relaxation()
+fb_springs = gen.get_mehp_simulator(es, entanglement_mode=pt.EntanglementMode.SPRING)
+fb_springs.run()
 
 print(
     f"Extra atoms — links: {fb_links.get_nr_of_extra_atoms()}, "
@@ -89,7 +93,7 @@ Extra atoms — links: 245, springs: 490
 Loading cached example data from entanglement_link_vs_spring_cache.npz...
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 72-79 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 76-83 -->
 
 ## Equilibrium Shear Modulus & System Degrees of Freedom
 
@@ -99,13 +103,13 @@ Multi-seed ensemble results (95% Student’s t confidence intervals):
   whereas entanglement springs saturate because the intermediate spring adds series compliance.
 - **System Size**: Entanglement springs add twice as many extra nodes to the linear system.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 79-82 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 83-86 -->
 ```Python
 plot_link_vs_spring_modulus(data)
 plot_link_vs_spring_dof(data)
 ```
 
-**Total running time of the script:** (0 minutes 0.312 seconds)
+**Total running time of the script:** (0 minutes 0.281 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-entanglement-link-vs-spring-py"></a>
 

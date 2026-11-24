@@ -58,18 +58,18 @@ Understanding these terms is crucial for effective use of the library.
 ![Entanglement Links](_static/images/entanglement_links.svg)![Entanglement Springs](_static/images/entanglement_springs.svg)
 
 **Entanglement Link**
-: A topological entanglement represented as a single merged 4-functional junction node pinning two chains (Bernhard and Gusev [[BG25](acknowledgements.html.md#id12)]).
-  In [`MEHPForceBalance2`](api/pylimer_tools_cpp.MEHPForceBalance2.html.md#pylimer_tools_cpp.MEHPForceBalance2), its contour position is fixed—it does not slip along the chain contour.
+: A topological entanglement represented as a single merged 4-functional junction node pinning two chains (Bernhard and Gusev [[BG25](acknowledgements.html.md#id12)]), selected via [`MERGED_LINKS`](api/pylimer_tools_cpp.EntanglementMode.html.md#pylimer_tools_cpp.EntanglementMode.MERGED_LINKS) in [`MEHPNetwork`](api/pylimer_tools_cpp.MEHPNetwork.html.md#pylimer_tools_cpp.MEHPNetwork) and [`MEHPSimulator`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator).
+  With [`LinearSystemMEHPSolver`](api/pylimer_tools_cpp.LinearSystemMEHPSolver.html.md#pylimer_tools_cpp.LinearSystemMEHPSolver), [`NonlinearOptimizationSolver`](api/pylimer_tools_cpp.NonlinearOptimizationSolver.html.md#pylimer_tools_cpp.NonlinearOptimizationSolver), or [`FIXED`](api/pylimer_tools_cpp.SlipMode.html.md#pylimer_tools_cpp.SlipMode.FIXED), its contour position is fixed—it does not slip along the chain contour.
 
 **Entanglement Spring**
-: A representation where entangled chains remain separate and are coupled by a compliant Hookean spring ([`MEHPForceBalance2`](api/pylimer_tools_cpp.MEHPForceBalance2.html.md#pylimer_tools_cpp.MEHPForceBalance2) with `entanglements_as_springs=True`). Like entanglement links, it does not slip along the chain contour.
+: A representation where entangled chains remain separate and are coupled by a compliant Hookean spring ([`SPRING`](api/pylimer_tools_cpp.EntanglementMode.html.md#pylimer_tools_cpp.EntanglementMode.SPRING) in [`MEHPNetwork`](api/pylimer_tools_cpp.MEHPNetwork.html.md#pylimer_tools_cpp.MEHPNetwork) and [`MEHPSimulator`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator)). Like fixed entanglement links, it does not slip along the chain contour.
 
 **Slip-Link / Slip-Spring**
-: An entanglement link or spring that is permitted to slide dynamically along the polymer chain contour to equalize strand tensions.
-  Supported in [`MEHPForceBalance`](api/pylimer_tools_cpp.MEHPForceBalance.html.md#pylimer_tools_cpp.MEHPForceBalance) (via `disable_slipping=False`), but omitted in [`MEHPForceBalance2`](api/pylimer_tools_cpp.MEHPForceBalance2.html.md#pylimer_tools_cpp.MEHPForceBalance2) where links are fixed because slipping was found to be an unnecessary complication that artificially softens the plateau modulus (Bernhard and Gusev [[BG25](acknowledgements.html.md#id12)]).
+: An entanglement link that is permitted to slide dynamically along the polymer chain contour to equalize strand tensions.
+  Supported in [`MEHPSimulator`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator) via [`SlipLinkRelaxationSolver`](api/pylimer_tools_cpp.SlipLinkRelaxationSolver.html.md#pylimer_tools_cpp.SlipLinkRelaxationSolver) ([`MEHPSlipLinkSolverConfig`](api/pylimer_tools_cpp.MEHPSlipLinkSolverConfig.html.md#pylimer_tools_cpp.MEHPSlipLinkSolverConfig) with [`SLIDING`](api/pylimer_tools_cpp.SlipMode.html.md#pylimer_tools_cpp.SlipMode.SLIDING)), whereas [`LinearSystemMEHPSolver`](api/pylimer_tools_cpp.LinearSystemMEHPSolver.html.md#pylimer_tools_cpp.LinearSystemMEHPSolver) and [`NonlinearOptimizationSolver`](api/pylimer_tools_cpp.NonlinearOptimizationSolver.html.md#pylimer_tools_cpp.NonlinearOptimizationSolver) use fixed links ([`FIXED`](api/pylimer_tools_cpp.SlipMode.html.md#pylimer_tools_cpp.SlipMode.FIXED)) because slipping was found to be an unnecessary complication that artificially softens the plateau modulus (Bernhard and Gusev [[BG25](acknowledgements.html.md#id12)]).
 
 **Spring vs. Strand**
-: In the force balance network ([`SimplifiedBalanceNetwork`](api/pylimer_tools_cpp.SimplifiedBalanceNetwork.html.md#pylimer_tools_cpp.SimplifiedBalanceNetwork)), a **strand** is the full chain connecting two chemical crosslinks, while a **spring** (or partial spring) is an individual Hookean connection between two adjacent links (crosslinks or entanglement links).
+: In the canonical MEHP network ([`MEHPNetwork`](api/pylimer_tools_cpp.MEHPNetwork.html.md#pylimer_tools_cpp.MEHPNetwork)), a **strand** is the full chain connecting two chemical crosslinks (or an entanglement coupling strand in spring mode), while a **spring** (or partial spring) is an individual constitutive connection between two adjacent links (crosslinks or entanglement links).
 
 ![Illustration of a Slip-Link sliding along a chain contour](_static/images/illustration-slip-link.svg)
 

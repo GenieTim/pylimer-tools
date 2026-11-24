@@ -25,7 +25,7 @@ This example demonstrates how to use the Maximum Entropy Homogenization Procedur
 (:cite:t:`gusev_numerical_2019`) with slip-links to homogenize a polymer network and predict
 its equilibrium shear modulus.
 
-.. GENERATED FROM PYTHON SOURCE LINES 10-90
+.. GENERATED FROM PYTHON SOURCE LINES 10-95
 
 .. code-block:: Python
 
@@ -41,7 +41,12 @@ its equilibrium shear modulus.
         get_parameters_for_polymer,
     )
     from pylimer_tools.io.read_lammps_output_file import read_data_file
-    from pylimer_tools_cpp import MEHPForceBalance, Universe
+    from pylimer_tools_cpp import (
+        MEHPSimulator,
+        MEHPSlipLinkSolverConfig,
+        SlipMode,
+        Universe,
+    )
 
     # Get parameters for conversion factors
     params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
@@ -67,17 +72,17 @@ its equilibrium shear modulus.
     assert isinstance(universe, Universe)
     vol = universe.get_volume()
 
-    # MEHPForceBalance: Hookean springs, with slip-links
-    mehp_fb = MEHPForceBalance.construct_with_random_sliplinks(
+    # MEHPSimulator with Hookean springs and sliding slip-links
+    mehp_fb = MEHPSimulator.construct_with_random_entanglements(
         universe,
-        nr_of_sliplinks_to_sample=int(params.get_entanglement_density() * vol),
+        nr_of_entanglements_to_sample=int(params.get_entanglement_density() * vol),
         upper_sampling_cutoff=params.get_sampling_cutoff(),
     )
-    mehp_fb.run_force_relaxation(max_nr_of_steps=1000)
+    mehp_fb.run(MEHPSlipLinkSolverConfig(max_nr_of_steps=1000, slip_mode=SlipMode.SLIDING))
 
     print(
         "Final residual (should be close to 0):",
-        mehp_fb.get_displacement_residual_norm(),
+        mehp_fb.get_residual_norm(),
     )
 
     # Apply conversion factors, measure resulting shear modulus
@@ -95,17 +100,17 @@ its equilibrium shear modulus.
     # Directional shear moduli
     gx = (
         gamma_conversion_factor
-        * np.sum(mehp_fb.get_gamma_factors_in_dir(r02_slope_magnitude, 0))
+        * np.sum(mehp_fb.get_gamma_factors_in_dir(0, r02_slope_magnitude))
         / vol
     )
     gy = (
         gamma_conversion_factor
-        * np.sum(mehp_fb.get_gamma_factors_in_dir(r02_slope_magnitude, 1))
+        * np.sum(mehp_fb.get_gamma_factors_in_dir(1, r02_slope_magnitude))
         / vol
     )
     gz = (
         gamma_conversion_factor
-        * np.sum(mehp_fb.get_gamma_factors_in_dir(r02_slope_magnitude, 2))
+        * np.sum(mehp_fb.get_gamma_factors_in_dir(2, r02_slope_magnitude))
         / vol
     )
 
@@ -117,13 +122,13 @@ its equilibrium shear modulus.
 
  .. code-block:: none
 
-    Final residual (should be close to 0): 9.839973441737702e-07
-    Shear Modulus [MPa]: 0.0386
+    Final residual (should be close to 0): 2.1820241291344907e-05
+    Shear Modulus [MPa]: 0.1561
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 91-96
+.. GENERATED FROM PYTHON SOURCE LINES 96-101
 
 Visualization
 -------------
@@ -131,7 +136,7 @@ We plot the distribution of strand elastic factors :math:`\Gamma` and the direct
 shear moduli :math:`G_x, G_y, G_z` compared to the total shear modulus
 :math:`G`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 96-164
+.. GENERATED FROM PYTHON SOURCE LINES 101-169
 
 .. code-block:: Python
 
@@ -230,7 +235,7 @@ shear moduli :math:`G_x, G_y, G_z` compared to the total shear modulus
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.389 seconds)
+   **Total running time of the script:** (0 minutes 0.376 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_force_balance.py:

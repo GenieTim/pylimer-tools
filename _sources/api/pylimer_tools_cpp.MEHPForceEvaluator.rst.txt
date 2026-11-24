@@ -6,28 +6,26 @@ MEHPForceEvaluator
 .. autoclass:: MEHPForceEvaluator
    :show-inheritance:
 
-   .. rubric:: Attributes Summary
-
-   .. autosummary::
-
-      ~MEHPForceEvaluator.is_2d
-      ~MEHPForceEvaluator.network
-
    .. rubric:: Methods Summary
 
    .. autosummary::
 
-      ~MEHPForceEvaluator.evaluate_force_set_gradient
+      ~MEHPForceEvaluator.evaluate_network_energy_and_gradient
+      ~MEHPForceEvaluator.evaluate_spring_energy
+      ~MEHPForceEvaluator.evaluate_spring_force
+      ~MEHPForceEvaluator.evaluate_spring_stiffness
       ~MEHPForceEvaluator.evaluate_stress_contribution
-      ~MEHPForceEvaluator.prepare_for_evaluations
-
-   .. rubric:: Attributes Documentation
-
-   .. autoattribute:: is_2d
-   .. autoattribute:: network
+      ~MEHPForceEvaluator.evaluate_stress_tensor
+      ~MEHPForceEvaluator.get_kappa
+      ~MEHPForceEvaluator.is_linear
 
    .. rubric:: Methods Documentation
 
-   .. automethod:: evaluate_force_set_gradient
+   .. automethod:: evaluate_network_energy_and_gradient
+   .. automethod:: evaluate_spring_energy
+   .. automethod:: evaluate_spring_force
+   .. automethod:: evaluate_spring_stiffness
    .. automethod:: evaluate_stress_contribution
-   .. automethod:: prepare_for_evaluations
+   .. automethod:: evaluate_stress_tensor
+   .. automethod:: get_kappa
+   .. automethod:: is_linear

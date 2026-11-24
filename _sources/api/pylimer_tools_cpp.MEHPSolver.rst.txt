@@ -1,0 +1,17 @@
+MEHPSolver
+==========
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: MEHPSolver
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~MEHPSolver.solve
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: solve

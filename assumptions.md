@@ -31,5 +31,4 @@ Note, however, that it assumes that the initial configuration of the structure h
 
 Relevant methods:
 - [`pylimer_tools_cpp.DPDSimulator.assume_box_large_enough()`](api/pylimer_tools_cpp.DPDSimulator.md#pylimer_tools_cpp.DPDSimulator.assume_box_large_enough)
-- [`pylimer_tools_cpp.MEHPForceRelaxation.assume_box_large_enough()`](api/pylimer_tools_cpp.MEHPForceRelaxation.md#pylimer_tools_cpp.MEHPForceRelaxation.assume_box_large_enough)
-- [`pylimer_tools_cpp.MEHPForceBalance.config_assume_box_large_enough()`](api/pylimer_tools_cpp.MEHPForceBalance.md#pylimer_tools_cpp.MEHPForceBalance.config_assume_box_large_enough)
+- [`pylimer_tools_cpp.MEHPSimulator.config_assume_box_large_enough()`](api/pylimer_tools_cpp.MEHPSimulator.md#pylimer_tools_cpp.MEHPSimulator.config_assume_box_large_enough)

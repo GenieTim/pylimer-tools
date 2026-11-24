@@ -1,0 +1,53 @@
+NLoptAlgorithm
+==============
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: NLoptAlgorithm
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~NLoptAlgorithm.GD_STOGO
+      ~NLoptAlgorithm.GN_CRS2_LM
+      ~NLoptAlgorithm.GN_DIRECT
+      ~NLoptAlgorithm.LD_LBFGS
+      ~NLoptAlgorithm.LD_MMA
+      ~NLoptAlgorithm.LD_SLSQP
+      ~NLoptAlgorithm.LD_TNEWTON
+      ~NLoptAlgorithm.LD_TNEWTON_PRECOND
+      ~NLoptAlgorithm.LD_TNEWTON_PRECOND_RESTART
+      ~NLoptAlgorithm.LD_TNEWTON_RESTART
+      ~NLoptAlgorithm.LD_VAR1
+      ~NLoptAlgorithm.LD_VAR2
+      ~NLoptAlgorithm.LN_BOBYQA
+      ~NLoptAlgorithm.LN_COBYLA
+      ~NLoptAlgorithm.LN_NELDERMEAD
+      ~NLoptAlgorithm.LN_NEWUOA
+      ~NLoptAlgorithm.LN_NEWUOA_BOUND
+      ~NLoptAlgorithm.LN_PRAXIS
+      ~NLoptAlgorithm.LN_SBPLX
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: GD_STOGO
+   .. autoattribute:: GN_CRS2_LM
+   .. autoattribute:: GN_DIRECT
+   .. autoattribute:: LD_LBFGS
+   .. autoattribute:: LD_MMA
+   .. autoattribute:: LD_SLSQP
+   .. autoattribute:: LD_TNEWTON
+   .. autoattribute:: LD_TNEWTON_PRECOND
+   .. autoattribute:: LD_TNEWTON_PRECOND_RESTART
+   .. autoattribute:: LD_TNEWTON_RESTART
+   .. autoattribute:: LD_VAR1
+   .. autoattribute:: LD_VAR2
+   .. autoattribute:: LN_BOBYQA
+   .. autoattribute:: LN_COBYLA
+   .. autoattribute:: LN_NELDERMEAD
+   .. autoattribute:: LN_NEWUOA
+   .. autoattribute:: LN_NEWUOA_BOUND
+   .. autoattribute:: LN_PRAXIS
+   .. autoattribute:: LN_SBPLX

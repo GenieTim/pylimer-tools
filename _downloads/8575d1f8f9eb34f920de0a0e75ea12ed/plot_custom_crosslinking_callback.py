@@ -30,7 +30,7 @@ from pylimer_tools.io.bead_spring_parameter_provider import (
     ParameterType,
     get_parameters_for_polymer,
 )
-from pylimer_tools_cpp import BackTrackStatus, MCUniverseGenerator, MEHPForceBalance2
+from pylimer_tools_cpp import BackTrackStatus, MCUniverseGenerator, MEHPSimulator
 
 # %%
 # Example 1: Stop at Conversion OR Soluble Fraction
@@ -93,11 +93,9 @@ def conversion_callback(gen, steps_remaining):
         if (step % 10 == 0) or (
             math.isclose(prev_wsol, target_wsol, rel_tol=1e-1, abs_tol=5e-2)
         ):
-            fb2 = gen.get_force_balance2()
-            assert isinstance(fb2, MEHPForceBalance2), (
-                "Force balance must be MEHPForceBalance2"
-            )
-            fb2.run_force_relaxation()
+            fb2 = gen.get_mehp_simulator()
+            assert isinstance(fb2, MEHPSimulator), "Force balance must be MEHPSimulator"
+            fb2.run()
             current_wsol = fb2.get_soluble_weight_fraction()
         else:
             current_wsol = prev_wsol

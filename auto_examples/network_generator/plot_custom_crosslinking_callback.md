@@ -40,7 +40,7 @@ from pylimer_tools.io.bead_spring_parameter_provider import (
     ParameterType,
     get_parameters_for_polymer,
 )
-from pylimer_tools_cpp import BackTrackStatus, MCUniverseGenerator, MEHPForceBalance2
+from pylimer_tools_cpp import BackTrackStatus, MCUniverseGenerator, MEHPSimulator
 ```
 
 <!-- GENERATED FROM PYTHON SOURCE LINES 36-41 -->
@@ -50,7 +50,7 @@ from pylimer_tools_cpp import BackTrackStatus, MCUniverseGenerator, MEHPForceBal
 Using a callback allows for more complex logic, such as
 stopping the process based on multiple criteria as illustrated here.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 41-126 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 41-124 -->
 ```Python
 # Get parameters for PDMS polymer density and bead distance
 params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
@@ -105,11 +105,9 @@ def conversion_callback(gen, steps_remaining):
         if (step % 10 == 0) or (
             math.isclose(prev_wsol, target_wsol, rel_tol=1e-1, abs_tol=5e-2)
         ):
-            fb2 = gen.get_force_balance2()
-            assert isinstance(fb2, MEHPForceBalance2), (
-                "Force balance must be MEHPForceBalance2"
-            )
-            fb2.run_force_relaxation()
+            fb2 = gen.get_mehp_simulator()
+            assert isinstance(fb2, MEHPSimulator), "Force balance must be MEHPSimulator"
+            fb2.run()
             current_wsol = fb2.get_soluble_weight_fraction()
         else:
             current_wsol = prev_wsol
@@ -141,14 +139,14 @@ Target conversion 0.9 or soluble fraction 0.2 reached at step 1473.
 Final conversion: 0.736 and w_sol: 0.198
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 127-132 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 125-130 -->
 
 ## Visualizing the Results
 
 Let’s plot the evolution of crosslinker conversion
 and soluble fraction over the steps.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 132-143 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 130-141 -->
 ```Python
 fig, ax = plt.subplots()
 
@@ -162,7 +160,7 @@ ax.legend()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.338 seconds)
+**Total running time of the script:** (0 minutes 0.354 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-custom-crosslinking-callback-py"></a>
 

@@ -1,0 +1,31 @@
+LinearSystemMEHPSolver
+======================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: LinearSystemMEHPSolver
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~LinearSystemMEHPSolver.config
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~LinearSystemMEHPSolver.get_config
+      ~LinearSystemMEHPSolver.set_config
+      ~LinearSystemMEHPSolver.solve
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: config
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: get_config
+   .. automethod:: set_config
+   .. automethod:: solve

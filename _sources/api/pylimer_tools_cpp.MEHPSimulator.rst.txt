@@ -1,0 +1,209 @@
+MEHPSimulator
+=============
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: MEHPSimulator
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~MEHPSimulator.force_evaluator
+      ~MEHPSimulator.is_2d
+      ~MEHPSimulator.last_solve_result
+      ~MEHPSimulator.network
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~MEHPSimulator.add_slip_links
+      ~MEHPSimulator.add_sliplinks
+      ~MEHPSimulator.break_too_long_strands
+      ~MEHPSimulator.config_assume_box_large_enough
+      ~MEHPSimulator.config_assume_network_is_complete
+      ~MEHPSimulator.config_auto_correlator_output
+      ~MEHPSimulator.config_average_output
+      ~MEHPSimulator.config_mean_bond_length
+      ~MEHPSimulator.config_mean_squared_bond_length
+      ~MEHPSimulator.config_remove_primary_loops
+      ~MEHPSimulator.config_restart_output
+      ~MEHPSimulator.config_step_output
+      ~MEHPSimulator.construct_from_string
+      ~MEHPSimulator.construct_with_random_entanglements
+      ~MEHPSimulator.count_active_clustered_atoms
+      ~MEHPSimulator.deform_to
+      ~MEHPSimulator.get_active_weight_fraction
+      ~MEHPSimulator.get_average_contour_length
+      ~MEHPSimulator.get_average_spring_length
+      ~MEHPSimulator.get_bond_lengths
+      ~MEHPSimulator.get_coordinates
+      ~MEHPSimulator.get_crosslinker_universe
+      ~MEHPSimulator.get_crosslinker_verse
+      ~MEHPSimulator.get_current_displacements
+      ~MEHPSimulator.get_current_time
+      ~MEHPSimulator.get_dangling_weight_fraction
+      ~MEHPSimulator.get_default_bond_length
+      ~MEHPSimulator.get_default_r0_square
+      ~MEHPSimulator.get_effective_functionality_of_atoms
+      ~MEHPSimulator.get_energy
+      ~MEHPSimulator.get_exit_reason
+      ~MEHPSimulator.get_force_evaluator
+      ~MEHPSimulator.get_gamma
+      ~MEHPSimulator.get_gamma_factor
+      ~MEHPSimulator.get_gamma_factors
+      ~MEHPSimulator.get_gamma_factors_in_dir
+      ~MEHPSimulator.get_indices_of_active_nodes
+      ~MEHPSimulator.get_initial_coordinates
+      ~MEHPSimulator.get_is_2d
+      ~MEHPSimulator.get_last_solve_result
+      ~MEHPSimulator.get_network
+      ~MEHPSimulator.get_nr_of_active_nodes
+      ~MEHPSimulator.get_nr_of_active_springs
+      ~MEHPSimulator.get_nr_of_active_strands
+      ~MEHPSimulator.get_nr_of_atoms
+      ~MEHPSimulator.get_nr_of_bonds
+      ~MEHPSimulator.get_nr_of_extra_atoms
+      ~MEHPSimulator.get_nr_of_extra_bonds
+      ~MEHPSimulator.get_nr_of_intra_chain_sliplinks
+      ~MEHPSimulator.get_nr_of_iterations
+      ~MEHPSimulator.get_nr_of_links
+      ~MEHPSimulator.get_nr_of_nodes
+      ~MEHPSimulator.get_nr_of_particles
+      ~MEHPSimulator.get_nr_of_springs
+      ~MEHPSimulator.get_nr_of_strands
+      ~MEHPSimulator.get_num_bonds_to_form
+      ~MEHPSimulator.get_num_intra_chain_slip_links
+      ~MEHPSimulator.get_num_intra_chain_sliplinks
+      ~MEHPSimulator.get_num_relocations
+      ~MEHPSimulator.get_num_shifts
+      ~MEHPSimulator.get_pressure
+      ~MEHPSimulator.get_residual
+      ~MEHPSimulator.get_residual_norm
+      ~MEHPSimulator.get_residuals
+      ~MEHPSimulator.get_simulation_has_run
+      ~MEHPSimulator.get_soluble_weight_fraction
+      ~MEHPSimulator.get_spring_contour_length
+      ~MEHPSimulator.get_spring_lengths
+      ~MEHPSimulator.get_spring_partitions
+      ~MEHPSimulator.get_spring_vectors
+      ~MEHPSimulator.get_strand_contour_length
+      ~MEHPSimulator.get_stress_tensor
+      ~MEHPSimulator.get_temperature
+      ~MEHPSimulator.get_timestep
+      ~MEHPSimulator.get_volume
+      ~MEHPSimulator.has_outputs
+      ~MEHPSimulator.randomly_add_slip_links
+      ~MEHPSimulator.randomly_add_sliplinks
+      ~MEHPSimulator.read_restart_file
+      ~MEHPSimulator.remove_inactive_links
+      ~MEHPSimulator.run
+      ~MEHPSimulator.serialize_to_string
+      ~MEHPSimulator.set_current_displacements
+      ~MEHPSimulator.set_force_evaluator
+      ~MEHPSimulator.set_is_2d
+      ~MEHPSimulator.simplify_network
+      ~MEHPSimulator.unlink_bifunctional_links
+      ~MEHPSimulator.validate_network
+      ~MEHPSimulator.write_restart_file
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: force_evaluator
+   .. autoattribute:: is_2d
+   .. autoattribute:: last_solve_result
+   .. autoattribute:: network
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: add_slip_links
+   .. automethod:: add_sliplinks
+   .. automethod:: break_too_long_strands
+   .. automethod:: config_assume_box_large_enough
+   .. automethod:: config_assume_network_is_complete
+   .. automethod:: config_auto_correlator_output
+   .. automethod:: config_average_output
+   .. automethod:: config_mean_bond_length
+   .. automethod:: config_mean_squared_bond_length
+   .. automethod:: config_remove_primary_loops
+   .. automethod:: config_restart_output
+   .. automethod:: config_step_output
+   .. automethod:: construct_from_string
+   .. automethod:: construct_with_random_entanglements
+   .. automethod:: count_active_clustered_atoms
+   .. automethod:: deform_to
+   .. automethod:: get_active_weight_fraction
+   .. automethod:: get_average_contour_length
+   .. automethod:: get_average_spring_length
+   .. automethod:: get_bond_lengths
+   .. automethod:: get_coordinates
+   .. automethod:: get_crosslinker_universe
+   .. automethod:: get_crosslinker_verse
+   .. automethod:: get_current_displacements
+   .. automethod:: get_current_time
+   .. automethod:: get_dangling_weight_fraction
+   .. automethod:: get_default_bond_length
+   .. automethod:: get_default_r0_square
+   .. automethod:: get_effective_functionality_of_atoms
+   .. automethod:: get_energy
+   .. automethod:: get_exit_reason
+   .. automethod:: get_force_evaluator
+   .. automethod:: get_gamma
+   .. automethod:: get_gamma_factor
+   .. automethod:: get_gamma_factors
+   .. automethod:: get_gamma_factors_in_dir
+   .. automethod:: get_indices_of_active_nodes
+   .. automethod:: get_initial_coordinates
+   .. automethod:: get_is_2d
+   .. automethod:: get_last_solve_result
+   .. automethod:: get_network
+   .. automethod:: get_nr_of_active_nodes
+   .. automethod:: get_nr_of_active_springs
+   .. automethod:: get_nr_of_active_strands
+   .. automethod:: get_nr_of_atoms
+   .. automethod:: get_nr_of_bonds
+   .. automethod:: get_nr_of_extra_atoms
+   .. automethod:: get_nr_of_extra_bonds
+   .. automethod:: get_nr_of_intra_chain_sliplinks
+   .. automethod:: get_nr_of_iterations
+   .. automethod:: get_nr_of_links
+   .. automethod:: get_nr_of_nodes
+   .. automethod:: get_nr_of_particles
+   .. automethod:: get_nr_of_springs
+   .. automethod:: get_nr_of_strands
+   .. automethod:: get_num_bonds_to_form
+   .. automethod:: get_num_intra_chain_slip_links
+   .. automethod:: get_num_intra_chain_sliplinks
+   .. automethod:: get_num_relocations
+   .. automethod:: get_num_shifts
+   .. automethod:: get_pressure
+   .. automethod:: get_residual
+   .. automethod:: get_residual_norm
+   .. automethod:: get_residuals
+   .. automethod:: get_simulation_has_run
+   .. automethod:: get_soluble_weight_fraction
+   .. automethod:: get_spring_contour_length
+   .. automethod:: get_spring_lengths
+   .. automethod:: get_spring_partitions
+   .. automethod:: get_spring_vectors
+   .. automethod:: get_strand_contour_length
+   .. automethod:: get_stress_tensor
+   .. automethod:: get_temperature
+   .. automethod:: get_timestep
+   .. automethod:: get_volume
+   .. automethod:: has_outputs
+   .. automethod:: randomly_add_slip_links
+   .. automethod:: randomly_add_sliplinks
+   .. automethod:: read_restart_file
+   .. automethod:: remove_inactive_links
+   .. automethod:: run
+   .. automethod:: serialize_to_string
+   .. automethod:: set_current_displacements
+   .. automethod:: set_force_evaluator
+   .. automethod:: set_is_2d
+   .. automethod:: simplify_network
+   .. automethod:: unlink_bifunctional_links
+   .. automethod:: validate_network
+   .. automethod:: write_restart_file

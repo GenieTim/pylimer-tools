@@ -19,7 +19,12 @@ from pylimer_tools.io.bead_spring_parameter_provider import (
     get_parameters_for_polymer,
 )
 from pylimer_tools.io.read_lammps_output_file import read_data_file
-from pylimer_tools_cpp import MEHPForceBalance, Universe
+from pylimer_tools_cpp import (
+    MEHPSimulator,
+    MEHPSlipLinkSolverConfig,
+    SlipMode,
+    Universe,
+)
 
 # Get parameters for conversion factors
 params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
@@ -45,17 +50,17 @@ universe = read_data_file(
 assert isinstance(universe, Universe)
 vol = universe.get_volume()
 
-# MEHPForceBalance: Hookean springs, with slip-links
-mehp_fb = MEHPForceBalance.construct_with_random_sliplinks(
+# MEHPSimulator with Hookean springs and sliding slip-links
+mehp_fb = MEHPSimulator.construct_with_random_entanglements(
     universe,
-    nr_of_sliplinks_to_sample=int(params.get_entanglement_density() * vol),
+    nr_of_entanglements_to_sample=int(params.get_entanglement_density() * vol),
     upper_sampling_cutoff=params.get_sampling_cutoff(),
 )
-mehp_fb.run_force_relaxation(max_nr_of_steps=1000)
+mehp_fb.run(MEHPSlipLinkSolverConfig(max_nr_of_steps=1000, slip_mode=SlipMode.SLIDING))
 
 print(
     "Final residual (should be close to 0):",
-    mehp_fb.get_displacement_residual_norm(),
+    mehp_fb.get_residual_norm(),
 )
 
 # Apply conversion factors, measure resulting shear modulus
@@ -73,17 +78,17 @@ print(f"Shear Modulus [MPa]: {shear_modulus:.4f}")
 # Directional shear moduli
 gx = (
     gamma_conversion_factor
-    * np.sum(mehp_fb.get_gamma_factors_in_dir(r02_slope_magnitude, 0))
+    * np.sum(mehp_fb.get_gamma_factors_in_dir(0, r02_slope_magnitude))
     / vol
 )
 gy = (
     gamma_conversion_factor
-    * np.sum(mehp_fb.get_gamma_factors_in_dir(r02_slope_magnitude, 1))
+    * np.sum(mehp_fb.get_gamma_factors_in_dir(1, r02_slope_magnitude))
     / vol
 )
 gz = (
     gamma_conversion_factor
-    * np.sum(mehp_fb.get_gamma_factors_in_dir(r02_slope_magnitude, 2))
+    * np.sum(mehp_fb.get_gamma_factors_in_dir(2, r02_slope_magnitude))
     / vol
 )
 

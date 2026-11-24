@@ -5,7 +5,7 @@
 pylimer-tools includes a powerful Monte Carlo-based network generator for creating realistic polymer systems.
 This tool is particularly useful for generating quick initial configurations for molecular dynamics simulations,
 or for doing fast predictions of the viscoelasticity using the [`NormalModeAnalyzer`](../../api/pylimer_tools_cpp.NormalModeAnalyzer.md#pylimer_tools_cpp.NormalModeAnalyzer) or the
-[`MEHPForceBalance`](../../api/pylimer_tools_cpp.MEHPForceBalance.md#pylimer_tools_cpp.MEHPForceBalance) and its variants.
+[`MEHPSimulator`](../../api/pylimer_tools_cpp.MEHPSimulator.md#pylimer_tools_cpp.MEHPSimulator) and its solver strategies.
 
 For more options, examples and advanced usage, see the [test suite](https://github.com/GenieTim/pylimer-tools/tree/main/tests)
 and the [src](../../modules.md) API reference, particularly of the [`MCUniverseGenerator`](../../api/pylimer_tools_cpp.MCUniverseGenerator.md#pylimer_tools_cpp.MCUniverseGenerator) class.

@@ -21,15 +21,18 @@
 Slipping vs. Fixed Entanglement Links
 =====================================
 
-In :class:`~pylimer_tools_cpp.MEHPForceBalance` (:cite:t:`gusev_numerical_2019`, :cite:t:`bernhard_phantom_2025`),
-entanglement links can either remain frozen at their initial contour positions (``disable_slipping=True``)
-or slide dynamically along the polymer strands to balance contour tension (``disable_slipping=False``).
+In :class:`~pylimer_tools_cpp.MEHPSimulator` (:cite:t:`gusev_numerical_2019`, :cite:t:`bernhard_phantom_2025`)
+with :class:`~pylimer_tools_cpp.SlipLinkRelaxationSolver` (:class:`~pylimer_tools_cpp.MEHPSlipLinkSolverConfig`),
+entanglement links can either remain frozen at their initial contour positions
+(:attr:`~pylimer_tools_cpp.SlipMode.FIXED`) or slide dynamically along the polymer
+strands to balance contour tension (:attr:`~pylimer_tools_cpp.SlipMode.SLIDING`).
 
 Dynamic contour slipping artificially softens the network modulus by relaxing affine tension
-and increases solver iterations 2–3x. Consequently, :class:`~pylimer_tools_cpp.MEHPForceBalance2`
-fixes entanglement positions by design.
+and increases solver iterations 2–3x. Consequently, :class:`~pylimer_tools_cpp.LinearSystemMEHPSolver`
+(and :class:`~pylimer_tools_cpp.NonlinearOptimizationSolver`) require :attr:`~pylimer_tools_cpp.SlipMode.FIXED`
+by design.
 
-.. GENERATED FROM PYTHON SOURCE LINES 13-32
+.. GENERATED FROM PYTHON SOURCE LINES 16-35
 
 .. code-block:: Python
 
@@ -59,15 +62,15 @@ fixes entanglement positions by design.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 33-38
+.. GENERATED FROM PYTHON SOURCE LINES 36-41
 
-Toggling Dynamic Slipping in ``MEHPForceBalance``
--------------------------------------------------
-On a generated network, ``disable_slipping=True`` freezes the sampled contour fractions,
-whereas ``disable_slipping=False`` updates them iteratively during force
-relaxation.
+Toggling Dynamic Slipping in ``MEHPSimulator``
+----------------------------------------------
+On a generated network, ``SlipMode.FIXED`` freezes the sampled contour fractions,
+whereas ``SlipMode.SLIDING`` updates them iteratively during force
+relaxation via :class:`~pylimer_tools_cpp.MEHPSlipLinkSolverConfig`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 38-67
+.. GENERATED FROM PYTHON SOURCE LINES 41-80
 
 .. code-block:: Python
 
@@ -86,11 +89,21 @@ relaxation.
         filtering_mode=pt.EntanglementFilteringMode.OMIT_INACTIVE,
     )
 
-    fb_fixed = gen.get_force_balance(es)
-    fb_fixed.run_force_relaxation(max_nr_of_steps=5000, disable_slipping=True)
+    fixed_cfg = pt.MEHPSlipLinkSolverConfig()
+    fixed_cfg.max_nr_of_steps = 5000
+    fixed_cfg.slip_mode = pt.SlipMode.FIXED
 
-    fb_slip = gen.get_force_balance(es)
-    fb_slip.run_force_relaxation(max_nr_of_steps=5000, disable_slipping=False)
+    fb_fixed = gen.get_mehp_simulator(
+        es, entanglement_mode=pt.EntanglementMode.MERGED_LINKS
+    )
+    fb_fixed.run(fixed_cfg)
+
+    slip_cfg = pt.MEHPSlipLinkSolverConfig()
+    slip_cfg.max_nr_of_steps = 5000
+    slip_cfg.slip_mode = pt.SlipMode.SLIDING
+
+    fb_slip = gen.get_mehp_simulator(es, entanglement_mode=pt.EntanglementMode.MERGED_LINKS)
+    fb_slip.run(slip_cfg)
 
     print(
         f"Iterations — fixed: {fb_fixed.get_nr_of_iterations()}, "
@@ -108,13 +121,13 @@ relaxation.
 
  .. code-block:: none
 
-    Iterations — fixed: 300, slipping: 941
+    Iterations — fixed: 512, slipping: 2350
     Loading cached example data from slipping_vs_fixed_cache.npz...
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 68-73
+.. GENERATED FROM PYTHON SOURCE LINES 81-86
 
 Modulus Reduction & Convergence Cost
 ------------------------------------
@@ -122,7 +135,7 @@ Multi-seed ensemble results (95% confidence intervals) confirm that dynamic slip
 the predicted shear modulus by ~30–40% at high entanglement densities while requiring 2–3x more
 relaxation iterations.
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-76
+.. GENERATED FROM PYTHON SOURCE LINES 86-89
 
 .. code-block:: Python
 
@@ -156,7 +169,7 @@ relaxation iterations.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.343 seconds)
+   **Total running time of the script:** (0 minutes 0.403 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_slipping_vs_fixed_links.py:

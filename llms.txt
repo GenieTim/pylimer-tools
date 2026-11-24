@@ -16,18 +16,18 @@
 - [Examples](auto_examples/index.html.md): The following gallery contains example scripts demonstrating the usage of various features in pylime...
 - [Dissipative Particle Dynamics (DPD) Simulations](auto_examples/dpd_simulations/index.html.md): pylimer-tools provides a powerful framework for simulating coarse-grained polymer systems using Diss...
 - [NOTE](auto_examples/dpd_simulations/plot_dpd_simulation.html.md): Go to the end
-- [Force Balance, Maximum Entropy Homogenization Procedures](auto_examples/force_balance/index.html.md): pylimer-tools provides three implementations of the Force Balance &#91;BG25&#93;, Maximum Entropy Homogeniza...
+- [Force Balance, Maximum Entropy Homogenization Procedures](auto_examples/force_balance/index.html.md): pylimer-tools provides a unified implementation of the Force Balance &#91;BG25&#93;, Maximum Entropy Homogen...
 - [NOTE](auto_examples/force_balance/plot_entanglement_link_vs_spring.html.md): Go to the end
-- [NOTE](auto_examples/force_balance/plot_slipping_vs_fixed_links.html.md): Go to the end
 - [NOTE](auto_examples/force_balance/plot_polydispersity_study.html.md): Go to the end
 - [NOTE](auto_examples/force_balance/plot_sampling_cutoff_effect.html.md): Go to the end
+- [NOTE](auto_examples/force_balance/plot_slipping_vs_fixed_links.html.md): Go to the end
 - [NOTE](auto_examples/force_balance/plot_inactive_removal_and_sampling.html.md): Go to the end
 - [NOTE](auto_examples/force_balance/plot_entanglement_sampling_comparison.html.md): Go to the end
 - [NOTE](auto_examples/force_balance/plot_representative_volume_pdms.html.md): Go to the end
 - [NOTE](auto_examples/force_balance/plot_fb_deformation_exp.html.md): Go to the end
 - [NOTE](auto_examples/force_balance/plot_force_balance.html.md): Go to the end
-- [NOTE](auto_examples/force_balance/plot_force_balance_2.html.md): Go to the end
 - [NOTE](auto_examples/force_balance/plot_force_relaxation.html.md): Go to the end
+- [NOTE](auto_examples/force_balance/plot_force_balance_2.html.md): Go to the end
 - [Network Generation](auto_examples/network_generator/index.html.md): pylimer-tools includes a powerful Monte Carlo-based network generator for creating realistic polymer...
 - [NOTE](auto_examples/network_generator/plot_save_network.html.md): Go to the end
 - [NOTE](auto_examples/network_generator/plot_polydisperse_system.html.md): Go to the end
@@ -103,23 +103,32 @@
 - [DumpFileReader](api/pylimer_tools_cpp.DumpFileReader.html.md): Bases: &#96;pybind11_object&#96;
 - [EndToEndStats](api/pylimer_tools_cpp.EndToEndStats.html.md): Bases: &#96;pybind11_object&#96;
 - [EntanglementFilteringMode](api/pylimer_tools_cpp.EntanglementFilteringMode.html.md): Bases: &#96;IntEnum&#96;
+- [EntanglementMode](api/pylimer_tools_cpp.EntanglementMode.html.md): Bases: &#96;Enum&#96;
 - [ExitReason](api/pylimer_tools_cpp.ExitReason.html.md): Bases: &#96;IntEnum&#96;
+- [HookeanForceEvaluator](api/pylimer_tools_cpp.HookeanForceEvaluator.html.md): Bases: &#96;MEHPForceEvaluator&#96;
 - [HybridConfig](api/pylimer_tools_cpp.HybridConfig.html.md): Bases: &#96;pybind11_object&#96;
 - [KPMConfig](api/pylimer_tools_cpp.KPMConfig.html.md): Bases: &#96;pybind11_object&#96;
 - [LazyUniverseSequenceIterator](api/pylimer_tools_cpp.LazyUniverseSequenceIterator.html.md): Bases: &#96;pybind11_object&#96;
 - [LinearMaxDistanceProvider](api/pylimer_tools_cpp.LinearMaxDistanceProvider.html.md): Bases: &#96;MaxDistanceProvider&#96;
+- [LinearSystemMEHPSolver](api/pylimer_tools_cpp.LinearSystemMEHPSolver.html.md): Bases: &#96;MEHPSolver&#96;
 - [LinkSwappingMode](api/pylimer_tools_cpp.LinkSwappingMode.html.md): Bases: &#96;Enum&#96;
 - [MCUniverseGenerator](api/pylimer_tools_cpp.MCUniverseGenerator.html.md): Bases: &#96;pybind11_object&#96;
-- [MEHPForceBalance](api/pylimer_tools_cpp.MEHPForceBalance.html.md): Bases: &#96;pybind11_object&#96;
-- [MEHPForceBalance2](api/pylimer_tools_cpp.MEHPForceBalance2.html.md): Bases: &#96;pybind11_object&#96;
 - [MEHPForceEvaluator](api/pylimer_tools_cpp.MEHPForceEvaluator.html.md): Bases: &#96;pybind11_object&#96;
-- [MEHPForceRelaxation](api/pylimer_tools_cpp.MEHPForceRelaxation.html.md): Bases: &#96;pybind11_object&#96;
+- [MEHPLinearSolverConfig](api/pylimer_tools_cpp.MEHPLinearSolverConfig.html.md): Bases: &#96;pybind11_object&#96;
+- [MEHPNetwork](api/pylimer_tools_cpp.MEHPNetwork.html.md): Bases: &#96;pybind11_object&#96;
+- [MEHPNonlinearSolverConfig](api/pylimer_tools_cpp.MEHPNonlinearSolverConfig.html.md): Bases: &#96;pybind11_object&#96;
+- [MEHPSimulator](api/pylimer_tools_cpp.MEHPSimulator.html.md): Bases: &#96;pybind11_object&#96;
+- [MEHPSlipLinkSolverConfig](api/pylimer_tools_cpp.MEHPSlipLinkSolverConfig.html.md): Bases: &#96;pybind11_object&#96;
+- [MEHPSolveResult](api/pylimer_tools_cpp.MEHPSolveResult.html.md): Bases: &#96;pybind11_object&#96;
+- [MEHPSolver](api/pylimer_tools_cpp.MEHPSolver.html.md): Bases: &#96;pybind11_object&#96;
 - [MaxDistanceProvider](api/pylimer_tools_cpp.MaxDistanceProvider.html.md): Bases: &#96;pybind11_object&#96;
 - [Molecule](api/pylimer_tools_cpp.Molecule.html.md): Bases: &#96;pybind11_object&#96;
 - [MoleculeIterator](api/pylimer_tools_cpp.MoleculeIterator.html.md): Bases: &#96;pybind11_object&#96;
 - [MoleculeType](api/pylimer_tools_cpp.MoleculeType.html.md): Bases: &#96;Enum&#96;
+- [NLoptAlgorithm](api/pylimer_tools_cpp.NLoptAlgorithm.html.md): Bases: &#96;Enum&#96;
 - [NoMaxDistanceProvider](api/pylimer_tools_cpp.NoMaxDistanceProvider.html.md): Bases: &#96;MaxDistanceProvider&#96;
 - [NonGaussianSpringForceEvaluator](api/pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html.md): Bases: &#96;MEHPForceEvaluator&#96;
+- [NonlinearOptimizationSolver](api/pylimer_tools_cpp.NonlinearOptimizationSolver.html.md): Bases: &#96;MEHPSolver&#96;
 - [NormalModeAnalyzer](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md): Bases: &#96;pybind11_object&#96;
 - [NormalModeSolver](api/pylimer_tools_cpp.NormalModeSolver.html.md): Bases: &#96;Enum&#96;
 - [NormalModeSpectrum](api/pylimer_tools_cpp.NormalModeSpectrum.html.md): Bases: &#96;pybind11_object&#96;
@@ -130,10 +139,8 @@
 - [RouseSolverType](api/pylimer_tools_cpp.RouseSolverType.html.md): Bases: &#96;IntEnum&#96;
 - [SLESolver](api/pylimer_tools_cpp.SLESolver.html.md): Bases: &#96;Enum&#96;
 - [SLQConfig](api/pylimer_tools_cpp.SLQConfig.html.md): Bases: &#96;pybind11_object&#96;
-- [SimpleSpringMEHPForceEvaluator](api/pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html.md): Bases: &#96;MEHPForceEvaluator&#96;
-- [SimplifiedBalance2Network](api/pylimer_tools_cpp.SimplifiedBalance2Network.html.md): Bases: &#96;pybind11_object&#96;
-- [SimplifiedBalanceNetwork](api/pylimer_tools_cpp.SimplifiedBalanceNetwork.html.md): Bases: &#96;pybind11_object&#96;
-- [SimplifiedNetwork](api/pylimer_tools_cpp.SimplifiedNetwork.html.md): Bases: &#96;pybind11_object&#96;
+- [SlipLinkRelaxationSolver](api/pylimer_tools_cpp.SlipLinkRelaxationSolver.html.md): Bases: &#96;MEHPSolver&#96;
+- [SlipMode](api/pylimer_tools_cpp.SlipMode.html.md): Bases: &#96;Enum&#96;
 - [StrandCategory](api/pylimer_tools_cpp.StrandCategory.html.md): Bases: &#96;IntEnum&#96;
 - [StrandPairEntanglements](api/pylimer_tools_cpp.StrandPairEntanglements.html.md): Bases: &#96;pybind11_object&#96;
 - [StructureSimplificationMode](api/pylimer_tools_cpp.StructureSimplificationMode.html.md): Bases: &#96;Enum&#96;
@@ -143,15 +150,15 @@
 - [STOP](api/pylimer_tools_cpp.STOP.html.md): Stop the linking process
 - [TRACK_BACKWARD](api/pylimer_tools_cpp.TRACK_BACKWARD.html.md): Track backward in the linking process
 - [TRACK_FORWARD](api/pylimer_tools_cpp.TRACK_FORWARD.html.md): Continue linking forward
-- [Computation times](auto_examples/dpd_simulations/sg_execution_times.html.md): &#42;&#42;00:04.282&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/dpd_simulations&#42;&#42;:
-- [Computation times](auto_examples/force_balance/sg_execution_times.html.md): &#42;&#42;00:09.582&#42;&#42; total execution time for 11 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
-- [Computation times](auto_examples/network_generator/sg_execution_times.html.md): &#42;&#42;00:52.176&#42;&#42; total execution time for 9 files &#42;&#42;from auto_examples/network_generator&#42;&#42;:
-- [Computation times](auto_examples/normal_mode_analysis/sg_execution_times.html.md): &#42;&#42;00:28.743&#42;&#42; total execution time for 2 files &#42;&#42;from auto_examples/normal_mode_analysis&#42;&#42;:
-- [Computation times](auto_examples/readers_writers/sg_execution_times.html.md): &#42;&#42;00:04.171&#42;&#42; total execution time for 13 files &#42;&#42;from auto_examples/readers_writers&#42;&#42;:
-- [Computation times](auto_examples/rouse_simulations/sg_execution_times.html.md): &#42;&#42;00:03.763&#42;&#42; total execution time for 2 files &#42;&#42;from auto_examples/rouse_simulations&#42;&#42;:
+- [Computation times](auto_examples/dpd_simulations/sg_execution_times.html.md): &#42;&#42;00:04.429&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/dpd_simulations&#42;&#42;:
+- [Computation times](auto_examples/force_balance/sg_execution_times.html.md): &#42;&#42;00:06.180&#42;&#42; total execution time for 11 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
+- [Computation times](auto_examples/network_generator/sg_execution_times.html.md): &#42;&#42;00:45.066&#42;&#42; total execution time for 9 files &#42;&#42;from auto_examples/network_generator&#42;&#42;:
+- [Computation times](auto_examples/normal_mode_analysis/sg_execution_times.html.md): &#42;&#42;00:21.903&#42;&#42; total execution time for 2 files &#42;&#42;from auto_examples/normal_mode_analysis&#42;&#42;:
+- [Computation times](auto_examples/readers_writers/sg_execution_times.html.md): &#42;&#42;00:03.896&#42;&#42; total execution time for 13 files &#42;&#42;from auto_examples/readers_writers&#42;&#42;:
+- [Computation times](auto_examples/rouse_simulations/sg_execution_times.html.md): &#42;&#42;00:03.157&#42;&#42; total execution time for 2 files &#42;&#42;from auto_examples/rouse_simulations&#42;&#42;:
 - [Computation times](auto_examples/sg_execution_times.html.md): &#42;&#42;00:00.000&#42;&#42; total execution time for 0 files &#42;&#42;from auto_examples&#42;&#42;:
-- [Computation times](auto_examples/structure_analysis/sg_execution_times.html.md): &#42;&#42;00:01.447&#42;&#42; total execution time for 5 files &#42;&#42;from auto_examples/structure_analysis&#42;&#42;:
-- [Computation times](auto_examples/trajectory_analysis/sg_execution_times.html.md): &#42;&#42;03:34.207&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/trajectory_analysis&#42;&#42;:
+- [Computation times](auto_examples/structure_analysis/sg_execution_times.html.md): &#42;&#42;00:01.230&#42;&#42; total execution time for 5 files &#42;&#42;from auto_examples/structure_analysis&#42;&#42;:
+- [Computation times](auto_examples/trajectory_analysis/sg_execution_times.html.md): &#42;&#42;03:05.529&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/trajectory_analysis&#42;&#42;:
 
 ## Optional
 

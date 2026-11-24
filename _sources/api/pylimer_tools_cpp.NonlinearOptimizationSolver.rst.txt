@@ -1,0 +1,31 @@
+NonlinearOptimizationSolver
+===========================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: NonlinearOptimizationSolver
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~NonlinearOptimizationSolver.config
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~NonlinearOptimizationSolver.get_config
+      ~NonlinearOptimizationSolver.set_config
+      ~NonlinearOptimizationSolver.solve
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: config
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: get_config
+   .. automethod:: set_config
+   .. automethod:: solve

@@ -54,9 +54,9 @@ import pylimer_tools_cpp as pt  # noqa: E402
 
 ## Varying `upper_cutoff` in Entanglement Sampling
 
-Pass `upper_cutoff` to [`sample_entanglements()`](../../api/pylimer_tools_cpp.MCUniverseGenerator.md#pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements)
-and compare rigid links (`entanglements_as_springs=False`) vs. compliant springs
-(`entanglements_as_springs=True`).
+Passing `upper_cutoff` to [`sample_entanglements()`](../../api/pylimer_tools_cpp.MCUniverseGenerator.md#pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements)
+compares rigid links (`EntanglementMode.MERGED_LINKS`) vs. compliant springs
+(`EntanglementMode.SPRING`).
 
 <!-- GENERATED FROM PYTHON SOURCE LINES 47-68 -->
 ```Python
@@ -73,8 +73,8 @@ for r_cut in (1.2, 2.6):
         upper_cutoff=r_cut,
         seed=f"cut_{r_cut}",
     )
-    fb = gen.get_force_balance2(es, entanglements_as_springs=False)
-    fb.run_force_relaxation()
+    fb = gen.get_mehp_simulator(es, entanglement_mode=pt.EntanglementMode.MERGED_LINKS)
+    fb.run()
     print(f"r_cut={r_cut}: sampled={len(es)}, iterations={fb.get_nr_of_iterations()}")
 
 cache_path = get_example_cache_path("sampling_cutoff_effect_cache.npz", "force_balance")
@@ -82,8 +82,8 @@ data = load_or_compute_cache(cache_path, run_sampling_cutoff_simulation)
 ```
 
 ```none
-r_cut=1.2: sampled=253, iterations=205
-r_cut=2.6: sampled=241, iterations=169
+r_cut=1.2: sampled=253, iterations=399
+r_cut=2.6: sampled=241, iterations=333
 Loading cached example data from sampling_cutoff_effect_cache.npz...
 ```
 
@@ -128,7 +128,7 @@ plot_cutoff_pair_distance_distribution(data)
 plot_cutoff_solver_iterations(data)
 ```
 
-**Total running time of the script:** (0 minutes 0.667 seconds)
+**Total running time of the script:** (0 minutes 0.576 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-sampling-cutoff-effect-py"></a>
 

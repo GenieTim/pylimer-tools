@@ -1,0 +1,39 @@
+MEHPSlipLinkSolverConfig
+========================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: MEHPSlipLinkSolverConfig
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~MEHPSlipLinkSolverConfig.do_inner_iterations
+      ~MEHPSlipLinkSolverConfig.inactive_removal_cutoff
+      ~MEHPSlipLinkSolverConfig.initial_residual_to_use
+      ~MEHPSlipLinkSolverConfig.link_swapping_mode
+      ~MEHPSlipLinkSolverConfig.max_nr_of_steps
+      ~MEHPSlipLinkSolverConfig.nr_of_crosslink_swaps_allowed_per_sliplink
+      ~MEHPSlipLinkSolverConfig.one_over_spring_partition_upper_limit
+      ~MEHPSlipLinkSolverConfig.simplification_mode
+      ~MEHPSlipLinkSolverConfig.slip_mode
+      ~MEHPSlipLinkSolverConfig.spring_breaking_length
+      ~MEHPSlipLinkSolverConfig.swapping_frequency
+      ~MEHPSlipLinkSolverConfig.xtol
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: do_inner_iterations
+   .. autoattribute:: inactive_removal_cutoff
+   .. autoattribute:: initial_residual_to_use
+   .. autoattribute:: link_swapping_mode
+   .. autoattribute:: max_nr_of_steps
+   .. autoattribute:: nr_of_crosslink_swaps_allowed_per_sliplink
+   .. autoattribute:: one_over_spring_partition_upper_limit
+   .. autoattribute:: simplification_mode
+   .. autoattribute:: slip_mode
+   .. autoattribute:: spring_breaking_length
+   .. autoattribute:: swapping_frequency
+   .. autoattribute:: xtol

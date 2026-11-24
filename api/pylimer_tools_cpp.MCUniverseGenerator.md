@@ -57,11 +57,10 @@ Initialize a new MCUniverseGenerator with specified box dimensions.
 | [`get_current_nr_of_atoms`](#pylimer_tools_cpp.MCUniverseGenerator.get_current_nr_of_atoms)(self)                       | Get the current number of atoms that the universe would/will have.                                                                                                                         |
 | [`get_current_nr_of_bonds`](#pylimer_tools_cpp.MCUniverseGenerator.get_current_nr_of_bonds)(self)                       | Get the current number of bonds that the universe would/will have.                                                                                                                         |
 | [`get_current_strand_conversion`](#pylimer_tools_cpp.MCUniverseGenerator.get_current_strand_conversion)(self)                 | Get the current conversion of strands, i.e., the fraction of strand ends that have been consumed.                                                                                          |
-| [`get_force_balance`](#pylimer_tools_cpp.MCUniverseGenerator.get_force_balance)(\*args, \*\*kwargs)               | Overloaded function.                                                                                                                                                                       |
-| [`get_force_balance2`](#pylimer_tools_cpp.MCUniverseGenerator.get_force_balance2)(\*args, \*\*kwargs)              | Overloaded function.                                                                                                                                                                       |
-| [`get_force_relaxation`](#pylimer_tools_cpp.MCUniverseGenerator.get_force_relaxation)(self)                          | Get an instance of the force relaxation procedure.                                                                                                                                         |
 | [`get_mean_bead_distance`](#pylimer_tools_cpp.MCUniverseGenerator.get_mean_bead_distance)(self)                        | Get the currently configured mean bead distance.                                                                                                                                           |
 | [`get_mean_squared_bead_distance`](#pylimer_tools_cpp.MCUniverseGenerator.get_mean_squared_bead_distance)(self)                | Get the currently configured mean squared bead distance.                                                                                                                                   |
+| [`get_mehp_network`](#pylimer_tools_cpp.MCUniverseGenerator.get_mehp_network)(self[, entanglements, ...])        | Build a canonical MEHPNetwork from the current simplified universe and optional sampled entanglements.                                                                                     |
+| [`get_mehp_simulator`](#pylimer_tools_cpp.MCUniverseGenerator.get_mehp_simulator)(\*args, \*\*kwargs)              | Overloaded function.                                                                                                                                                                       |
 | [`get_nr_of_atoms`](#pylimer_tools_cpp.MCUniverseGenerator.get_nr_of_atoms)(self)                               | Get the current number of atoms that the universe would/will have.                                                                                                                         |
 | [`get_nr_of_bonds`](#pylimer_tools_cpp.MCUniverseGenerator.get_nr_of_bonds)(self)                               | Get the current number of bonds that the universe would/will have.                                                                                                                         |
 | [`get_universe`](#pylimer_tools_cpp.MCUniverseGenerator.get_universe)(self)                                  | Fetch the current (or final) state of the universe.                                                                                                                                        |
@@ -353,94 +352,6 @@ Get the current conversion of strands, i.e., the fraction of strand ends that ha
 * **Returns:**
   Strand conversion as a fraction between 0 and 1.
 
-#### get_force_balance(\*args, \*\*kwargs)
-
-Overloaded function.
-
-1. get_force_balance(self: pylimer_tools_cpp.MCUniverseGenerator) -> pylimer_tools_cpp.MEHPForceBalance
-   > Get an instance of the force balance procedure.
-   > This is a useful shorthand e.g. to skip the sampling of beads within in the strands.
-   > * **return:**
-   >   Configured MEHPForceBalance instance.
-2. get_force_balance(self: pylimer_tools_cpp.MCUniverseGenerator, entanglements: pylimer_tools_cpp.StrandPairEntanglements) -> pylimer_tools_cpp.MEHPForceBalance
-   > Get an instance of the force balance procedure with pre-sampled entanglements,
-   > bypassing the creation of a Universe.
-   > * **param entanglements:**
-   >   Sampled StrandPairEntanglements.
-   > * **return:**
-   >   Configured MEHPForceBalance instance.
-3. get_force_balance(self: pylimer_tools_cpp.MCUniverseGenerator, nr_of_entanglements_to_sample: typing.SupportsInt | typing.SupportsIndex, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_entanglements: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3.0, seed: str = ‘’, filtering_mode: pylimer_tools_cpp.EntanglementFilteringMode = EntanglementFilteringMode.OMIT_INACTIVE) -> pylimer_tools_cpp.MEHPForceBalance
-   > Sample entanglements and return a configured MEHPForceBalance instance,
-   > bypassing the creation of a Universe.
-   > * **param nr_of_entanglements_to_sample:**
-   >   Target number of entanglements to sample.
-   > * **param upper_cutoff:**
-   >   Upper cutoff distance between entangled beads.
-   > * **param lower_cutoff:**
-   >   Lower cutoff distance between entangled beads (default: 0.0).
-   > * **param minimum_nr_of_entanglements:**
-   >   Minimum number of entanglements required (default: 0).
-   > * **param same_strand_cutoff:**
-   >   Minimum contour separation on the same strand (default: 3.0).
-   > * **param seed:**
-   >   Optional random seed (uses generator RNG if empty).
-   > * **param filtering_mode:**
-   >   Filtering mode for entanglements (default: EntanglementFilteringMode.OMIT_INACTIVE).
-   > * **return:**
-   >   Configured MEHPForceBalance instance.
-
-#### get_force_balance2(\*args, \*\*kwargs)
-
-Overloaded function.
-
-1. get_force_balance2(self: pylimer_tools_cpp.MCUniverseGenerator) -> pylimer_tools_cpp.MEHPForceBalance2
-   > Get an instance of the force balance procedure.
-   > This is a useful shorthand e.g. to skip the sampling of beads within in the strands.
-   > * **return:**
-   >   Configured MEHPForceBalance2 instance.
-2. get_force_balance2(self: pylimer_tools_cpp.MCUniverseGenerator, entanglements: pylimer_tools_cpp.StrandPairEntanglements, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, entanglements_as_springs: bool = False) -> pylimer_tools_cpp.MEHPForceBalance2
-   > Get an instance of the MEHPForceBalance2 procedure with pre-sampled entanglements,
-   > bypassing the creation of a Universe.
-   > * **param entanglements:**
-   >   Sampled StrandPairEntanglements.
-   > * **param crosslinker_type:**
-   >   Crosslinker atom type (default: 2).
-   > * **param entanglements_as_springs:**
-   >   Whether to represent entanglements as springs between two split nodes (default: False).
-   > * **return:**
-   >   Configured MEHPForceBalance2 instance.
-3. get_force_balance2(self: pylimer_tools_cpp.MCUniverseGenerator, nr_of_entanglements_to_sample: typing.SupportsInt | typing.SupportsIndex, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_entanglements: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3.0, seed: str = ‘’, filtering_mode: pylimer_tools_cpp.EntanglementFilteringMode = EntanglementFilteringMode.OMIT_INACTIVE, entanglements_as_springs: bool = False, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2) -> pylimer_tools_cpp.MEHPForceBalance2
-   > Sample entanglements and return a configured MEHPForceBalance2 instance,
-   > bypassing the creation of a Universe.
-   > * **param nr_of_entanglements_to_sample:**
-   >   Target number of entanglements to sample.
-   > * **param upper_cutoff:**
-   >   Upper cutoff distance between entangled beads.
-   > * **param lower_cutoff:**
-   >   Lower cutoff distance between entangled beads (default: 0.0).
-   > * **param minimum_nr_of_entanglements:**
-   >   Minimum number of entanglements required (default: 0).
-   > * **param same_strand_cutoff:**
-   >   Minimum contour separation on the same strand (default: 3.0).
-   > * **param seed:**
-   >   Optional random seed (uses generator RNG if empty).
-   > * **param filtering_mode:**
-   >   Filtering mode for entanglements (default: EntanglementFilteringMode.OMIT_INACTIVE).
-   > * **param entanglements_as_springs:**
-   >   Whether to represent entanglements as springs between two split nodes (default: False).
-   > * **param crosslinker_type:**
-   >   Crosslinker atom type (default: 2).
-   > * **return:**
-   >   Configured MEHPForceBalance2 instance.
-
-#### get_force_relaxation(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator)) → [pylimer_tools_cpp.MEHPForceRelaxation](pylimer_tools_cpp.MEHPForceRelaxation.md#pylimer_tools_cpp.MEHPForceRelaxation)
-
-Get an instance of the force relaxation procedure.
-This is a useful shorthand e.g. to skip the sampling of beads within in the strands.
-
-* **Returns:**
-  Configured MEHPForceRelaxation instance.
-
 #### get_mean_bead_distance(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator)) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Get the currently configured mean bead distance.
@@ -454,6 +365,70 @@ Get the currently configured mean squared bead distance.
 
 * **Returns:**
   The currently configured mean squared distance between beads
+
+#### get_mehp_network(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), entanglements: [pylimer_tools_cpp.StrandPairEntanglements](pylimer_tools_cpp.StrandPairEntanglements.md#pylimer_tools_cpp.StrandPairEntanglements) = StrandPairEntanglements(), entanglement_mode: [pylimer_tools_cpp.EntanglementMode](pylimer_tools_cpp.EntanglementMode.md#pylimer_tools_cpp.EntanglementMode) = EntanglementMode.MERGED_LINKS, crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2, remove_dangling_chains: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False, include_free_chains: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [pylimer_tools_cpp.MEHPNetwork](pylimer_tools_cpp.MEHPNetwork.md#pylimer_tools_cpp.MEHPNetwork)
+
+Build a canonical MEHPNetwork from the current simplified universe and optional sampled entanglements.
+
+* **Parameters:**
+  * **entanglements** – Optional pre-sampled strand-pair entanglements.
+  * **entanglement_mode** – Entanglement representation mode (default: EntanglementMode.MERGED_LINKS).
+  * **crosslinker_type** – Atom type identifying crosslinkers (default: 2).
+  * **remove_dangling_chains** – Omit dangling chains when True (default: False).
+  * **include_free_chains** – Include free/soluble chains when True (default: True).
+* **Returns:**
+  Configured MEHPNetwork instance.
+
+#### get_mehp_simulator(\*args, \*\*kwargs)
+
+Overloaded function.
+
+1. get_mehp_simulator(self: pylimer_tools_cpp.MCUniverseGenerator, entanglements: pylimer_tools_cpp.StrandPairEntanglements = StrandPairEntanglements(), entanglement_mode: pylimer_tools_cpp.EntanglementMode = EntanglementMode.MERGED_LINKS, force_evaluator: pylimer_tools_cpp.MEHPForceEvaluator = None, is_2d: bool = False, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, remove_dangling_chains: bool = False, include_free_chains: bool = True) -> pylimer_tools_cpp.MEHPSimulator
+   > Construct a unified MEHPSimulator from the current simplified universe and optional pre-sampled entanglements,
+   > bypassing the creation of a Universe.
+   > * **param entanglements:**
+   >   Optional pre-sampled strand-pair entanglements.
+   > * **param entanglement_mode:**
+   >   Entanglement representation mode (default: EntanglementMode.MERGED_LINKS).
+   > * **param force_evaluator:**
+   >   Optional constitutive force evaluator (defaults to HookeanForceEvaluator(1.0) when None).
+   > * **param is_2d:**
+   >   Treat system as 2D when True (default: False).
+   > * **param crosslinker_type:**
+   >   Atom type identifying crosslinkers (default: 2).
+   > * **param remove_dangling_chains:**
+   >   Omit dangling chains when True (default: False).
+   > * **param include_free_chains:**
+   >   Include free/soluble chains when True (default: True).
+   > * **return:**
+   >   Configured MEHPSimulator instance.
+2. get_mehp_simulator(self: pylimer_tools_cpp.MCUniverseGenerator, nr_of_entanglements_to_sample: typing.SupportsInt | typing.SupportsIndex, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_entanglements: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3.0, seed: str = ‘’, filter_dangling_and_soluble: bool = True, entanglement_mode: pylimer_tools_cpp.EntanglementMode = EntanglementMode.MERGED_LINKS, force_evaluator: pylimer_tools_cpp.MEHPForceEvaluator = None, is_2d: bool = False, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2) -> pylimer_tools_cpp.MEHPSimulator
+   > Sample random entanglements from the simplified universe and construct a unified MEHPSimulator,
+   > bypassing the creation of a Universe.
+   > * **param nr_of_entanglements_to_sample:**
+   >   Target number of entanglements to sample.
+   > * **param upper_cutoff:**
+   >   Upper pair sampling cutoff.
+   > * **param lower_cutoff:**
+   >   Lower pair sampling cutoff (default: 0.0).
+   > * **param minimum_nr_of_entanglements:**
+   >   Minimum entanglements required if possible (default: 0).
+   > * **param same_strand_cutoff:**
+   >   Minimum chemical distance for same-strand pairs (default: 3.0).
+   > * **param seed:**
+   >   PRNG seed string (empty uses generator seed).
+   > * **param filter_dangling_and_soluble:**
+   >   Omit entanglements on inactive strands (default: True).
+   > * **param entanglement_mode:**
+   >   Entanglement representation mode (default: EntanglementMode.MERGED_LINKS).
+   > * **param force_evaluator:**
+   >   Optional constitutive force evaluator (defaults to HookeanForceEvaluator(1.0) when None).
+   > * **param is_2d:**
+   >   Treat system as 2D when True (default: False).
+   > * **param crosslinker_type:**
+   >   Atom type identifying crosslinkers (default: 2).
+   > * **return:**
+   >   Configured MEHPSimulator instance.
 
 #### get_nr_of_atoms(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator)) → [int](https://docs.python.org/3/builtins/functions.html#int)
 

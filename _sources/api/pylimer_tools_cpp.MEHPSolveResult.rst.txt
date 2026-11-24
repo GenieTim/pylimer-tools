@@ -1,0 +1,33 @@
+MEHPSolveResult
+===============
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: MEHPSolveResult
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~MEHPSolveResult.cg_fallback_triggered
+      ~MEHPSolveResult.effective_sle_solver
+      ~MEHPSolveResult.energy
+      ~MEHPSolveResult.exit_reason
+      ~MEHPSolveResult.nr_of_iterations
+      ~MEHPSolveResult.nr_of_relocations
+      ~MEHPSolveResult.nr_of_shifts
+      ~MEHPSolveResult.one_over_spring_partition_upper_limit_used
+      ~MEHPSolveResult.residual
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: cg_fallback_triggered
+   .. autoattribute:: effective_sle_solver
+   .. autoattribute:: energy
+   .. autoattribute:: exit_reason
+   .. autoattribute:: nr_of_iterations
+   .. autoattribute:: nr_of_relocations
+   .. autoattribute:: nr_of_shifts
+   .. autoattribute:: one_over_spring_partition_upper_limit_used
+   .. autoattribute:: residual

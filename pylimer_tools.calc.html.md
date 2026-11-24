@@ -5,12 +5,14 @@
 ## pylimer_tools.calc.mehp_utilities module
 
 This module is deprecated.
-Use [`pylimer_tools_cpp.MEHPForceBalance`](api/pylimer_tools_cpp.MEHPForceBalance.html.md#pylimer_tools_cpp.MEHPForceBalance) or [`pylimer_tools_cpp.MEHPForceRelaxation`](api/pylimer_tools_cpp.MEHPForceRelaxation.html.md#pylimer_tools_cpp.MEHPForceRelaxation) instead.
+Use [`pylimer_tools_cpp.MEHPSimulator`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator) (with e.g.
+[`pylimer_tools_cpp.HookeanForceEvaluator`](api/pylimer_tools_cpp.HookeanForceEvaluator.html.md#pylimer_tools_cpp.HookeanForceEvaluator) or
+[`pylimer_tools_cpp.NonGaussianSpringForceEvaluator`](api/pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html.md#pylimer_tools_cpp.NonGaussianSpringForceEvaluator)) instead.
 
 In principle, it offers comparable functionality, but without the force minimization - the networks you pass
 to these methods should be minimized first.
 
-### pylimer_tools.calc.mehp_utilities.compute_cycle_rank(networks: Sequence[[Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe)] | [None](https://docs.python.org/3/builtins/constants.html#None) = None, nu: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, mu: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, abs_tol: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = 1, rel_tol: [float](https://docs.python.org/3/builtins/functions.html#float) = 1, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2) → [float](https://docs.python.org/3/builtins/functions.html#float)
+### pylimer_tools.calc.mehp_utilities.compute_cycle_rank(networks: Sequence[[Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe)] | [None](https://docs.python.org/3/builtins/constants.html#None) = None, nu: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, mu: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, abs_tol: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = 1, rel_tol: [float](https://docs.python.org/3/builtins/functions.html#float) = 1, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) | [None](https://docs.python.org/3/builtins/constants.html#None) = 2) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Compute the cycle rank ($\chi$).
 Assumes the precursor-chains to be bifunctional.
@@ -22,23 +24,23 @@ No need to provide all the parameters — either/or:
 
 #### CAUTION
 With high certainty, you should not use this function,
-and instead the MEHPForceBalance, MEHPForceBalance2
-or MEHPForceRelaxation classes from pylimer_tools_cpp.
+and instead use [`MEHPSimulator`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator)
+from `pylimer_tools_cpp`.
 
 * **Parameters:**
-  * **networks** (*Union* *[**Sequence* *[*[*Universe*](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe) *]* *,* *None* *]*) – The networks to calculate the cycle rank for
-  * **nu** (*Union* *[*[*float*](https://docs.python.org/3/builtins/functions.html#float) *,* *None* *]*) – Number of elastically effective (active) strands per unit volume
-  * **mu** (*Union* *[*[*float*](https://docs.python.org/3/builtins/functions.html#float) *,* *None* *]*) – Number density of the elastically effective crosslinks
-  * **abs_tol** ([*float*](https://docs.python.org/3/builtins/functions.html#float)) – The absolute tolerance to categorize a chain as active (min. end-to-end distance).
+  * **networks** (*Sequence* *[*[*Universe*](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe) *]*  *|* *None*) – The networks to calculate the cycle rank for
+  * **nu** ([*float*](https://docs.python.org/3/builtins/functions.html#float) *|* *None*) – Number of elastically effective (active) strands per unit volume
+  * **mu** ([*float*](https://docs.python.org/3/builtins/functions.html#float) *|* *None*) – Number density of the elastically effective crosslinks
+  * **abs_tol** ([*float*](https://docs.python.org/3/builtins/functions.html#float) *|* *None*) – The absolute tolerance to categorize a chain as active (min. end-to-end distance).
     Set to None to use only rel_tol
   * **rel_tol** ([*float*](https://docs.python.org/3/builtins/functions.html#float)) – The relative tolerance to categorize a chain as active (0: all, 1: none)
-  * **crosslinker_type** ([*int*](https://docs.python.org/3/builtins/functions.html#int)) – The atom type of the crosslinkers/junctions
+  * **crosslinker_type** ([*int*](https://docs.python.org/3/builtins/functions.html#int) *|* *None*) – The atom type of the crosslinkers/junctions
 * **Returns:**
   The cycle rank ($\xi = \nu_{eff} - \mu_{eff}$) in units of 1/Volume
 * **Return type:**
   [float](https://docs.python.org/3/builtins/functions.html#float)
 
-### pylimer_tools.calc.mehp_utilities.compute_effective_nr_density_of_junctions(networks: Sequence[[Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe)], abs_tol: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = 0, rel_tol: [float](https://docs.python.org/3/builtins/functions.html#float) = 1, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2, min_num_effective_strands: [int](https://docs.python.org/3/builtins/functions.html#int) = 2) → [float](https://docs.python.org/3/builtins/functions.html#float)
+### pylimer_tools.calc.mehp_utilities.compute_effective_nr_density_of_junctions(networks: Sequence[[Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe)], abs_tol: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = 0, rel_tol: [float](https://docs.python.org/3/builtins/functions.html#float) = 1, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) | [None](https://docs.python.org/3/builtins/constants.html#None) = 2, min_num_effective_strands: [int](https://docs.python.org/3/builtins/functions.html#int) = 2) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Compute the number density of the elastically effective crosslinks,
 defined as the ones that connect at least min_num_effective_strands elastically effective strands.
@@ -49,10 +51,10 @@ Source:
 
 * **Parameters:**
   * **networks** (*Sequence* *[*[*Universe*](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe) *]*) – The networks to compute $\mu_{eff}$ for
-  * **abs_tol** ([*float*](https://docs.python.org/3/builtins/functions.html#float)) – The absolute tolerance to categorize a chain as active (min. end-to-end distance).
+  * **abs_tol** ([*float*](https://docs.python.org/3/builtins/functions.html#float) *|* *None*) – The absolute tolerance to categorize a chain as active (min. end-to-end distance).
     Set to None to use only rel_tol
   * **rel_tol** ([*float*](https://docs.python.org/3/builtins/functions.html#float)) – The relative tolerance to categorize a chain as active (0: all, 1: none)
-  * **crosslinker_type** ([*int*](https://docs.python.org/3/builtins/functions.html#int)) – The atom type of the crosslinkers/junctions
+  * **crosslinker_type** ([*int*](https://docs.python.org/3/builtins/functions.html#int) *|* *None*) – The atom type of the crosslinkers/junctions
   * **min_num_effective_strands** ([*int*](https://docs.python.org/3/builtins/functions.html#int)) – The number of elastically effective strands to qualify a junction as such
 * **Returns:**
   The effective number density of junctions in units of 1/Volume
@@ -73,12 +75,12 @@ Source:
 
 #### CAUTION
 With high certainty, you should not use this function,
-and instead the MEHPForceBalance, MEHPForceBalance2
-or MEHPForceRelaxation classes from pylimer_tools_cpp.
+and instead use [`MEHPSimulator`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator)
+from `pylimer_tools_cpp`.
 
 * **Parameters:**
   * **networks** (*Sequence* *[*[*Universe*](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe) *]*) – The networks to compute $\nu_{eff}$ for
-  * **abs_tol** ([*float*](https://docs.python.org/3/builtins/functions.html#float)) – The absolute tolerance to categorize a chain as active (min. end-to-end distance).
+  * **abs_tol** ([*float*](https://docs.python.org/3/builtins/functions.html#float) *|* *None*) – The absolute tolerance to categorize a chain as active (min. end-to-end distance).
     Set to None to use only rel_tol
   * **rel_tol** ([*float*](https://docs.python.org/3/builtins/functions.html#float)) – The relative tolerance to categorize a chain as active (0: all, 1: none)
   * **crosslinker_type** ([*int*](https://docs.python.org/3/builtins/functions.html#int)) – The atom type of the crosslinkers/junctions
@@ -133,8 +135,8 @@ Source:
 
 #### CAUTION
 With high certainty, you should not use this function,
-and instead the MEHPForceBalance, MEHPForceBalance2
-or MEHPForceRelaxation classes from pylimer_tools_cpp.
+and instead use [`MEHPSimulator`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator)
+from `pylimer_tools_cpp`.
 
 * **Parameters:**
   * **networks** (*Sequence* *[*[*Universe*](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe) *]*) – The polymer systems to predict the shear modulus for

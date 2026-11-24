@@ -76,14 +76,14 @@ import pylimer_tools_cpp as pt  # noqa: E402
 
 On-demand sampling is the default on [`MCUniverseGenerator`](../../api/pylimer_tools_cpp.MCUniverseGenerator.html.md#pylimer_tools_cpp.MCUniverseGenerator) and
 avoids allocating the full [`Universe`](../../api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe) when only the
-[`MEHPForceBalance2`](../../api/pylimer_tools_cpp.MEHPForceBalance2.html.md#pylimer_tools_cpp.MEHPForceBalance2) modulus is needed.
+[`MEHPSimulator`](../../api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator) modulus is needed.
 
 Below we build a small PDMS-like network and run both paths side by side.
 Multi-seed scaling and ensemble plots in the following sections load precomputed
 benchmark data (recomputable via `--recompute` or
 `PYLIMER_RECOMPUTE_CACHE=1`).
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 72-110 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 72-117 -->
 ```Python
 gen = pt.MCUniverseGenerator(18.0, 18.0, 18.0)
 gen.set_seed(42)
@@ -93,6 +93,9 @@ gen.add_strands(200, [50] * 200)
 gen.add_crosslinkers(100, 4)
 gen.link_strands_to_conversion(0.92)
 
+linear_cfg = pt.MEHPLinearSolverConfig()
+linear_cfg.simplification_mode = pt.StructureSimplificationMode.INACTIVE_THEN_X2F
+
 # 1. On-demand (Universe-free, O(N_strands) memory)
 es_od = gen.sample_entanglements(
     nr_of_entanglements_to_sample=300,
@@ -100,8 +103,10 @@ es_od = gen.sample_entanglements(
     seed="demo",
     filtering_mode=pt.EntanglementFilteringMode.OMIT_INACTIVE,
 )
-fb_od = gen.get_force_balance2(es_od)
-fb_od.run_force_relaxation(pt.StructureSimplificationMode.INACTIVE_THEN_X2F)
+fb_od = gen.get_mehp_simulator(
+    es_od, entanglement_mode=pt.EntanglementMode.MERGED_LINKS
+)
+fb_od.run(linear_cfg)
 
 # 2. Discrete (explicit Universe, O(N_atoms) memory)
 universe = gen.get_universe()
@@ -112,8 +117,10 @@ ents_disc = pt.randomly_sample_entanglements(
     seed="demo",
     filtering_mode=pt.EntanglementFilteringMode.OMIT_INACTIVE,
 )
-fb_disc = pt.MEHPForceBalance2(universe, ents_disc)
-fb_disc.run_force_relaxation(pt.StructureSimplificationMode.INACTIVE_THEN_X2F)
+fb_disc = pt.MEHPSimulator(
+    universe, ents_disc, entanglement_mode=pt.EntanglementMode.MERGED_LINKS
+)
+fb_disc.run(linear_cfg)
 
 print(f"On-demand links: {len(es_od)}, Discrete links: {len(ents_disc.pairs_of_atoms)}")
 
@@ -128,7 +135,7 @@ On-demand links: 226, Discrete links: 234
 Loading cached example data from entanglement_sampling_comparison_cache.npz...
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 111-116 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 118-123 -->
 
 ## Memory Footprint & Runtime Scaling
 
@@ -136,13 +143,13 @@ Explicit bead generation inflates peak resident memory (RSS) due to bead coordin
 neighbor search structures, and igraph graphs. On-demand bounding-box sampling keeps memory
 nearly flat while also running faster on large networks.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 116-120 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 123-127 -->
 ```Python
 plot_sampling_memory_scaling(data)
 plot_sampling_runtime_scaling(data)
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 121-127 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 128-134 -->
 
 ## Strand-Length Scaling & Phase Breakdown
 
@@ -151,13 +158,13 @@ between $O(N_{\text{strands}})$ and $O(N_{\text{atoms}})$ work. The phase breakd
 isolates where discrete sampling spends its time (`get_universe`,
 sampling, and graph build).
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 127-131 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 134-138 -->
 ```Python
 plot_sampling_strand_length_scaling(data)
 plot_sampling_phase_breakdown(data)
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 132-137 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 139-144 -->
 
 ## Conformational Distributions ($\alpha$ and $r$)
 
@@ -165,12 +172,12 @@ Because on-demand sampling regenerates exact discrete bead paths inside candidat
 both contour positions $\alpha$ (uniform) and spatial pair separations $r$
 ($\propto r^2$) match discrete sampling.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 137-140 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 144-147 -->
 ```Python
 plot_sampling_distributions(data)
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 141-152 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 148-159 -->
 
 ## Defective Networks Across Conversion ($p \in [0.75, 1.00]$)
 
@@ -184,12 +191,12 @@ Below full conversion, dangling chains and sol fractions must be handled consist
   effective entanglement density when nominal $N_{\text{ent}}$ is
   fixed per total volume).
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 152-155 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 159-162 -->
 ```Python
 plot_sampling_conversion_sweep(data)
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 156-161 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 163-168 -->
 
 ## Benchmark Hardware
 
@@ -197,7 +204,7 @@ plot_sampling_conversion_sweep(data)
 The cached memory and runtime benchmarks above were recorded on the
 hardware reported below.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 161-162 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 168-169 -->
 ```Python
 print(format_benchmark_footnote(data))
 ```
@@ -206,7 +213,7 @@ print(format_benchmark_footnote(data))
 Measured on: Apple M3 Pro (12 cores), 36 GB RAM, Mac15,7, macOS 27.2.1 (arm64), Python 3.13.18 (cached 2026-11-17).
 ```
 
-**Total running time of the script:** (0 minutes 1.237 seconds)
+**Total running time of the script:** (0 minutes 1.069 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-entanglement-sampling-comparison-py"></a>
 

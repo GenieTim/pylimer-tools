@@ -1,0 +1,31 @@
+MEHPNonlinearSolverConfig
+=========================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: MEHPNonlinearSolverConfig
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~MEHPNonlinearSolverConfig.algorithm
+      ~MEHPNonlinearSolverConfig.ftol
+      ~MEHPNonlinearSolverConfig.inactive_removal_cutoff
+      ~MEHPNonlinearSolverConfig.max_nr_of_steps
+      ~MEHPNonlinearSolverConfig.simplification_mode
+      ~MEHPNonlinearSolverConfig.slip_mode
+      ~MEHPNonlinearSolverConfig.spring_breaking_length
+      ~MEHPNonlinearSolverConfig.xtol
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: algorithm
+   .. autoattribute:: ftol
+   .. autoattribute:: inactive_removal_cutoff
+   .. autoattribute:: max_nr_of_steps
+   .. autoattribute:: simplification_mode
+   .. autoattribute:: slip_mode
+   .. autoattribute:: spring_breaking_length
+   .. autoattribute:: xtol

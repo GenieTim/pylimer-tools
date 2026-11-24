@@ -12,15 +12,18 @@ to download the full example code.
 
 # Slipping vs. Fixed Entanglement Links
 
-In [`MEHPForceBalance`](../../api/pylimer_tools_cpp.MEHPForceBalance.md#pylimer_tools_cpp.MEHPForceBalance) (Gusev [[Gus19](../../acknowledgements.md#id8)], Bernhard and Gusev [[BG25](../../acknowledgements.md#id12)]),
-entanglement links can either remain frozen at their initial contour positions (`disable_slipping=True`)
-or slide dynamically along the polymer strands to balance contour tension (`disable_slipping=False`).
+In [`MEHPSimulator`](../../api/pylimer_tools_cpp.MEHPSimulator.md#pylimer_tools_cpp.MEHPSimulator) (Gusev [[Gus19](../../acknowledgements.md#id8)], Bernhard and Gusev [[BG25](../../acknowledgements.md#id12)])
+with [`SlipLinkRelaxationSolver`](../../api/pylimer_tools_cpp.SlipLinkRelaxationSolver.md#pylimer_tools_cpp.SlipLinkRelaxationSolver) ([`MEHPSlipLinkSolverConfig`](../../api/pylimer_tools_cpp.MEHPSlipLinkSolverConfig.md#pylimer_tools_cpp.MEHPSlipLinkSolverConfig)),
+entanglement links can either remain frozen at their initial contour positions
+([`FIXED`](../../api/pylimer_tools_cpp.SlipMode.md#pylimer_tools_cpp.SlipMode.FIXED)) or slide dynamically along the polymer
+strands to balance contour tension ([`SLIDING`](../../api/pylimer_tools_cpp.SlipMode.md#pylimer_tools_cpp.SlipMode.SLIDING)).
 
 Dynamic contour slipping artificially softens the network modulus by relaxing affine tension
-and increases solver iterations 2–3x. Consequently, [`MEHPForceBalance2`](../../api/pylimer_tools_cpp.MEHPForceBalance2.md#pylimer_tools_cpp.MEHPForceBalance2)
-fixes entanglement positions by design.
+and increases solver iterations 2–3x. Consequently, [`LinearSystemMEHPSolver`](../../api/pylimer_tools_cpp.LinearSystemMEHPSolver.md#pylimer_tools_cpp.LinearSystemMEHPSolver)
+(and [`NonlinearOptimizationSolver`](../../api/pylimer_tools_cpp.NonlinearOptimizationSolver.md#pylimer_tools_cpp.NonlinearOptimizationSolver)) require [`FIXED`](../../api/pylimer_tools_cpp.SlipMode.md#pylimer_tools_cpp.SlipMode.FIXED)
+by design.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 13-32 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 16-35 -->
 ```Python
 from pathlib import Path
 import sys
@@ -41,15 +44,15 @@ from _study_runners import run_slipping_vs_fixed_simulation  # noqa: E402
 import pylimer_tools_cpp as pt  # noqa: E402
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 33-38 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 36-41 -->
 
-## Toggling Dynamic Slipping in `MEHPForceBalance`
+## Toggling Dynamic Slipping in `MEHPSimulator`
 
-On a generated network, `disable_slipping=True` freezes the sampled contour fractions,
-whereas `disable_slipping=False` updates them iteratively during force
-relaxation.
+On a generated network, `SlipMode.FIXED` freezes the sampled contour fractions,
+whereas `SlipMode.SLIDING` updates them iteratively during force
+relaxation via [`MEHPSlipLinkSolverConfig`](../../api/pylimer_tools_cpp.MEHPSlipLinkSolverConfig.md#pylimer_tools_cpp.MEHPSlipLinkSolverConfig).
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 38-67 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 41-80 -->
 ```Python
 gen = pt.MCUniverseGenerator(18.0, 18.0, 18.0)
 gen.set_seed(42)
@@ -65,11 +68,21 @@ es = gen.sample_entanglements(
     filtering_mode=pt.EntanglementFilteringMode.OMIT_INACTIVE,
 )
 
-fb_fixed = gen.get_force_balance(es)
-fb_fixed.run_force_relaxation(max_nr_of_steps=5000, disable_slipping=True)
+fixed_cfg = pt.MEHPSlipLinkSolverConfig()
+fixed_cfg.max_nr_of_steps = 5000
+fixed_cfg.slip_mode = pt.SlipMode.FIXED
 
-fb_slip = gen.get_force_balance(es)
-fb_slip.run_force_relaxation(max_nr_of_steps=5000, disable_slipping=False)
+fb_fixed = gen.get_mehp_simulator(
+    es, entanglement_mode=pt.EntanglementMode.MERGED_LINKS
+)
+fb_fixed.run(fixed_cfg)
+
+slip_cfg = pt.MEHPSlipLinkSolverConfig()
+slip_cfg.max_nr_of_steps = 5000
+slip_cfg.slip_mode = pt.SlipMode.SLIDING
+
+fb_slip = gen.get_mehp_simulator(es, entanglement_mode=pt.EntanglementMode.MERGED_LINKS)
+fb_slip.run(slip_cfg)
 
 print(
     f"Iterations — fixed: {fb_fixed.get_nr_of_iterations()}, "
@@ -81,11 +94,11 @@ data = load_or_compute_cache(cache_path, run_slipping_vs_fixed_simulation)
 ```
 
 ```none
-Iterations — fixed: 300, slipping: 941
+Iterations — fixed: 512, slipping: 2350
 Loading cached example data from slipping_vs_fixed_cache.npz...
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 68-73 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 81-86 -->
 
 ## Modulus Reduction & Convergence Cost
 
@@ -93,13 +106,13 @@ Multi-seed ensemble results (95% confidence intervals) confirm that dynamic slip
 the predicted shear modulus by ~30–40% at high entanglement densities while requiring 2–3x more
 relaxation iterations.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 73-76 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 86-89 -->
 ```Python
 plot_slipping_vs_fixed_modulus(data)
 plot_slipping_vs_fixed_iterations(data)
 ```
 
-**Total running time of the script:** (0 minutes 0.343 seconds)
+**Total running time of the script:** (0 minutes 0.403 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-slipping-vs-fixed-links-py"></a>
 

@@ -12,11 +12,11 @@ to download the full example code.
 
 # Deformation Experiment
 
-This example shows how to use the MEHPForceBalance2 class in a deformation experiment.
+This example shows how to use the MEHPSimulator class in a deformation experiment.
 
 It also shows, that deformation is an equivalent method to the $\Gamma$ factor to obtain the modulus.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 9-137 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 9-141 -->
 ```Python
 import copy
 from pathlib import Path
@@ -32,7 +32,13 @@ from pylimer_tools.io.bead_spring_parameter_provider import (
     get_parameters_for_polymer,
 )
 from pylimer_tools.io.read_lammps_output_file import read_data_file
-from pylimer_tools_cpp import Box, MEHPForceBalance2, Universe
+from pylimer_tools_cpp import (
+    Box,
+    EntanglementMode,
+    MEHPLinearSolverConfig,
+    MEHPSimulator,
+    Universe,
+)
 
 # Get parameters for conversion factors
 params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
@@ -57,20 +63,18 @@ universe = read_data_file(
 )
 assert isinstance(universe, Universe)
 
-# 2. MEHPForceBalance2: Hookean springs with fixed entanglement links
-mehp_fb = MEHPForceBalance2(
+# Hookean springs with fixed entanglement links
+mehp_fb = MEHPSimulator.construct_with_random_entanglements(
     universe,
     nr_of_entanglements_to_sample=int(
         params.get_entanglement_density() * universe.get_volume()
     ),
     upper_sampling_cutoff=params.get_sampling_cutoff(),
-    entanglements_as_springs=False,
+    entanglement_mode=EntanglementMode.MERGED_LINKS,
 )
-mehp_fb.run_force_relaxation()
+mehp_fb.run(MEHPLinearSolverConfig())
 
-print(
-    "Final residual (should be close to 0):", mehp_fb.get_displacement_residual_norm()
-)
+print("Final residual (should be close to 0):", mehp_fb.get_residual_norm())
 
 # apply conversion factors, measure resulting shear modulus
 r02_slope = params.get("R02")
@@ -112,7 +116,7 @@ for lmbda in lmbdas:
         assert math.isclose(box_0.get_volume(), new_box.get_volume())
         mehp_fb.deform_to(new_box)
 
-        mehp_fb.run_force_relaxation()
+        mehp_fb.run(MEHPLinearSolverConfig())
 
         stress_tensor = mehp_fb.get_stress_tensor()
 
@@ -147,17 +151,17 @@ plt.show()
 ```
 
 ```none
-Final residual (should be close to 0): 2.498259704732998e-08
-Shear Modulus from Equilibrium [MPa]:  0.02974606553785756
+Final residual (should be close to 0): 3.136663882021073e-10
+Shear Modulus from Equilibrium [MPa]:  0.2646243043002573
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 138-141 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 142-145 -->
 
 Rather than using the nominal stress, you can also use the
 stress tensor directly to compute the shear modulus.
 Therewith, you could try to investigate e.g. the Mooney-Rivlin behaviour.
 
-**Total running time of the script:** (0 minutes 0.202 seconds)
+**Total running time of the script:** (0 minutes 0.175 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-fb-deformation-exp-py"></a>
 

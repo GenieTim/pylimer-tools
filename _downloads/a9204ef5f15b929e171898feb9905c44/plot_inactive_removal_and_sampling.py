@@ -3,7 +3,7 @@ Inactive Removal & Sampling
 ===========================
 
 Networks below full conversion contain **dangling chains**, **sol fractions**, and **loops**.
-In :class:`~pylimer_tools_cpp.MEHPForceBalance2`, entanglements do not slip off chain ends,
+In :class:`~pylimer_tools_cpp.MEHPSimulator` with fixed entanglements, links do not slip off chain ends,
 so two complementary controls prevent dangling arms from artificially stiffening the network:
 
 1. **Sampling-time topological filtering** (:class:`~pylimer_tools_cpp.EntanglementFilteringMode`):
@@ -52,8 +52,12 @@ gen.link_strands_to_conversion(0.80)
 es_unfilt = gen.sample_entanglements(
     250, upper_cutoff=2.6, seed="demo", filtering_mode=pt.EntanglementFilteringMode.NONE
 )
-fb_naive = gen.get_force_balance2(es_unfilt)
-fb_naive.run_force_relaxation(pt.StructureSimplificationMode.NO_SIMPLIFICATION)
+fb_naive = gen.get_mehp_simulator(es_unfilt)
+fb_naive.run(
+    pt.MEHPLinearSolverConfig(
+        simplification_mode=pt.StructureSimplificationMode.NO_SIMPLIFICATION
+    )
+)
 
 es_filt = gen.sample_entanglements(
     250,
@@ -61,8 +65,12 @@ es_filt = gen.sample_entanglements(
     seed="demo",
     filtering_mode=pt.EntanglementFilteringMode.OMIT_INACTIVE,
 )
-fb_clean = gen.get_force_balance2(es_filt)
-fb_clean.run_force_relaxation(pt.StructureSimplificationMode.INACTIVE_THEN_X2F)
+fb_clean = gen.get_mehp_simulator(es_filt)
+fb_clean.run(
+    pt.MEHPLinearSolverConfig(
+        simplification_mode=pt.StructureSimplificationMode.INACTIVE_THEN_X2F
+    )
+)
 
 print(
     f"Springs — naive: {fb_naive.get_nr_of_springs()}, "

@@ -1,0 +1,31 @@
+HookeanForceEvaluator
+=====================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: HookeanForceEvaluator
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~HookeanForceEvaluator.evaluate_network_energy_and_gradient
+      ~HookeanForceEvaluator.evaluate_spring_energy
+      ~HookeanForceEvaluator.evaluate_spring_force
+      ~HookeanForceEvaluator.evaluate_spring_stiffness
+      ~HookeanForceEvaluator.evaluate_stress_contribution
+      ~HookeanForceEvaluator.evaluate_stress_tensor
+      ~HookeanForceEvaluator.get_kappa
+      ~HookeanForceEvaluator.is_linear
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: evaluate_network_energy_and_gradient
+   .. automethod:: evaluate_spring_energy
+   .. automethod:: evaluate_spring_force
+   .. automethod:: evaluate_spring_stiffness
+   .. automethod:: evaluate_stress_contribution
+   .. automethod:: evaluate_stress_tensor
+   .. automethod:: get_kappa
+   .. automethod:: is_linear

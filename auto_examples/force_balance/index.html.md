@@ -2,14 +2,14 @@
 
 # Force Balance, Maximum Entropy Homogenization Procedures
 
-pylimer-tools provides three implementations of the Force Balance [[BG25](../../acknowledgements.html.md#id12)], Maximum Entropy Homogenization Procedure (MEHP) [[Gus19](../../acknowledgements.html.md#id8)] to reduce polymer networks to their minimum energy, maximum entropy homogenized state.
+pylimer-tools provides a unified implementation of the Force Balance [[BG25](../../acknowledgements.html.md#id12)], Maximum Entropy Homogenization Procedure (MEHP) [[Gus19](../../acknowledgements.html.md#id8)] to reduce polymer networks to their minimum energy, maximum entropy homogenized state.
 This is useful for predicting the (phantom) equilibrium shear modulus of the network.
 
-Here, we distinguish the following three different implementations:
+The unified architecture coordinates a canonical [`MEHPNetwork`](../../api/pylimer_tools_cpp.MEHPNetwork.html.md#pylimer_tools_cpp.MEHPNetwork) (supporting phantom networks, fixed merged entanglement links via [`MERGED_LINKS`](../../api/pylimer_tools_cpp.EntanglementMode.html.md#pylimer_tools_cpp.EntanglementMode.MERGED_LINKS), and compliant coupling springs via [`SPRING`](../../api/pylimer_tools_cpp.EntanglementMode.html.md#pylimer_tools_cpp.EntanglementMode.SPRING)), a stateless [`MEHPForceEvaluator`](../../api/pylimer_tools_cpp.MEHPForceEvaluator.html.md#pylimer_tools_cpp.MEHPForceEvaluator) ([`HookeanForceEvaluator`](../../api/pylimer_tools_cpp.HookeanForceEvaluator.html.md#pylimer_tools_cpp.HookeanForceEvaluator), [`NonGaussianSpringForceEvaluator`](../../api/pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html.md#pylimer_tools_cpp.NonGaussianSpringForceEvaluator), or custom Python subclasses), and interchangeable [`MEHPSolver`](../../api/pylimer_tools_cpp.MEHPSolver.html.md#pylimer_tools_cpp.MEHPSolver) strategies inside [`MEHPSimulator`](../../api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator):
 
-- [`MEHPForceRelaxation`](../../api/pylimer_tools_cpp.MEHPForceRelaxation.html.md#pylimer_tools_cpp.MEHPForceRelaxation): An MEHP implementation that allows the use of non-linear force potentials,
-- [`MEHPForceBalance`](../../api/pylimer_tools_cpp.MEHPForceBalance.html.md#pylimer_tools_cpp.MEHPForceBalance): A Force Balance implementation using Hookean springs that supports slip-links with optional dynamic contour slipping (or fixed links via `disable_slipping=True`),
-- [`MEHPForceBalance2`](../../api/pylimer_tools_cpp.MEHPForceBalance2.html.md#pylimer_tools_cpp.MEHPForceBalance2): The faster implementation of the Force Balance procedure, representing entanglements as fixed 4-functional links (like tetrafunctional crosslinks) or compliant Hookean springs, without contour slipping.
+- [`LinearSystemMEHPSolver`](../../api/pylimer_tools_cpp.LinearSystemMEHPSolver.html.md#pylimer_tools_cpp.LinearSystemMEHPSolver) ([`MEHPLinearSolverConfig`](../../api/pylimer_tools_cpp.MEHPLinearSolverConfig.html.md#pylimer_tools_cpp.MEHPLinearSolverConfig)): The fastest solver for linear Hookean networks with fixed entanglement links ([`FIXED`](../../api/pylimer_tools_cpp.SlipMode.html.md#pylimer_tools_cpp.SlipMode.FIXED)) or springs, assembling and solving a sparse graph-Laplacian linear system (including optional GPU Metal backends).
+- [`SlipLinkRelaxationSolver`](../../api/pylimer_tools_cpp.SlipLinkRelaxationSolver.html.md#pylimer_tools_cpp.SlipLinkRelaxationSolver) ([`MEHPSlipLinkSolverConfig`](../../api/pylimer_tools_cpp.MEHPSlipLinkSolverConfig.html.md#pylimer_tools_cpp.MEHPSlipLinkSolverConfig)): An iterative alternating coordinate and contour-partition relaxation solver for Hookean networks that supports dynamic contour slipping ([`SLIDING`](../../api/pylimer_tools_cpp.SlipMode.html.md#pylimer_tools_cpp.SlipMode.SLIDING)) and slip-link swapping as well as fixed links ([`FIXED`](../../api/pylimer_tools_cpp.SlipMode.html.md#pylimer_tools_cpp.SlipMode.FIXED)).
+- [`NonlinearOptimizationSolver`](../../api/pylimer_tools_cpp.NonlinearOptimizationSolver.html.md#pylimer_tools_cpp.NonlinearOptimizationSolver) ([`MEHPNonlinearSolverConfig`](../../api/pylimer_tools_cpp.MEHPNonlinearSolverConfig.html.md#pylimer_tools_cpp.MEHPNonlinearSolverConfig)): A general NLopt-based energy minimization solver supporting linear and non-linear constitutive force potentials (e.g., [`NonGaussianSpringForceEvaluator`](../../api/pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html.md#pylimer_tools_cpp.NonGaussianSpringForceEvaluator) or custom Python [`MEHPForceEvaluator`](../../api/pylimer_tools_cpp.MEHPForceEvaluator.html.md#pylimer_tools_cpp.MEHPForceEvaluator) subclasses) on phantom and fixed-entanglement networks.
 
 ## Sampling Entanglements
 
@@ -23,24 +23,19 @@ Both methods support [`EntanglementFilteringMode`](../../api/pylimer_tools_cpp.E
 See:
 
 - [Entanglement Sampling Methods](plot_entanglement_sampling_comparison.html.md) for a detailed benchmark and comparison of discrete vs. on-demand sampling methods,
-- [Entanglement Links vs. Springs](plot_entanglement_link_vs_spring.html.md) for the difference between modeling entanglements as rigid merged links versus compliant Hookean springs in Force Balance 2,
-- [Slipping vs. Fixed Entanglement Links](plot_slipping_vs_fixed_links.html.md) for a comparison of dynamic contour slipping versus fixed entanglement links in Force Balance 1, and
-- [Inactive Removal & Sampling](plot_inactive_removal_and_sampling.html.md) for the removal of inactive strands/entanglements in Force Balance 2 and the impact of pre-filtering dangling chains during entanglement sampling,
+- [Entanglement Links vs. Springs](plot_entanglement_link_vs_spring.html.md) for the difference between modeling entanglements as rigid merged links ([`MERGED_LINKS`](../../api/pylimer_tools_cpp.EntanglementMode.html.md#pylimer_tools_cpp.EntanglementMode.MERGED_LINKS)) versus compliant Hookean springs ([`SPRING`](../../api/pylimer_tools_cpp.EntanglementMode.html.md#pylimer_tools_cpp.EntanglementMode.SPRING)),
+- [Slipping vs. Fixed Entanglement Links](plot_slipping_vs_fixed_links.html.md) for a comparison of dynamic contour slipping ([`SLIDING`](../../api/pylimer_tools_cpp.SlipMode.html.md#pylimer_tools_cpp.SlipMode.SLIDING)) versus fixed entanglement links ([`FIXED`](../../api/pylimer_tools_cpp.SlipMode.html.md#pylimer_tools_cpp.SlipMode.FIXED)) using [`SlipLinkRelaxationSolver`](../../api/pylimer_tools_cpp.SlipLinkRelaxationSolver.html.md#pylimer_tools_cpp.SlipLinkRelaxationSolver),
+- [Inactive Removal & Sampling](plot_inactive_removal_and_sampling.html.md) for the removal of inactive strands/entanglements via [`StructureSimplificationMode`](../../api/pylimer_tools_cpp.StructureSimplificationMode.html.md#pylimer_tools_cpp.StructureSimplificationMode) and the impact of pre-filtering dangling chains during entanglement sampling,
 - [Polydispersity Study](plot_polydispersity_study.html.md) for the effect of precursor strand length polydispersity on equilibrium shear modulus and defect fractions,
-- [Sampling Cut-Off Effect](plot_sampling_cutoff_effect.html.md) for the effect of the slip-link sampling cut-off distance on the equilibrium shear modulus in Force Balance 2, investigating pre-strain distortions, link vs. spring representations, and interactions with strand length $N$, conversion $p$, and stoichiometric imbalance $r$, and
+- [Sampling Cut-Off Effect](plot_sampling_cutoff_effect.html.md) for the effect of the slip-link sampling cut-off distance on the equilibrium shear modulus, investigating pre-strain distortions, link vs. spring representations, and interactions with strand length $N$, conversion $p$, and stoichiometric imbalance $r$, and
 - [Representative Volume Study for PDMS Networks](plot_representative_volume_pdms.html.md) for a representative volume element (RVE) study of realistic PDMS networks across chain length $N$, conversion $p$, stoichiometric imbalance $r$, and ensemble sample count.
 
 <div id='sg-tag-list' class='sphx-glr-tag-list'></div><div class="sphx-glr-thumbnails">
-<!-- thumbnail-parent-div-open --><div class="sphx-glr-thumbcontainer" tooltip="In MEHPForceBalance2 (gusev_numerical_2019, bernhard_phantom_2025), users can choose between two representations for sampled entanglements via entanglements_as_springs:">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_entanglement_link_vs_spring_thumb.png)
+<!-- thumbnail-parent-div-open --><div class="sphx-glr-thumbcontainer" tooltip="In MEHPSimulator with LinearSystemMEHPSolver (gusev_numerical_2019, bernhard_phantom_2025), users can choose between two representations for sampled entanglements via entanglement_mode:">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_entanglement_link_vs_spring_thumb.png)
 
 [Entanglement Links vs. Springs](plot_entanglement_link_vs_spring.html.md)
 
   <div class="sphx-glr-thumbnail-title">Entanglement Links vs. Springs</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="In MEHPForceBalance (gusev_numerical_2019, bernhard_phantom_2025), entanglement links can either remain frozen at their initial contour positions (\`\`disable_slipping=True\`\`) or slide dynamically along the polymer strands to balance contour tension (\`\`disable_slipping=False\`\`).">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_slipping_vs_fixed_links_thumb.png)
-
-[Slipping vs. Fixed Entanglement Links](plot_slipping_vs_fixed_links.html.md)
-
-  <div class="sphx-glr-thumbnail-title">Slipping vs. Fixed Entanglement Links</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="In this example, we study the effect of precursor strand length polydispersity on the equilibrium shear modulus and topological network structure of end-linked polymer networks (tsimouri_monte_2021, bernhard_phantom_2025).">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_polydispersity_study_thumb.png)
 
 [Polydispersity Study](plot_polydispersity_study.html.md)
@@ -51,7 +46,12 @@ See:
 [Sampling Cut-Off Effect](plot_sampling_cutoff_effect.html.md)
 
   <div class="sphx-glr-thumbnail-title">Sampling Cut-Off Effect</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="Networks below full conversion contain dangling chains, sol fractions, and loops. In MEHPForceBalance2, entanglements do not slip off chain ends, so two complementary controls prevent dangling arms from artificially stiffening the network:">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_inactive_removal_and_sampling_thumb.png)
+</div><div class="sphx-glr-thumbcontainer" tooltip="In MEHPSimulator (gusev_numerical_2019, bernhard_phantom_2025) with SlipLinkRelaxationSolver (~pylimer_tools_cpp.MEHPSlipLinkSolverConfig), entanglement links can either remain frozen at their initial contour positions (~pylimer_tools_cpp.SlipMode.FIXED) or slide dynamically along the polymer strands to balance contour tension (~pylimer_tools_cpp.SlipMode.SLIDING).">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_slipping_vs_fixed_links_thumb.png)
+
+[Slipping vs. Fixed Entanglement Links](plot_slipping_vs_fixed_links.html.md)
+
+  <div class="sphx-glr-thumbnail-title">Slipping vs. Fixed Entanglement Links</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Networks below full conversion contain dangling chains, sol fractions, and loops. In MEHPSimulator with fixed entanglements, links do not slip off chain ends, so two complementary controls prevent dangling arms from artificially stiffening the network:">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_inactive_removal_and_sampling_thumb.png)
 
 [Inactive Removal & Sampling](plot_inactive_removal_and_sampling.html.md)
 
@@ -61,12 +61,12 @@ See:
 [Entanglement Sampling Methods](plot_entanglement_sampling_comparison.html.md)
 
   <div class="sphx-glr-thumbnail-title">Entanglement Sampling Methods</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="When predicting the equilibrium shear modulus G of polymer networks via Monte Carlo network generation (~pylimer_tools_cpp.MCUniverseGenerator), on-demand entanglement sampling (~pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements), and MEHPForceBalance2, the simulation box must be large enough to act as a Representative Volume Element (RVE)—avoiding both finite-size bias (e.g. periodic self-looping or insufficient topological sampling) and excessive sample-to-sample variance.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_representative_volume_pdms_thumb.png)
+</div><div class="sphx-glr-thumbcontainer" tooltip="When predicting the equilibrium shear modulus G of polymer networks via Monte Carlo network generation (~pylimer_tools_cpp.MCUniverseGenerator), on-demand entanglement sampling (~pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements), and MEHPSimulator (~pylimer_tools_cpp.LinearSystemMEHPSolver), the simulation box must be large enough to act as a Representative Volume Element (RVE)—avoiding both finite-size bias (e.g. periodic self-looping or insufficient topological sampling) and excessive sample-to-sample variance.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_representative_volume_pdms_thumb.png)
 
 [Representative Volume Study for PDMS Networks](plot_representative_volume_pdms.html.md)
 
   <div class="sphx-glr-thumbnail-title">Representative Volume Study for PDMS Networks</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="This example shows how to use the MEHPForceBalance2 class in a deformation experiment.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_fb_deformation_exp_thumb.png)
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example shows how to use the MEHPSimulator class in a deformation experiment.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_fb_deformation_exp_thumb.png)
 
 [Deformation Experiment](plot_fb_deformation_exp.html.md)
 
@@ -76,15 +76,15 @@ See:
 [Force Balance](plot_force_balance.html.md)
 
   <div class="sphx-glr-thumbnail-title">Force Balance</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="MEHPForceBalance2 is a modernized, high-performance implementation of the Maximum Entropy Homogenization Procedure (MEHP) (gusev_numerical_2019, bernhard_phantom_2025).">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_force_balance_2_thumb.png)
-
-[Force Balance 2](plot_force_balance_2.html.md)
-
-  <div class="sphx-glr-thumbnail-title">Force Balance 2</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the &quot;original&quot; MEHP implementation (see gusev_numerical_2019) without slip-links or entanglements.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_force_relaxation_thumb.png)
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the unified MEHPSimulator with interchangeable constitutive MEHPForceEvaluator models and MEHPSolver strategies (see gusev_numerical_2019) without slip-links or entanglements.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_force_relaxation_thumb.png)
 
 [MEHP Force Relaxation](plot_force_relaxation.html.md)
 
   <div class="sphx-glr-thumbnail-title">MEHP Force Relaxation</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="MEHPSimulator paired with LinearSystemMEHPSolver provides a high-performance implementation of the Maximum Entropy Homogenization Procedure (MEHP) (gusev_numerical_2019, bernhard_phantom_2025).">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_force_balance_2_thumb.png)
+
+[Force Balance 2](plot_force_balance_2.html.md)
+
+  <div class="sphx-glr-thumbnail-title">Force Balance 2</div>
 </div>
 <!-- thumbnail-parent-div-close --></div>

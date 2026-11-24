@@ -10,24 +10,34 @@ NonGaussianSpringForceEvaluator
 
    .. autosummary::
 
-      ~NonGaussianSpringForceEvaluator.is_2d
-      ~NonGaussianSpringForceEvaluator.network
+      ~NonGaussianSpringForceEvaluator.l
 
    .. rubric:: Methods Summary
 
    .. autosummary::
 
-      ~NonGaussianSpringForceEvaluator.evaluate_force_set_gradient
+      ~NonGaussianSpringForceEvaluator.evaluate_network_energy_and_gradient
+      ~NonGaussianSpringForceEvaluator.evaluate_spring_energy
+      ~NonGaussianSpringForceEvaluator.evaluate_spring_force
+      ~NonGaussianSpringForceEvaluator.evaluate_spring_stiffness
       ~NonGaussianSpringForceEvaluator.evaluate_stress_contribution
-      ~NonGaussianSpringForceEvaluator.prepare_for_evaluations
+      ~NonGaussianSpringForceEvaluator.evaluate_stress_tensor
+      ~NonGaussianSpringForceEvaluator.get_kappa
+      ~NonGaussianSpringForceEvaluator.get_segment_length
+      ~NonGaussianSpringForceEvaluator.is_linear
 
    .. rubric:: Attributes Documentation
 
-   .. autoattribute:: is_2d
-   .. autoattribute:: network
+   .. autoattribute:: l
 
    .. rubric:: Methods Documentation
 
-   .. automethod:: evaluate_force_set_gradient
+   .. automethod:: evaluate_network_energy_and_gradient
+   .. automethod:: evaluate_spring_energy
+   .. automethod:: evaluate_spring_force
+   .. automethod:: evaluate_spring_stiffness
    .. automethod:: evaluate_stress_contribution
-   .. automethod:: prepare_for_evaluations
+   .. automethod:: evaluate_stress_tensor
+   .. automethod:: get_kappa
+   .. automethod:: get_segment_length
+   .. automethod:: is_linear

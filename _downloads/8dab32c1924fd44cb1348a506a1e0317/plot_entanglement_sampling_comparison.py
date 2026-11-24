@@ -63,7 +63,7 @@ import pylimer_tools_cpp as pt  # noqa: E402
 # ----------------------------------------------
 # On-demand sampling is the default on :class:`~pylimer_tools_cpp.MCUniverseGenerator` and
 # avoids allocating the full :class:`~pylimer_tools_cpp.Universe` when only the
-# :class:`~pylimer_tools_cpp.MEHPForceBalance2` modulus is needed.
+# :class:`~pylimer_tools_cpp.MEHPSimulator` modulus is needed.
 #
 # Below we build a small PDMS-like network and run both paths side by side.
 # Multi-seed scaling and ensemble plots in the following sections load precomputed
@@ -78,6 +78,9 @@ gen.add_strands(200, [50] * 200)
 gen.add_crosslinkers(100, 4)
 gen.link_strands_to_conversion(0.92)
 
+linear_cfg = pt.MEHPLinearSolverConfig()
+linear_cfg.simplification_mode = pt.StructureSimplificationMode.INACTIVE_THEN_X2F
+
 # 1. On-demand (Universe-free, O(N_strands) memory)
 es_od = gen.sample_entanglements(
     nr_of_entanglements_to_sample=300,
@@ -85,8 +88,10 @@ es_od = gen.sample_entanglements(
     seed="demo",
     filtering_mode=pt.EntanglementFilteringMode.OMIT_INACTIVE,
 )
-fb_od = gen.get_force_balance2(es_od)
-fb_od.run_force_relaxation(pt.StructureSimplificationMode.INACTIVE_THEN_X2F)
+fb_od = gen.get_mehp_simulator(
+    es_od, entanglement_mode=pt.EntanglementMode.MERGED_LINKS
+)
+fb_od.run(linear_cfg)
 
 # 2. Discrete (explicit Universe, O(N_atoms) memory)
 universe = gen.get_universe()
@@ -97,8 +102,10 @@ ents_disc = pt.randomly_sample_entanglements(
     seed="demo",
     filtering_mode=pt.EntanglementFilteringMode.OMIT_INACTIVE,
 )
-fb_disc = pt.MEHPForceBalance2(universe, ents_disc)
-fb_disc.run_force_relaxation(pt.StructureSimplificationMode.INACTIVE_THEN_X2F)
+fb_disc = pt.MEHPSimulator(
+    universe, ents_disc, entanglement_mode=pt.EntanglementMode.MERGED_LINKS
+)
+fb_disc.run(linear_cfg)
 
 print(f"On-demand links: {len(es_od)}, Discrete links: {len(ents_disc.pairs_of_atoms)}")
 

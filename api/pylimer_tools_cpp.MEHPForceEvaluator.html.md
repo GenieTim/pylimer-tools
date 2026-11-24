@@ -4,81 +4,64 @@
 
 Bases: `pybind11_object`
 
-The base interface to change the way the force is evaluated during a MEHP run.
+Stateless constitutive model interface for evaluating spring energies, forces,
+stiffnesses, and virial stress tensors in MEHP networks.
 
 To create a custom force evaluator in Python, subclass this class and implement:
 
-- [`evaluate_force_set_gradient()`](#pylimer_tools_cpp.MEHPForceEvaluator.evaluate_force_set_gradient): Compute the force and optionally its gradient
-- [`evaluate_stress_contribution()`](#pylimer_tools_cpp.MEHPForceEvaluator.evaluate_stress_contribution): Compute stress tensor contributions
-- [`prepare_for_evaluations()`](#pylimer_tools_cpp.MEHPForceEvaluator.prepare_for_evaluations): Prepare for a batch of evaluations
-
-### Attributes Summary
-
-| [`is_2d`](#pylimer_tools_cpp.MEHPForceEvaluator.is_2d)   |    |
-|----------------------------------------------------------|----|
-| [`network`](#pylimer_tools_cpp.MEHPForceEvaluator.network) |    |
+- [`evaluate_spring_energy()`](#pylimer_tools_cpp.MEHPForceEvaluator.evaluate_spring_energy): Compute strain energy for one spring
+- [`evaluate_spring_force()`](#pylimer_tools_cpp.MEHPForceEvaluator.evaluate_spring_force): Compute force vector for one spring
 
 ### Methods Summary
 
-| [`evaluate_force_set_gradient`](#pylimer_tools_cpp.MEHPForceEvaluator.evaluate_force_set_gradient)(self, n, ...[, ...])   | Evaluate the force and optionally compute its gradient.   |
-|-----------------------------------------------------------------------------------------------------|-----------------------------------------------------------|
-| [`evaluate_stress_contribution`](#pylimer_tools_cpp.MEHPForceEvaluator.evaluate_stress_contribution)(self, ...)            | Evaluate the stress-contribution for a single spring.     |
-| [`prepare_for_evaluations`](#pylimer_tools_cpp.MEHPForceEvaluator.prepare_for_evaluations)(self)                      | Prepare the evaluator for a series of evaluations.        |
-
-### Attributes Documentation
-
-#### is_2d
-
-#### network
+| [`evaluate_network_energy_and_gradient`](#pylimer_tools_cpp.MEHPForceEvaluator.evaluate_network_energy_and_gradient)(self, ...)   | Evaluate total network elastic energy and optional link gradient.           |
+|----------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------|
+| [`evaluate_spring_energy`](#pylimer_tools_cpp.MEHPForceEvaluator.evaluate_spring_energy)(self, spring_vec, ...)     | Evaluate strain energy of a single spring.                                  |
+| [`evaluate_spring_force`](#pylimer_tools_cpp.MEHPForceEvaluator.evaluate_spring_force)(self, spring_vec, ...)      | Evaluate spring force vector dE/d(spring_vec) for a single spring.          |
+| [`evaluate_spring_stiffness`](#pylimer_tools_cpp.MEHPForceEvaluator.evaluate_spring_stiffness)(self, spring_vec, ...)  | Evaluate 3x3 tangent stiffness matrix dF/d(spring_vec) for a single spring. |
+| [`evaluate_stress_contribution`](#pylimer_tools_cpp.MEHPForceEvaluator.evaluate_stress_contribution)(self, ...)           | Evaluate the (i, j) virial stress contribution of a single spring.          |
+| [`evaluate_stress_tensor`](#pylimer_tools_cpp.MEHPForceEvaluator.evaluate_stress_tensor)(self, net, ...[, is_2d])   | Evaluate the 3x3 virial stress tensor for the network.                      |
+| [`get_kappa`](#pylimer_tools_cpp.MEHPForceEvaluator.get_kappa)(self)                                   | Return the spring stiffness parameter kappa.                                |
+| [`is_linear`](#pylimer_tools_cpp.MEHPForceEvaluator.is_linear)(self)                                   | Indicate whether the constitutive force law is linear in displacement.      |
 
 ### Methods Documentation
 
-#### evaluate_force_set_gradient(self: [pylimer_tools_cpp.MEHPForceEvaluator](#pylimer_tools_cpp.MEHPForceEvaluator), n: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), spring_distances: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], compute_gradient: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)
+#### evaluate_network_energy_and_gradient(self: [pylimer_tools_cpp.MEHPForceEvaluator](#pylimer_tools_cpp.MEHPForceEvaluator), net: [pylimer_tools_cpp.MEHPNetwork](pylimer_tools_cpp.MEHPNetwork.html.md#pylimer_tools_cpp.MEHPNetwork), spring_vectors: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], is_2d: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False, compute_gradient: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)
 
-Evaluate the force and optionally compute its gradient.
-
-This is one of the primary methods to override when creating a
-custom force evaluator. Override this in Python by defining a method
-that returns a tuple of (force, gradient).
+Evaluate total network elastic energy and optional link gradient.
 
 * **Parameters:**
-  * **n** – The dimensionality of the problem (the number of coordinates)
-  * **spring_distances** – The sequential (x, y, z) spring distances as a vector
-  * **compute_gradient** – If True, the gradient should be computed and returned
+  * **net** – Network topology and contour lengths.
+  * **spring_vectors** – Flattened spring vectors (size 3 \* nr_of_springs).
+  * **is_2d** – If True, treat the system as planar (ignore z components).
+  * **compute_gradient** – If True, compute and return link gradient ndarray.
 * **Returns:**
-  A tuple (force, gradient) where:
-  - force: The computed force value (float)
-  - gradient: The gradient as a list (or None if compute_gradient was False)
+  Tuple (energy, gradient_or_none).
 
-Example implementation in Python:
+#### evaluate_spring_energy(self: [pylimer_tools_cpp.MEHPForceEvaluator](#pylimer_tools_cpp.MEHPForceEvaluator), spring_vec: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[3, 1]'], contour_length: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
-```default
-def evaluate_force_set_gradient(self, n, spring_distances, compute_gradient):
-    force = 0.0
-    # ... compute force ...
+Evaluate strain energy of a single spring.
 
-    gradient = None
-    if compute_gradient:
-        gradient = [0.0] * n
-        # ... compute gradient ...
+#### evaluate_spring_force(self: [pylimer_tools_cpp.MEHPForceEvaluator](#pylimer_tools_cpp.MEHPForceEvaluator), spring_vec: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[3, 1]'], contour_length: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 1]']
 
-    return (force, gradient)
-```
+Evaluate spring force vector dE/d(spring_vec) for a single spring.
 
-#### evaluate_stress_contribution(self: [pylimer_tools_cpp.MEHPForceEvaluator](#pylimer_tools_cpp.MEHPForceEvaluator), spring_distances: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], i: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), j: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), spring_index: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [float](https://docs.python.org/3/builtins/functions.html#float)
+#### evaluate_spring_stiffness(self: [pylimer_tools_cpp.MEHPForceEvaluator](#pylimer_tools_cpp.MEHPForceEvaluator), spring_vec: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[3, 1]'], contour_length: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 3]']
 
-Evaluate the stress-contribution for a single spring.
+Evaluate 3x3 tangent stiffness matrix dF/d(spring_vec) for a single spring.
 
-* **Parameters:**
-  * **spring_distances** – The three coordinate differences for one spring (list of 3 floats)
-  * **i** – The row index of the stress tensor
-  * **j** – The column index of the stress tensor
-  * **spring_index** – The index of the spring being evaluated
-* **Returns:**
-  The stress contribution value
+#### evaluate_stress_contribution(self: [pylimer_tools_cpp.MEHPForceEvaluator](#pylimer_tools_cpp.MEHPForceEvaluator), spring_vec: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[3, 1]'], i: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), j: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), contour_length: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
-#### prepare_for_evaluations(self: [pylimer_tools_cpp.MEHPForceEvaluator](#pylimer_tools_cpp.MEHPForceEvaluator)) → [None](https://docs.python.org/3/builtins/constants.html#None)
+Evaluate the (i, j) virial stress contribution of a single spring.
 
-Prepare the evaluator for a series of evaluations.
-This method is called before a batch of force evaluations,
-allowing for any necessary setup or precomputation.
+#### evaluate_stress_tensor(self: [pylimer_tools_cpp.MEHPForceEvaluator](#pylimer_tools_cpp.MEHPForceEvaluator), net: [pylimer_tools_cpp.MEHPNetwork](pylimer_tools_cpp.MEHPNetwork.html.md#pylimer_tools_cpp.MEHPNetwork), spring_vectors: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], volume: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), is_2d: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 3]']
+
+Evaluate the 3x3 virial stress tensor for the network.
+
+#### get_kappa(self: [pylimer_tools_cpp.MEHPForceEvaluator](#pylimer_tools_cpp.MEHPForceEvaluator)) → [float](https://docs.python.org/3/builtins/functions.html#float)
+
+Return the spring stiffness parameter kappa.
+
+#### is_linear(self: [pylimer_tools_cpp.MEHPForceEvaluator](#pylimer_tools_cpp.MEHPForceEvaluator)) → [bool](https://docs.python.org/3/builtins/functions.html#bool)
+
+Indicate whether the constitutive force law is linear in displacement.

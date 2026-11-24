@@ -55,7 +55,7 @@ import pylimer_tools_cpp as pt  # noqa: E402
 ## Generating a Polydisperse Network
 
 Pass a per-strand list of lengths to [`add_strands()`](../../api/pylimer_tools_cpp.MCUniverseGenerator.html.md#pylimer_tools_cpp.MCUniverseGenerator.add_strands)
-and compare [`get_force_balance2()`](../../api/pylimer_tools_cpp.MCUniverseGenerator.html.md#pylimer_tools_cpp.MCUniverseGenerator.get_force_balance2) with and
+and compare [`get_mehp_simulator()`](../../api/pylimer_tools_cpp.MCUniverseGenerator.html.md#pylimer_tools_cpp.MCUniverseGenerator.get_mehp_simulator) with and
 without sampled entanglements.
 
 <!-- GENERATED FROM PYTHON SOURCE LINES 48-79 -->
@@ -75,12 +75,12 @@ gen.add_strands(nr_of_strands=n_strands, strand_lengths=strand_lengths)
 gen.add_crosslinkers(int(0.5 * n_strands), 4)
 gen.link_strands_to_conversion(crosslinker_conversion=0.925)
 
-fb_phantom = gen.get_force_balance2()
-fb_phantom.run_force_relaxation()
+fb_phantom = gen.get_mehp_simulator()
+fb_phantom.run()
 
 es = gen.sample_entanglements(300, upper_cutoff=2.6, seed="demo")
-fb_total = gen.get_force_balance2(es)
-fb_total.run_force_relaxation()
+fb_total = gen.get_mehp_simulator(es)
+fb_total.run()
 
 print(
     f"Active fraction: {fb_total.get_active_weight_fraction():.3f}, "
@@ -110,7 +110,7 @@ plot_polydispersity_modulus(data)
 plot_polydispersity_fractions(data)
 ```
 
-**Total running time of the script:** (0 minutes 0.282 seconds)
+**Total running time of the script:** (0 minutes 0.239 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-polydispersity-study-py"></a>
 

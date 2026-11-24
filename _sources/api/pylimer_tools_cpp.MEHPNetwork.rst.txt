@@ -1,0 +1,113 @@
+MEHPNetwork
+===========
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: MEHPNetwork
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~MEHPNetwork.L
+      ~MEHPNetwork.assume_box_large_enough
+      ~MEHPNetwork.assume_complete
+      ~MEHPNetwork.box
+      ~MEHPNetwork.coordinates
+      ~MEHPNetwork.default_bond_length
+      ~MEHPNetwork.default_r02
+      ~MEHPNetwork.link_indices_of_strand
+      ~MEHPNetwork.link_is_entanglement
+      ~MEHPNetwork.mean_spring_contour_length
+      ~MEHPNetwork.mean_strand_contour_length
+      ~MEHPNetwork.nr_of_crosslink_swaps_endured
+      ~MEHPNetwork.nr_of_links
+      ~MEHPNetwork.nr_of_nodes
+      ~MEHPNetwork.nr_of_springs
+      ~MEHPNetwork.nr_of_strands
+      ~MEHPNetwork.old_atom_ids
+      ~MEHPNetwork.old_atom_types
+      ~MEHPNetwork.remove_primary_loops
+      ~MEHPNetwork.spring_box_offset
+      ~MEHPNetwork.spring_contour_length
+      ~MEHPNetwork.spring_index_a
+      ~MEHPNetwork.spring_index_b
+      ~MEHPNetwork.spring_indices_of_strand
+      ~MEHPNetwork.spring_is_entanglement
+      ~MEHPNetwork.spring_partitions
+      ~MEHPNetwork.strand_contour_length
+      ~MEHPNetwork.strand_index_of_spring
+      ~MEHPNetwork.strand_indices_of_link
+      ~MEHPNetwork.vol
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~MEHPNetwork.compute_active_weight_fraction
+      ~MEHPNetwork.compute_dangling_weight_fraction
+      ~MEHPNetwork.compute_soluble_weight_fraction
+      ~MEHPNetwork.deform_to
+      ~MEHPNetwork.evaluate_spring_lengths
+      ~MEHPNetwork.evaluate_spring_vectors
+      ~MEHPNetwork.find_active_springs
+      ~MEHPNetwork.find_active_strands
+      ~MEHPNetwork.from_crosslinker_universe
+      ~MEHPNetwork.from_universe
+      ~MEHPNetwork.from_universe_with_random_entanglements
+      ~MEHPNetwork.get_crosslinker_verse
+      ~MEHPNetwork.get_gamma_factor
+      ~MEHPNetwork.simplify
+      ~MEHPNetwork.validate
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: L
+   .. autoattribute:: assume_box_large_enough
+   .. autoattribute:: assume_complete
+   .. autoattribute:: box
+   .. autoattribute:: coordinates
+   .. autoattribute:: default_bond_length
+   .. autoattribute:: default_r02
+   .. autoattribute:: link_indices_of_strand
+   .. autoattribute:: link_is_entanglement
+   .. autoattribute:: mean_spring_contour_length
+   .. autoattribute:: mean_strand_contour_length
+   .. autoattribute:: nr_of_crosslink_swaps_endured
+   .. autoattribute:: nr_of_links
+   .. autoattribute:: nr_of_nodes
+   .. autoattribute:: nr_of_springs
+   .. autoattribute:: nr_of_strands
+   .. autoattribute:: old_atom_ids
+   .. autoattribute:: old_atom_types
+   .. autoattribute:: remove_primary_loops
+   .. autoattribute:: spring_box_offset
+   .. autoattribute:: spring_contour_length
+   .. autoattribute:: spring_index_a
+   .. autoattribute:: spring_index_b
+   .. autoattribute:: spring_indices_of_strand
+   .. autoattribute:: spring_is_entanglement
+   .. autoattribute:: spring_partitions
+   .. autoattribute:: strand_contour_length
+   .. autoattribute:: strand_index_of_spring
+   .. autoattribute:: strand_indices_of_link
+   .. autoattribute:: vol
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: compute_active_weight_fraction
+   .. automethod:: compute_dangling_weight_fraction
+   .. automethod:: compute_soluble_weight_fraction
+   .. automethod:: deform_to
+   .. automethod:: evaluate_spring_lengths
+   .. automethod:: evaluate_spring_vectors
+   .. automethod:: find_active_springs
+   .. automethod:: find_active_strands
+   .. automethod:: from_crosslinker_universe
+   .. automethod:: from_universe
+   .. automethod:: from_universe_with_random_entanglements
+   .. automethod:: get_crosslinker_verse
+   .. automethod:: get_gamma_factor
+   .. automethod:: simplify
+   .. automethod:: validate
