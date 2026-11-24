@@ -22,7 +22,7 @@
 <link rel="manifest" href="/_static/favicon/site.webmanifest" />
 
 <link rel="alternate" type="text/markdown" href="plot_resistance_distance_analysis.html.md">
-<link rel="describedby" href="llms.txt"><link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Trajectory Analysis" href="../trajectory_analysis/index.html"><link rel="prev" title="Extract Synthesis Parameters" href="plot_structure_analysis.html">
+<link rel="describedby" href="llms.txt"><link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Trajectory Analysis" href="../trajectory_analysis/index.html"><link rel="prev" title="Topological Leaf Pruning vs. PBC-Aware Force Balance" href="plot_topological_leaf_pruning_vs_pbc.html">
 
     <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
         <title>Topological Resistance Distance &amp; Commute Time Analysis - pylimer-tools</title>
@@ -290,6 +290,7 @@
 <li class="toctree-l3"><a class="reference internal" href="plot_loop_analysis.html">Loop Finding and Analysis</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_end_to_end_distribution.html">End-to-End Distribution</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_structure_analysis.html">Extract Synthesis Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_topological_leaf_pruning_vs_pbc.html">Topological Leaf Pruning vs. PBC-Aware Force Balance</a></li>
 <li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Topological Resistance Distance &amp; Commute Time Analysis</a></li>
 </ul>
 </li>
@@ -1051,19 +1052,19 @@ solves.</p>
 </span></pre></div></div>
 <img src="../../_images/sphx_glr_plot_resistance_distance_analysis_003.png" srcset="../../_images/sphx_glr_plot_resistance_distance_analysis_003.png" alt="Parallel Network Pathways Lower Resistance Below $d_{\mathrm{graph}}$, Crosslinker Resistance Distribution & Solver Speedup" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Loaded polymer network: 4590 atoms, 4600 bonds, 3 connected components (largest: 4542 atoms).
 Evaluated 1540 crosslinker pairs (56 crosslinkers):
-  Individual solves: 38.35 ms
-  Batched multi-RHS: 29.50 ms (speedup: 1.30x)
+  Individual solves: 46.81 ms
+  Batched multi-RHS: 39.81 ms (speedup: 1.18x)
   Max difference:    0.00e+00
 
 All-pairs &amp; Kirchhoff benchmarks on 300-node crosslinked ring:
-  Pairwise loop (44,850 pairs):   103.27 ms
-  All-pairs chunk_size=1:         0.46 ms
-  All-pairs chunk_size=128:       0.49 ms (vs loop: 209.6x, vs chunk=1: 0.92x, max diff: 0.00e+00)
-  Kirchhoff spectral (O(N^3)):    9.65 ms
-  Kirchhoff fast (chunked):       0.52 ms (speedup: 18.5x, |diff|: 1.80e-07)
+  Pairwise loop (44,850 pairs):   117.58 ms
+  All-pairs chunk_size=1:         0.45 ms
+  All-pairs chunk_size=128:       0.53 ms (vs loop: 221.2x, vs chunk=1: 0.85x, max diff: 0.00e+00)
+  Kirchhoff spectral (O(N^3)):    11.31 ms
+  Kirchhoff fast (chunked):       0.59 ms (speedup: 19.1x, |diff|: 1.80e-07)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.005 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.250 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-structure-analysis-plot-resistance-distance-analysis-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/6e97a52096dbb670ad83c28e1d77a6f9/plot_resistance_distance_analysis.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_resistance_distance_analysis.ipynb</span></code></a></p>
@@ -1093,14 +1094,14 @@ All-pairs &amp; Kirchhoff benchmarks on 300-node crosslinked ring:
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="plot_structure_analysis.html">
+          <a class="prev-page" href="plot_topological_leaf_pruning_vs_pbc.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Extract Synthesis Parameters</div>
+                <div class="title">Topological Leaf Pruning vs. PBC-Aware Force Balance</div>
                 
               </div>
             </a>

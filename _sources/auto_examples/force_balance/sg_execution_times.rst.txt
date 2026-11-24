@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:06.180** total execution time for 11 files **from auto_examples/force_balance**:
+**00:07.161** total execution time for 11 files **from auto_examples/force_balance**:
 
 .. container::
 
@@ -33,35 +33,35 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_representative_volume_pdms.py` (``plot_representative_volume_pdms.py``)
-     - 00:02.013
+     - 00:02.323
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_entanglement_sampling_comparison.py` (``plot_entanglement_sampling_comparison.py``)
-     - 00:01.069
+     - 00:01.265
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_sampling_cutoff_effect.py` (``plot_sampling_cutoff_effect.py``)
-     - 00:00.576
+     - 00:00.685
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_inactive_removal_and_sampling.py` (``plot_inactive_removal_and_sampling.py``)
-     - 00:00.540
+     - 00:00.645
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_slipping_vs_fixed_links.py` (``plot_slipping_vs_fixed_links.py``)
-     - 00:00.403
+     - 00:00.452
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_balance.py` (``plot_force_balance.py``)
-     - 00:00.376
+     - 00:00.423
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_balance_2.py` (``plot_force_balance_2.py``)
-     - 00:00.291
+     - 00:00.338
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_entanglement_link_vs_spring.py` (``plot_entanglement_link_vs_spring.py``)
-     - 00:00.281
+     - 00:00.293
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_polydispersity_study.py` (``plot_polydispersity_study.py``)
-     - 00:00.239
+     - 00:00.292
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_relaxation.py` (``plot_force_relaxation.py``)
-     - 00:00.216
+     - 00:00.248
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_fb_deformation_exp.py` (``plot_fb_deformation_exp.py``)
-     - 00:00.175
+     - 00:00.198
      - 0.0

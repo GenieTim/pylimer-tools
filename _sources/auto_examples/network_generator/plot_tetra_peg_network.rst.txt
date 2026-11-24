@@ -185,7 +185,7 @@ The thumbnail was created using the `polymer-graph-sketcher <https://genietim.gi
 
  .. code-block:: none
 
-    Starting tetra-PEG network generation at 2026-11-24 07:48:18.854164
+    Starting tetra-PEG network generation at 2026-11-24 09:33:45.895480
     System parameters:
       Box size: 80.0³
       Star crosslinkers: 150
@@ -205,7 +205,7 @@ The thumbnail was created using the `polymer-graph-sketcher <https://genietim.gi
       Final strand conversion: 0.822
     Relaxing crosslink positions...
     Generating final universe with bead coordinates...
-    Network generation completed at 2026-11-24 07:48:18.875073
+    Network generation completed at 2026-11-24 09:33:45.923001
     Final network statistics:
       Total atoms: 12900
       Total bonds: 12985
@@ -291,7 +291,7 @@ We analyze and plot the distribution of strand types after crosslinking:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.120 seconds)
+   **Total running time of the script:** (0 minutes 0.140 seconds)
 
 
 .. _sphx_glr_download_auto_examples_network_generator_plot_tetra_peg_network.py:

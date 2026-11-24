@@ -385,6 +385,24 @@ Finally, to find the shortest loop a specific atom is involved in, you can use t
 There are exponentially many paths between two crosslinkers of a network,
 and you may run out of memory when using these functions, if your network is lattice-like.
 
+### Topological Leaf Pruning & Active Core
+
+To identify the topologically active 2-core of a network (pruning dangling branches,
+1-core trees, and unconnected/free chains), you can use
+[`peel_topological_leaves()`](../api/pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe.peel_topological_leaves) or
+[`identify_active_atoms()`](../api/pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe.identify_active_atoms).
+
+#### NOTE
+Topological leaf pruning operates purely on crosslinker connectivity
+(`strand_from` / `strand_to`) and ignores atom coordinates and periodic
+boundary conditions (PBC). As a result, it cannot distinguish a local
+(non-PBC, zero-tension) loop from a PBC-spanning (elastically active) loop.
+(Note that in an entangled network, even a non-PBC primary loop can become
+elastically active if an entanglement or slip-link is associated with it.)
+See [Topological Leaf Pruning vs. PBC-Aware Force Balance](structure_analysis/plot_topological_leaf_pruning_vs_pbc.md)
+for a side-by-side comparison with PBC- and/or entanglement-aware force-balance relaxation
+([`MEHPSimulator`](../api/pylimer_tools_cpp.MEHPSimulator.md#pylimer_tools_cpp.MEHPSimulator)).
+
 ### Topological Resistance Distance & Commute Times
 
 For cyclic and cross-linked networks where many parallel pathways connect pairs of nodes,
@@ -418,6 +436,11 @@ analytical verifications, matrix diagnostics, and performance benchmarks on cros
 [Extract Synthesis Parameters](structure_analysis/plot_structure_analysis.md)
 
   <div class="sphx-glr-thumbnail-title">Extract Synthesis Parameters</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="peel_topological_leaves and identify_active_atoms perform an iterative 2-core peeling strictly on crosslinker connectivity (\`\`strand_from\`\` / strand_to). Because this peeling does not inspect atom coordinates, box dimensions, or periodic boundary conditions (PBC), it cannot distinguish a loop that wraps across the PBC (elastically active) from a loop that closes locally inside the box (elastically inactive / solvent).">![](auto_examples/structure_analysis/images/thumb/sphx_glr_plot_topological_leaf_pruning_vs_pbc_thumb.png)
+
+[Topological Leaf Pruning vs. PBC-Aware Force Balance](structure_analysis/plot_topological_leaf_pruning_vs_pbc.md)
+
+  <div class="sphx-glr-thumbnail-title">Topological Leaf Pruning vs. PBC-Aware Force Balance</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use ResistanceDistanceAnalysis to analyze the connectivity, effective resistances, Kirchhoff index, random-walk commute times, and node resistance centrality of polymer architectures and crosslinked networks.">![](auto_examples/structure_analysis/images/thumb/sphx_glr_plot_resistance_distance_analysis_thumb.png)
 
 [Topological Resistance Distance & Commute Time Analysis](structure_analysis/plot_resistance_distance_analysis.md)

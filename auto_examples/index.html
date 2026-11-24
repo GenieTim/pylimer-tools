@@ -290,6 +290,7 @@
 <li class="toctree-l3"><a class="reference internal" href="structure_analysis/plot_loop_analysis.html">Loop Finding and Analysis</a></li>
 <li class="toctree-l3"><a class="reference internal" href="structure_analysis/plot_end_to_end_distribution.html">End-to-End Distribution</a></li>
 <li class="toctree-l3"><a class="reference internal" href="structure_analysis/plot_structure_analysis.html">Extract Synthesis Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="structure_analysis/plot_topological_leaf_pruning_vs_pbc.html">Topological Leaf Pruning vs. PBC-Aware Force Balance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="structure_analysis/plot_resistance_distance_analysis.html">Topological Resistance Distance &amp; Commute Time Analysis</a></li>
 </ul>
 </li>
@@ -704,6 +705,25 @@ and <a class="reference internal" href="../api/pylimer_tools_cpp.ResistanceDista
 and you may run out of memory when using these functions, if your network is lattice-like.</p>
 </div>
 </section>
+<section id="topological-leaf-pruning-active-core">
+<h3>Topological Leaf Pruning &amp; Active Core<a class="headerlink" href="#topological-leaf-pruning-active-core" title="Link to this heading">¶</a></h3>
+<p>To identify the topologically active 2-core of a network (pruning dangling branches,
+1-core trees, and unconnected/free chains), you can use
+<a class="reference internal" href="../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.peel_topological_leaves" title="pylimer_tools_cpp.Universe.peel_topological_leaves"><code class="xref py py-func docutils literal notranslate"><span class="pre">peel_topological_leaves()</span></code></a> or
+<a class="reference internal" href="../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.identify_active_atoms" title="pylimer_tools_cpp.Universe.identify_active_atoms"><code class="xref py py-func docutils literal notranslate"><span class="pre">identify_active_atoms()</span></code></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Topological leaf pruning operates purely on crosslinker connectivity
+(<code class="docutils literal notranslate"><span class="pre">strand_from</span></code> / <code class="docutils literal notranslate"><span class="pre">strand_to</span></code>) and ignores atom coordinates and periodic
+boundary conditions (PBC). As a result, it cannot distinguish a local
+(non-PBC, zero-tension) loop from a PBC-spanning (elastically active) loop.
+(Note that in an entangled network, even a non-PBC primary loop can become
+elastically active if an entanglement or slip-link is associated with it.)
+See <a class="reference internal" href="structure_analysis/plot_topological_leaf_pruning_vs_pbc.html"><span class="doc">Topological Leaf Pruning vs. PBC-Aware Force Balance</span></a>
+for a side-by-side comparison with PBC- and/or entanglement-aware force-balance relaxation
+(<a class="reference internal" href="../api/pylimer_tools_cpp.MEHPSimulator.html#pylimer_tools_cpp.MEHPSimulator" title="pylimer_tools_cpp.MEHPSimulator"><code class="xref py py-class docutils literal notranslate"><span class="pre">MEHPSimulator</span></code></a>).</p>
+</div>
+</section>
 <section id="topological-resistance-distance-commute-times">
 <h3>Topological Resistance Distance &amp; Commute Times<a class="headerlink" href="#topological-resistance-distance-commute-times" title="Link to this heading">¶</a></h3>
 <p>For cyclic and cross-linked networks where many parallel pathways connect pairs of nodes,
@@ -726,6 +746,9 @@ analytical verifications, matrix diagnostics, and performance benchmarks on cros
 </div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to analyze the structure of a crosslinked polymer network to get the stoichiometric imbalance r, the crosslinker conversion p or the functionality of the crosslinker f."><img alt="" src="../_images/sphx_glr_plot_structure_analysis_thumb.png" />
 <p><a class="reference internal" href="structure_analysis/plot_structure_analysis.html"><span class="doc">Extract Synthesis Parameters</span></a></p>
   <div class="sphx-glr-thumbnail-title">Extract Synthesis Parameters</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="peel_topological_leaves and identify_active_atoms perform an iterative 2-core peeling strictly on crosslinker connectivity (``strand_from`` / strand_to). Because this peeling does not inspect atom coordinates, box dimensions, or periodic boundary conditions (PBC), it cannot distinguish a loop that wraps across the PBC (elastically active) from a loop that closes locally inside the box (elastically inactive / solvent)."><img alt="" src="../_images/sphx_glr_plot_topological_leaf_pruning_vs_pbc_thumb.png" />
+<p><a class="reference internal" href="structure_analysis/plot_topological_leaf_pruning_vs_pbc.html"><span class="doc">Topological Leaf Pruning vs. PBC-Aware Force Balance</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Topological Leaf Pruning vs. PBC-Aware Force Balance</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use ResistanceDistanceAnalysis to analyze the connectivity, effective resistances, Kirchhoff index, random-walk commute times, and node resistance centrality of polymer architectures and crosslinked networks."><img alt="" src="../_images/sphx_glr_plot_resistance_distance_analysis_thumb.png" />
 <p><a class="reference internal" href="structure_analysis/plot_resistance_distance_analysis.html"><span class="doc">Topological Resistance Distance &amp; Commute Time Analysis</span></a></p>
   <div class="sphx-glr-thumbnail-title">Topological Resistance Distance & Commute Time Analysis</div>
@@ -822,6 +845,7 @@ This includes reading trajectory data and computing various properties.</p>
 <li><a class="reference internal" href="#structure-analysis">Structure Analysis</a><ul>
 <li><a class="reference internal" href="#decomposing-crosslinked-networks-to-chains">Decomposing Crosslinked Networks to Chains</a></li>
 <li><a class="reference internal" href="#finding-loops">Finding Loops</a></li>
+<li><a class="reference internal" href="#topological-leaf-pruning-active-core">Topological Leaf Pruning &amp; Active Core</a></li>
 <li><a class="reference internal" href="#topological-resistance-distance-commute-times">Topological Resistance Distance &amp; Commute Times</a></li>
 </ul>
 </li>

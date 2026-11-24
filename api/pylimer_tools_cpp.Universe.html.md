@@ -785,6 +785,12 @@ Identify which atoms belong to the topologically active 2-core of the network.
 
 Atoms on pruned leaves, dangling branches, and soluble components will have false.
 
+#### NOTE
+Uses [`peel_topological_leaves()`](pylimer_tools_cpp.peel_topological_leaves.html.md#pylimer_tools_cpp.peel_topological_leaves) and is therefore purely topological
+(ignores coordinates and PBC). Local (non-PBC) primary loops and isolated
+multi-crosslinker cycles are still marked `True`, while crosslinker-less
+PBC-spanning rings are marked `False`.
+
 * **Parameters:**
   **crosslinker_type** – Type ID of crosslinker atoms (default: 2)
 * **Returns:**
@@ -805,6 +811,17 @@ Get more or less edges than currently present, interpolating between junctions.
 Peel 1-core dangling trees and subgraphs from the network topology.
 
 Returns a boolean vector indicating for each strand whether it is ignored (pruned).
+
+#### NOTE
+Purely topological (2-core peeling on crosslinker connectivity); it does not
+inspect coordinates or periodic boundary conditions (PBC). Crosslinker-less
+solvent rings are always pruned (even if PBC-spanning), whereas primary loops
+and multi-crosslinker cycles are always kept (even if local / non-PBC, since
+a primary loop can still become elastically active when an entanglement or
+slip-link is associated with it).
+Use [`MEHPSimulator`](pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator) with
+`assume_box_large_enough=False` to separate PBC-spanning (or entangled)
+active loops from local zero-tension loops.
 
 * **Parameters:**
   **crosslinker_type** – Type ID of crosslinker atoms (default: 2)

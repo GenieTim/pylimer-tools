@@ -288,6 +288,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/structure_analysis/plot_loop_analysis.html">Loop Finding and Analysis</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/structure_analysis/plot_end_to_end_distribution.html">End-to-End Distribution</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/structure_analysis/plot_structure_analysis.html">Extract Synthesis Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/structure_analysis/plot_topological_leaf_pruning_vs_pbc.html">Topological Leaf Pruning vs. PBC-Aware Force Balance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/structure_analysis/plot_resistance_distance_analysis.html">Topological Resistance Distance &amp; Commute Time Analysis</a></li>
 </ul>
 </li>
@@ -441,6 +442,23 @@
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">peel_topological_leaves</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crosslinker_universe</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.CrosslinkerUniverse.html#pylimer_tools_cpp.CrosslinkerUniverse" title="pylimer_tools_cpp.CrosslinkerUniverse"><span class="pre">pylimer_tools_cpp.CrosslinkerUniverse</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><span class="pre">bool</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.peel_topological_leaves" title="Link to this definition">¶</a></dt>
 <dd><p>Peel 1-core dangling trees and subgraphs iteratively from the CrosslinkerUniverse topology.
 Returns a boolean vector indicating for each strand whether it is ignored (pruned).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is a purely topological 2-core peeling on <code class="docutils literal notranslate"><span class="pre">strand_from</span></code>/<code class="docutils literal notranslate"><span class="pre">strand_to</span></code> and
+does not account for coordinates or periodic boundary conditions (PBC):</p>
+<ul class="simple">
+<li><p>Free/dangling strands (including crosslinker-less solvent rings) are always pruned,
+even if they wrap across the PBC.</p></li>
+<li><p>Primary loops (<code class="docutils literal notranslate"><span class="pre">strand_from</span> <span class="pre">==</span> <span class="pre">strand_to</span> <span class="pre">&gt;=</span> <span class="pre">0</span></code>) and multi-crosslinker cycles are
+always kept in the 2-core, even if they do not span the PBC (note that a
+non-PBC primary loop can still become elastically active if an entanglement or
+slip-link is associated with it, whereas in a phantom network without
+entanglements it relaxes to zero tension).</p></li>
+</ul>
+<p>To distinguish PBC-spanning (or entangled) active loops from non-PBC
+zero-tension loops, use <a class="reference internal" href="pylimer_tools_cpp.MEHPSimulator.html#pylimer_tools_cpp.MEHPSimulator" title="pylimer_tools_cpp.MEHPSimulator"><code class="xref py py-class docutils literal notranslate"><span class="pre">MEHPSimulator</span></code></a> with
+<code class="docutils literal notranslate"><span class="pre">assume_box_large_enough=False</span></code>.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.peel_topological_leaves.params.crosslinker_universe"></span><strong>crosslinker_universe</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.peel_topological_leaves.params.crosslinker_universe">¶</a> – The CrosslinkerUniverse representation.</p>

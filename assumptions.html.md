@@ -32,3 +32,13 @@ Note, however, that it assumes that the initial configuration of the structure h
 Relevant methods:
 - [`pylimer_tools_cpp.DPDSimulator.assume_box_large_enough()`](api/pylimer_tools_cpp.DPDSimulator.html.md#pylimer_tools_cpp.DPDSimulator.assume_box_large_enough)
 - [`pylimer_tools_cpp.MEHPSimulator.config_assume_box_large_enough()`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.config_assume_box_large_enough)
+
+#### NOTE
+Purely topological utilities such as [`pylimer_tools_cpp.Universe.peel_topological_leaves()`](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe.peel_topological_leaves),
+[`pylimer_tools_cpp.Universe.identify_active_atoms()`](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe.identify_active_atoms), and
+[`pylimer_tools_cpp.peel_topological_leaves()`](api/pylimer_tools_cpp.peel_topological_leaves.html.md#pylimer_tools_cpp.peel_topological_leaves) do not use coordinates or PBC at all:
+they retain all 2-core cycles (including local non-PBC loops, which can still become
+elastically active when an entanglement or slip-link is associated with them) and prune all
+crosslinker-less rings (even PBC-spanning ones). See
+[Topological Leaf Pruning vs. PBC-Aware Force Balance](auto_examples/structure_analysis/plot_topological_leaf_pruning_vs_pbc.html.md) for an
+example comparing topological leaf pruning with PBC-aware MEHP force balance.
