@@ -15,6 +15,7 @@ namespace {
   [[nodiscard]] bool requiresFiniteBounds(const NLoptAlgorithm alg)
   {
     switch (alg) {
+      case NLoptAlgorithm::LD_MMA:
       case NLoptAlgorithm::GN_DIRECT:
       case NLoptAlgorithm::GN_CRS2_LM:
       case NLoptAlgorithm::GD_STOGO:

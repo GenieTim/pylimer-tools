@@ -4820,7 +4820,7 @@ TEST_CASE("MEHPSimulator cross-solver parity on phantom and fixed-entanglement "
       pcm::StructureSimplificationMode::NO_SIMPLIFICATION;
 
     pcm::MEHPNonlinearSolverConfig nlCfg;
-    nlCfg.algorithm = pcm::NLoptAlgorithm::LD_MMA;
+    nlCfg.algorithm = pcm::NLoptAlgorithm::LD_LBFGS;
     nlCfg.maxNrOfSteps = 50000;
     nlCfg.xtol = 1e-14;
     nlCfg.ftol = 1e-14;
