@@ -44,14 +44,12 @@ public:
 
   [[nodiscard]] bool isLinear() const override
   {
-    PYBIND11_OVERRIDE_NAME(
-      bool, MEHPForceEvaluator, "is_linear", isLinear, );
+    PYBIND11_OVERRIDE_NAME(bool, MEHPForceEvaluator, "is_linear", isLinear, );
   }
 
   [[nodiscard]] double getKappa() const override
   {
-    PYBIND11_OVERRIDE_NAME(
-      double, MEHPForceEvaluator, "get_kappa", getKappa, );
+    PYBIND11_OVERRIDE_NAME(double, MEHPForceEvaluator, "get_kappa", getKappa, );
   }
 
   [[nodiscard]] double evaluateSpringEnergy(
@@ -113,9 +111,9 @@ public:
     double* const grad) const override
   {
     py::gil_scoped_acquire gil;
-    const py::function override = py::get_override(
-      static_cast<const MEHPForceEvaluator*>(this),
-      "evaluate_network_energy_and_gradient");
+    const py::function override =
+      py::get_override(static_cast<const MEHPForceEvaluator*>(this),
+                       "evaluate_network_energy_and_gradient");
     if (override) {
       const py::object result =
         override(std::cref(net), springVectors, is2D, grad != nullptr);
@@ -140,10 +138,9 @@ public:
         const Eigen::VectorXd gradVec = t[1].cast<Eigen::VectorXd>();
         const size_t expectedSize = 3 * net.nrOfLinks;
         if (static_cast<size_t>(gradVec.size()) != expectedSize) {
-          throw std::runtime_error(
-            "Gradient size mismatch: expected " +
-            std::to_string(expectedSize) + ", got " +
-            std::to_string(gradVec.size()));
+          throw std::runtime_error("Gradient size mismatch: expected " +
+                                   std::to_string(expectedSize) + ", got " +
+                                   std::to_string(gradVec.size()));
         }
         for (size_t i = 0; i < expectedSize; ++i) {
           grad[i] = gradVec[static_cast<Eigen::Index>(i)];
@@ -366,7 +363,6 @@ the simulation or optimization procedure.)pbdoc")
   )pbdoc",
         py::arg("x"));
 
-
   ////////////////////////////////////////////////////////////////
   // MARK: Configuration Enums
   py::native_enum<mehp::StructureSimplificationMode>(
@@ -398,7 +394,6 @@ the simulation or optimization procedure.)pbdoc")
 #undef X
       .finalize();
 
-
   py::native_enum<mehp::EntanglementMode>(
     m,
     "EntanglementMode",
@@ -407,9 +402,10 @@ the simulation or optimization procedure.)pbdoc")
     .value("NONE",
            mehp::EntanglementMode::NONE,
            "Phantom network (crosslinks only).")
-    .value("MERGED_LINKS",
-           mehp::EntanglementMode::MERGED_LINKS,
-           "Entanglement links lie directly on strand contour (no extra spring).")
+    .value(
+      "MERGED_LINKS",
+      mehp::EntanglementMode::MERGED_LINKS,
+      "Entanglement links lie directly on strand contour (no extra spring).")
     .value("SPRING",
            mehp::EntanglementMode::SPRING,
            "Entangled beads coupled by compliant Hookean spring.")
@@ -434,12 +430,10 @@ the simulation or optimization procedure.)pbdoc")
     "enum.Enum",
     "Supported NLopt optimization algorithms for MEHP force relaxation.")
     .value("LD_MMA", mehp::NLoptAlgorithm::LD_MMA, "NLopt LD_MMA algorithm.")
-    .value("LD_LBFGS",
-           mehp::NLoptAlgorithm::LD_LBFGS,
-           "NLopt LD_LBFGS algorithm.")
-    .value("LD_SLSQP",
-           mehp::NLoptAlgorithm::LD_SLSQP,
-           "NLopt LD_SLSQP algorithm.")
+    .value(
+      "LD_LBFGS", mehp::NLoptAlgorithm::LD_LBFGS, "NLopt LD_LBFGS algorithm.")
+    .value(
+      "LD_SLSQP", mehp::NLoptAlgorithm::LD_SLSQP, "NLopt LD_SLSQP algorithm.")
     .value("LD_TNEWTON",
            mehp::NLoptAlgorithm::LD_TNEWTON,
            "NLopt LD_TNEWTON algorithm.")
@@ -454,9 +448,8 @@ the simulation or optimization procedure.)pbdoc")
            "NLopt LD_TNEWTON_PRECOND_RESTART algorithm.")
     .value("LD_VAR1", mehp::NLoptAlgorithm::LD_VAR1, "NLopt LD_VAR1 algorithm.")
     .value("LD_VAR2", mehp::NLoptAlgorithm::LD_VAR2, "NLopt LD_VAR2 algorithm.")
-    .value("LN_SBPLX",
-           mehp::NLoptAlgorithm::LN_SBPLX,
-           "NLopt LN_SBPLX algorithm.")
+    .value(
+      "LN_SBPLX", mehp::NLoptAlgorithm::LN_SBPLX, "NLopt LN_SBPLX algorithm.")
     .value("LN_BOBYQA",
            mehp::NLoptAlgorithm::LN_BOBYQA,
            "NLopt LN_BOBYQA algorithm.")
@@ -481,17 +474,15 @@ the simulation or optimization procedure.)pbdoc")
     .value("GN_CRS2_LM",
            mehp::NLoptAlgorithm::GN_CRS2_LM,
            "NLopt GN_CRS2_LM algorithm.")
-    .value("GD_STOGO",
-           mehp::NLoptAlgorithm::GD_STOGO,
-           "NLopt GD_STOGO algorithm.")
+    .value(
+      "GD_STOGO", mehp::NLoptAlgorithm::GD_STOGO, "NLopt GD_STOGO algorithm.")
     .finalize();
 
   ////////////////////////////////////////////////////////////////
   // MARK: Canonical MEHP Network
-  py::class_<mehp::MEHPNetwork, py::smart_holder>(
-    m,
-    "MEHPNetwork",
-    R"pbdoc(
+  py::class_<mehp::MEHPNetwork, py::smart_holder>(m,
+                                                  "MEHPNetwork",
+                                                  R"pbdoc(
       Canonical polymer network representation shared across MEHP linear-system,
       slip-link relaxation, and nonlinear optimization solvers.
     )pbdoc")
@@ -512,10 +503,10 @@ the simulation or optimization procedure.)pbdoc")
         :return: Constructed MEHPNetwork.
       )pbdoc",
       py::arg("universe"),
-      py::arg_v("entanglements",
-                pylimer_tools::topo::entanglement_detection::
-                  AtomPairEntanglements(),
-                "AtomPairEntanglements()"),
+      py::arg_v(
+        "entanglements",
+        pylimer_tools::topo::entanglement_detection::AtomPairEntanglements(),
+        "AtomPairEntanglements()"),
       py::arg("crosslinker_type") = 2,
       py::arg_v("entanglement_mode",
                 mehp::EntanglementMode::MERGED_LINKS,
@@ -523,10 +514,9 @@ the simulation or optimization procedure.)pbdoc")
       py::arg("keep_2functional_crosslinkers") = false,
       py::arg("remove_primary_loops") = false,
       py::arg("assume_box_large_enough") = false)
-    .def_static(
-      "from_universe_with_random_entanglements",
-      &mehp::MEHPNetwork::fromUniverseWithRandomEntanglements,
-      R"pbdoc(
+    .def_static("from_universe_with_random_entanglements",
+                &mehp::MEHPNetwork::fromUniverseWithRandomEntanglements,
+                R"pbdoc(
         Sample random entanglements from an atomistic Universe and build a canonical MEHPNetwork.
 
         :param universe: Atomistic polymer Universe.
@@ -545,22 +535,22 @@ the simulation or optimization procedure.)pbdoc")
         :param assume_box_large_enough: Assume box large enough for minimum-image PBC.
         :return: Constructed MEHPNetwork.
       )pbdoc",
-      py::arg("universe"),
-      py::arg("nr_of_entanglements_to_sample"),
-      py::arg("upper_sampling_cutoff"),
-      py::arg("lower_sampling_cutoff") = 0.0,
-      py::arg("min_nr_of_entanglements") = 0,
-      py::arg("same_strand_cutoff") = 0.0,
-      py::arg("seed") = "",
-      py::arg("crosslinker_type") = 2,
-      py::arg_v("entanglement_mode",
-                mehp::EntanglementMode::MERGED_LINKS,
-                "EntanglementMode.MERGED_LINKS"),
-      py::arg("with_crosslinkers") = true,
-      py::arg("filter_dangling_and_soluble") = false,
-      py::arg("keep_2functional_crosslinkers") = false,
-      py::arg("remove_primary_loops") = false,
-      py::arg("assume_box_large_enough") = false)
+                py::arg("universe"),
+                py::arg("nr_of_entanglements_to_sample"),
+                py::arg("upper_sampling_cutoff"),
+                py::arg("lower_sampling_cutoff") = 0.0,
+                py::arg("min_nr_of_entanglements") = 0,
+                py::arg("same_strand_cutoff") = 0.0,
+                py::arg("seed") = "",
+                py::arg("crosslinker_type") = 2,
+                py::arg_v("entanglement_mode",
+                          mehp::EntanglementMode::MERGED_LINKS,
+                          "EntanglementMode.MERGED_LINKS"),
+                py::arg("with_crosslinkers") = true,
+                py::arg("filter_dangling_and_soluble") = false,
+                py::arg("keep_2functional_crosslinkers") = false,
+                py::arg("remove_primary_loops") = false,
+                py::arg("assume_box_large_enough") = false)
     .def_static(
       "from_crosslinker_universe",
       &mehp::MEHPNetwork::fromCrosslinkerUniverse,
@@ -580,10 +570,10 @@ the simulation or optimization procedure.)pbdoc")
       )pbdoc",
       py::arg("box"),
       py::arg("crosslinker_universe"),
-      py::arg_v("entanglements",
-                pylimer_tools::topo::entanglement_detection::
-                  StrandPairEntanglements(),
-                "StrandPairEntanglements()"),
+      py::arg_v(
+        "entanglements",
+        pylimer_tools::topo::entanglement_detection::StrandPairEntanglements(),
+        "StrandPairEntanglements()"),
       py::arg("crosslinker_type") = 2,
       py::arg_v("entanglement_mode",
                 mehp::EntanglementMode::MERGED_LINKS,
@@ -625,8 +615,7 @@ the simulation or optimization procedure.)pbdoc")
                    &mehp::MEHPNetwork::meanSpringContourLength)
     .def_readwrite("mean_strand_contour_length",
                    &mehp::MEHPNetwork::meanStrandContourLength)
-    .def_readwrite("default_bond_length",
-                   &mehp::MEHPNetwork::defaultBondLength)
+    .def_readwrite("default_bond_length", &mehp::MEHPNetwork::defaultBondLength)
     .def_readwrite("default_r02", &mehp::MEHPNetwork::defaultR02)
     .def_readwrite("nr_of_crosslink_swaps_endured",
                    &mehp::MEHPNetwork::nrOfCrosslinkSwapsEndured)
@@ -642,7 +631,8 @@ the simulation or optimization procedure.)pbdoc")
          py::arg("u") = Eigen::VectorXd())
     .def("deform_to",
          py::overload_cast<const pe::Box&>(&mehp::MEHPNetwork::deformTo),
-         "Affinely deform network coordinates and baked box offsets to target_box.",
+         "Affinely deform network coordinates and baked box offsets to "
+         "target_box.",
          py::arg("target_box"))
     .def(
       "deform_to",
@@ -653,12 +643,14 @@ the simulation or optimization procedure.)pbdoc")
         self.deformTo(targetBox, uVec);
         writeBackNumpyVectorIfCompatible(uObj, uVec);
       },
-      "Affinely deform network coordinates, displacements u, and baked box offsets to target_box.",
+      "Affinely deform network coordinates, displacements u, and baked box "
+      "offsets to target_box.",
       py::arg("target_box"),
       py::arg("u"))
     .def("evaluate_spring_vectors",
          &mehp::MEHPNetwork::evaluateSpringVectors,
-         "Evaluate all flattened spring end-to-end vectors (size 3 * nr_of_springs).",
+         "Evaluate all flattened spring end-to-end vectors (size 3 * "
+         "nr_of_springs).",
          py::arg("u"),
          py::arg("is_2d") = false)
     .def("evaluate_spring_lengths",
@@ -705,7 +697,8 @@ the simulation or optimization procedure.)pbdoc")
          py::arg("is_2d") = false)
     .def("get_crosslinker_verse",
          &mehp::MEHPNetwork::getCrosslinkerVerse,
-         "Reconstruct a coarse-grained Universe of crosslinker nodes bonded by polymer strands.",
+         "Reconstruct a coarse-grained Universe of crosslinker nodes bonded by "
+         "polymer strands.",
          py::arg("u") = Eigen::VectorXd())
     .def(
       "simplify",
@@ -749,10 +742,9 @@ the simulation or optimization procedure.)pbdoc")
   // MARK: Force Evaluators
   py::class_<mehp::MEHPForceEvaluator,
              mehp::PyMEHPForceEvaluator,
-             py::smart_holder>(
-    m,
-    "MEHPForceEvaluator",
-    R"pbdoc(
+             py::smart_holder>(m,
+                               "MEHPForceEvaluator",
+                               R"pbdoc(
       Stateless constitutive model interface for evaluating spring energies, forces,
       stiffnesses, and virial stress tensors in MEHP networks.
 
@@ -762,9 +754,10 @@ the simulation or optimization procedure.)pbdoc")
       - :meth:`evaluate_spring_force`: Compute force vector for one spring
     )pbdoc")
     .def(py::init<>())
-    .def("is_linear",
-         &mehp::MEHPForceEvaluator::isLinear,
-         "Indicate whether the constitutive force law is linear in displacement.")
+    .def(
+      "is_linear",
+      &mehp::MEHPForceEvaluator::isLinear,
+      "Indicate whether the constitutive force law is linear in displacement.")
     .def("get_kappa",
          &mehp::MEHPForceEvaluator::getKappa,
          "Return the spring stiffness parameter kappa.")
@@ -780,7 +773,8 @@ the simulation or optimization procedure.)pbdoc")
          py::arg("contour_length"))
     .def("evaluate_spring_stiffness",
          &mehp::MEHPForceEvaluator::evaluateSpringStiffness,
-         "Evaluate 3x3 tangent stiffness matrix dF/d(spring_vec) for a single spring.",
+         "Evaluate 3x3 tangent stiffness matrix dF/d(spring_vec) for a single "
+         "spring.",
          py::arg("spring_vec"),
          py::arg("contour_length"))
     .def("evaluate_stress_contribution",
@@ -798,8 +792,8 @@ the simulation or optimization procedure.)pbdoc")
          const bool is2D,
          const bool computeGradient) -> py::tuple {
         if (computeGradient) {
-          Eigen::VectorXd gradVec = Eigen::VectorXd::Zero(
-            static_cast<Eigen::Index>(3 * net.nrOfLinks));
+          Eigen::VectorXd gradVec =
+            Eigen::VectorXd::Zero(static_cast<Eigen::Index>(3 * net.nrOfLinks));
           const double energy = self.evaluateNetworkEnergyAndGradient(
             net, springVectors, is2D, gradVec.data());
           return py::make_tuple(energy, gradVec);
@@ -831,10 +825,9 @@ the simulation or optimization procedure.)pbdoc")
 
   py::class_<mehp::HookeanForceEvaluator,
              mehp::MEHPForceEvaluator,
-             py::smart_holder>(
-    m,
-    "HookeanForceEvaluator",
-    R"pbdoc(
+             py::smart_holder>(m,
+                               "HookeanForceEvaluator",
+                               R"pbdoc(
       Linear Gaussian (Hookean) spring constitutive evaluator:
       :math:`E_s = \frac{\kappa}{2 N_s} \|\Delta\mathbf{r}_s\|^2`.
 
@@ -844,18 +837,15 @@ the simulation or optimization procedure.)pbdoc")
 
   py::class_<mehp::NonGaussianSpringForceEvaluator,
              mehp::MEHPForceEvaluator,
-             py::smart_holder>(
-    m,
-    "NonGaussianSpringForceEvaluator",
-    R"pbdoc(
+             py::smart_holder>(m,
+                               "NonGaussianSpringForceEvaluator",
+                               R"pbdoc(
       Non-Gaussian freely-jointed-chain (inverse Langevin) spring evaluator.
 
       :param kappa: Stiffness parameter (>= 0).
       :param l: Kuhn segment length (> 0).
     )pbdoc")
-    .def(py::init<double, double>(),
-         py::arg("kappa") = 1.0,
-         py::arg("l") = 1.0)
+    .def(py::init<double, double>(), py::arg("kappa") = 1.0, py::arg("l") = 1.0)
     .def_property_readonly(
       "l",
       &mehp::NonGaussianSpringForceEvaluator::getSegmentLength,
@@ -880,18 +870,16 @@ the simulation or optimization procedure.)pbdoc")
                      const int cgFallbackMaxIterations,
                      const double gradientDescentLearningRate,
                      const mehp::SlipMode slipMode) {
-           return mehp::MEHPLinearSolverConfig{
-             solver,
-             simplificationMode,
-             inactiveRemovalCutoff,
-             residualReduction,
-             maxIterations,
-             springBreakingLength,
-             inPlaceRebuildThreshold,
-             cgFallbackMaxIterations,
-             gradientDescentLearningRate,
-             slipMode
-           };
+           return mehp::MEHPLinearSolverConfig{ solver,
+                                                simplificationMode,
+                                                inactiveRemovalCutoff,
+                                                residualReduction,
+                                                maxIterations,
+                                                springBreakingLength,
+                                                inPlaceRebuildThreshold,
+                                                cgFallbackMaxIterations,
+                                                gradientDescentLearningRate,
+                                                slipMode };
          }),
          py::arg_v("solver", mehp::SLESolver::DEFAULT, "SLESolver.DEFAULT"),
          py::arg_v("simplification_mode",
@@ -999,7 +987,8 @@ the simulation or optimization procedure.)pbdoc")
   py::class_<mehp::MEHPNonlinearSolverConfig, py::smart_holder>(
     m,
     "MEHPNonlinearSolverConfig",
-    "Configuration for general nonlinear optimization MEHP equilibrium solving via NLopt.")
+    "Configuration for general nonlinear optimization MEHP equilibrium solving "
+    "via NLopt.")
     .def(py::init([](const mehp::NLoptAlgorithm algorithm,
                      const long int maxNrOfSteps,
                      const double xtol,
@@ -1008,20 +997,17 @@ the simulation or optimization procedure.)pbdoc")
                      const double inactiveRemovalCutoff,
                      const double springBreakingLength,
                      const mehp::SlipMode slipMode) {
-           return mehp::MEHPNonlinearSolverConfig{
-             algorithm,
-             maxNrOfSteps,
-             xtol,
-             ftol,
-             simplificationMode,
-             inactiveRemovalCutoff,
-             springBreakingLength,
-             slipMode
-           };
+           return mehp::MEHPNonlinearSolverConfig{ algorithm,
+                                                   maxNrOfSteps,
+                                                   xtol,
+                                                   ftol,
+                                                   simplificationMode,
+                                                   inactiveRemovalCutoff,
+                                                   springBreakingLength,
+                                                   slipMode };
          }),
-         py::arg_v("algorithm",
-                   mehp::NLoptAlgorithm::LD_MMA,
-                   "NLoptAlgorithm.LD_MMA"),
+         py::arg_v(
+           "algorithm", mehp::NLoptAlgorithm::LD_MMA, "NLoptAlgorithm.LD_MMA"),
          py::arg("max_nr_of_steps") = 250000,
          py::arg("xtol") = 1e-12,
          py::arg("ftol") = 1e-9,
@@ -1065,7 +1051,8 @@ the simulation or optimization procedure.)pbdoc")
   py::class_<mehp::MEHPSolver, py::smart_holder>(
     m,
     "MEHPSolver",
-    "Abstract strategy interface for solving mechanical equilibrium on an MEHPNetwork.")
+    "Abstract strategy interface for solving mechanical equilibrium on an "
+    "MEHPNetwork.")
     .def("solve",
          &solveWithPythonDisplacements,
          "Solve for equilibrium link displacements on net starting from u.",
@@ -1077,7 +1064,8 @@ the simulation or optimization procedure.)pbdoc")
   py::class_<mehp::LinearSystemMEHPSolver, mehp::MEHPSolver, py::smart_holder>(
     m,
     "LinearSystemMEHPSolver",
-    "Equilibrium solver for linear (Hookean) MEHP networks via sparse linear system assembly.")
+    "Equilibrium solver for linear (Hookean) MEHP networks via sparse linear "
+    "system assembly.")
     .def(py::init<const mehp::MEHPLinearSolverConfig&>(),
          py::arg_v("config",
                    mehp::MEHPLinearSolverConfig{},
@@ -1090,30 +1078,30 @@ the simulation or optimization procedure.)pbdoc")
          &mehp::LinearSystemMEHPSolver::setConfig,
          py::arg("config"));
 
-  py::class_<mehp::SlipLinkRelaxationSolver,
-             mehp::MEHPSolver,
-             py::smart_holder>(
-    m,
-    "SlipLinkRelaxationSolver",
-    "Iterative alternating coordinate and contour-partition relaxation solver for slip-link networks.")
-    .def(py::init<const mehp::MEHPSlipLinkSolverConfig&>(),
-         py::arg_v("config",
-                   mehp::MEHPSlipLinkSolverConfig{},
-                   "MEHPSlipLinkSolverConfig()"))
-    .def_property("config",
-                  &mehp::SlipLinkRelaxationSolver::getConfig,
-                  &mehp::SlipLinkRelaxationSolver::setConfig)
-    .def("get_config", &mehp::SlipLinkRelaxationSolver::getConfig)
-    .def("set_config",
-         &mehp::SlipLinkRelaxationSolver::setConfig,
-         py::arg("config"));
+  py::
+    class_<mehp::SlipLinkRelaxationSolver, mehp::MEHPSolver, py::smart_holder>(
+      m,
+      "SlipLinkRelaxationSolver",
+      "Iterative alternating coordinate and contour-partition relaxation "
+      "solver for slip-link networks.")
+      .def(py::init<const mehp::MEHPSlipLinkSolverConfig&>(),
+           py::arg_v("config",
+                     mehp::MEHPSlipLinkSolverConfig{},
+                     "MEHPSlipLinkSolverConfig()"))
+      .def_property("config",
+                    &mehp::SlipLinkRelaxationSolver::getConfig,
+                    &mehp::SlipLinkRelaxationSolver::setConfig)
+      .def("get_config", &mehp::SlipLinkRelaxationSolver::getConfig)
+      .def("set_config",
+           &mehp::SlipLinkRelaxationSolver::setConfig,
+           py::arg("config"));
 
   py::class_<mehp::NonlinearOptimizationSolver,
              mehp::MEHPSolver,
-             py::smart_holder>(
-    m,
-    "NonlinearOptimizationSolver",
-    "General nonlinear energy minimization solver for MEHP networks using NLopt.")
+             py::smart_holder>(m,
+                               "NonlinearOptimizationSolver",
+                               "General nonlinear energy minimization solver "
+                               "for MEHP networks using NLopt.")
     .def(py::init<const mehp::MEHPNonlinearSolverConfig&>(),
          py::arg_v("config",
                    mehp::MEHPNonlinearSolverConfig{},
@@ -1145,23 +1133,22 @@ the simulation or optimization procedure.)pbdoc")
          py::arg("network"),
          py::arg("force_evaluator") = nullptr,
          py::arg("is_2d") = false)
-    .def(py::init<
-           const pe::Universe&,
-           const pylimer_tools::topo::entanglement_detection::
-             AtomPairEntanglements&,
-           int,
-           mehp::EntanglementMode,
-           std::shared_ptr<mehp::MEHPForceEvaluator>,
-           bool,
-           bool,
-           bool,
-           bool>(),
+    .def(py::init<const pe::Universe&,
+                  const pylimer_tools::topo::entanglement_detection::
+                    AtomPairEntanglements&,
+                  int,
+                  mehp::EntanglementMode,
+                  std::shared_ptr<mehp::MEHPForceEvaluator>,
+                  bool,
+                  bool,
+                  bool,
+                  bool>(),
          "Instantiate MEHPSimulator from an atomistic Universe.",
          py::arg("universe"),
-         py::arg_v("entanglements",
-                   pylimer_tools::topo::entanglement_detection::
-                     AtomPairEntanglements(),
-                   "AtomPairEntanglements()"),
+         py::arg_v(
+           "entanglements",
+           pylimer_tools::topo::entanglement_detection::AtomPairEntanglements(),
+           "AtomPairEntanglements()"),
          py::arg("crosslinker_type") = 2,
          py::arg_v("entanglement_mode",
                    mehp::EntanglementMode::MERGED_LINKS,
@@ -1171,39 +1158,40 @@ the simulation or optimization procedure.)pbdoc")
          py::arg("keep_2functional_crosslinkers") = false,
          py::arg("remove_primary_loops") = false,
          py::arg("assume_box_large_enough") = false)
-    .def(py::init<
-           const pe::Box&,
-           const mehp::CrosslinkerUniverse&,
-           const pylimer_tools::topo::entanglement_detection::
-             StrandPairEntanglements&,
-           int,
-           mehp::EntanglementMode,
-           std::shared_ptr<mehp::MEHPForceEvaluator>,
-           bool,
-           bool,
-           bool,
-           bool,
-           bool>(),
-         "Instantiate MEHPSimulator from a Box and a CrosslinkerUniverse.",
-         py::arg("box"),
-         py::arg("crosslinker_universe"),
-         py::arg_v("entanglements",
-                   pylimer_tools::topo::entanglement_detection::
-                     StrandPairEntanglements(),
-                   "StrandPairEntanglements()"),
-         py::arg("crosslinker_type") = 2,
-         py::arg_v("entanglement_mode",
-                   mehp::EntanglementMode::MERGED_LINKS,
-                   "EntanglementMode.MERGED_LINKS"),
-         py::arg("force_evaluator") = nullptr,
-         py::arg("is_2d") = false,
-         py::arg("remove_dangling_chains") = false,
-         py::arg("include_free_chains") = true,
-         py::arg("remove_primary_loops") = false,
-         py::arg("assume_box_large_enough") = false)
+    .def(
+      py::init<const pe::Box&,
+               const mehp::CrosslinkerUniverse&,
+               const pylimer_tools::topo::entanglement_detection::
+                 StrandPairEntanglements&,
+               int,
+               mehp::EntanglementMode,
+               std::shared_ptr<mehp::MEHPForceEvaluator>,
+               bool,
+               bool,
+               bool,
+               bool,
+               bool>(),
+      "Instantiate MEHPSimulator from a Box and a CrosslinkerUniverse.",
+      py::arg("box"),
+      py::arg("crosslinker_universe"),
+      py::arg_v(
+        "entanglements",
+        pylimer_tools::topo::entanglement_detection::StrandPairEntanglements(),
+        "StrandPairEntanglements()"),
+      py::arg("crosslinker_type") = 2,
+      py::arg_v("entanglement_mode",
+                mehp::EntanglementMode::MERGED_LINKS,
+                "EntanglementMode.MERGED_LINKS"),
+      py::arg("force_evaluator") = nullptr,
+      py::arg("is_2d") = false,
+      py::arg("remove_dangling_chains") = false,
+      py::arg("include_free_chains") = true,
+      py::arg("remove_primary_loops") = false,
+      py::arg("assume_box_large_enough") = false)
     .def_static("construct_with_random_entanglements",
                 &mehp::MEHPSimulator::constructWithRandomEntanglements,
-                "Construct MEHPSimulator from a Universe with randomly sampled entanglements.",
+                "Construct MEHPSimulator from a Universe with randomly sampled "
+                "entanglements.",
                 py::arg("universe"),
                 py::arg("nr_of_entanglements_to_sample"),
                 py::arg("upper_sampling_cutoff"),
@@ -1222,10 +1210,9 @@ the simulation or optimization procedure.)pbdoc")
                 py::arg("keep_2functional_crosslinkers") = false,
                 py::arg("remove_primary_loops") = false,
                 py::arg("assume_box_large_enough") = false)
-    .def("__copy__",
-         [](const mehp::MEHPSimulator& self) {
-           return mehp::MEHPSimulator(self);
-         })
+    .def(
+      "__copy__",
+      [](const mehp::MEHPSimulator& self) { return mehp::MEHPSimulator(self); })
     // Configuration & Mutators
     .def_property("force_evaluator",
                   &mehp::MEHPSimulator::getForceEvaluator,
@@ -1249,16 +1236,11 @@ the simulation or optimization procedure.)pbdoc")
     .def("config_remove_primary_loops",
          &mehp::MEHPSimulator::configRemovePrimaryLoops,
          py::arg("remove") = false)
-    .def_property("is_2d",
-                  &mehp::MEHPSimulator::getIs2D,
-                  &mehp::MEHPSimulator::setIs2D)
-    .def("set_is_2d",
-         &mehp::MEHPSimulator::setIs2D,
-         py::arg("is_2d"))
+    .def_property(
+      "is_2d", &mehp::MEHPSimulator::getIs2D, &mehp::MEHPSimulator::setIs2D)
+    .def("set_is_2d", &mehp::MEHPSimulator::setIs2D, py::arg("is_2d"))
     .def("get_is_2d", &mehp::MEHPSimulator::getIs2D)
-    .def("deform_to",
-         &mehp::MEHPSimulator::deformTo,
-         py::arg("target_box"))
+    .def("deform_to", &mehp::MEHPSimulator::deformTo, py::arg("target_box"))
     // Simplification
     .def("break_too_long_strands",
          &mehp::MEHPSimulator::breakTooLongStrands,
@@ -1325,8 +1307,7 @@ the simulation or optimization procedure.)pbdoc")
     .def("set_current_displacements",
          &mehp::MEHPSimulator::setCurrentDisplacements,
          py::arg("new_displacements"))
-    .def("get_initial_coordinates",
-         &mehp::MEHPSimulator::getInitialCoordinates)
+    .def("get_initial_coordinates", &mehp::MEHPSimulator::getInitialCoordinates)
     .def("get_spring_vectors", &mehp::MEHPSimulator::getSpringVectors)
     .def("get_spring_lengths", &mehp::MEHPSimulator::getSpringLengths)
     .def("get_average_spring_length",
@@ -1351,8 +1332,7 @@ the simulation or optimization procedure.)pbdoc")
     .def("get_nr_of_active_strands",
          &mehp::MEHPSimulator::getNrOfActiveStrands,
          py::arg("tolerance") = 1e-3)
-    .def("get_crosslinker_universe",
-         &mehp::MEHPSimulator::getCrosslinkerVerse)
+    .def("get_crosslinker_universe", &mehp::MEHPSimulator::getCrosslinkerVerse)
     .def("get_crosslinker_verse", &mehp::MEHPSimulator::getCrosslinkerVerse)
     .def("get_default_r0_square", &mehp::MEHPSimulator::getDefaultR0Square)
     .def("get_default_bond_length", &mehp::MEHPSimulator::getDefaultBondLength)
@@ -1455,11 +1435,10 @@ the simulation or optimization procedure.)pbdoc")
         return mehp::MEHPSimulator::readRestartFile(filenameCopy);
       },
       py::arg("file"))
-    .def(
-      "serialize_to_string",
-      [](const mehp::MEHPSimulator& sim) {
-        return py::bytes(sim.serializeToString());
-      })
+    .def("serialize_to_string",
+         [](const mehp::MEHPSimulator& sim) {
+           return py::bytes(sim.serializeToString());
+         })
     .def_static("construct_from_string",
                 &mehp::MEHPSimulator::constructFromString,
                 py::arg("s"))

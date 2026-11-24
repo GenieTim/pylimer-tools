@@ -145,8 +145,7 @@ MEHPSimulator::constructWithRandomEntanglements(
 void
 MEHPSimulator::setForceEvaluator(std::shared_ptr<MEHPForceEvaluator> evaluator)
 {
-  INVALIDARG_EXP_IFN(evaluator != nullptr,
-                     "Force evaluator cannot be null.");
+  INVALIDARG_EXP_IFN(evaluator != nullptr, "Force evaluator cannot be null.");
   this->forceEvaluator = std::move(evaluator);
 }
 
@@ -162,8 +161,9 @@ MEHPSimulator::configMeanBondLength(const double meanBondLength)
 void
 MEHPSimulator::configMeanSquaredBondLength(const double r02)
 {
-  INVALIDARG_EXP_IFN(std::isfinite(r02) && r02 >= 0.0,
-                     "Mean squared bond length must be non-negative and finite.");
+  INVALIDARG_EXP_IFN(
+    std::isfinite(r02) && r02 >= 0.0,
+    "Mean squared bond length must be non-negative and finite.");
   this->network.defaultR02 = r02;
   this->network.defaultBondLength = std::sqrt(r02);
 }
@@ -246,13 +246,8 @@ MEHPSimulator::addSlipLinks(const std::vector<size_t>& strandIdx1,
                             const Eigen::VectorXd& z,
                             const bool clampAlpha)
 {
-  return this->network.addSlipLinks(strandIdx1,
-                                    strandIdx2,
-                                    x,
-                                    y,
-                                    z,
-                                    &this->currentDisplacements,
-                                    clampAlpha);
+  return this->network.addSlipLinks(
+    strandIdx1, strandIdx2, x, y, z, &this->currentDisplacements, clampAlpha);
 }
 
 size_t
@@ -328,7 +323,8 @@ MEHPSimulator::run(const MEHPSolver& solver,
                                        wrappedCallbacks);
   this->simulationHasRun = true;
   if (this->hasOutputs()) {
-    this->handleOutput(static_cast<long int>(this->lastSolveResult.nrOfIterations));
+    this->handleOutput(
+      static_cast<long int>(this->lastSolveResult.nrOfIterations));
   }
   return this->lastSolveResult;
 }
@@ -373,10 +369,9 @@ MEHPSimulator::run()
 void
 MEHPSimulator::setCurrentDisplacements(const Eigen::VectorXd& newDisplacements)
 {
-  INVALIDARG_EXP_IFN(
-    newDisplacements.size() ==
-      static_cast<Eigen::Index>(3 * this->network.nrOfLinks),
-    "Displacement vector size must equal 3 * nrOfLinks.");
+  INVALIDARG_EXP_IFN(newDisplacements.size() ==
+                       static_cast<Eigen::Index>(3 * this->network.nrOfLinks),
+                     "Displacement vector size must equal 3 * nrOfLinks.");
   this->currentDisplacements = newDisplacements;
   if (this->is2D) {
     for (size_t i = 0; i < this->network.nrOfLinks; ++i) {
@@ -398,7 +393,8 @@ size_t
 MEHPSimulator::getNrOfActiveNodes(const double tolerance) const
 {
   return static_cast<size_t>(
-    this->network.findActiveNodes(this->currentDisplacements, tolerance, this->is2D)
+    this->network
+      .findActiveNodes(this->currentDisplacements, tolerance, this->is2D)
       .count());
 }
 
@@ -491,11 +487,10 @@ MEHPSimulator::getPressure() const
           this->forceEvaluator->getKappa(),
           this->is2D,
           this->lastSolveResult.oneOverSpringPartitionUpperLimitUsed)
-      : this->forceEvaluator->evaluateStressTensor(
-          this->network,
-          this->getSpringVectors(),
-          this->network.vol,
-          this->is2D);
+      : this->forceEvaluator->evaluateStressTensor(this->network,
+                                                   this->getSpringVectors(),
+                                                   this->network.vol,
+                                                   this->is2D);
   return stress.trace() / 3.0;
 }
 

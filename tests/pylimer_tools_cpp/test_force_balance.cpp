@@ -61,17 +61,17 @@ outputNetwork(const pcm::MEHPNetwork& net,
           << partialSpringIdx << ": "
           << springPartitions[static_cast<Eigen::Index>(partialSpringIdx)]
           << " ("
-          << roundForOutput(
-               net.springBoxOffset
-                 [3 * static_cast<Eigen::Index>(partialSpringIdx) + 0])
+          << roundForOutput(net.springBoxOffset[3 * static_cast<Eigen::Index>(
+                                                      partialSpringIdx) +
+                                                0])
           << ", "
-          << roundForOutput(
-               net.springBoxOffset
-                 [3 * static_cast<Eigen::Index>(partialSpringIdx) + 1])
+          << roundForOutput(net.springBoxOffset[3 * static_cast<Eigen::Index>(
+                                                      partialSpringIdx) +
+                                                1])
           << ", "
-          << roundForOutput(
-               net.springBoxOffset
-                 [3 * static_cast<Eigen::Index>(partialSpringIdx) + 2])
+          << roundForOutput(net.springBoxOffset[3 * static_cast<Eigen::Index>(
+                                                      partialSpringIdx) +
+                                                2])
           << ")" << std::endl;
       }
     }
@@ -209,8 +209,8 @@ TEST_CASE("MC swap accept and reject work", "[analysis][MEHPSimulator]")
   SECTION("MC condition accepts as requested")
   {
     pcm::MEHPNetwork net = baseNet;
-    Eigen::VectorXd u = Eigen::VectorXd::Zero(
-      static_cast<Eigen::Index>(3 * net.nrOfLinks));
+    Eigen::VectorXd u =
+      Eigen::VectorXd::Zero(static_cast<Eigen::Index>(3 * net.nrOfLinks));
     net.addSlipLinks({ 0, 0 },
                      { 1, 1 },
                      (Eigen::VectorXd(2) << 21.03, 23.01).finished(),
@@ -233,8 +233,8 @@ TEST_CASE("MC swap accept and reject work", "[analysis][MEHPSimulator]")
   SECTION("MC condition rejects as requested")
   {
     pcm::MEHPNetwork net = baseNet;
-    Eigen::VectorXd u = Eigen::VectorXd::Zero(
-      static_cast<Eigen::Index>(3 * net.nrOfLinks));
+    Eigen::VectorXd u =
+      Eigen::VectorXd::Zero(static_cast<Eigen::Index>(3 * net.nrOfLinks));
     net.addSlipLinks({ 0, 0 },
                      { 1, 1 },
                      (Eigen::VectorXd(2) << 21., 23.).finished(),
@@ -296,19 +296,18 @@ TEST_CASE("MC swap accept and reject work with crosslinkers",
     }
     throw std::runtime_error("Link atom ID not found in test");
   };
-  auto findStrandBetween = [](const pcm::MEHPNetwork& net,
-                              const size_t linkA,
-                              const size_t linkB) {
-    for (size_t s = 0; s < net.nrOfStrands; ++s) {
-      const size_t endA = net.linkIndicesOfStrand[s].front();
-      const size_t endB = net.linkIndicesOfStrand[s].back();
-      if ((endA == linkA && endB == linkB) ||
-          (endA == linkB && endB == linkA)) {
-        return s;
+  auto findStrandBetween =
+    [](const pcm::MEHPNetwork& net, const size_t linkA, const size_t linkB) {
+      for (size_t s = 0; s < net.nrOfStrands; ++s) {
+        const size_t endA = net.linkIndicesOfStrand[s].front();
+        const size_t endB = net.linkIndicesOfStrand[s].back();
+        if ((endA == linkA && endB == linkB) ||
+            (endA == linkB && endB == linkA)) {
+          return s;
+        }
       }
-    }
-    throw std::runtime_error("Strand between links not found in test");
-  };
+      throw std::runtime_error("Strand between links not found in test");
+    };
 
   const size_t link1 = findLinkByOldAtomId(baseNet, 1);
   const size_t link2 = findLinkByOldAtomId(baseNet, 2);
@@ -320,8 +319,8 @@ TEST_CASE("MC swap accept and reject work with crosslinkers",
   SECTION("MC condition accepts as requested")
   {
     pcm::MEHPNetwork net = baseNet;
-    Eigen::VectorXd u = Eigen::VectorXd::Zero(
-      static_cast<Eigen::Index>(3 * net.nrOfLinks));
+    Eigen::VectorXd u =
+      Eigen::VectorXd::Zero(static_cast<Eigen::Index>(3 * net.nrOfLinks));
     const double alphaOnSwap =
       (net.linkIndicesOfStrand[swapStrand].front() == link4) ? (1. - 0.966667)
                                                              : 0.966667;
@@ -354,8 +353,8 @@ TEST_CASE("MC swap accept and reject work with crosslinkers",
   SECTION("MC condition rejects as requested")
   {
     pcm::MEHPNetwork net = baseNet;
-    Eigen::VectorXd u = Eigen::VectorXd::Zero(
-      static_cast<Eigen::Index>(3 * net.nrOfLinks));
+    Eigen::VectorXd u =
+      Eigen::VectorXd::Zero(static_cast<Eigen::Index>(3 * net.nrOfLinks));
     const double alphaOnSwap =
       (net.linkIndicesOfStrand[swapStrand].front() == link4) ? (1. - 0.966667)
                                                              : 0.966667;
@@ -448,16 +447,16 @@ TEST_CASE("MEHP Force Balance handles slip-links on primary loops",
 
   SECTION("Unentangled primary loop")
   {
-    const pcm::MEHPNetwork net = pcm::MEHPNetwork::fromUniverse(
-      mutUniverse,
-      {},
-      2,
-      pcm::EntanglementMode::MERGED_LINKS,
-      true,
-      false,
-      true);
-    Eigen::VectorXd displacements = Eigen::VectorXd::Zero(
-      static_cast<Eigen::Index>(3 * net.nrOfLinks));
+    const pcm::MEHPNetwork net =
+      pcm::MEHPNetwork::fromUniverse(mutUniverse,
+                                     {},
+                                     2,
+                                     pcm::EntanglementMode::MERGED_LINKS,
+                                     true,
+                                     false,
+                                     true);
+    Eigen::VectorXd displacements =
+      Eigen::VectorXd::Zero(static_cast<Eigen::Index>(3 * net.nrOfLinks));
     CHECK_NOTHROW(net.displaceToMeanPosition(displacements, 0, false, 1.));
     CHECK(displacements[0] == Catch::Approx(7.687).epsilon(1e-5));
     CHECK(displacements[1] == Catch::Approx(2.03926).epsilon(1e-5));
@@ -466,20 +465,20 @@ TEST_CASE("MEHP Force Balance handles slip-links on primary loops",
 
   SECTION("Entangled primary loop")
   {
-    pcm::MEHPNetwork net = pcm::MEHPNetwork::fromUniverse(
-      mutUniverse,
-      {},
-      2,
-      pcm::EntanglementMode::MERGED_LINKS,
-      true,
-      false,
-      true);
+    pcm::MEHPNetwork net =
+      pcm::MEHPNetwork::fromUniverse(mutUniverse,
+                                     {},
+                                     2,
+                                     pcm::EntanglementMode::MERGED_LINKS,
+                                     true,
+                                     false,
+                                     true);
     net.strandContourLength = Eigen::VectorXd::Constant(
       static_cast<Eigen::Index>(net.nrOfStrands), 15.);
     net.springContourLength = net.strandContourLength;
     net.recomputeMeanContourLengths();
-    Eigen::VectorXd displacements = Eigen::VectorXd::Zero(
-      static_cast<Eigen::Index>(3 * net.nrOfLinks));
+    Eigen::VectorXd displacements =
+      Eigen::VectorXd::Zero(static_cast<Eigen::Index>(3 * net.nrOfLinks));
     size_t loopStrandIdx = 0;
     bool foundLoop = false;
     size_t detachedStrandIdx = 0;
@@ -505,18 +504,15 @@ TEST_CASE("MEHP Force Balance handles slip-links on primary loops",
     REQUIRE(foundLoop);
     REQUIRE(foundDetached);
     REQUIRE(foundStrandTo5);
-    const double alphaTo5 =
-      (net.linkIndicesOfStrand[strandTo5].front() == 0)
-        ? 0.9310344827586207
-        : (1.0 - 0.9310344827586207);
+    const double alphaTo5 = (net.linkIndicesOfStrand[strandTo5].front() == 0)
+                              ? 0.9310344827586207
+                              : (1.0 - 0.9310344827586207);
     net.addSlipLinks(
       { loopStrandIdx, strandTo5 },
       { detachedStrandIdx, detachedStrandIdx },
-      (Eigen::VectorXd(2) << 1.3263401618628183, 42.04664022316877)
-        .finished(),
+      (Eigen::VectorXd(2) << 1.3263401618628183, 42.04664022316877).finished(),
       (Eigen::VectorXd(2) << 6.670300217824844, 7.18272624553976).finished(),
-      (Eigen::VectorXd(2) << 41.85951429390015, 0.8578704100544575)
-        .finished(),
+      (Eigen::VectorXd(2) << 41.85951429390015, 0.8578704100544575).finished(),
       { 0.5333333333333333, alphaTo5 },
       { 0.5, 0.5 },
       &displacements);
@@ -569,9 +565,9 @@ TEST_CASE("MEHPForceBalance phantom with and without removal is the same",
 
   CHECK(forceBalancerPhantom.getNrOfSprings() ==
         forceBalancerPhantomRem.getNrOfSprings());
-  CHECK_THAT(forceBalancerPhantom.getResidual(),
-             Catch::Matchers::WithinRel(
-               forceBalancerPhantomRem.getResidual(), 0.001));
+  CHECK_THAT(
+    forceBalancerPhantom.getResidual(),
+    Catch::Matchers::WithinRel(forceBalancerPhantomRem.getResidual(), 0.001));
   CHECK_THAT(forceBalancerPhantom.getSolubleWeightFraction(),
              Catch::Matchers::WithinRel(
                forceBalancerPhantomRem.getSolubleWeightFraction(), 0.001));
@@ -690,8 +686,8 @@ TEST_CASE("MEHP Force Balance handles slip-link convergence correctly",
     false);
 
   pcm::MEHPNetwork net = forceBalancer.getNetwork();
-  Eigen::VectorXd displacements = Eigen::VectorXd::Zero(
-    static_cast<Eigen::Index>(3 * net.nrOfLinks));
+  Eigen::VectorXd displacements =
+    Eigen::VectorXd::Zero(static_cast<Eigen::Index>(3 * net.nrOfLinks));
   CHECK(net.springPartitions[2] ==
         Catch::Approx(0.7931034482758621 - 0.13793103448275862));
   // one output step
@@ -758,9 +754,16 @@ TEST_CASE("MEHPSimulator slip-link balance runs",
       double nrOfChains = 1.e4;
       CHECK(static_cast<double>(universe2.getMolecules(2).size()) ==
             Catch::Approx(nrOfChains));
-      pcm::MEHPSimulator forceBalancer2 = pcm::MEHPSimulator(
-        universe2, {}, 2, pcm::EntanglementMode::MERGED_LINKS, nullptr, false,
-        false, false, true);
+      pcm::MEHPSimulator forceBalancer2 =
+        pcm::MEHPSimulator(universe2,
+                           {},
+                           2,
+                           pcm::EntanglementMode::MERGED_LINKS,
+                           nullptr,
+                           false,
+                           false,
+                           false,
+                           true);
 
       std::vector<size_t> allLinks(forceBalancer2.getNrOfLinks());
       std::iota(allLinks.begin(), allLinks.end(), size_t{ 0 });
@@ -777,9 +780,16 @@ TEST_CASE("MEHPSimulator slip-link balance runs",
       SECTION("Actual balance results in correct phantom results")
       {
         std::cout << "Doing phantom force balance" << std::endl;
-        pcm::MEHPSimulator forceRelaxer = pcm::MEHPSimulator(
-          universe2, {}, 2, pcm::EntanglementMode::NONE, nullptr, false, false,
-          false, true);
+        pcm::MEHPSimulator forceRelaxer =
+          pcm::MEHPSimulator(universe2,
+                             {},
+                             2,
+                             pcm::EntanglementMode::NONE,
+                             nullptr,
+                             false,
+                             false,
+                             false,
+                             true);
         CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::UNSET);
         CHECK(forceBalancer2.getNrOfIterations() == 0);
         CHECK(forceBalancer2.getVolume() ==
@@ -838,9 +848,8 @@ TEST_CASE("MEHPSimulator slip-link balance runs",
         CHECK_THAT(forceBalancer2.getGammaFactor(b02),
                    Catch::Matchers::WithinRel(
                      forceBalancer2.getGammaFactor(b02, nrOfChains), 0.03));
-        CHECK_THAT(
-          forceBalancer2.getGammaFactor(b02, nrOfChains),
-          Catch::Matchers::WithinRel(0.319446, 0.03));
+        CHECK_THAT(forceBalancer2.getGammaFactor(b02, nrOfChains),
+                   Catch::Matchers::WithinRel(0.319446, 0.03));
         CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
         CHECK(forceBalancer2.getNrOfActiveNodes() > 1);
         CHECK(forceBalancer2.getNrOfActiveSprings() > 1);
@@ -858,9 +867,16 @@ TEST_CASE("MEHPSimulator slip-link balance runs",
       SECTION("Actual balance results in correct slip-link results")
       {
         std::cout << "Doing non-phantom force balance" << std::endl;
-        pcm::MEHPSimulator forceRelaxer = pcm::MEHPSimulator(
-          universe2, {}, 2, pcm::EntanglementMode::NONE, nullptr, false, false,
-          false, true);
+        pcm::MEHPSimulator forceRelaxer =
+          pcm::MEHPSimulator(universe2,
+                             {},
+                             2,
+                             pcm::EntanglementMode::NONE,
+                             nullptr,
+                             false,
+                             false,
+                             false,
+                             true);
         CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::UNSET);
         CHECK(forceBalancer2.getNrOfIterations() == 0);
         CHECK(forceBalancer2.getVolume() ==
@@ -896,9 +912,16 @@ TEST_CASE("MEHPSimulator slip-link balance runs",
                           "333_2d_t_7500001.structure.out" } });
     CHECK(universeSeq.getLength() == 1);
     pe::Universe universe = universeSeq.atIndex(0);
-    pcm::MEHPSimulator forceBalancer = pcm::MEHPSimulator(
-      universe, {}, 2, pcm::EntanglementMode::NONE, nullptr, true, false,
-      false, true);
+    pcm::MEHPSimulator forceBalancer =
+      pcm::MEHPSimulator(universe,
+                         {},
+                         2,
+                         pcm::EntanglementMode::NONE,
+                         nullptr,
+                         true,
+                         false,
+                         false,
+                         true);
     CHECK(forceBalancer.getExitReason() == pcm::ExitReason::UNSET);
     CHECK(forceBalancer.getNrOfIterations() == 0);
     CHECK(forceBalancer.getVolume() == Catch::Approx(universe.getVolume()));
@@ -912,9 +935,16 @@ TEST_CASE("MEHPSimulator slip-link balance runs",
     CHECK(forceBalancer.getExitReason() == pcm::ExitReason::MAX_STEPS);
     CHECK_NOTHROW(forceBalancer.validateNetwork());
 
-    pcm::MEHPSimulator forceBalancer2 = pcm::MEHPSimulator(
-      universe, {}, 2, pcm::EntanglementMode::NONE, nullptr, true, false,
-      false, true);
+    pcm::MEHPSimulator forceBalancer2 =
+      pcm::MEHPSimulator(universe,
+                         {},
+                         2,
+                         pcm::EntanglementMode::NONE,
+                         nullptr,
+                         true,
+                         false,
+                         false,
+                         true);
     pcm::MEHPSlipLinkSolverConfig fullConfig;
     fullConfig.maxNrOfSteps = 10000;
     fullConfig.xtol = 1e-10;
@@ -1110,9 +1140,16 @@ TEST_CASE(
   CHECK(universeSeq.getLength() == 1);
   pe::Universe universe = universeSeq.atIndex(0);
   std::cout << "Read file. " << std::endl;
-  pcm::MEHPSimulator forceBalancer = pcm::MEHPSimulator(
-    universe, {}, 2, pcm::EntanglementMode::NONE, nullptr, false, true, false,
-    false);
+  pcm::MEHPSimulator forceBalancer =
+    pcm::MEHPSimulator(universe,
+                       {},
+                       2,
+                       pcm::EntanglementMode::NONE,
+                       nullptr,
+                       false,
+                       true,
+                       false,
+                       false);
   size_t nrOfAddedLinks =
     forceBalancer.randomlyAddSlipLinks(250, 2.0, 12, 2.0, "seed1");
   CHECK(nrOfAddedLinks >= 12);
@@ -1141,16 +1178,22 @@ TEST_CASE("MEHP Force Balance can run with empty universe",
 {
   std::cout << "Running test \"MEHP Force Balance can run with empty universe\""
             << std::endl;
-  pcm::MEHPSimulator forceBalancer = pcm::MEHPSimulator(
-    pe::Universe(), {}, 2, pcm::EntanglementMode::NONE, nullptr, false, true,
-    false, false);
+  pcm::MEHPSimulator forceBalancer =
+    pcm::MEHPSimulator(pe::Universe(),
+                       {},
+                       2,
+                       pcm::EntanglementMode::NONE,
+                       nullptr,
+                       false,
+                       true,
+                       false,
+                       false);
   CHECK_NOTHROW(forceBalancer.validateNetwork());
   CHECK_NOTHROW(forceBalancer.run(pcm::MEHPSlipLinkSolverConfig{}));
   CHECK_NOTHROW(forceBalancer.validateNetwork());
 }
 
-TEST_CASE("MEHP Force Balance can be interrupted",
-          "[analysis][MEHPSimulator]")
+TEST_CASE("MEHP Force Balance can be interrupted", "[analysis][MEHPSimulator]")
 {
   std::cout << "Running test \"MEHP Force Balance can be interrupted\""
             << std::endl;
@@ -1219,9 +1262,16 @@ TEST_CASE("MEHP Force Balance can run with swapping slip-links",
     CHECK(universeSeq.getLength() == 1);
     pe::Universe universe = universeSeq.atIndex(0);
     std::cout << "Read file. " << std::endl;
-    pcm::MEHPSimulator forceBalancer = pcm::MEHPSimulator(
-      universe, {}, 2, pcm::EntanglementMode::NONE, nullptr, false, false,
-      false, false);
+    pcm::MEHPSimulator forceBalancer =
+      pcm::MEHPSimulator(universe,
+                         {},
+                         2,
+                         pcm::EntanglementMode::NONE,
+                         nullptr,
+                         false,
+                         false,
+                         false,
+                         false);
     size_t nrOfAddedLinks =
       forceBalancer.randomlyAddSlipLinks(250, 2.0, 25, 2.0, "seed_swap");
     CHECK(nrOfAddedLinks >= 25);
@@ -1290,9 +1340,16 @@ TEST_CASE(
     CHECK(universeSeq.getLength() == 1);
     pe::Universe universe = universeSeq.atIndex(0);
     std::cout << "Read file. " << std::endl;
-    pcm::MEHPSimulator forceBalancer = pcm::MEHPSimulator(
-      universe, {}, 2, pcm::EntanglementMode::NONE, nullptr, false, true, false,
-      true);
+    pcm::MEHPSimulator forceBalancer =
+      pcm::MEHPSimulator(universe,
+                         {},
+                         2,
+                         pcm::EntanglementMode::NONE,
+                         nullptr,
+                         false,
+                         true,
+                         false,
+                         true);
     size_t nrOfAddedLinks =
       forceBalancer.randomlyAddSlipLinks(350, 2.0, 40, 2.0, "large_box_1");
     CHECK(nrOfAddedLinks >= 40);
@@ -1317,9 +1374,15 @@ TEST_CASE(
     CHECK_NOTHROW(net.validate(displacements));
 
     ////////////////////////////////////////////////////////////////
-    forceBalancer = pcm::MEHPSimulator(
-      universe, {}, 2, pcm::EntanglementMode::NONE, nullptr, false, false, true,
-      true);
+    forceBalancer = pcm::MEHPSimulator(universe,
+                                       {},
+                                       2,
+                                       pcm::EntanglementMode::NONE,
+                                       nullptr,
+                                       false,
+                                       false,
+                                       true,
+                                       true);
     nrOfAddedLinks =
       forceBalancer.randomlyAddSlipLinks(1000, 2.0, 100, 2.0, "large_box_2");
     CHECK(nrOfAddedLinks >= 100);
@@ -1357,9 +1420,16 @@ TEST_CASE(
     CHECK(universeSeq.getLength() == 1);
     pe::Universe universe = universeSeq.atIndex(0);
     std::cout << "Read file. " << std::endl;
-    pcm::MEHPSimulator forceBalancer = pcm::MEHPSimulator(
-      universe, {}, 2, pcm::EntanglementMode::NONE, nullptr, false, true, false,
-      false);
+    pcm::MEHPSimulator forceBalancer =
+      pcm::MEHPSimulator(universe,
+                         {},
+                         2,
+                         pcm::EntanglementMode::NONE,
+                         nullptr,
+                         false,
+                         true,
+                         false,
+                         false);
     size_t nrOfAddedLinks =
       forceBalancer.randomlyAddSlipLinks(350, 2.0, 42, 2.0, "small_box_1");
     CHECK(nrOfAddedLinks >= 40);
@@ -1382,9 +1452,15 @@ TEST_CASE(
     CHECK_NOTHROW(net.validate(displacements));
 
     ////////////////////////////////////////////////////////////////
-    forceBalancer = pcm::MEHPSimulator(
-      universe, {}, 2, pcm::EntanglementMode::NONE, nullptr, false, false, true,
-      false);
+    forceBalancer = pcm::MEHPSimulator(universe,
+                                       {},
+                                       2,
+                                       pcm::EntanglementMode::NONE,
+                                       nullptr,
+                                       false,
+                                       false,
+                                       true,
+                                       false);
     nrOfAddedLinks =
       forceBalancer.randomlyAddSlipLinks(350, 2.0, 42, 2.0, "small_box_2");
     CHECK(nrOfAddedLinks >= 40);
@@ -1401,8 +1477,7 @@ TEST_CASE(
   }
 }
 
-TEST_CASE("MEHP Force Balance handles slip-links",
-          "[analysis][MEHPSimulator]")
+TEST_CASE("MEHP Force Balance handles slip-links", "[analysis][MEHPSimulator]")
 {
   std::cout << "Running test \"MEHP Force Balance handles slip-links\""
             << std::endl;
@@ -1427,9 +1502,16 @@ TEST_CASE("MEHP Force Balance handles slip-links",
   SECTION("Slip-links are placed where requested")
   {
 
-    pcm::MEHPSimulator forceBalancer = pcm::MEHPSimulator(
-      universe, {}, 2, pcm::EntanglementMode::NONE, nullptr, false, true, false,
-      true);
+    pcm::MEHPSimulator forceBalancer =
+      pcm::MEHPSimulator(universe,
+                         {},
+                         2,
+                         pcm::EntanglementMode::NONE,
+                         nullptr,
+                         false,
+                         true,
+                         false,
+                         true);
 
     pcm::MEHPNetwork baseNet = forceBalancer.getNetwork();
     baseNet.strandContourLength.setConstant(15.0);
@@ -1453,9 +1535,16 @@ TEST_CASE("MEHP Force Balance handles slip-links",
     universe.addAtoms(
       { 10 }, { 1 }, { 0. }, { 0. }, { 0. }, { 1 }, { 1 }, { 1 });
     universe.addBonds(2, { { 1, 10 } }, { { 10, 3 } });
-    pcm::MEHPSimulator forceBalancer = pcm::MEHPSimulator(
-      universe, {}, 2, pcm::EntanglementMode::NONE, nullptr, false, true, false,
-      true);
+    pcm::MEHPSimulator forceBalancer =
+      pcm::MEHPSimulator(universe,
+                         {},
+                         2,
+                         pcm::EntanglementMode::NONE,
+                         nullptr,
+                         false,
+                         true,
+                         false,
+                         true);
     Eigen::VectorXd sX(1), sY(1), sZ(1);
     sX << 4.2;
     sY << 3.9;
@@ -1590,12 +1679,10 @@ TEST_CASE("MEHP Force Balance handles slip-links",
         const size_t sp1 = net.springIndicesOfStrand[targetStrand][1];
         const size_t spAtL2 = net.isPartOfSpring(l2, sp0) ? sp0 : sp1;
         const size_t spOther = (spAtL2 == sp0) ? sp1 : sp0;
-        CHECK_THAT(
-          springPartitions[static_cast<Eigen::Index>(spAtL2)],
-          Catch::Matchers::WithinAbs(0., 1e-3));
-        CHECK_THAT(
-          springPartitions[static_cast<Eigen::Index>(spOther)],
-          Catch::Matchers::WithinAbs(1., 1e-3));
+        CHECK_THAT(springPartitions[static_cast<Eigen::Index>(spAtL2)],
+                   Catch::Matchers::WithinAbs(0., 1e-3));
+        CHECK_THAT(springPartitions[static_cast<Eigen::Index>(spOther)],
+                   Catch::Matchers::WithinAbs(1., 1e-3));
       }
       // CHECK(springPartitions[8] == Catch::Approx(1.0).margin(1e-6)); // 5-3
       // CHECK(springPartitions[7] + 1e-5 == Catch::Approx(0.0 +
@@ -1686,9 +1773,16 @@ TEST_CASE("MEHP Force Balance Free chains collapse",
     pe::Box(nrOfBeads * 9.0, nrOfBeads * 9.0, nrOfBeads * 9.0);
   universe.setBox(deformedBox, true);
 
-  pcm::MEHPSimulator forceBalancer = pcm::MEHPSimulator(
-    universe, {}, 2, pcm::EntanglementMode::NONE, nullptr, false, true, false,
-    false);
+  pcm::MEHPSimulator forceBalancer =
+    pcm::MEHPSimulator(universe,
+                       {},
+                       2,
+                       pcm::EntanglementMode::NONE,
+                       nullptr,
+                       false,
+                       true,
+                       false,
+                       false);
   forceBalancer.deformTo(originalBox);
   CHECK_THAT(forceBalancer.getVolume(),
              Catch::Matchers::WithinRel(originalBox.getVolume()));
@@ -1803,9 +1897,16 @@ TEST_CASE("MEHP Force Balance Entanglement Beads Are Removed",
   CHECK(universe.getNrOfAtoms() == nrOfBeads);
   CHECK(universe.getNrOfBonds() == bondTo.size());
 
-  pcm::MEHPSimulator forceBalancer = pcm::MEHPSimulator(
-    universe, {}, 2, pcm::EntanglementMode::NONE, nullptr, false, true, false,
-    false);
+  pcm::MEHPSimulator forceBalancer =
+    pcm::MEHPSimulator(universe,
+                       {},
+                       2,
+                       pcm::EntanglementMode::NONE,
+                       nullptr,
+                       false,
+                       true,
+                       false,
+                       false);
   CHECK(forceBalancer.getNrOfSprings() == forceBalancer.getNrOfStrands());
   CHECK(forceBalancer.getNrOfSprings() == nrOfBeads / nrOfBeadsPerChain + 3);
   double initialResidual = forceBalancer.getResiduals().squaredNorm();
@@ -1814,8 +1915,7 @@ TEST_CASE("MEHP Force Balance Entanglement Beads Are Removed",
   cfg.maxNrOfSteps = 20000;
   cfg.xtol = 1e-12;
   cfg.initialResidualToUse = initialResidual;
-  cfg.simplificationMode =
-    pcm::StructureSimplificationMode::INACTIVE_THEN_X2F;
+  cfg.simplificationMode = pcm::StructureSimplificationMode::INACTIVE_THEN_X2F;
 
   SECTION("Large enough box")
   {
@@ -1870,9 +1970,16 @@ TEST_CASE("MEHP Force Balance fully active chains are fully active",
 
       SECTION("Without entanglements")
       {
-        pcm::MEHPSimulator forceBalancer = pcm::MEHPSimulator(
-          universe, {}, 2, pcm::EntanglementMode::NONE, nullptr, false, true,
-          false, false);
+        pcm::MEHPSimulator forceBalancer =
+          pcm::MEHPSimulator(universe,
+                             {},
+                             2,
+                             pcm::EntanglementMode::NONE,
+                             nullptr,
+                             false,
+                             true,
+                             false,
+                             false);
         size_t initialNSprings = forceBalancer.getNrOfSprings();
 
         SECTION("For large enough box")
@@ -2232,8 +2339,7 @@ TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC p = 1",
   }
 }
 
-TEST_CASE("MEHP Force Balance does not collapse",
-          "[analysis][MEHPSimulator]")
+TEST_CASE("MEHP Force Balance does not collapse", "[analysis][MEHPSimulator]")
 {
   std::cout << "Running test \"MEHP Force Balance does not collapse\""
             << std::endl;
@@ -2266,14 +2372,20 @@ TEST_CASE("MEHP Force Balance does not collapse",
   pcm::MEHPSlipLinkSolverConfig cfg;
   cfg.maxNrOfSteps = 10000;
   cfg.xtol = 1e-15;
-  cfg.simplificationMode =
-    pcm::StructureSimplificationMode::INACTIVE_THEN_X2F;
+  cfg.simplificationMode = pcm::StructureSimplificationMode::INACTIVE_THEN_X2F;
 
   SECTION("Assuming large enough box")
   {
-    pcm::MEHPSimulator forceBalanceConventional = pcm::MEHPSimulator(
-      universe, {}, 2, pcm::EntanglementMode::NONE, nullptr, true, true, false,
-      true);
+    pcm::MEHPSimulator forceBalanceConventional =
+      pcm::MEHPSimulator(universe,
+                         {},
+                         2,
+                         pcm::EntanglementMode::NONE,
+                         nullptr,
+                         true,
+                         true,
+                         false,
+                         true);
     CHECK_NOTHROW(forceBalanceConventional.run(cfg));
     CHECK(forceBalanceConventional.getNrOfIterations() > 0);
     CHECK(forceBalanceConventional.getExitReason() ==
@@ -2287,9 +2399,16 @@ TEST_CASE("MEHP Force Balance does not collapse",
   }
   SECTION("Assuming too small box")
   {
-    pcm::MEHPSimulator forceBalanceNew = pcm::MEHPSimulator(
-      universe, {}, 2, pcm::EntanglementMode::NONE, nullptr, true, true, false,
-      false);
+    pcm::MEHPSimulator forceBalanceNew =
+      pcm::MEHPSimulator(universe,
+                         {},
+                         2,
+                         pcm::EntanglementMode::NONE,
+                         nullptr,
+                         true,
+                         true,
+                         false,
+                         false);
     CHECK_NOTHROW(forceBalanceNew.run(cfg));
     CHECK(forceBalanceNew.getNrOfIterations() > 0);
     CHECK(forceBalanceNew.getExitReason() == pcm::ExitReason::X_TOLERANCE);
@@ -2498,8 +2617,7 @@ TEST_CASE("MEHP Force Balance correctly re-aligns Slip-Links to Images",
   }
 }
 
-TEST_CASE("Particular MEHP Force Balance Example",
-          "[analysis][MEHPSimulator]")
+TEST_CASE("Particular MEHP Force Balance Example", "[analysis][MEHPSimulator]")
 {
   std::cout << "Running test \"Particular MEHP Force Balance Example\""
             << std::endl;
@@ -2519,9 +2637,16 @@ TEST_CASE("Particular MEHP Force Balance Example",
     pe::Universe universe = universeSeq.atIndex(0);
     std::cout << "Read file " << inputFile << std::endl;
 
-    pcm::MEHPSimulator forceBalancer = pcm::MEHPSimulator(
-      universe, {}, 2, pcm::EntanglementMode::NONE, nullptr, false, false,
-      false, true);
+    pcm::MEHPSimulator forceBalancer =
+      pcm::MEHPSimulator(universe,
+                         {},
+                         2,
+                         pcm::EntanglementMode::NONE,
+                         nullptr,
+                         false,
+                         false,
+                         false,
+                         true);
     CHECK_NOTHROW(forceBalancer.run(pcm::MEHPSlipLinkSolverConfig{}));
 
     double pressBefore = forceBalancer.getPressure();
@@ -2550,19 +2675,40 @@ TEST_CASE("Random sampling example", "[analysis][MEHPSimulator][long]")
     pe::Universe universe = universeSeq.atIndex(0);
     std::cout << "Read file " << inputFile << std::endl;
 
-    pcm::MEHPSimulator forceBalancerLargeOldSampling = pcm::MEHPSimulator(
-      universe, {}, 2, pcm::EntanglementMode::NONE, nullptr, false, true, false,
-      true);
+    pcm::MEHPSimulator forceBalancerLargeOldSampling =
+      pcm::MEHPSimulator(universe,
+                         {},
+                         2,
+                         pcm::EntanglementMode::NONE,
+                         nullptr,
+                         false,
+                         true,
+                         false,
+                         true);
     forceBalancerLargeOldSampling.randomlyAddSlipLinks(
       1000, 6.0, 900, 3.0, "53467829");
 
-    pcm::MEHPSimulator forceBalancerSmallOldSampling1 = pcm::MEHPSimulator(
-      universe, {}, 2, pcm::EntanglementMode::NONE, nullptr, false, true, false,
-      false);
+    pcm::MEHPSimulator forceBalancerSmallOldSampling1 =
+      pcm::MEHPSimulator(universe,
+                         {},
+                         2,
+                         pcm::EntanglementMode::NONE,
+                         nullptr,
+                         false,
+                         true,
+                         false,
+                         false);
 
-    pcm::MEHPSimulator forceBalancerSmallOldSampling2 = pcm::MEHPSimulator(
-      universe, {}, 2, pcm::EntanglementMode::NONE, nullptr, false, true, false,
-      false);
+    pcm::MEHPSimulator forceBalancerSmallOldSampling2 =
+      pcm::MEHPSimulator(universe,
+                         {},
+                         2,
+                         pcm::EntanglementMode::NONE,
+                         nullptr,
+                         false,
+                         true,
+                         false,
+                         false);
 
     CHECK_THAT(forceBalancerSmallOldSampling1.getResidualNorm(),
                Catch::Matchers::WithinRel(
@@ -2614,10 +2760,9 @@ TEST_CASE("Random sampling example", "[analysis][MEHPSimulator][long]")
     CHECK_THAT(forceBalancerSmallNewSampling.getPressure(),
                Catch::Matchers::WithinRel(
                  forceBalancerSmallOldSampling1.getPressure(), 0.5));
-    CHECK_THAT(
-      forceBalancerSmallNewSampling.getResidualNorm(),
-      Catch::Matchers::WithinRel(
-        forceBalancerSmallOldSampling1.getResidualNorm(), 0.5));
+    CHECK_THAT(forceBalancerSmallNewSampling.getResidualNorm(),
+               Catch::Matchers::WithinRel(
+                 forceBalancerSmallOldSampling1.getResidualNorm(), 0.5));
 
     REQUIRE(forceBalancerSmallOldSampling1.getNetwork().nrOfStrands ==
             forceBalancerSmallNewSampling.getNetwork().nrOfStrands);
@@ -2644,22 +2789,42 @@ TEST_CASE("Force Balance random sampling example small",
   pe::Universe universe = universeSeq.atIndex(0);
   std::cout << "Read file " << inputFile << std::endl;
 
-  pcm::MEHPSimulator forceBalancer = pcm::MEHPSimulator(
-    universe, {}, 2, pcm::EntanglementMode::NONE, nullptr, true, false, false,
-    true);
+  pcm::MEHPSimulator forceBalancer =
+    pcm::MEHPSimulator(universe,
+                       {},
+                       2,
+                       pcm::EntanglementMode::NONE,
+                       nullptr,
+                       true,
+                       false,
+                       false,
+                       true);
   forceBalancer.randomlyAddSlipLinks(12, 6.0, 11, 3.0, "86573452");
 
-  pcm::MEHPSimulator forceBalancer2 = pcm::MEHPSimulator(
-    universe, {}, 2, pcm::EntanglementMode::NONE, nullptr, true, false, false,
-    false);
+  pcm::MEHPSimulator forceBalancer2 =
+    pcm::MEHPSimulator(universe,
+                       {},
+                       2,
+                       pcm::EntanglementMode::NONE,
+                       nullptr,
+                       true,
+                       false,
+                       false,
+                       false);
 
-  pcm::MEHPSimulator forceBalancer3 = pcm::MEHPSimulator(
-    universe, {}, 2, pcm::EntanglementMode::NONE, nullptr, true, false, false,
-    false);
+  pcm::MEHPSimulator forceBalancer3 =
+    pcm::MEHPSimulator(universe,
+                       {},
+                       2,
+                       pcm::EntanglementMode::NONE,
+                       nullptr,
+                       true,
+                       false,
+                       false,
+                       false);
 
-  CHECK_THAT(
-    forceBalancer2.getResidualNorm(),
-    Catch::Matchers::WithinRel(forceBalancer3.getResidualNorm()));
+  CHECK_THAT(forceBalancer2.getResidualNorm(),
+             Catch::Matchers::WithinRel(forceBalancer3.getResidualNorm()));
 
   forceBalancer2.configAssumeBoxLargeEnough(false);
   forceBalancer2.randomlyAddSlipLinks(12, 6.0, 11, 3.0, "86573452");
@@ -2667,9 +2832,8 @@ TEST_CASE("Force Balance random sampling example small",
   forceBalancer3.configAssumeBoxLargeEnough(false);
 
   CHECK(forceBalancer.getPressure() <= forceBalancer2.getPressure());
-  CHECK_THAT(
-    forceBalancer2.getResidualNorm(),
-    Catch::Matchers::WithinRel(forceBalancer3.getResidualNorm()));
+  CHECK_THAT(forceBalancer2.getResidualNorm(),
+             Catch::Matchers::WithinRel(forceBalancer3.getResidualNorm()));
   CHECK_THAT(forceBalancer2.getPressure(),
              Catch::Matchers::WithinRel(forceBalancer3.getPressure()));
 
@@ -2749,8 +2913,7 @@ TEST_CASE("Yet another sampling example", "[analysis][MEHPSimulator][long]")
       alpha1.push_back(sumAlphaAlongStrandUpToLink(
         net.strandIndicesOfLink[linkIdx][0], linkIdx));
       alpha2.push_back(sumAlphaAlongStrandUpToLink(
-        pylimer_tools::utils::last(net.strandIndicesOfLink[linkIdx]),
-        linkIdx));
+        pylimer_tools::utils::last(net.strandIndicesOfLink[linkIdx]), linkIdx));
       ++entIdx;
       // TODO: handle these primary loops, then increase required accuracy
       // if (net.strandIndicesOfLink[linkIdx].size() == 1 ||
@@ -2811,7 +2974,8 @@ TEST_CASE("Yet another sampling example", "[analysis][MEHPSimulator][long]")
     auto getDisplacementResidualNorm = [](const pcm::MEHPSimulator& sim,
                                           const double limit) {
       Eigen::VectorXd uTmp = sim.getCurrentDisplacements();
-      return sim.getNetwork().displaceToMeanPosition(uTmp, sim.getIs2D(), limit);
+      return sim.getNetwork().displaceToMeanPosition(
+        uTmp, sim.getIs2D(), limit);
     };
 
     // after adding slip-links
@@ -2885,9 +3049,16 @@ TEST_CASE("Conversion of structure is equal for both methods",
         false,
         false);
 
-    pcm::MEHPSimulator forceBalancerOldConversion = pcm::MEHPSimulator(
-      universe, {}, 2, pcm::EntanglementMode::NONE, nullptr, false, true, false,
-      false);
+    pcm::MEHPSimulator forceBalancerOldConversion =
+      pcm::MEHPSimulator(universe,
+                         {},
+                         2,
+                         pcm::EntanglementMode::NONE,
+                         nullptr,
+                         false,
+                         true,
+                         false,
+                         false);
 
     CHECK(forceBalancerNewConversion.getNetwork().springIndexA.isApprox(
       forceBalancerOldConversion.getNetwork().springIndexA));
@@ -2898,9 +3069,9 @@ TEST_CASE("Conversion of structure is equal for both methods",
     CHECK(forceBalancerNewConversion.getNetwork().springBoxOffset.isApprox(
       forceBalancerOldConversion.getNetwork().springBoxOffset));
 
-    CHECK_THAT(forceBalancerOldConversion.getResidualNorm(),
-               Catch::Matchers::WithinRel(
-                 forceBalancerNewConversion.getResidualNorm()));
+    CHECK_THAT(
+      forceBalancerOldConversion.getResidualNorm(),
+      Catch::Matchers::WithinRel(forceBalancerNewConversion.getResidualNorm()));
     CHECK_THAT(
       forceBalancerOldConversion.getPressure(),
       Catch::Matchers::WithinRel(forceBalancerNewConversion.getPressure()));
@@ -2975,9 +3146,16 @@ TEST_CASE("Adding slip-links does not influence other springs",
   pe::Universe universe = universeSeq.atIndex(0);
   std::cout << "Read file " << inputFile << std::endl;
 
-  pcm::MEHPSimulator forceBalancerOldSamplingSmall = pcm::MEHPSimulator(
-    universe, {}, 2, pcm::EntanglementMode::NONE, nullptr, false, true, false,
-    false);
+  pcm::MEHPSimulator forceBalancerOldSamplingSmall =
+    pcm::MEHPSimulator(universe,
+                       {},
+                       2,
+                       pcm::EntanglementMode::NONE,
+                       nullptr,
+                       false,
+                       true,
+                       false,
+                       false);
   Eigen::VectorXd strandVectorsWithoutSlipLinks =
     forceBalancerOldSamplingSmall.getNetwork().evaluateStrandVectors(
       forceBalancerOldSamplingSmall.getCurrentDisplacements(), false);
@@ -3031,10 +3209,11 @@ TEST_CASE("Adding slip-links does not influence other springs",
   CHECK(forceBalancer2.getNrOfSprings() >
         forceBalancer2Without.getNrOfSprings());
 
-  CHECK(forceBalancer2.getNetwork()
-          .evaluateStrandVectors(forceBalancer2.getCurrentDisplacements(), false)
-          .isApprox(forceBalancer2Without.getNetwork().evaluateStrandVectors(
-            forceBalancer2Without.getCurrentDisplacements(), false)));
+  CHECK(
+    forceBalancer2.getNetwork()
+      .evaluateStrandVectors(forceBalancer2.getCurrentDisplacements(), false)
+      .isApprox(forceBalancer2Without.getNetwork().evaluateStrandVectors(
+        forceBalancer2Without.getCurrentDisplacements(), false)));
 }
 
 TEST_CASE(
@@ -3063,27 +3242,27 @@ TEST_CASE(
       pylimer_tools::topo::entanglement_detection::randomlyFindEntanglements(
         universe, 4368, 4., 0., 190, 0, "af1346lhkdsaöf123", 2, true);
 
-  pcm::MEHPSimulator forceBalancerEntanglementSprings = pcm::MEHPSimulator(
-    universe,
-    entanglements,
-    2,
-    pcm::EntanglementMode::SPRING,
-    nullptr,
-    false,
-    true,
-    false,
-    true);
+  pcm::MEHPSimulator forceBalancerEntanglementSprings =
+    pcm::MEHPSimulator(universe,
+                       entanglements,
+                       2,
+                       pcm::EntanglementMode::SPRING,
+                       nullptr,
+                       false,
+                       true,
+                       false,
+                       true);
 
-  pcm::MEHPSimulator forceBalancerEntanglementLinks = pcm::MEHPSimulator(
-    universe,
-    entanglements,
-    2,
-    pcm::EntanglementMode::MERGED_LINKS,
-    nullptr,
-    false,
-    true,
-    false,
-    true);
+  pcm::MEHPSimulator forceBalancerEntanglementLinks =
+    pcm::MEHPSimulator(universe,
+                       entanglements,
+                       2,
+                       pcm::EntanglementMode::MERGED_LINKS,
+                       nullptr,
+                       false,
+                       true,
+                       false,
+                       true);
 
   REQUIRE(forceBalancerEntanglementSprings.getNrOfSprings() >
           forceBalancerEntanglementLinks.getNrOfSprings());
@@ -3148,7 +3327,8 @@ TEST_CASE(
     pcm::MEHPSlipLinkSolverConfig cfg;
     cfg.maxNrOfSteps = 5000;
     cfg.xtol = 1e-15;
-    cfg.simplificationMode = pcm::StructureSimplificationMode::NO_SIMPLIFICATION;
+    cfg.simplificationMode =
+      pcm::StructureSimplificationMode::NO_SIMPLIFICATION;
     cfg.slipMode = pcm::SlipMode::FIXED;
     forceBalancerEntanglementSprings.run(cfg);
     forceBalancerEntanglementLinks.run(cfg);
@@ -3203,27 +3383,27 @@ TEST_CASE(
       pylimer_tools::topo::entanglement_detection::randomlyFindEntanglements(
         universe, 4368, 4., 0., 190, 0, "af1346lhkdsaöf123", 2, true);
 
-  pcm::MEHPSimulator forceBalancerEntanglements = pcm::MEHPSimulator(
-    universe,
-    entanglements,
-    2,
-    pcm::EntanglementMode::MERGED_LINKS,
-    nullptr,
-    false,
-    true,
-    false,
-    true);
+  pcm::MEHPSimulator forceBalancerEntanglements =
+    pcm::MEHPSimulator(universe,
+                       entanglements,
+                       2,
+                       pcm::EntanglementMode::MERGED_LINKS,
+                       nullptr,
+                       false,
+                       true,
+                       false,
+                       true);
 
-  pcm::MEHPSimulator forceBalancerPhantom = pcm::MEHPSimulator(
-    universe,
-    {},
-    2,
-    pcm::EntanglementMode::NONE,
-    nullptr,
-    false,
-    true,
-    false,
-    true);
+  pcm::MEHPSimulator forceBalancerPhantom =
+    pcm::MEHPSimulator(universe,
+                       {},
+                       2,
+                       pcm::EntanglementMode::NONE,
+                       nullptr,
+                       false,
+                       true,
+                       false,
+                       true);
 
   double initialResidualE =
     forceBalancerEntanglements.getResiduals().squaredNorm();
@@ -3250,8 +3430,7 @@ TEST_CASE(
   cfgE.maxNrOfSteps = 5000;
   cfgE.xtol = 1e-10;
   cfgE.initialResidualToUse = initialResidualE;
-  cfgE.simplificationMode =
-    pcm::StructureSimplificationMode::INACTIVE_THEN_X2F;
+  cfgE.simplificationMode = pcm::StructureSimplificationMode::INACTIVE_THEN_X2F;
   cfgE.inactiveRemovalCutoff = 1e-3;
   cfgE.slipMode = pcm::SlipMode::FIXED;
 

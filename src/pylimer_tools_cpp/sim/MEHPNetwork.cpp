@@ -15,453 +15,455 @@ namespace pylimer_tools::sim::mehp {
 
 namespace {
 
-/**
- * @brief Synchronize box geometry fields (`box`, `L`, `boxHalfs`, `vol`).
- */
-void
-populateBoxMetadata(MEHPNetwork& net, const pylimer_tools::entities::Box& box)
-{
-  net.box = box;
-  net.L[0] = net.box.getLx();
-  net.L[1] = net.box.getLy();
-  net.L[2] = net.box.getLz();
-  for (size_t dir = 0; dir < 3; ++dir) {
-    net.boxHalfs[dir] = 0.5 * net.L[dir];
-  }
-  net.vol = net.box.getVolume();
-}
-
-/**
- * @brief Set `springCoordinateIndexA` and `springCoordinateIndexB` for one spring.
- */
-void
-setSpringCoordinateIndicesAt(MEHPNetwork& net,
-                             const Eigen::Index sIdx,
-                             const int linkA,
-                             const int linkB)
-{
-  for (Eigen::Index dir = 0; dir < 3; ++dir) {
-    net.springCoordinateIndexA[3 * sIdx + dir] =
-      3 * linkA + static_cast<int>(dir);
-    net.springCoordinateIndexB[3 * sIdx + dir] =
-      3 * linkB + static_cast<int>(dir);
-  }
-}
-
-/**
- * @brief Renumber Eigen vector/array entries while preserving disabled (`< 0`) entries.
- */
-template<typename VecType>
-void
-safeRenumberWithMapping(VecType& v, const std::vector<long int>& newMapping)
-{
-  for (Eigen::Index idx = 0; idx < v.size(); ++idx) {
-    if (v[idx] < 0) {
-      continue;
+  /**
+   * @brief Synchronize box geometry fields (`box`, `L`, `boxHalfs`, `vol`).
+   */
+  void populateBoxMetadata(MEHPNetwork& net,
+                           const pylimer_tools::entities::Box& box)
+  {
+    net.box = box;
+    net.L[0] = net.box.getLx();
+    net.L[1] = net.box.getLy();
+    net.L[2] = net.box.getLz();
+    for (size_t dir = 0; dir < 3; ++dir) {
+      net.boxHalfs[dir] = 0.5 * net.L[dir];
     }
-    const size_t oldIdx = static_cast<size_t>(v[idx]);
-    assert(oldIdx < newMapping.size());
-    assert(newMapping[oldIdx] >= 0);
-    v[idx] = static_cast<typename VecType::Scalar>(newMapping[oldIdx]);
+    net.vol = net.box.getVolume();
   }
-}
 
-/**
- * @brief Recompute `strandContourLength[strandIdx]` and all constituent
- * `springPartitions` from the current `springContourLength` values.
- */
-void
-recomputeStrandPartitionsFromContourLengths(MEHPNetwork& net,
-                                            const size_t strandIdx)
-{
-  const Eigen::Index sIdx = static_cast<Eigen::Index>(strandIdx);
-  double totalN = 0.0;
-  for (const size_t spIdx : net.springIndicesOfStrand[strandIdx]) {
-    totalN += net.springContourLength[static_cast<Eigen::Index>(spIdx)];
-  }
-  net.strandContourLength[sIdx] = totalN;
-  for (const size_t spIdx : net.springIndicesOfStrand[strandIdx]) {
-    const Eigen::Index spE = static_cast<Eigen::Index>(spIdx);
-    net.springPartitions[spE] =
-      (totalN > 0.0) ? (net.springContourLength[spE] / totalN) : 1.0;
-  }
-}
-
-/**
- * @brief Remove all polymer primary loop strands (along with attached
- * entanglement coupling springs), preserving existing crosslink node indices.
- */
-void
-removePrimaryLoopStrandsInternal(MEHPNetwork& net)
-{
-  std::vector<size_t> springsToRemove;
-  for (size_t strandIdx = 0; strandIdx < net.nrOfStrands; ++strandIdx) {
-    if (net.isEntanglementStrand(strandIdx) ||
-        !net.isLoopingStrand(strandIdx)) {
-      continue;
+  /**
+   * @brief Set `springCoordinateIndexA` and `springCoordinateIndexB` for one
+   * spring.
+   */
+  void setSpringCoordinateIndicesAt(MEHPNetwork& net,
+                                    const Eigen::Index sIdx,
+                                    const int linkA,
+                                    const int linkB)
+  {
+    for (Eigen::Index dir = 0; dir < 3; ++dir) {
+      net.springCoordinateIndexA[3 * sIdx + dir] =
+        3 * linkA + static_cast<int>(dir);
+      net.springCoordinateIndexB[3 * sIdx + dir] =
+        3 * linkB + static_cast<int>(dir);
     }
+  }
+
+  /**
+   * @brief Renumber Eigen vector/array entries while preserving disabled (`<
+   * 0`) entries.
+   */
+  template<typename VecType>
+  void safeRenumberWithMapping(VecType& v,
+                               const std::vector<long int>& newMapping)
+  {
+    for (Eigen::Index idx = 0; idx < v.size(); ++idx) {
+      if (v[idx] < 0) {
+        continue;
+      }
+      const size_t oldIdx = static_cast<size_t>(v[idx]);
+      assert(oldIdx < newMapping.size());
+      assert(newMapping[oldIdx] >= 0);
+      v[idx] = static_cast<typename VecType::Scalar>(newMapping[oldIdx]);
+    }
+  }
+
+  /**
+   * @brief Recompute `strandContourLength[strandIdx]` and all constituent
+   * `springPartitions` from the current `springContourLength` values.
+   */
+  void recomputeStrandPartitionsFromContourLengths(MEHPNetwork& net,
+                                                   const size_t strandIdx)
+  {
+    const Eigen::Index sIdx = static_cast<Eigen::Index>(strandIdx);
+    double totalN = 0.0;
     for (const size_t spIdx : net.springIndicesOfStrand[strandIdx]) {
-      springsToRemove.push_back(spIdx);
+      totalN += net.springContourLength[static_cast<Eigen::Index>(spIdx)];
     }
-    pylimer_tools::utils::append(
-      springsToRemove, net.getEntanglementSpringsAtStrand(strandIdx));
+    net.strandContourLength[sIdx] = totalN;
+    for (const size_t spIdx : net.springIndicesOfStrand[strandIdx]) {
+      const Eigen::Index spE = static_cast<Eigen::Index>(spIdx);
+      net.springPartitions[spE] =
+        (totalN > 0.0) ? (net.springContourLength[spE] / totalN) : 1.0;
+    }
   }
-  if (!springsToRemove.empty()) {
-    net.removeSprings(springsToRemove, false, nullptr);
-  }
-}
 
-struct StrandEndpointSummary
-{
-  size_t nCrosslinks = 0;
-  size_t nDanglingEnds = 0;
-  size_t nFreeEnds = 0;
-  std::vector<size_t> includedStrandIndices;
-  std::vector<size_t> danglingEndPartners;
-  std::vector<int> danglingEndTypes;
-  std::vector<int> freeEndTypes;
-};
-
-int
-getStrandBeadType(const CrosslinkerUniverse& cu, const size_t rawStrandIdx)
-{
-  if (rawStrandIdx < cu.strandBeadType.size()) {
-    return cu.strandBeadType[rawStrandIdx];
-  }
-  return 1;
-}
-
-StrandEndpointSummary
-collectIncludedStrands(const CrosslinkerUniverse& cu,
-                       const bool includeDanglingChains,
-                       const bool includeFreeChains)
-{
-  StrandEndpointSummary summary;
-  summary.nCrosslinks = cu.xlinkTypes.size();
-  const size_t nRawStrands = cu.strandFrom.size();
-
-  INVALIDARG_EXP_IFN(
-    cu.xlinkX.size() == summary.nCrosslinks &&
-      cu.xlinkY.size() == summary.nCrosslinks &&
-      cu.xlinkZ.size() == summary.nCrosslinks,
-    "Crosslinker coordinate arrays in CrosslinkerUniverse have mismatched sizes.");
-  INVALIDARG_EXP_IFN(
-    cu.strandTo.size() == nRawStrands &&
-      cu.beadsInStrand.size() == nRawStrands,
-    "Strand arrays in CrosslinkerUniverse have mismatched sizes.");
-
-  summary.includedStrandIndices.reserve(nRawStrands);
-  for (size_t s = 0; s < nRawStrands; ++s) {
-    const long int fromXl = cu.strandFrom[s];
-    const long int toXl = cu.strandTo[s];
-
-    if (fromXl >= 0 && toXl >= 0) {
-      INVALIDARG_EXP_IFN(
-        static_cast<size_t>(fromXl) < summary.nCrosslinks &&
-          static_cast<size_t>(toXl) < summary.nCrosslinks,
-        "CrosslinkerUniverse strand references out-of-range crosslink index.");
-      summary.includedStrandIndices.push_back(s);
-    } else if (fromXl >= 0 || toXl >= 0) {
-      const long int partner = (fromXl >= 0) ? fromXl : toXl;
-      INVALIDARG_EXP_IFN(
-        static_cast<size_t>(partner) < summary.nCrosslinks,
-        "CrosslinkerUniverse dangling strand references out-of-range crosslink.");
-      if (includeDanglingChains) {
-        summary.includedStrandIndices.push_back(s);
-        summary.danglingEndPartners.push_back(static_cast<size_t>(partner));
-        summary.danglingEndTypes.push_back(getStrandBeadType(cu, s));
-        summary.nDanglingEnds += 1;
+  /**
+   * @brief Remove all polymer primary loop strands (along with attached
+   * entanglement coupling springs), preserving existing crosslink node indices.
+   */
+  void removePrimaryLoopStrandsInternal(MEHPNetwork& net)
+  {
+    std::vector<size_t> springsToRemove;
+    for (size_t strandIdx = 0; strandIdx < net.nrOfStrands; ++strandIdx) {
+      if (net.isEntanglementStrand(strandIdx) ||
+          !net.isLoopingStrand(strandIdx)) {
+        continue;
       }
-    } else {
-      if (includeFreeChains) {
-        summary.includedStrandIndices.push_back(s);
-        const int bType = getStrandBeadType(cu, s);
-        summary.freeEndTypes.push_back(bType);
-        summary.freeEndTypes.push_back(bType);
-        summary.nFreeEnds += 2;
+      for (const size_t spIdx : net.springIndicesOfStrand[strandIdx]) {
+        springsToRemove.push_back(spIdx);
       }
+      pylimer_tools::utils::append(
+        springsToRemove, net.getEntanglementSpringsAtStrand(strandIdx));
+    }
+    if (!springsToRemove.empty()) {
+      net.removeSprings(springsToRemove, false, nullptr);
     }
   }
-  return summary;
-}
 
-/**
- * @brief Return candidate link displacement or zero if displacement vector is omitted.
- */
-Eigen::Vector3d
-displacementAt(const Eigen::VectorXd* u, const size_t linkIdx)
-{
-  if (u == nullptr || u->size() == 0) {
-    return Eigen::Vector3d::Zero();
-  }
-  return u->segment<3>(3 * static_cast<Eigen::Index>(linkIdx));
-}
+  struct StrandEndpointSummary
+  {
+    size_t nCrosslinks = 0;
+    size_t nDanglingEnds = 0;
+    size_t nFreeEnds = 0;
+    std::vector<size_t> includedStrandIndices;
+    std::vector<size_t> danglingEndPartners;
+    std::vector<int> danglingEndTypes;
+    std::vector<int> freeEndTypes;
+  };
 
-/**
- * @brief Split an existing sub-spring cleanly into `existingSpringIdx`
- * `[oldA -> insertedLinkIdx]` and `newSpringIdx` `[insertedLinkIdx -> oldB]`.
- *
- * Updates connectivity arrays, `linkIndicesOfStrand`, `springIndicesOfStrand`,
- * `strandIndicesOfLink`, `springPartitions`, `springContourLength`, and box offsets.
- */
-void
-insertLinkOntoSubSpring(MEHPNetwork& net,
-                        const Eigen::VectorXd& u,
-                        const size_t strandIdx,
-                        const size_t subSpringPos,
-                        const size_t existingSpringIdx,
-                        const size_t newSpringIdx,
-                        const size_t insertedLinkIdx,
-                        const double firstSubSpringPartition,
-                        const bool is2D)
-{
-  const Eigen::Index dividedE = static_cast<Eigen::Index>(existingSpringIdx);
-  const Eigen::Index addedE = static_cast<Eigen::Index>(newSpringIdx);
-  const Eigen::Index strandE = static_cast<Eigen::Index>(strandIdx);
-
-  const int partnerAInt = net.springIndexA[dividedE];
-  const int partnerBInt = net.springIndexB[dividedE];
-  const double oldPartition = net.springPartitions[dividedE];
-  const double secondPartition = oldPartition - firstSubSpringPartition;
-  RUNTIME_EXP_IFN(
-    firstSubSpringPartition > 0.0 && secondPartition > 0.0,
-    "Split spring partitions must be strictly positive.");
-
-  const Eigen::Vector3d distanceBefore =
-    net.evaluateSpringVector(u, existingSpringIdx, is2D);
-
-  net.springIndexB[dividedE] = static_cast<int>(insertedLinkIdx);
-  setSpringCoordinateIndicesAt(
-    net, dividedE, partnerAInt, static_cast<int>(insertedLinkIdx));
-
-  net.springIndexA[addedE] = static_cast<int>(insertedLinkIdx);
-  net.springIndexB[addedE] = partnerBInt;
-  setSpringCoordinateIndicesAt(
-    net, addedE, static_cast<int>(insertedLinkIdx), partnerBInt);
-
-  net.strandIndexOfSpring[addedE] = static_cast<int>(strandIdx);
-  net.springIsEntanglement[addedE] = false;
-  net.springBoxOffset.segment<3>(3 * addedE) = Eigen::Vector3d::Zero();
-
-  net.springIndicesOfStrand[strandIdx].insert(
-    net.springIndicesOfStrand[strandIdx].begin() +
-      static_cast<std::ptrdiff_t>(subSpringPos) + 1,
-    newSpringIdx);
-  net.linkIndicesOfStrand[strandIdx].insert(
-    net.linkIndicesOfStrand[strandIdx].begin() +
-      static_cast<std::ptrdiff_t>(subSpringPos) + 1,
-    insertedLinkIdx);
-  pylimer_tools::utils::addIfNotContained(
-    net.strandIndicesOfLink[insertedLinkIdx], strandIdx);
-
-  net.realignSlipLinkToImages(
-    u, insertedLinkIdx, existingSpringIdx, newSpringIdx, is2D);
-
-  net.springPartitions[dividedE] = firstSubSpringPartition;
-  net.springPartitions[addedE] = secondPartition;
-  const double strandN = net.strandContourLength[strandE];
-  net.springContourLength[dividedE] = firstSubSpringPartition * strandN;
-  net.springContourLength[addedE] = secondPartition * strandN;
-
-  const Eigen::Vector3d distanceAfter =
-    net.evaluateSpringVector(u, existingSpringIdx, is2D) +
-    net.evaluateSpringVector(u, newSpringIdx, is2D);
-  if (net.assumeBoxLargeEnough) {
-    Eigen::Vector3d diff = distanceAfter - distanceBefore;
-    net.box.handlePBC(diff);
-    if (is2D) {
-      diff[2] = 0.0;
+  int getStrandBeadType(const CrosslinkerUniverse& cu,
+                        const size_t rawStrandIdx)
+  {
+    if (rawStrandIdx < cu.strandBeadType.size()) {
+      return cu.strandBeadType[rawStrandIdx];
     }
-    RUNTIME_EXP_IFN(diff.norm() < 1e-7,
-                    "Splitting a spring must preserve total end-to-end vector.");
-  } else {
-    RUNTIME_EXP_IFN(
-      pylimer_tools::utils::vector_approx_equal(
-        distanceBefore, distanceAfter, 1e-7),
-      "Splitting a spring must preserve total end-to-end vector.");
+    return 1;
   }
-}
 
-/**
- * @brief Merge `removedSpringIdx` into `keptSpringIdx` around `linkToReduce`
- * without shrinking array capacities (`removedSpringIdx` is detached with
- * `-1` indices ready for `removeSprings`).
- */
-void
-mergeTwoSpringsWithoutRemoval(MEHPNetwork& net,
-                              const Eigen::VectorXd& u,
-                              const size_t removedSpringIdx,
-                              const size_t keptSpringIdx,
-                              const size_t linkToReduce)
-{
-  const Eigen::Index keptIdx = static_cast<Eigen::Index>(keptSpringIdx);
-  const Eigen::Index removedIdx = static_cast<Eigen::Index>(removedSpringIdx);
-  const int linkToReduceInt = static_cast<int>(linkToReduce);
+  StrandEndpointSummary collectIncludedStrands(const CrosslinkerUniverse& cu,
+                                               const bool includeDanglingChains,
+                                               const bool includeFreeChains)
+  {
+    StrandEndpointSummary summary;
+    summary.nCrosslinks = cu.xlinkTypes.size();
+    const size_t nRawStrands = cu.strandFrom.size();
 
-  INVALIDARG_EXP_IFN(removedSpringIdx < net.nrOfSprings,
-                     "Removed spring index out of bounds.");
-  INVALIDARG_EXP_IFN(keptSpringIdx < net.nrOfSprings,
-                     "Kept spring index out of bounds.");
-  INVALIDARG_EXP_IFN(keptSpringIdx != removedSpringIdx,
-                     "Cannot merge a spring with itself.");
-  INVALIDARG_EXP_IFN(!net.springIsEntanglement[keptIdx],
-                     "Cannot merge entanglement coupling spring.");
-  INVALIDARG_EXP_IFN(!net.springIsEntanglement[removedIdx],
-                     "Cannot merge entanglement coupling spring.");
-  INVALIDARG_EXP_IFN(XOR(net.springIndexA[keptIdx] == linkToReduceInt,
-                         net.springIndexB[keptIdx] == linkToReduceInt),
-                     "Link to reduce must appear on exactly one end of kept spring.");
-  INVALIDARG_EXP_IFN(XOR(net.springIndexA[removedIdx] == linkToReduceInt,
-                         net.springIndexB[removedIdx] == linkToReduceInt),
-                     "Link to reduce must appear on exactly one end of removed spring.");
+    INVALIDARG_EXP_IFN(cu.xlinkX.size() == summary.nCrosslinks &&
+                         cu.xlinkY.size() == summary.nCrosslinks &&
+                         cu.xlinkZ.size() == summary.nCrosslinks,
+                       "Crosslinker coordinate arrays in CrosslinkerUniverse "
+                       "have mismatched sizes.");
+    INVALIDARG_EXP_IFN(
+      cu.strandTo.size() == nRawStrands &&
+        cu.beadsInStrand.size() == nRawStrands,
+      "Strand arrays in CrosslinkerUniverse have mismatched sizes.");
 
-  const bool isStrandMerger =
-    net.strandIndexOfSpring[keptIdx] != net.strandIndexOfSpring[removedIdx];
-  const Eigen::Vector3d totalDistance =
-    net.evaluateSpringVectorTo(u, keptSpringIdx, linkToReduce) +
-    net.evaluateSpringVectorFrom(u, removedSpringIdx, linkToReduce);
+    summary.includedStrandIndices.reserve(nRawStrands);
+    for (size_t s = 0; s < nRawStrands; ++s) {
+      const long int fromXl = cu.strandFrom[s];
+      const long int toXl = cu.strandTo[s];
 
-  const bool keptIsA = net.springIndexA[keptIdx] == linkToReduceInt;
-  const size_t otherEndKept = static_cast<size_t>(
-    keptIsA ? net.springIndexB[keptIdx] : net.springIndexA[keptIdx]);
-  const bool removedIsA = net.springIndexA[removedIdx] == linkToReduceInt;
-  const size_t otherEndRemoved = static_cast<size_t>(
-    removedIsA ? net.springIndexB[removedIdx] : net.springIndexA[removedIdx]);
-
-  const size_t removedStrandIdx =
-    static_cast<size_t>(net.strandIndexOfSpring[removedIdx]);
-  const size_t keptStrandIdx =
-    static_cast<size_t>(net.strandIndexOfSpring[keptIdx]);
-
-  net.springContourLength[keptIdx] += net.springContourLength[removedIdx];
-  net.springIndexA[keptIdx] =
-    static_cast<int>(keptIsA ? otherEndRemoved : otherEndKept);
-  net.springIndexB[keptIdx] =
-    static_cast<int>(keptIsA ? otherEndKept : otherEndRemoved);
-  net.springBoxOffset.segment<3>(3 * keptIdx) +=
-    net.springBoxOffset.segment<3>(3 * removedIdx) *
-    (keptIsA == removedIsA ? -1.0 : 1.0);
-  setSpringCoordinateIndicesAt(
-    net, keptIdx, net.springIndexA[keptIdx], net.springIndexB[keptIdx]);
-
-  if (isStrandMerger) {
-    std::vector<size_t> removedStrandsLinks =
-      net.linkIndicesOfStrand[removedStrandIdx];
-    std::vector<size_t> removedStrandsSprings =
-      net.springIndicesOfStrand[removedStrandIdx];
-
-    for (const size_t springIdx : removedStrandsSprings) {
-      net.strandIndexOfSpring[static_cast<Eigen::Index>(springIdx)] =
-        static_cast<int>(keptStrandIdx);
-    }
-
-    std::vector<size_t> uniqueRemovedLinks = removedStrandsLinks;
-    pylimer_tools::utils::sort_remove_duplicates(uniqueRemovedLinks);
-    for (const size_t lIdx : uniqueRemovedLinks) {
-      for (size_t& sIdx : net.strandIndicesOfLink[lIdx]) {
-        if (sIdx == removedStrandIdx) {
-          sIdx = keptStrandIdx;
-          break;
+      if (fromXl >= 0 && toXl >= 0) {
+        INVALIDARG_EXP_IFN(static_cast<size_t>(fromXl) < summary.nCrosslinks &&
+                             static_cast<size_t>(toXl) < summary.nCrosslinks,
+                           "CrosslinkerUniverse strand references out-of-range "
+                           "crosslink index.");
+        summary.includedStrandIndices.push_back(s);
+      } else if (fromXl >= 0 || toXl >= 0) {
+        const long int partner = (fromXl >= 0) ? fromXl : toXl;
+        INVALIDARG_EXP_IFN(static_cast<size_t>(partner) < summary.nCrosslinks,
+                           "CrosslinkerUniverse dangling strand references "
+                           "out-of-range crosslink.");
+        if (includeDanglingChains) {
+          summary.includedStrandIndices.push_back(s);
+          summary.danglingEndPartners.push_back(static_cast<size_t>(partner));
+          summary.danglingEndTypes.push_back(getStrandBeadType(cu, s));
+          summary.nDanglingEnds += 1;
+        }
+      } else {
+        if (includeFreeChains) {
+          summary.includedStrandIndices.push_back(s);
+          const int bType = getStrandBeadType(cu, s);
+          summary.freeEndTypes.push_back(bType);
+          summary.freeEndTypes.push_back(bType);
+          summary.nFreeEnds += 2;
         }
       }
-      pylimer_tools::utils::sort_remove_duplicates(
-        net.strandIndicesOfLink[lIdx]);
     }
+    return summary;
+  }
 
-    bool invertSpringDirections = false;
-    if (!keptIsA && removedIsA) {
-      net.linkIndicesOfStrand[keptStrandIdx].pop_back();
-      pylimer_tools::utils::append(
-        net.linkIndicesOfStrand[keptStrandIdx], removedStrandsLinks, 1);
-      pylimer_tools::utils::append(
-        net.springIndicesOfStrand[keptStrandIdx], removedStrandsSprings, 1);
-    } else if (keptIsA && !removedIsA) {
-      removedStrandsLinks.pop_back();
-      net.linkIndicesOfStrand[keptStrandIdx][0] = removedStrandsLinks.back();
-      pylimer_tools::utils::prepend(
-        net.linkIndicesOfStrand[keptStrandIdx], removedStrandsLinks, 0, 1);
-      removedStrandsSprings.pop_back();
-      pylimer_tools::utils::prepend(net.springIndicesOfStrand[keptStrandIdx],
-                                    removedStrandsSprings);
-    } else if (keptIsA && removedIsA) {
-      net.linkIndicesOfStrand[keptStrandIdx][0] = removedStrandsLinks[1];
-      pylimer_tools::utils::prepend_inverse(
-        net.linkIndicesOfStrand[keptStrandIdx], removedStrandsLinks, 0, 2);
-      pylimer_tools::utils::prepend_inverse(
-        net.springIndicesOfStrand[keptStrandIdx], removedStrandsSprings, 0, 1);
-      invertSpringDirections = true;
+  /**
+   * @brief Return candidate link displacement or zero if displacement vector is
+   * omitted.
+   */
+  Eigen::Vector3d displacementAt(const Eigen::VectorXd* u, const size_t linkIdx)
+  {
+    if (u == nullptr || u->size() == 0) {
+      return Eigen::Vector3d::Zero();
+    }
+    return u->segment<3>(3 * static_cast<Eigen::Index>(linkIdx));
+  }
+
+  /**
+   * @brief Split an existing sub-spring cleanly into `existingSpringIdx`
+   * `[oldA -> insertedLinkIdx]` and `newSpringIdx` `[insertedLinkIdx -> oldB]`.
+   *
+   * Updates connectivity arrays, `linkIndicesOfStrand`,
+   * `springIndicesOfStrand`, `strandIndicesOfLink`, `springPartitions`,
+   * `springContourLength`, and box offsets.
+   */
+  void insertLinkOntoSubSpring(MEHPNetwork& net,
+                               const Eigen::VectorXd& u,
+                               const size_t strandIdx,
+                               const size_t subSpringPos,
+                               const size_t existingSpringIdx,
+                               const size_t newSpringIdx,
+                               const size_t insertedLinkIdx,
+                               const double firstSubSpringPartition,
+                               const bool is2D)
+  {
+    const Eigen::Index dividedE = static_cast<Eigen::Index>(existingSpringIdx);
+    const Eigen::Index addedE = static_cast<Eigen::Index>(newSpringIdx);
+    const Eigen::Index strandE = static_cast<Eigen::Index>(strandIdx);
+
+    const int partnerAInt = net.springIndexA[dividedE];
+    const int partnerBInt = net.springIndexB[dividedE];
+    const double oldPartition = net.springPartitions[dividedE];
+    const double secondPartition = oldPartition - firstSubSpringPartition;
+    RUNTIME_EXP_IFN(firstSubSpringPartition > 0.0 && secondPartition > 0.0,
+                    "Split spring partitions must be strictly positive.");
+
+    const Eigen::Vector3d distanceBefore =
+      net.evaluateSpringVector(u, existingSpringIdx, is2D);
+
+    net.springIndexB[dividedE] = static_cast<int>(insertedLinkIdx);
+    setSpringCoordinateIndicesAt(
+      net, dividedE, partnerAInt, static_cast<int>(insertedLinkIdx));
+
+    net.springIndexA[addedE] = static_cast<int>(insertedLinkIdx);
+    net.springIndexB[addedE] = partnerBInt;
+    setSpringCoordinateIndicesAt(
+      net, addedE, static_cast<int>(insertedLinkIdx), partnerBInt);
+
+    net.strandIndexOfSpring[addedE] = static_cast<int>(strandIdx);
+    net.springIsEntanglement[addedE] = false;
+    net.springBoxOffset.segment<3>(3 * addedE) = Eigen::Vector3d::Zero();
+
+    net.springIndicesOfStrand[strandIdx].insert(
+      net.springIndicesOfStrand[strandIdx].begin() +
+        static_cast<std::ptrdiff_t>(subSpringPos) + 1,
+      newSpringIdx);
+    net.linkIndicesOfStrand[strandIdx].insert(
+      net.linkIndicesOfStrand[strandIdx].begin() +
+        static_cast<std::ptrdiff_t>(subSpringPos) + 1,
+      insertedLinkIdx);
+    pylimer_tools::utils::addIfNotContained(
+      net.strandIndicesOfLink[insertedLinkIdx], strandIdx);
+
+    net.realignSlipLinkToImages(
+      u, insertedLinkIdx, existingSpringIdx, newSpringIdx, is2D);
+
+    net.springPartitions[dividedE] = firstSubSpringPartition;
+    net.springPartitions[addedE] = secondPartition;
+    const double strandN = net.strandContourLength[strandE];
+    net.springContourLength[dividedE] = firstSubSpringPartition * strandN;
+    net.springContourLength[addedE] = secondPartition * strandN;
+
+    const Eigen::Vector3d distanceAfter =
+      net.evaluateSpringVector(u, existingSpringIdx, is2D) +
+      net.evaluateSpringVector(u, newSpringIdx, is2D);
+    if (net.assumeBoxLargeEnough) {
+      Eigen::Vector3d diff = distanceAfter - distanceBefore;
+      net.box.handlePBC(diff);
+      if (is2D) {
+        diff[2] = 0.0;
+      }
+      RUNTIME_EXP_IFN(
+        diff.norm() < 1e-7,
+        "Splitting a spring must preserve total end-to-end vector.");
     } else {
-      removedStrandsLinks.pop_back();
-      net.linkIndicesOfStrand[keptStrandIdx].pop_back();
-      removedStrandsSprings.pop_back();
-      pylimer_tools::utils::append_inverse(
-        net.linkIndicesOfStrand[keptStrandIdx], removedStrandsLinks);
-      pylimer_tools::utils::append_inverse(
-        net.springIndicesOfStrand[keptStrandIdx], removedStrandsSprings);
-      invertSpringDirections = true;
+      RUNTIME_EXP_IFN(
+        pylimer_tools::utils::vector_approx_equal(
+          distanceBefore, distanceAfter, 1e-7),
+        "Splitting a spring must preserve total end-to-end vector.");
     }
+  }
 
-    if (invertSpringDirections) {
+  /**
+   * @brief Merge `removedSpringIdx` into `keptSpringIdx` around `linkToReduce`
+   * without shrinking array capacities (`removedSpringIdx` is detached with
+   * `-1` indices ready for `removeSprings`).
+   */
+  void mergeTwoSpringsWithoutRemoval(MEHPNetwork& net,
+                                     const Eigen::VectorXd& u,
+                                     const size_t removedSpringIdx,
+                                     const size_t keptSpringIdx,
+                                     const size_t linkToReduce)
+  {
+    const Eigen::Index keptIdx = static_cast<Eigen::Index>(keptSpringIdx);
+    const Eigen::Index removedIdx = static_cast<Eigen::Index>(removedSpringIdx);
+    const int linkToReduceInt = static_cast<int>(linkToReduce);
+
+    INVALIDARG_EXP_IFN(removedSpringIdx < net.nrOfSprings,
+                       "Removed spring index out of bounds.");
+    INVALIDARG_EXP_IFN(keptSpringIdx < net.nrOfSprings,
+                       "Kept spring index out of bounds.");
+    INVALIDARG_EXP_IFN(keptSpringIdx != removedSpringIdx,
+                       "Cannot merge a spring with itself.");
+    INVALIDARG_EXP_IFN(!net.springIsEntanglement[keptIdx],
+                       "Cannot merge entanglement coupling spring.");
+    INVALIDARG_EXP_IFN(!net.springIsEntanglement[removedIdx],
+                       "Cannot merge entanglement coupling spring.");
+    INVALIDARG_EXP_IFN(
+      XOR(net.springIndexA[keptIdx] == linkToReduceInt,
+          net.springIndexB[keptIdx] == linkToReduceInt),
+      "Link to reduce must appear on exactly one end of kept spring.");
+    INVALIDARG_EXP_IFN(
+      XOR(net.springIndexA[removedIdx] == linkToReduceInt,
+          net.springIndexB[removedIdx] == linkToReduceInt),
+      "Link to reduce must appear on exactly one end of removed spring.");
+
+    const bool isStrandMerger =
+      net.strandIndexOfSpring[keptIdx] != net.strandIndexOfSpring[removedIdx];
+    const Eigen::Vector3d totalDistance =
+      net.evaluateSpringVectorTo(u, keptSpringIdx, linkToReduce) +
+      net.evaluateSpringVectorFrom(u, removedSpringIdx, linkToReduce);
+
+    const bool keptIsA = net.springIndexA[keptIdx] == linkToReduceInt;
+    const size_t otherEndKept = static_cast<size_t>(
+      keptIsA ? net.springIndexB[keptIdx] : net.springIndexA[keptIdx]);
+    const bool removedIsA = net.springIndexA[removedIdx] == linkToReduceInt;
+    const size_t otherEndRemoved = static_cast<size_t>(
+      removedIsA ? net.springIndexB[removedIdx] : net.springIndexA[removedIdx]);
+
+    const size_t removedStrandIdx =
+      static_cast<size_t>(net.strandIndexOfSpring[removedIdx]);
+    const size_t keptStrandIdx =
+      static_cast<size_t>(net.strandIndexOfSpring[keptIdx]);
+
+    net.springContourLength[keptIdx] += net.springContourLength[removedIdx];
+    net.springIndexA[keptIdx] =
+      static_cast<int>(keptIsA ? otherEndRemoved : otherEndKept);
+    net.springIndexB[keptIdx] =
+      static_cast<int>(keptIsA ? otherEndKept : otherEndRemoved);
+    net.springBoxOffset.segment<3>(3 * keptIdx) +=
+      net.springBoxOffset.segment<3>(3 * removedIdx) *
+      (keptIsA == removedIsA ? -1.0 : 1.0);
+    setSpringCoordinateIndicesAt(
+      net, keptIdx, net.springIndexA[keptIdx], net.springIndexB[keptIdx]);
+
+    if (isStrandMerger) {
+      std::vector<size_t> removedStrandsLinks =
+        net.linkIndicesOfStrand[removedStrandIdx];
+      std::vector<size_t> removedStrandsSprings =
+        net.springIndicesOfStrand[removedStrandIdx];
+
       for (const size_t springIdx : removedStrandsSprings) {
-        if (springIdx == removedSpringIdx) {
-          continue;
-        }
-        const Eigen::Index sIdx = static_cast<Eigen::Index>(springIdx);
-        std::swap(net.springIndexA[sIdx], net.springIndexB[sIdx]);
-        for (Eigen::Index dir = 0; dir < 3; ++dir) {
-          std::swap(net.springCoordinateIndexA[3 * sIdx + dir],
-                    net.springCoordinateIndexB[3 * sIdx + dir]);
-        }
-        net.springBoxOffset.segment<3>(3 * sIdx) *= -1.0;
+        net.strandIndexOfSpring[static_cast<Eigen::Index>(springIdx)] =
+          static_cast<int>(keptStrandIdx);
       }
+
+      std::vector<size_t> uniqueRemovedLinks = removedStrandsLinks;
+      pylimer_tools::utils::sort_remove_duplicates(uniqueRemovedLinks);
+      for (const size_t lIdx : uniqueRemovedLinks) {
+        for (size_t& sIdx : net.strandIndicesOfLink[lIdx]) {
+          if (sIdx == removedStrandIdx) {
+            sIdx = keptStrandIdx;
+            break;
+          }
+        }
+        pylimer_tools::utils::sort_remove_duplicates(
+          net.strandIndicesOfLink[lIdx]);
+      }
+
+      bool invertSpringDirections = false;
+      if (!keptIsA && removedIsA) {
+        net.linkIndicesOfStrand[keptStrandIdx].pop_back();
+        pylimer_tools::utils::append(
+          net.linkIndicesOfStrand[keptStrandIdx], removedStrandsLinks, 1);
+        pylimer_tools::utils::append(
+          net.springIndicesOfStrand[keptStrandIdx], removedStrandsSprings, 1);
+      } else if (keptIsA && !removedIsA) {
+        removedStrandsLinks.pop_back();
+        net.linkIndicesOfStrand[keptStrandIdx][0] = removedStrandsLinks.back();
+        pylimer_tools::utils::prepend(
+          net.linkIndicesOfStrand[keptStrandIdx], removedStrandsLinks, 0, 1);
+        removedStrandsSprings.pop_back();
+        pylimer_tools::utils::prepend(net.springIndicesOfStrand[keptStrandIdx],
+                                      removedStrandsSprings);
+      } else if (keptIsA && removedIsA) {
+        net.linkIndicesOfStrand[keptStrandIdx][0] = removedStrandsLinks[1];
+        pylimer_tools::utils::prepend_inverse(
+          net.linkIndicesOfStrand[keptStrandIdx], removedStrandsLinks, 0, 2);
+        pylimer_tools::utils::prepend_inverse(
+          net.springIndicesOfStrand[keptStrandIdx],
+          removedStrandsSprings,
+          0,
+          1);
+        invertSpringDirections = true;
+      } else {
+        removedStrandsLinks.pop_back();
+        net.linkIndicesOfStrand[keptStrandIdx].pop_back();
+        removedStrandsSprings.pop_back();
+        pylimer_tools::utils::append_inverse(
+          net.linkIndicesOfStrand[keptStrandIdx], removedStrandsLinks);
+        pylimer_tools::utils::append_inverse(
+          net.springIndicesOfStrand[keptStrandIdx], removedStrandsSprings);
+        invertSpringDirections = true;
+      }
+
+      if (invertSpringDirections) {
+        for (const size_t springIdx : removedStrandsSprings) {
+          if (springIdx == removedSpringIdx) {
+            continue;
+          }
+          const Eigen::Index sIdx = static_cast<Eigen::Index>(springIdx);
+          std::swap(net.springIndexA[sIdx], net.springIndexB[sIdx]);
+          for (Eigen::Index dir = 0; dir < 3; ++dir) {
+            std::swap(net.springCoordinateIndexA[3 * sIdx + dir],
+                      net.springCoordinateIndexB[3 * sIdx + dir]);
+          }
+          net.springBoxOffset.segment<3>(3 * sIdx) *= -1.0;
+        }
+      }
+
+      net.linkIndicesOfStrand[removedStrandIdx].clear();
+      net.springIndicesOfStrand[removedStrandIdx].clear();
+      net.strandContourLength[static_cast<Eigen::Index>(removedStrandIdx)] =
+        0.0;
     }
 
-    net.linkIndicesOfStrand[removedStrandIdx].clear();
-    net.springIndicesOfStrand[removedStrandIdx].clear();
-    net.strandContourLength[static_cast<Eigen::Index>(removedStrandIdx)] = 0.0;
+    // Detach removed spring
+    net.springIndexA[removedIdx] = -1;
+    net.springIndexB[removedIdx] = -1;
+    net.strandIndexOfSpring[removedIdx] = -1;
+
+    if (!isStrandMerger) {
+      pylimer_tools::utils::removeIfContained(
+        net.springIndicesOfStrand[keptStrandIdx], removedSpringIdx);
+      pylimer_tools::utils::removeIfContained(
+        net.linkIndicesOfStrand[keptStrandIdx], linkToReduce);
+    }
+    net.strandIndicesOfLink[linkToReduce].clear();
+
+    recomputeStrandPartitionsFromContourLengths(net, keptStrandIdx);
+
+    const Eigen::Vector3d distanceAfter =
+      net.evaluateSpringVectorFrom(u, keptSpringIdx, otherEndKept);
+    RUNTIME_EXP_IFN(pylimer_tools::utils::vector_approx_equal(
+                      totalDistance, distanceAfter, 1e-7),
+                    "Merged spring distance mismatch after merging springs.");
   }
 
-  // Detach removed spring
-  net.springIndexA[removedIdx] = -1;
-  net.springIndexB[removedIdx] = -1;
-  net.strandIndexOfSpring[removedIdx] = -1;
-
-  if (!isStrandMerger) {
-    pylimer_tools::utils::removeIfContained(
-      net.springIndicesOfStrand[keptStrandIdx], removedSpringIdx);
-    pylimer_tools::utils::removeIfContained(
-      net.linkIndicesOfStrand[keptStrandIdx], linkToReduce);
+  /**
+   * @brief Collect unique adjacent link neighbors and attached springs for
+   * local reversible slip-link swap energy checks.
+   */
+  std::vector<size_t> collectLocalNeighborsForLinks(
+    const MEHPNetwork& net,
+    const std::vector<size_t>& centerLinks)
+  {
+    std::vector<size_t> neighbors = centerLinks;
+    for (const size_t linkIdx : centerLinks) {
+      const std::vector<size_t> linkNeighbors =
+        net.getNeighbourLinkIndices(linkIdx);
+      neighbors.insert(
+        neighbors.end(), linkNeighbors.begin(), linkNeighbors.end());
+    }
+    pylimer_tools::utils::sort_remove_duplicates(neighbors);
+    return neighbors;
   }
-  net.strandIndicesOfLink[linkToReduce].clear();
-
-  recomputeStrandPartitionsFromContourLengths(net, keptStrandIdx);
-
-  const Eigen::Vector3d distanceAfter =
-    net.evaluateSpringVectorFrom(u, keptSpringIdx, otherEndKept);
-  RUNTIME_EXP_IFN(
-    pylimer_tools::utils::vector_approx_equal(
-      totalDistance, distanceAfter, 1e-7),
-    "Merged spring distance mismatch after merging springs.");
-}
-
-/**
- * @brief Collect unique adjacent link neighbors and attached springs for local
- * reversible slip-link swap energy checks.
- */
-std::vector<size_t>
-collectLocalNeighborsForLinks(const MEHPNetwork& net,
-                              const std::vector<size_t>& centerLinks)
-{
-  std::vector<size_t> neighbors = centerLinks;
-  for (const size_t linkIdx : centerLinks) {
-    const std::vector<size_t> linkNeighbors =
-      net.getNeighbourLinkIndices(linkIdx);
-    neighbors.insert(
-      neighbors.end(), linkNeighbors.begin(), linkNeighbors.end());
-  }
-  pylimer_tools::utils::sort_remove_duplicates(neighbors);
-  return neighbors;
-}
 
 } // namespace
 
@@ -580,8 +582,7 @@ MEHPNetwork::fromUniverse(
   }
   for (size_t vIdx = 0; vIdx < nAtoms; ++vIdx) {
     if (vertexDegrees[vIdx] == 2 && pairOfAtom[vIdx] < 0 &&
-        !(keep2FunctionalCrosslinkers &&
-          atomTypes[vIdx] == crossLinkerType)) {
+        !(keep2FunctionalCrosslinkers && atomTypes[vIdx] == crossLinkerType)) {
       startingVertices.push_back(static_cast<igraph_integer_t>(vIdx));
     }
   }
@@ -900,9 +901,8 @@ MEHPNetwork::fromUniverse(
     }
   }
 
-  net.strandIndicesOfLink =
-    pylimer_tools::utils::initializeWithValue(net.nrOfLinks,
-                                              std::vector<size_t>());
+  net.strandIndicesOfLink = pylimer_tools::utils::initializeWithValue(
+    net.nrOfLinks, std::vector<size_t>());
   for (size_t s = 0; s < net.nrOfStrands; ++s) {
     for (const size_t lIdx : net.linkIndicesOfStrand[s]) {
       pylimer_tools::utils::addIfNotContained(net.strandIndicesOfLink[lIdx], s);
@@ -920,8 +920,7 @@ MEHPNetwork::fromUniverse(
     const size_t oldVertexIdx = newLinkIdxToOldVertexIdx[linkIdx];
     const bool isEnt = (pairOfAtom[oldVertexIdx] >= 0);
     net.linkIsEntanglement[lIdx] = isEnt;
-    net.oldAtomIds[lIdx] =
-      isEnt ? -1 : static_cast<int>(atomIds[oldVertexIdx]);
+    net.oldAtomIds[lIdx] = isEnt ? -1 : static_cast<int>(atomIds[oldVertexIdx]);
     net.oldAtomTypes[lIdx] = atomTypes[oldVertexIdx];
     net.coordinates.segment<3>(3 * lIdx) = newLinkPositions[linkIdx];
   }
@@ -1114,9 +1113,8 @@ MEHPNetwork::fromCrosslinkerUniverse(
     if (!entanglementsAsSprings) {
       const size_t linkIdx = nNodes + e;
       const Eigen::Index linkE = static_cast<Eigen::Index>(linkIdx);
-      Eigen::Vector3d mid(entanglements.x[entE],
-                          entanglements.y[entE],
-                          entanglements.z[entE]);
+      Eigen::Vector3d mid(
+        entanglements.x[entE], entanglements.y[entE], entanglements.z[entE]);
       box.handlePBC(mid);
       net.coordinates.segment<3>(3 * linkE) = mid;
       net.linkIsEntanglement[linkE] = true;
@@ -1160,7 +1158,8 @@ MEHPNetwork::fromCrosslinkerUniverse(
     }
   }
 
-  net.nrOfStrands = nPolymerStrands + (entanglementsAsSprings ? nEntanglements : 0);
+  net.nrOfStrands =
+    nPolymerStrands + (entanglementsAsSprings ? nEntanglements : 0);
   net.nrOfSprings =
     nPolymerStrands +
     (entanglementsAsSprings ? (3 * nEntanglements) : (2 * nEntanglements));
@@ -1355,8 +1354,9 @@ MEHPNetwork::fromCrosslinkerUniverse(
   assert(nextSpringIdx == net.nrOfSprings);
   if (countBondStats > 0) {
     net.defaultBondLength = sumBondLength / static_cast<double>(countBondStats);
-    net.defaultR02 = (sumR02 > 0.0) ? (sumR02 / static_cast<double>(countBondStats))
-                                    : (net.defaultBondLength * net.defaultBondLength);
+    net.defaultR02 = (sumR02 > 0.0)
+                       ? (sumR02 / static_cast<double>(countBondStats))
+                       : (net.defaultBondLength * net.defaultBondLength);
   }
 
   net.extractSelfMetadata();
@@ -1373,8 +1373,7 @@ MEHPNetwork::fromCrosslinkerUniverse(
 // =============================================================================
 
 void
-MEHPNetwork::extractUniverseMetadata(
-  const pylimer_tools::entities::Universe& u)
+MEHPNetwork::extractUniverseMetadata(const pylimer_tools::entities::Universe& u)
 {
   this->universeNrOfAtoms = u.getNrOfAtoms();
   this->defaultBondLength =
@@ -1513,8 +1512,7 @@ MEHPNetwork::inferNrOfAtomsFromNetwork() const
   nAtoms += static_cast<double>(this->nrOfLinks);
   if (this->springIsEntanglement.size() == 0 ||
       !this->springIsEntanglement.any()) {
-    nAtoms += static_cast<double>(
-      (this->linkIsEntanglement == true).count());
+    nAtoms += static_cast<double>((this->linkIsEntanglement == true).count());
   }
   return nAtoms;
 }
@@ -1550,9 +1548,9 @@ MEHPNetwork::computeClampedInverseSpringContourLength(
   if (oneOverSpringPartitionUpperLimit > 0.0) {
     const double upperLimit = oneOverSpringPartitionUpperLimit;
     const double remainingLength = strandContourLen - (1.0 / upperLimit);
-    const double lowerLimit =
-      (remainingLength > 0.0) ? std::min(1.0 / remainingLength, upperLimit)
-                              : upperLimit;
+    const double lowerLimit = (remainingLength > 0.0)
+                                ? std::min(1.0 / remainingLength, upperLimit)
+                                : upperLimit;
     const double rawInv =
       (springContourLen > 0.0) ? (1.0 / springContourLen) : upperLimit;
     return std::clamp(rawInv, lowerLimit, upperLimit);
@@ -1661,8 +1659,8 @@ MEHPNetwork::addSlipLinks(const std::vector<size_t>& strandIdx1,
     true;
   this->oldAtomIds.tail(static_cast<Eigen::Index>(nNewSlipLinks)) = -1;
   this->oldAtomTypes.tail(static_cast<Eigen::Index>(nNewSlipLinks)) = 1;
-  this->nrOfCrosslinkSwapsEndured
-    .tail(static_cast<Eigen::Index>(nNewSlipLinks)) = 0;
+  this->nrOfCrosslinkSwapsEndured.tail(
+    static_cast<Eigen::Index>(nNewSlipLinks)) = 0;
 
   this->springIndexA.conservativeResize(newTotalSpringsE);
   this->springIndexB.conservativeResize(newTotalSpringsE);
@@ -1675,8 +1673,8 @@ MEHPNetwork::addSlipLinks(const std::vector<size_t>& strandIdx1,
   this->springPartitions.conservativeResize(newTotalSpringsE);
   this->strandIndexOfSpring.conservativeResize(newTotalSpringsE);
   this->springIsEntanglement.conservativeResize(newTotalSpringsE);
-  this->springIsEntanglement.tail(static_cast<Eigen::Index>(2 * nNewSlipLinks)) =
-    false;
+  this->springIsEntanglement.tail(
+    static_cast<Eigen::Index>(2 * nNewSlipLinks)) = false;
 
   Eigen::VectorXd localU;
   Eigen::VectorXd* activeU = u;
@@ -1787,7 +1785,8 @@ MEHPNetwork::randomlyAddSlipLinks(const size_t nrOfEntanglementsToSample,
   std::vector<size_t> cuNodeToLink;
 
   for (size_t s = 0; s < this->nrOfStrands; ++s) {
-    if (this->isEntanglementStrand(s) || this->linkIndicesOfStrand[s].size() < 2) {
+    if (this->isEntanglementStrand(s) ||
+        this->linkIndicesOfStrand[s].size() < 2) {
       continue;
     }
     const size_t endA = this->linkIndicesOfStrand[s].front();
@@ -1835,8 +1834,8 @@ MEHPNetwork::randomlyAddSlipLinks(const size_t nrOfEntanglementsToSample,
   }
 
   for (const size_t sIdx : includedNetworkStrands) {
-    const size_t cuA =
-      static_cast<size_t>(linkToCuNode[this->linkIndicesOfStrand[sIdx].front()]);
+    const size_t cuA = static_cast<size_t>(
+      linkToCuNode[this->linkIndicesOfStrand[sIdx].front()]);
     const size_t cuB =
       static_cast<size_t>(linkToCuNode[this->linkIndicesOfStrand[sIdx].back()]);
     nodeDegree[cuA] += 1;
@@ -1855,8 +1854,8 @@ MEHPNetwork::randomlyAddSlipLinks(const size_t nrOfEntanglementsToSample,
   std::vector<bool> strandIsReversed(nCuStrands, false);
   for (size_t k = 0; k < nCuStrands; ++k) {
     const size_t sIdx = includedNetworkStrands[k];
-    const size_t cuA =
-      static_cast<size_t>(linkToCuNode[this->linkIndicesOfStrand[sIdx].front()]);
+    const size_t cuA = static_cast<size_t>(
+      linkToCuNode[this->linkIndicesOfStrand[sIdx].front()]);
     const size_t cuB =
       static_cast<size_t>(linkToCuNode[this->linkIndicesOfStrand[sIdx].back()]);
     const bool aIsFree =
@@ -1865,8 +1864,7 @@ MEHPNetwork::randomlyAddSlipLinks(const size_t nrOfEntanglementsToSample,
       (nodeDegree[cuB] == 1 && cu.xlinkTypes[cuB] != crossLinkerType);
     const int nBonds = static_cast<int>(
       std::round(this->strandContourLength[static_cast<Eigen::Index>(sIdx)]));
-    const int nFreeEnds =
-      static_cast<int>(aIsFree) + static_cast<int>(bIsFree);
+    const int nFreeEnds = static_cast<int>(aIsFree) + static_cast<int>(bIsFree);
     cu.beadsInStrand[k] = std::max(0, nBonds - 1 + nFreeEnds);
     if (aIsFree && !bIsFree) {
       cu.strandFrom[k] = static_cast<long int>(cuB);
@@ -1878,8 +1876,8 @@ MEHPNetwork::randomlyAddSlipLinks(const size_t nrOfEntanglementsToSample,
     }
   }
 
-  pylimer_tools::topo::entanglement_detection::StrandPairEntanglements
-    sampled = pylimer_tools::topo::entanglement_detection::
+  pylimer_tools::topo::entanglement_detection::StrandPairEntanglements sampled =
+    pylimer_tools::topo::entanglement_detection::
       randomlyFindEntanglementsOnDemand(this->box,
                                         cu,
                                         nrOfEntanglementsToSample,
@@ -1919,10 +1917,9 @@ MEHPNetwork::realignSlipLinkToImages(const Eigen::VectorXd& u,
                        springIdx2 < this->nrOfSprings &&
                        slipLinkIdx < this->nrOfLinks,
                      "Index out of range in realignSlipLinkToImages.");
-  INVALIDARG_EXP_IFN(
-    this->springIndexB[s1E] == static_cast<int>(slipLinkIdx) &&
-      this->springIndexA[s2E] == static_cast<int>(slipLinkIdx),
-    "Sub-springs must meet head-to-tail at the slip-link.");
+  INVALIDARG_EXP_IFN(this->springIndexB[s1E] == static_cast<int>(slipLinkIdx) &&
+                       this->springIndexA[s2E] == static_cast<int>(slipLinkIdx),
+                     "Sub-springs must meet head-to-tail at the slip-link.");
 
   const Eigen::Vector3d totalOffset =
     this->springBoxOffset.segment<3>(3 * s1E) +
@@ -2130,8 +2127,8 @@ MEHPNetwork::displaceToMeanPosition(
   Eigen::ArrayXd nSpringsPerLink = Eigen::ArrayXd::Zero(3 * nLinksE);
   nSpringsPerLink(this->springCoordinateIndexA) += nonLoopMask;
   nSpringsPerLink(this->springCoordinateIndexB) += nonLoopMask;
-  nSpringsPerLink = nSpringsPerLink.unaryExpr(
-    [](const double v) { return v > 0.0 ? v : 1.0; });
+  nSpringsPerLink =
+    nSpringsPerLink.unaryExpr([](const double v) { return v > 0.0 ? v : 1.0; });
 
   Eigen::ArrayXd backForthDisp = Eigen::ArrayXd::Zero(3 * nLinksE);
   backForthDisp(this->springCoordinateIndexA) +=
@@ -2142,8 +2139,9 @@ MEHPNetwork::displaceToMeanPosition(
                    (nSpringsPerLink(this->springCoordinateIndexB) * 2.0));
 
   const Eigen::VectorXd finalDisp = (remainingDisp + backForthDisp).matrix();
-  RUNTIME_EXP_IFN(pylimer_tools::utils::all_components_finite(finalDisp),
-                  "Non-finite displacement computed in displaceToMeanPosition.");
+  RUNTIME_EXP_IFN(
+    pylimer_tools::utils::all_components_finite(finalDisp),
+    "Non-finite displacement computed in displaceToMeanPosition.");
   u += finalDisp;
   return pylimer_tools::utils::segmentwise_norm_max(finalDisp, 3);
 }
@@ -2320,8 +2318,7 @@ MEHPNetwork::swapSlipLinksOnSpring(const size_t springIdx,
                      "Cannot swap slip-links across an entanglement spring.");
   const size_t link1 = static_cast<size_t>(this->springIndexA[sE]);
   const size_t link2 = static_cast<size_t>(this->springIndexB[sE]);
-  INVALIDARG_EXP_IFN(link1 != link2,
-                     "Cannot swap slip-link with itself.");
+  INVALIDARG_EXP_IFN(link1 != link2, "Cannot swap slip-link with itself.");
   INVALIDARG_EXP_IFN(
     this->linkIsEntanglement[static_cast<Eigen::Index>(link1)] &&
       this->linkIsEntanglement[static_cast<Eigen::Index>(link2)],
@@ -2383,8 +2380,7 @@ MEHPNetwork::moveSlipLinkFromRailToRail(
   const bool is2D)
 {
   INVALIDARG_EXP_IFN(
-    sourceSpringIdx != targetSpringIdx &&
-      sourceSpringIdx < this->nrOfSprings &&
+    sourceSpringIdx != targetSpringIdx && sourceSpringIdx < this->nrOfSprings &&
       targetSpringIdx < this->nrOfSprings,
     "Invalid source/target spring indices in moveSlipLinkFromRailToRail.");
 
@@ -2392,8 +2388,10 @@ MEHPNetwork::moveSlipLinkFromRailToRail(
   const Eigen::Index tgtE = static_cast<Eigen::Index>(targetSpringIdx);
   const size_t srcA = static_cast<size_t>(this->springIndexA[srcE]);
   const size_t srcB = static_cast<size_t>(this->springIndexB[srcE]);
-  const bool aIsSlip = this->linkIsEntanglement[static_cast<Eigen::Index>(srcA)];
-  const bool bIsSlip = this->linkIsEntanglement[static_cast<Eigen::Index>(srcB)];
+  const bool aIsSlip =
+    this->linkIsEntanglement[static_cast<Eigen::Index>(srcA)];
+  const bool bIsSlip =
+    this->linkIsEntanglement[static_cast<Eigen::Index>(srcB)];
   INVALIDARG_EXP_IFN(
     XOR(aIsSlip, bIsSlip),
     "Source spring must connect exactly one slip-link and one crosslink.");
@@ -2427,9 +2425,9 @@ MEHPNetwork::moveSlipLinkFromRailToRail(
 
   const std::vector<size_t>& srcSprings =
     this->springIndicesOfStrand[srcStrandIdx];
-  const size_t otherInvolvedSpring =
-    (srcSprings.front() == sourceSpringIdx) ? srcSprings[1]
-                                            : srcSprings[srcSprings.size() - 2];
+  const size_t otherInvolvedSpring = (srcSprings.front() == sourceSpringIdx)
+                                       ? srcSprings[1]
+                                       : srcSprings[srcSprings.size() - 2];
 
   // Merge sourceSpringIdx into otherInvolvedSpring and remove sourceSpringIdx
   // while keeping link indices intact (`removeZeroFunctionalLinks = false`).
@@ -2479,8 +2477,8 @@ MEHPNetwork::moveSlipLinkFromRailToRail(
   } else {
     // Temporarily give the split `insertedAlpha` and rescale remaining segments
     // proportionally so every sub-spring stays >= minAlpha and sums to 1.0.
-    firstSegAlpha = crosslinkIsStartOfTarget ? insertedAlpha
-                                             : (oldSegAlpha - insertedAlpha);
+    firstSegAlpha =
+      crosslinkIsStartOfTarget ? insertedAlpha : (oldSegAlpha - insertedAlpha);
   }
 
   insertLinkOntoSubSpring(*this,
@@ -2519,7 +2517,8 @@ MEHPNetwork::moveSlipLinkFromRailToRail(
         }
       }
       this->springPartitions[xAdjE] += taken;
-      this->springContourLength[xAdjE] = this->springPartitions[xAdjE] * newTgtN;
+      this->springContourLength[xAdjE] =
+        this->springPartitions[xAdjE] * newTgtN;
     }
   }
 
@@ -2540,8 +2539,9 @@ MEHPNetwork::rotateSlipLinkAroundCrosslink(
   const bool respectLoops,
   const bool is2D)
 {
-  INVALIDARG_EXP_IFN(springIdx < this->nrOfSprings,
-                     "Spring index out of range in rotateSlipLinkAroundCrosslink.");
+  INVALIDARG_EXP_IFN(
+    springIdx < this->nrOfSprings,
+    "Spring index out of range in rotateSlipLinkAroundCrosslink.");
   const Eigen::Index sE = static_cast<Eigen::Index>(springIdx);
   const size_t linkA = static_cast<size_t>(this->springIndexA[sE]);
   const size_t linkB = static_cast<size_t>(this->springIndexB[sE]);
@@ -2578,9 +2578,8 @@ MEHPNetwork::rotateSlipLinkAroundCrosslink(
        tgtN > 1.0 / oneOverSpringPartitionUpperLimit)
         ? 1.0 / (tgtN - 1.0 / oneOverSpringPartitionUpperLimit)
         : 1e-9;
-    if (minAlpha *
-          static_cast<double>(this->springIndicesOfStrand[strandIdx].size() +
-                              1) >=
+    if (minAlpha * static_cast<double>(
+                     this->springIndicesOfStrand[strandIdx].size() + 1) >=
         1.0) {
       continue;
     }
@@ -2650,15 +2649,13 @@ MEHPNetwork::moveSlipLinkAlongStrand(
   }
 
   const bool involvesCrosslink = (!aIsSlip || !bIsSlip);
-  const bool respectLoops =
-    (mode == LinkSwappingMode::ALL_CYCLE ||
-     mode == LinkSwappingMode::ALL_MC_CYCLE ||
-     mode == LinkSwappingMode::ALL_MC_TRY_CYCLE);
-  const bool mcMode =
-    (mode == LinkSwappingMode::ALL_MC ||
-     mode == LinkSwappingMode::ALL_MC_CYCLE ||
-     mode == LinkSwappingMode::ALL_MC_TRY ||
-     mode == LinkSwappingMode::ALL_MC_TRY_CYCLE);
+  const bool respectLoops = (mode == LinkSwappingMode::ALL_CYCLE ||
+                             mode == LinkSwappingMode::ALL_MC_CYCLE ||
+                             mode == LinkSwappingMode::ALL_MC_TRY_CYCLE);
+  const bool mcMode = (mode == LinkSwappingMode::ALL_MC ||
+                       mode == LinkSwappingMode::ALL_MC_CYCLE ||
+                       mode == LinkSwappingMode::ALL_MC_TRY ||
+                       mode == LinkSwappingMode::ALL_MC_TRY_CYCLE);
 
   if (!involvesCrosslink) {
     // Two interior slip-links along the same strand
@@ -2712,7 +2709,8 @@ MEHPNetwork::moveSlipLinkAlongStrand(
       return true;
     }
 
-    // MC reversible check: test swap, locally relax the pair, keep if stress drops
+    // MC reversible check: test swap, locally relax the pair, keep if stress
+    // drops
     const std::vector<size_t> localLinks =
       collectLocalNeighborsForLinks(*this, { partnerA, partnerB });
     const double residualBefore =
@@ -2761,8 +2759,7 @@ MEHPNetwork::moveSlipLinkAlongStrand(
     return false;
   }
 
-  const std::vector<size_t>& sSprings =
-    this->springIndicesOfStrand[strandIdx];
+  const std::vector<size_t>& sSprings = this->springIndicesOfStrand[strandIdx];
   if (sSprings.size() < 2) {
     return false;
   }
@@ -2808,8 +2805,7 @@ MEHPNetwork::moveSlipLinkAlongStrand(
     const size_t endSpring =
       candAtFront ? this->springIndicesOfStrand[candStrandIdx].front()
                   : this->springIndicesOfStrand[candStrandIdx].back();
-    if (endSpring != springIdx &&
-        this->isPartOfSpring(xlinkIdx, endSpring)) {
+    if (endSpring != springIdx && this->isPartOfSpring(xlinkIdx, endSpring)) {
       candidates.push_back(
         CandidateBranch{ candStrandIdx, candAtFront, endSpring });
     }
@@ -2819,8 +2815,7 @@ MEHPNetwork::moveSlipLinkAlongStrand(
   }
 
   if (!mcMode) {
-    Eigen::Vector3d thisVec =
-      this->evaluateSpringVector(u, springIdx, is2D);
+    Eigen::Vector3d thisVec = this->evaluateSpringVector(u, springIdx, is2D);
     Eigen::Vector3d otherVec =
       this->evaluateSpringVector(u, otherRailSpring, is2D);
     if (slipLinkIdx == partnerA) {
@@ -2829,19 +2824,19 @@ MEHPNetwork::moveSlipLinkAlongStrand(
     }
 
     for (const CandidateBranch& cand : candidates) {
-      const Eigen::Vector3d candVec =
-        this->evaluateSpringVectorFrom(u, cand.currentEndSpring, xlinkIdx, is2D);
-      const double forceBefore = (-otherVec + thisVec).squaredNorm() +
-                                 (candVec - thisVec).squaredNorm();
-      const double forceAfter = candVec.squaredNorm() +
-                                (-2.0 * thisVec - otherVec).squaredNorm();
+      const Eigen::Vector3d candVec = this->evaluateSpringVectorFrom(
+        u, cand.currentEndSpring, xlinkIdx, is2D);
+      const double forceBefore =
+        (-otherVec + thisVec).squaredNorm() + (candVec - thisVec).squaredNorm();
+      const double forceAfter =
+        candVec.squaredNorm() + (-2.0 * thisVec - otherVec).squaredNorm();
       if (forceAfter < forceBefore) {
-        const long int newSp = this->moveSlipLinkFromRailToRail(
-          springIdx,
-          cand.currentEndSpring,
-          u,
-          oneOverSpringPartitionUpperLimit,
-          is2D);
+        const long int newSp =
+          this->moveSlipLinkFromRailToRail(springIdx,
+                                           cand.currentEndSpring,
+                                           u,
+                                           oneOverSpringPartitionUpperLimit,
+                                           is2D);
         if (newSp >= 0) {
           this->nrOfCrosslinkSwapsEndured[slipE] += 1;
           return true;
@@ -2881,7 +2876,8 @@ MEHPNetwork::moveSlipLinkAlongStrand(
         this->springContourLength[spE] = saved[k] * totalN;
       }
     };
-  const std::vector<double> savedSrcPartitions = saveStrandPartitions(strandIdx);
+  const std::vector<double> savedSrcPartitions =
+    saveStrandPartitions(strandIdx);
 
   size_t currentSrcSpringIdx = springIdx;
   for (const CandidateBranch& cand : candidates) {
@@ -2892,12 +2888,12 @@ MEHPNetwork::moveSlipLinkAlongStrand(
     const std::vector<double> savedCandPartitions =
       saveStrandPartitions(cand.strandIdx);
 
-    const long int newSp = this->moveSlipLinkFromRailToRail(
-      currentSrcSpringIdx,
-      candSpringIdx,
-      u,
-      oneOverSpringPartitionUpperLimit,
-      is2D);
+    const long int newSp =
+      this->moveSlipLinkFromRailToRail(currentSrcSpringIdx,
+                                       candSpringIdx,
+                                       u,
+                                       oneOverSpringPartitionUpperLimit,
+                                       is2D);
     if (newSp < 0) {
       continue;
     }
@@ -2924,12 +2920,12 @@ MEHPNetwork::moveSlipLinkAlongStrand(
     const size_t returnTarget =
       srcAtFront ? this->springIndicesOfStrand[strandIdx].front()
                  : this->springIndicesOfStrand[strandIdx].back();
-    const long int restored = this->moveSlipLinkFromRailToRail(
-      static_cast<size_t>(newSp),
-      returnTarget,
-      u,
-      oneOverSpringPartitionUpperLimit,
-      is2D);
+    const long int restored =
+      this->moveSlipLinkFromRailToRail(static_cast<size_t>(newSp),
+                                       returnTarget,
+                                       u,
+                                       oneOverSpringPartitionUpperLimit,
+                                       is2D);
     RUNTIME_EXP_IFN(restored >= 0,
                     "Failed to roll back rejected slip-link crosslink hop.");
     currentSrcSpringIdx = static_cast<size_t>(restored);
@@ -3050,8 +3046,8 @@ MEHPNetwork::findInactiveSprings(const Eigen::VectorXd& u,
   INVALIDARG_EXP_IFN(
     u.size() == static_cast<Eigen::Index>(3 * this->nrOfLinks),
     "Displacement vector u size must match network nrOfLinks.");
-  Eigen::ArrayXb result =
-    Eigen::ArrayXb::Constant(static_cast<Eigen::Index>(this->nrOfSprings), false);
+  Eigen::ArrayXb result = Eigen::ArrayXb::Constant(
+    static_cast<Eigen::Index>(this->nrOfSprings), false);
   if (this->nrOfSprings == 0) {
     return result;
   }
@@ -3107,9 +3103,9 @@ MEHPNetwork::removeSpringsAndCollectMatrixUpdates(
                    sortedDesc.end());
 
   if (constants != nullptr) {
-    INVALIDARG_EXP_IFN(
-      constants->size() == static_cast<Eigen::Index>(3 * this->nrOfLinks),
-      "Constants vector size must match 3 * nrOfLinks.");
+    INVALIDARG_EXP_IFN(constants->size() ==
+                         static_cast<Eigen::Index>(3 * this->nrOfLinks),
+                       "Constants vector size must match 3 * nrOfLinks.");
   }
 
   updates.reserve(sortedDesc.size());
@@ -3155,14 +3151,12 @@ MEHPNetwork::removeSprings(const std::vector<size_t>& springIndicesToRemove,
   }
 
   std::vector<size_t> sortedSprings = springIndicesToRemove;
-  std::sort(
-    sortedSprings.begin(), sortedSprings.end(), std::greater<size_t>());
+  std::sort(sortedSprings.begin(), sortedSprings.end(), std::greater<size_t>());
   sortedSprings.erase(std::unique(sortedSprings.begin(), sortedSprings.end()),
                       sortedSprings.end());
 
-  INVALIDARG_EXP_IFN(
-    sortedSprings.front() < this->nrOfSprings,
-    "Spring index out of bounds in removeSprings.");
+  INVALIDARG_EXP_IFN(sortedSprings.front() < this->nrOfSprings,
+                     "Spring index out of bounds in removeSprings.");
 
   std::vector<size_t> strandsToDelete;
   for (const size_t spIdx : sortedSprings) {
@@ -3296,8 +3290,7 @@ MEHPNetwork::unlinkBifunctionalLinks(Eigen::VectorXd& u,
     }
     const std::vector<size_t> springIndices =
       this->getSpringIndicesOfLink(lIdx);
-    if (springIndices.size() == 2 &&
-        !this->isLoopingSpring(springIndices[0]) &&
+    if (springIndices.size() == 2 && !this->isLoopingSpring(springIndices[0]) &&
         !this->isLoopingSpring(springIndices[1])) {
       const Eigen::Index s0E = static_cast<Eigen::Index>(springIndices[0]);
       const Eigen::Index s1E = static_cast<Eigen::Index>(springIndices[1]);
@@ -3362,9 +3355,8 @@ MEHPNetwork::removeZeroFunctionalLinks(Eigen::VectorXd* u)
     this->coordinates, linksWithDirsToRemove, true, true);
   if (u != nullptr && u->size() > 0) {
     INVALIDARG_EXP_IFN(
-      u->size() ==
-        this->coordinates.size() +
-          static_cast<Eigen::Index>(linksWithDirsToRemove.size()),
+      u->size() == this->coordinates.size() +
+                     static_cast<Eigen::Index>(linksWithDirsToRemove.size()),
       "Displacement vector u size mismatch in removeZeroFunctionalLinks.");
     pylimer_tools::utils::removeRows(*u, linksWithDirsToRemove, true, true);
   }
@@ -3492,10 +3484,9 @@ MEHPNetwork::evaluateSpringVectors(const Eigen::VectorXd& u,
   }
 
   const Eigen::VectorXd displacedCoords = this->coordinates + u;
-  Eigen::VectorXd vectors =
-    (displacedCoords(this->springCoordinateIndexB) -
-     displacedCoords(this->springCoordinateIndexA)) +
-    this->springBoxOffset;
+  Eigen::VectorXd vectors = (displacedCoords(this->springCoordinateIndexB) -
+                             displacedCoords(this->springCoordinateIndexA)) +
+                            this->springBoxOffset;
 
   if (this->assumeBoxLargeEnough) {
     this->box.handlePBC(vectors);
@@ -3660,14 +3651,13 @@ MEHPNetwork::evaluateStressTensor(
       (strandIdxInt >= 0)
         ? this->strandContourLength[static_cast<Eigen::Index>(strandIdxInt)]
         : this->springContourLength[sE];
-    const double invContour =
-      (oneOverSpringPartitionUpperLimit > 0.0)
-        ? computeClampedInverseSpringContourLength(
-            isPartial,
-            this->springContourLength[sE],
-            strandN,
-            oneOverSpringPartitionUpperLimit)
-        : (1.0 / this->springContourLength[sE]);
+    const double invContour = (oneOverSpringPartitionUpperLimit > 0.0)
+                                ? computeClampedInverseSpringContourLength(
+                                    isPartial,
+                                    this->springContourLength[sE],
+                                    strandN,
+                                    oneOverSpringPartitionUpperLimit)
+                                : (1.0 / this->springContourLength[sE]);
 
     stress.noalias() += (kappa * invContour) * (dist * dist.transpose());
   }
@@ -3688,8 +3678,7 @@ MEHPNetwork::evaluateStressTensorForLinks(
     u.size() == static_cast<Eigen::Index>(3 * this->nrOfLinks),
     "Displacement vector u size must match network nrOfLinks.");
   Eigen::Matrix3d stress = Eigen::Matrix3d::Zero();
-  const double halfOverVolume =
-    0.5 / (this->L[0] * this->L[1] * this->L[2]);
+  const double halfOverVolume = 0.5 / (this->L[0] * this->L[1] * this->L[2]);
 
   for (const size_t linkIdx : linkIndices) {
     if (linkIdx >= this->nrOfLinks) {
@@ -3707,20 +3696,19 @@ MEHPNetwork::evaluateStressTensorForLinks(
       const int strandIdxInt = this->strandIndexOfSpring[sE];
       const bool isPartial =
         (strandIdxInt >= 0 && !this->springIsEntanglement[sE] &&
-         this->springIndicesOfStrand[static_cast<size_t>(strandIdxInt)]
-             .size() > 1);
+         this->springIndicesOfStrand[static_cast<size_t>(strandIdxInt)].size() >
+           1);
       const double strandN =
         (strandIdxInt >= 0)
           ? this->strandContourLength[static_cast<Eigen::Index>(strandIdxInt)]
           : this->springContourLength[sE];
-      const double invContour =
-        (oneOverSpringPartitionUpperLimit > 0.0)
-          ? computeClampedInverseSpringContourLength(
-              isPartial,
-              this->springContourLength[sE],
-              strandN,
-              oneOverSpringPartitionUpperLimit)
-          : (1.0 / this->springContourLength[sE]);
+      const double invContour = (oneOverSpringPartitionUpperLimit > 0.0)
+                                  ? computeClampedInverseSpringContourLength(
+                                      isPartial,
+                                      this->springContourLength[sE],
+                                      strandN,
+                                      oneOverSpringPartitionUpperLimit)
+                                  : (1.0 / this->springContourLength[sE]);
       stress.noalias() += (kappa * invContour) * (dist * dist.transpose());
     }
   }
@@ -3859,12 +3847,13 @@ MEHPNetwork::findActiveSprings(const Eigen::VectorXd& u,
                                const bool is2D) const
 {
   const Eigen::VectorXd springVectors = this->evaluateSpringVectors(u, is2D);
-  Eigen::ArrayXb result =
-    Eigen::ArrayXb::Constant(static_cast<Eigen::Index>(this->nrOfSprings), false);
+  Eigen::ArrayXb result = Eigen::ArrayXb::Constant(
+    static_cast<Eigen::Index>(this->nrOfSprings), false);
   for (size_t i = 0; i < this->nrOfSprings; ++i) {
     const Eigen::Index sE = static_cast<Eigen::Index>(i);
-    result[sE] = !distanceIsWithinTolerance(
-      springVectors.segment<3>(3 * sE), tolerance, this->springContourLength[sE]);
+    result[sE] = !distanceIsWithinTolerance(springVectors.segment<3>(3 * sE),
+                                            tolerance,
+                                            this->springContourLength[sE]);
   }
   return result;
 }
@@ -3874,8 +3863,8 @@ MEHPNetwork::findActiveStrands(const Eigen::VectorXd& u,
                                const double tolerance,
                                const bool is2D) const
 {
-  Eigen::ArrayXb result =
-    Eigen::ArrayXb::Constant(static_cast<Eigen::Index>(this->nrOfStrands), false);
+  Eigen::ArrayXb result = Eigen::ArrayXb::Constant(
+    static_cast<Eigen::Index>(this->nrOfStrands), false);
   const Eigen::ArrayXb activeSprings =
     this->findActiveSprings(u, tolerance, is2D);
 
@@ -3909,12 +3898,12 @@ MEHPNetwork::findActiveStrands(const Eigen::VectorXd& u,
       continue;
     }
 
-    const bool anyActive = std::any_of(
-      strandSprings.begin(),
-      strandSprings.end(),
-      [&activeSprings](const size_t spIdx) {
-        return activeSprings[static_cast<Eigen::Index>(spIdx)];
-      });
+    const bool anyActive =
+      std::any_of(strandSprings.begin(),
+                  strandSprings.end(),
+                  [&activeSprings](const size_t spIdx) {
+                    return activeSprings[static_cast<Eigen::Index>(spIdx)];
+                  });
     if (!anyActive) {
       continue;
     }
@@ -3995,8 +3984,8 @@ MEHPNetwork::findActiveStrandsInDir(const Eigen::VectorXd& u,
 {
   INVALIDARG_EXP_IFN(dir >= 0 && dir < 3, "Direction must be 0, 1, or 2.");
   const Eigen::VectorXd springVectors = this->evaluateSpringVectors(u, is2D);
-  Eigen::ArrayXb result =
-    Eigen::ArrayXb::Constant(static_cast<Eigen::Index>(this->nrOfStrands), false);
+  Eigen::ArrayXb result = Eigen::ArrayXb::Constant(
+    static_cast<Eigen::Index>(this->nrOfStrands), false);
   for (size_t i = 0; i < this->nrOfSprings; ++i) {
     const Eigen::Index sE = static_cast<Eigen::Index>(i);
     const int strandIdxInt = this->strandIndexOfSpring[sE];
@@ -4039,8 +4028,7 @@ MEHPNetwork::findActiveNodes(const Eigen::VectorXd& u,
                              const double tolerance,
                              const bool is2D) const
 {
-  const Eigen::ArrayXb activeLinks =
-    this->findActiveLinks(u, tolerance, is2D);
+  const Eigen::ArrayXb activeLinks = this->findActiveLinks(u, tolerance, is2D);
   Eigen::ArrayXb activeNodes =
     Eigen::ArrayXb::Constant(static_cast<Eigen::Index>(this->nrOfNodes), false);
   size_t nodeIdx = 0;
@@ -4063,8 +4051,8 @@ MEHPNetwork::findSpringsAndLinksClusteredToActive(const Eigen::VectorXd& u,
     "Displacement vector u size must match network nrOfLinks.");
 
   Eigen::ArrayXb strandIsActive = this->findActiveStrands(u, tolerance, is2D);
-  Eigen::ArrayXb springIsActive =
-    Eigen::ArrayXb::Constant(static_cast<Eigen::Index>(this->nrOfSprings), false);
+  Eigen::ArrayXb springIsActive = Eigen::ArrayXb::Constant(
+    static_cast<Eigen::Index>(this->nrOfSprings), false);
   Eigen::ArrayXb linkIsActive =
     Eigen::ArrayXb::Constant(static_cast<Eigen::Index>(this->nrOfLinks), false);
   std::vector<size_t> linkQueue;
@@ -4118,8 +4106,8 @@ MEHPNetwork::findStrandsAndNodesClusteredToActive(const Eigen::VectorXd& u,
   const std::pair<Eigen::ArrayXb, Eigen::ArrayXb> clustered =
     this->findSpringsAndLinksClusteredToActive(u, tolerance, is2D);
 
-  Eigen::ArrayXb strandIsActive =
-    Eigen::ArrayXb::Constant(static_cast<Eigen::Index>(this->nrOfStrands), false);
+  Eigen::ArrayXb strandIsActive = Eigen::ArrayXb::Constant(
+    static_cast<Eigen::Index>(this->nrOfStrands), false);
   Eigen::ArrayXb nodeIsActive =
     Eigen::ArrayXb::Constant(static_cast<Eigen::Index>(this->nrOfNodes), false);
 
@@ -4186,8 +4174,8 @@ MEHPNetwork::computeActiveWeightFraction(const Eigen::VectorXd& u,
 
   Eigen::ArrayXb activeLinks =
     Eigen::ArrayXb::Constant(static_cast<Eigen::Index>(this->nrOfLinks), false);
-  Eigen::ArrayXb activeSprings =
-    Eigen::ArrayXb::Constant(static_cast<Eigen::Index>(this->nrOfSprings), false);
+  Eigen::ArrayXb activeSprings = Eigen::ArrayXb::Constant(
+    static_cast<Eigen::Index>(this->nrOfSprings), false);
 
   for (size_t strandIdx = 0; strandIdx < this->nrOfStrands; ++strandIdx) {
     if (!activeStrands[static_cast<Eigen::Index>(strandIdx)]) {
@@ -4334,8 +4322,7 @@ MEHPNetwork::getEffectiveFunctionalityOfAtoms(const Eigen::VectorXd& u,
   std::vector<int> activeStrandsPerLink(this->nrOfLinks, 0);
   for (size_t s = 0; s < this->nrOfStrands; ++s) {
     if (!activeStrands[static_cast<Eigen::Index>(s)] ||
-        this->linkIndicesOfStrand[s].empty() ||
-        this->isEntanglementStrand(s)) {
+        this->linkIndicesOfStrand[s].empty() || this->isEntanglementStrand(s)) {
       continue;
     }
     activeStrandsPerLink[this->linkIndicesOfStrand[s].front()] += 1;
@@ -4377,12 +4364,11 @@ MEHPNetwork::getGammaFactors(const Eigen::VectorXd& u,
   for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(this->nrOfSprings);
        ++i) {
     const double invContour = 1.0 / this->springContourLength[i];
-    gammaFactors[i] =
-      springVectors.segment<3>(3 * i).squaredNorm() * commonDenominator *
-      invContour;
+    gammaFactors[i] = springVectors.segment<3>(3 * i).squaredNorm() *
+                      commonDenominator * invContour;
     RUNTIME_EXP_IFN(std::isfinite(gammaFactors[i]),
-                    "Non-finite gamma factor for spring " +
-                      std::to_string(i) + ".");
+                    "Non-finite gamma factor for spring " + std::to_string(i) +
+                      ".");
   }
   return gammaFactors;
 }
@@ -4544,8 +4530,9 @@ MEHPNetwork::validate(const Eigen::VectorXd& u) const
     RUNTIME_EXP_IFN(std::isfinite(this->L[dir]) && this->L[dir] > 0.0,
                     "Box dimension L[" + std::to_string(dir) +
                       "] must be finite and positive.");
-    RUNTIME_EXP_IFN(APPROX_EQUAL(this->boxHalfs[dir], 0.5 * this->L[dir], 1e-12),
-                    "Expected boxHalfs to equal 0.5 * L.");
+    RUNTIME_EXP_IFN(
+      APPROX_EQUAL(this->boxHalfs[dir], 0.5 * this->L[dir], 1e-12),
+      "Expected boxHalfs to equal 0.5 * L.");
     RUNTIME_EXP_IFN(
       APPROX_EQUAL(this->L[dir], this->box.getL(static_cast<int>(dir)), 1e-12),
       "MEHPNetwork.L must stay synchronized with MEHPNetwork.box.");
@@ -4605,8 +4592,7 @@ MEHPNetwork::validate(const Eigen::VectorXd& u) const
                   "Invalid size of springIsEntanglement.");
 
   for (size_t linkIdx = 0; linkIdx < this->nrOfLinks; ++linkIdx) {
-    const std::vector<size_t>& linkStrands =
-      this->strandIndicesOfLink[linkIdx];
+    const std::vector<size_t>& linkStrands = this->strandIndicesOfLink[linkIdx];
     for (size_t j = 0; j < linkStrands.size(); ++j) {
       const size_t strandIdx = linkStrands[j];
       RUNTIME_EXP_IFN(strandIdx < this->nrOfStrands,
@@ -4616,19 +4602,20 @@ MEHPNetwork::validate(const Eigen::VectorXd& u) const
                   linkStrands.end(),
                   strandIdx) == linkStrands.end(),
         "Duplicate strand index in strandIndicesOfLink.");
-      RUNTIME_EXP_IFN(
-        std::find(this->linkIndicesOfStrand[strandIdx].begin(),
-                  this->linkIndicesOfStrand[strandIdx].end(),
-                  linkIdx) != this->linkIndicesOfStrand[strandIdx].end(),
-        "Strand <-> link mapping inconsistency.");
+      RUNTIME_EXP_IFN(std::find(this->linkIndicesOfStrand[strandIdx].begin(),
+                                this->linkIndicesOfStrand[strandIdx].end(),
+                                linkIdx) !=
+                        this->linkIndicesOfStrand[strandIdx].end(),
+                      "Strand <-> link mapping inconsistency.");
     }
   }
 
   for (size_t strandIdx = 0; strandIdx < this->nrOfStrands; ++strandIdx) {
     const std::vector<size_t>& links = this->linkIndicesOfStrand[strandIdx];
     const std::vector<size_t>& springs = this->springIndicesOfStrand[strandIdx];
-    RUNTIME_EXP_IFN(!links.empty() && links.size() == springs.size() + 1,
-                    "Each strand must have links.size() == springs.size() + 1.");
+    RUNTIME_EXP_IFN(
+      !links.empty() && links.size() == springs.size() + 1,
+      "Each strand must have links.size() == springs.size() + 1.");
 
     const bool isEntStrand = this->isEntanglementStrand(strandIdx);
     if (isEntStrand) {
@@ -4667,13 +4654,15 @@ MEHPNetwork::validate(const Eigen::VectorXd& u) const
                       "Spring endpoint ordering along strand is inconsistent.");
       sumSubContour += this->springContourLength[spE];
       sumPartitions += this->springPartitions[spE];
-      RUNTIME_EXP_IFN(
-        APPROX_EQUAL(
-          this->springContourLength[spE], this->springPartitions[spE] * totalN, 1e-6),
-        "springContourLength must equal springPartitions * strandContourLength.");
+      RUNTIME_EXP_IFN(APPROX_EQUAL(this->springContourLength[spE],
+                                   this->springPartitions[spE] * totalN,
+                                   1e-6),
+                      "springContourLength must equal springPartitions * "
+                      "strandContourLength.");
     }
-    RUNTIME_EXP_IFN(APPROX_EQUAL(sumSubContour, totalN, 1e-6),
-                    "Sub-spring contour lengths must sum to strandContourLength.");
+    RUNTIME_EXP_IFN(
+      APPROX_EQUAL(sumSubContour, totalN, 1e-6),
+      "Sub-spring contour lengths must sum to strandContourLength.");
     RUNTIME_EXP_IFN(APPROX_EQUAL(sumPartitions, 1.0, 1e-6),
                     "Sub-spring partitions along strand must sum to 1.0.");
 
@@ -4681,15 +4670,15 @@ MEHPNetwork::validate(const Eigen::VectorXd& u) const
       for (size_t j = 0; j < links.size(); ++j) {
         const Eigen::Index lIdx = static_cast<Eigen::Index>(links[j]);
         const bool expectedEnt = (j != 0) && (j + 1 != links.size());
-        RUNTIME_EXP_IFN(
-          this->linkIsEntanglement[lIdx] == expectedEnt,
-          "Polymer strand endpoints must be non-entanglement nodes and interior "
-          "links must be entanglements.");
-        RUNTIME_EXP_IFN(
-          std::find(this->strandIndicesOfLink[links[j]].begin(),
-                    this->strandIndicesOfLink[links[j]].end(),
-                    strandIdx) != this->strandIndicesOfLink[links[j]].end(),
-          "Strand missing from strandIndicesOfLink.");
+        RUNTIME_EXP_IFN(this->linkIsEntanglement[lIdx] == expectedEnt,
+                        "Polymer strand endpoints must be non-entanglement "
+                        "nodes and interior "
+                        "links must be entanglements.");
+        RUNTIME_EXP_IFN(std::find(this->strandIndicesOfLink[links[j]].begin(),
+                                  this->strandIndicesOfLink[links[j]].end(),
+                                  strandIdx) !=
+                          this->strandIndicesOfLink[links[j]].end(),
+                        "Strand missing from strandIndicesOfLink.");
       }
     }
   }

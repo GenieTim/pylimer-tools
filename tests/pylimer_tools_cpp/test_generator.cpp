@@ -533,12 +533,10 @@ TEST_CASE("Generator can return force balance and relaxation",
   REQUIRE(universe.getAtomsOfType(2).size() == 100);
   REQUIRE(universe.getAtomsOfType(1).size() == 200 * 19);
 
-  const pylimer_tools::sim::mehp::MEHPNetwork fbNet =
-    generator.getMEHPNetwork(
-      {}, pylimer_tools::sim::mehp::EntanglementMode::NONE);
-  const pylimer_tools::sim::mehp::MEHPNetwork frNet =
-    generator.getMEHPNetwork(
-      {}, pylimer_tools::sim::mehp::EntanglementMode::NONE);
+  const pylimer_tools::sim::mehp::MEHPNetwork fbNet = generator.getMEHPNetwork(
+    {}, pylimer_tools::sim::mehp::EntanglementMode::NONE);
+  const pylimer_tools::sim::mehp::MEHPNetwork frNet = generator.getMEHPNetwork(
+    {}, pylimer_tools::sim::mehp::EntanglementMode::NONE);
 
   REQUIRE(fbNet.nrOfSprings == frNet.nrOfSprings);
   REQUIRE(fbNet.coordinates.isApprox(frNet.coordinates));
@@ -1341,9 +1339,8 @@ TEST_CASE("Universe generator uses correct w_sol even for strange structures",
   generator.useZScoreMaxDistance(3., 1.107008);
   generator.linkStrandsToSolubleFraction(0.31);
 
-  const pylimer_tools::sim::mehp::MEHPNetwork net1 =
-    generator.getMEHPNetwork(
-      {}, pylimer_tools::sim::mehp::EntanglementMode::NONE);
+  const pylimer_tools::sim::mehp::MEHPNetwork net1 = generator.getMEHPNetwork(
+    {}, pylimer_tools::sim::mehp::EntanglementMode::NONE);
 
   const pe::Universe universe = generator.getUniverse();
 
@@ -1864,9 +1861,10 @@ TEST_CASE("linkStrandsToStrandsToConversion also works with free strands",
   }
 }
 
-TEST_CASE("MCUniverseGenerator on-demand entanglements bypass Universe to "
-          "MEHPSimulator",
-          "[generator][MCUniverseGenerator][EntanglementDetector][MEHPSimulator]")
+TEST_CASE(
+  "MCUniverseGenerator on-demand entanglements bypass Universe to "
+  "MEHPSimulator",
+  "[generator][MCUniverseGenerator][EntanglementDetector][MEHPSimulator]")
 {
   pu::MCUniverseGenerator generator(25.0, 25.0, 25.0);
   generator.setSeed(424242);
@@ -1888,7 +1886,8 @@ TEST_CASE("MCUniverseGenerator on-demand entanglements bypass Universe to "
   REQUIRE(entanglements.size() >= 20);
   CHECK(entanglements.size() <= 60);
 
-  SECTION("MEHPSimulator slip-link solver direct from generator with entanglements")
+  SECTION(
+    "MEHPSimulator slip-link solver direct from generator with entanglements")
   {
     pylimer_tools::sim::mehp::MEHPSimulator fb = generator.getMEHPSimulator(
       entanglements, pylimer_tools::sim::mehp::EntanglementMode::MERGED_LINKS);
@@ -1925,7 +1924,8 @@ TEST_CASE("MCUniverseGenerator on-demand entanglements bypass Universe to "
     CHECK(fb2.getNumExtraAtoms() == entanglements.size());
     CHECK(fb2.getNumExtraBonds() == 0);
 
-    // Compare weight fractions and gamma with Universe-constructed MEHPSimulator
+    // Compare weight fractions and gamma with Universe-constructed
+    // MEHPSimulator
     const pylimer_tools::topo::entanglement_detection::AtomPairEntanglements
       atomPairs = entanglements.toAtomPairEntanglements(
         generator.getCrosslinkerUniverse());
@@ -1977,7 +1977,10 @@ TEST_CASE("MCUniverseGenerator on-demand entanglements bypass Universe to "
         generator.getCrosslinkerUniverse());
     pe::Universe universe = generator.getUniverse();
     pylimer_tools::sim::mehp::MEHPSimulator fb2UnivSprings(
-      universe, atomPairs, 2, pylimer_tools::sim::mehp::EntanglementMode::SPRING);
+      universe,
+      atomPairs,
+      2,
+      pylimer_tools::sim::mehp::EntanglementMode::SPRING);
 
     pylimer_tools::sim::mehp::MEHPLinearSolverConfig linearConfig;
     linearConfig.simplificationMode =
@@ -2341,10 +2344,9 @@ TEST_CASE("MCUniverseGenerator streaming stats match Universe and "
   CHECK(uCu.strandFrom.size() == cu.strandFrom.size());
   const pylimer_tools::sim::mehp::CrosslinkerUniverse cuActive =
     gen.getCrosslinkerUniverse();
-  pylimer_tools::sim::mehp::MEHPSimulator simFromCu(
-    uActive.getBox(), cuActive);
-  pylimer_tools::sim::mehp::MEHPSimulator simFromGen = gen.getMEHPSimulator(
-    {}, pylimer_tools::sim::mehp::EntanglementMode::NONE);
+  pylimer_tools::sim::mehp::MEHPSimulator simFromCu(uActive.getBox(), cuActive);
+  pylimer_tools::sim::mehp::MEHPSimulator simFromGen =
+    gen.getMEHPSimulator({}, pylimer_tools::sim::mehp::EntanglementMode::NONE);
   CHECK(simFromCu.getNrOfSprings() == simFromGen.getNrOfSprings());
   CHECK(simFromCu.getNrOfLinks() == simFromGen.getNrOfLinks());
   CHECK(simFromCu.getNrOfNodes() == simFromGen.getNrOfNodes());

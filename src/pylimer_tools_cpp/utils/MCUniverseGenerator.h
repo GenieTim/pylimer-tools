@@ -606,7 +606,8 @@ public:
 
   /**
    * @brief Construct a unified @ref pylimer_tools::sim::mehp::MEHPSimulator
-   * from the current simplified universe and optional pre-sampled entanglements.
+   * from the current simplified universe and optional pre-sampled
+   * entanglements.
    *
    * @param entanglements Optional pre-sampled strand-pair entanglements
    * @param entanglementMode Entanglement representation mode

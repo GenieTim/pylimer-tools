@@ -48,8 +48,9 @@ struct MEHPNetwork
   // ===========================================================================
   // Counts & averages
   // ===========================================================================
-  size_t nrOfLinks = 0;   ///< Total links (nodes + entanglements)
-  size_t nrOfNodes = 0;   ///< Count of non-entanglement links (!linkIsEntanglement)
+  size_t nrOfLinks = 0; ///< Total links (nodes + entanglements)
+  size_t nrOfNodes =
+    0; ///< Count of non-entanglement links (!linkIsEntanglement)
   size_t nrOfStrands = 0; ///< Number of topological polymer/coupling strands
   size_t nrOfSprings = 0; ///< Number of sub-springs/springs
   double meanStrandContourLength = 0.0;
@@ -67,15 +68,17 @@ struct MEHPNetwork
   // ===========================================================================
   Eigen::VectorXd coordinates;
   Eigen::ArrayXb linkIsEntanglement;
-  Eigen::ArrayXi oldAtomIds;   ///< -1 for entanglement links
+  Eigen::ArrayXi oldAtomIds; ///< -1 for entanglement links
   Eigen::ArrayXi oldAtomTypes;
   ArrayXArrayXi strandIndicesOfLink;
-  Eigen::ArrayXi nrOfCrosslinkSwapsEndured; ///< Always sized nrOfLinks, indexed by linkIdx
+  Eigen::ArrayXi
+    nrOfCrosslinkSwapsEndured; ///< Always sized nrOfLinks, indexed by linkIdx
 
   // ===========================================================================
   // Strand arrays (sized nrOfStrands)
   // ===========================================================================
-  Eigen::VectorXd strandContourLength; ///< Total N_s per strand; 1.0 for SPRING coupling strands
+  Eigen::VectorXd strandContourLength; ///< Total N_s per strand; 1.0 for SPRING
+                                       ///< coupling strands
   ArrayXArrayXi linkIndicesOfStrand;
   ArrayXArrayXi springIndicesOfStrand;
 
@@ -146,8 +149,8 @@ struct MEHPNetwork
    * @param withCrosslinkers Whether the system contains crosslinkers of type
    *        @p crossLinkerType to exclude as entanglement targets (passed as
    *        ignoreCrosslinks)
-   * @param filterDanglingAndSoluble Omit entanglements touching dangling/soluble
-   *        strands during sampling
+   * @param filterDanglingAndSoluble Omit entanglements touching
+   * dangling/soluble strands during sampling
    * @param keep2FunctionalCrosslinkers Keep degree-2 crosslinkers as nodes
    * @param removePrimaryLoops Remove polymer primary loops upon construction
    * @param assumeBoxLargeEnough Assume box large enough for minimum-image PBC
@@ -356,7 +359,8 @@ struct MEHPNetwork
    * @brief Update `springPartitions` and synced `springContourLength` around an
    * interior slip-link to equalize tension along its strand(s).
    *
-   * @param linkIdx Entanglement link index (`linkIsEntanglement[linkIdx] == true`)
+   * @param linkIdx Entanglement link index (`linkIsEntanglement[linkIdx] ==
+   * true`)
    * @param u Current displacements
    * @param oneOverSpringPartitionUpperLimit Upper limit on `1 / N_part`
    * @param is2D Treat system as 2D
@@ -377,10 +381,10 @@ struct MEHPNetwork
    * @param oneOverSpringPartitionUpperLimit Upper limit for inverse partition
    * @return double Maximum 3D displacement norm among all links
    */
-  double displaceToMeanPosition(Eigen::VectorXd& u,
-                                bool is2D = false,
-                                double oneOverSpringPartitionUpperLimit = 1.0)
-    const;
+  double displaceToMeanPosition(
+    Eigen::VectorXd& u,
+    bool is2D = false,
+    double oneOverSpringPartitionUpperLimit = 1.0) const;
 
   /**
    * @brief Displace a single link to the weighted equilibrium position of its
@@ -392,25 +396,27 @@ struct MEHPNetwork
    * @param oneOverSpringPartitionUpperLimit Upper limit for inverse partition
    * @return double Norm of displacement step applied to @p linkIdx
    */
-  double displaceToMeanPosition(Eigen::VectorXd& u,
-                                size_t linkIdx,
-                                bool is2D = false,
-                                double oneOverSpringPartitionUpperLimit = 1.0)
-    const;
+  double displaceToMeanPosition(
+    Eigen::VectorXd& u,
+    size_t linkIdx,
+    bool is2D = false,
+    double oneOverSpringPartitionUpperLimit = 1.0) const;
 
   /**
    * @brief Merge the two springs connected to a bifunctional link into one.
    *
    * Supports both bifunctional crosslinks (merging two strands into one while
-   * keeping `springPartitions` normalized) and interior slip-links along a single
-   * strand (coalescing two adjacent sub-springs). Does not assume crosslinks or
-   * entanglements reside in contiguous index ranges.
+   * keeping `springPartitions` normalized) and interior slip-links along a
+   * single strand (coalescing two adjacent sub-springs). Does not assume
+   * crosslinks or entanglements reside in contiguous index ranges.
    *
    * @param linkIdx Link index whose two springs are merged
    * @param u Displacement vector resized if @p removeIfZeroFunctional is true
-   * @param removeIfZeroFunctional Also erase @p linkIdx if it becomes 0-functional
+   * @param removeIfZeroFunctional Also erase @p linkIdx if it becomes
+   * 0-functional
    * @return true if two springs were merged; false if @p linkIdx is not
-   *         eligible (e.g., functionality != 2, looping, or entanglement spring)
+   *         eligible (e.g., functionality != 2, looping, or entanglement
+   * spring)
    */
   bool mergeSpringsAtLink(size_t linkIdx,
                           Eigen::VectorXd& u,
@@ -425,7 +431,8 @@ struct MEHPNetwork
   void removeLink(size_t linkIdx, Eigen::VectorXd* u = nullptr);
 
   /**
-   * @brief Remove a single 0-functional link and resize displacement vector @p u.
+   * @brief Remove a single 0-functional link and resize displacement vector @p
+   * u.
    *
    * @param linkIdx Link index to remove (must have 0 attached strands)
    * @param u Displacement vector resized alongside @p coordinates
@@ -556,8 +563,8 @@ struct MEHPNetwork
    * @brief Break and remove all strands containing a spring whose weighted
    * length `|r_i| / N_i` exceeds @p breakingLength.
    *
-   * Link indices are preserved (`removeZeroFunctionalLinks = false`) so that the
-   * caller's `const Eigen::VectorXd& u` remains conformant.
+   * Link indices are preserved (`removeZeroFunctionalLinks = false`) so that
+   * the caller's `const Eigen::VectorXd& u` remains conformant.
    *
    * @param u Current displacements
    * @param breakingLength Breaking threshold on `|r_i| / N_i`
@@ -578,11 +585,10 @@ struct MEHPNetwork
    * @param checkAll Also mark orphaned/dangling springs directly
    * @return Eigen::ArrayXb Boolean mask sized `nrOfSprings`
    */
-  [[nodiscard]] Eigen::ArrayXb findInactiveSprings(
-    const Eigen::VectorXd& u,
-    double tolerance = 1e-9,
-    bool is2D = false,
-    bool checkAll = false) const;
+  [[nodiscard]] Eigen::ArrayXb findInactiveSprings(const Eigen::VectorXd& u,
+                                                   double tolerance = 1e-9,
+                                                   bool is2D = false,
+                                                   bool checkAll = false) const;
 
   /**
    * @brief Remove specified springs without renumbering link indices and
@@ -642,7 +648,8 @@ struct MEHPNetwork
                                  bool entanglementsOnly = false);
 
   /**
-   * @brief Remove all links with no connected strands (`strandIndicesOfLink[l].empty()`).
+   * @brief Remove all links with no connected strands
+   * (`strandIndicesOfLink[l].empty()`).
    *
    * @param u Displacement vector resized alongside @p coordinates
    * @return size_t Number of links removed
@@ -665,7 +672,8 @@ struct MEHPNetwork
    * @param mode Simplification strategy
    * @param tolerance Activity tolerance
    * @param is2D Treat system as 2D
-   * @param breakingLength Optional spring breaking length (> 0 enables breaking)
+   * @param breakingLength Optional spring breaking length (> 0 enables
+   * breaking)
    * @return size_t Total strands broken plus springs and links removed
    */
   size_t simplify(Eigen::VectorXd& u,
@@ -741,11 +749,10 @@ struct MEHPNetwork
   /**
    * @brief Evaluate the vector of @p springIdx oriented ending at @p linkIdx.
    */
-  [[nodiscard]] Eigen::Vector3d evaluateSpringVectorTo(
-    const Eigen::VectorXd& u,
-    size_t springIdx,
-    size_t linkIdx,
-    bool is2D = false) const;
+  [[nodiscard]] Eigen::Vector3d evaluateSpringVectorTo(const Eigen::VectorXd& u,
+                                                       size_t springIdx,
+                                                       size_t linkIdx,
+                                                       bool is2D = false) const;
 
   /**
    * @brief Evaluate the contour-summed vector of each strand.
@@ -774,7 +781,8 @@ struct MEHPNetwork
                                                     bool is2D = false) const;
 
   /**
-   * @brief Evaluate the 3x3 virial/spring stress tensor summed over all springs.
+   * @brief Evaluate the 3x3 virial/spring stress tensor summed over all
+   * springs.
    *
    * @param u Current displacements
    * @param kappa Spring constant prefactor
@@ -828,21 +836,21 @@ struct MEHPNetwork
   // ===========================================================================
 
   [[nodiscard]] Eigen::ArrayXb findActiveSprings(const Eigen::VectorXd& u,
-                                                   double tolerance = 1e-3,
-                                                   bool is2D = false) const;
+                                                 double tolerance = 1e-3,
+                                                 bool is2D = false) const;
   [[nodiscard]] Eigen::ArrayXb findActiveStrands(const Eigen::VectorXd& u,
-                                                   double tolerance = 1e-3,
-                                                   bool is2D = false) const;
+                                                 double tolerance = 1e-3,
+                                                 bool is2D = false) const;
   [[nodiscard]] Eigen::ArrayXb findActiveStrandsInDir(const Eigen::VectorXd& u,
-                                                        int dir,
-                                                        double tolerance = 1e-3,
-                                                        bool is2D = false) const;
+                                                      int dir,
+                                                      double tolerance = 1e-3,
+                                                      bool is2D = false) const;
   [[nodiscard]] Eigen::ArrayXb findActiveLinks(const Eigen::VectorXd& u,
-                                                 double tolerance = 1e-3,
-                                                 bool is2D = false) const;
+                                               double tolerance = 1e-3,
+                                               bool is2D = false) const;
   [[nodiscard]] Eigen::ArrayXb findActiveNodes(const Eigen::VectorXd& u,
-                                                 double tolerance = 1e-3,
-                                                 bool is2D = false) const;
+                                               double tolerance = 1e-3,
+                                               bool is2D = false) const;
   [[nodiscard]] std::pair<Eigen::ArrayXb, Eigen::ArrayXb>
   findSpringsAndLinksClusteredToActive(const Eigen::VectorXd& u,
                                        double tolerance = 1e-3,
@@ -866,8 +874,8 @@ struct MEHPNetwork
                                                      double tolerance = 1e-3,
                                                      bool is2D = false) const;
   [[nodiscard]] double countActiveClusteredAtoms(const Eigen::VectorXd& u,
-                                                   double tolerance = 1e-3,
-                                                   bool is2D = false) const;
+                                                 double tolerance = 1e-3,
+                                                 bool is2D = false) const;
 
   [[nodiscard]] std::unordered_map<long int, int>
   getEffectiveFunctionalityOfAtoms(const Eigen::VectorXd& u,

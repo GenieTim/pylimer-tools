@@ -1311,11 +1311,8 @@ MCUniverseGenerator::getMEHPSimulator(
   const int crossLinkerType) const
 {
   if (entanglementMode == pylimer_tools::sim::mehp::EntanglementMode::NONE) {
-    return this->getMEHPSimulator({},
-                                  entanglementMode,
-                                  std::move(evaluator),
-                                  is2D,
-                                  crossLinkerType);
+    return this->getMEHPSimulator(
+      {}, entanglementMode, std::move(evaluator), is2D, crossLinkerType);
   }
   const pylimer_tools::topo::entanglement_detection::StrandPairEntanglements
     entanglements = this->sampleEntanglements(nrOfEntanglementsToSample,
@@ -1325,8 +1322,11 @@ MCUniverseGenerator::getMEHPSimulator(
                                               sameStrandCutoff,
                                               seed,
                                               filterDanglingAndSoluble);
-  return this->getMEHPSimulator(
-    entanglements, entanglementMode, std::move(evaluator), is2D, crossLinkerType);
+  return this->getMEHPSimulator(entanglements,
+                                entanglementMode,
+                                std::move(evaluator),
+                                is2D,
+                                crossLinkerType);
 }
 
 void

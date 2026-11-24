@@ -34,7 +34,8 @@ namespace pylimer_tools::sim::mehp {
  * simulator coordinating a canonical @ref MEHPNetwork, a stateless
  * @ref MEHPForceEvaluator, and an interchangeable @ref MEHPSolver strategy.
  */
-class MEHPSimulator final : public pylimer_tools::sim::OutputSupportingSimulation
+class MEHPSimulator final
+  : public pylimer_tools::sim::OutputSupportingSimulation
 {
 private:
 #ifdef CEREALIZABLE
