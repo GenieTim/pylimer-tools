@@ -151,15 +151,15 @@
 - [STOP](api/pylimer_tools_cpp.STOP.html.md): Stop the linking process
 - [TRACK_BACKWARD](api/pylimer_tools_cpp.TRACK_BACKWARD.html.md): Track backward in the linking process
 - [TRACK_FORWARD](api/pylimer_tools_cpp.TRACK_FORWARD.html.md): Continue linking forward
-- [Computation times](auto_examples/dpd_simulations/sg_execution_times.html.md): &#42;&#42;00:04.325&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/dpd_simulations&#42;&#42;:
-- [Computation times](auto_examples/force_balance/sg_execution_times.html.md): &#42;&#42;00:07.161&#42;&#42; total execution time for 11 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
-- [Computation times](auto_examples/network_generator/sg_execution_times.html.md): &#42;&#42;00:51.896&#42;&#42; total execution time for 9 files &#42;&#42;from auto_examples/network_generator&#42;&#42;:
-- [Computation times](auto_examples/normal_mode_analysis/sg_execution_times.html.md): &#42;&#42;00:31.752&#42;&#42; total execution time for 2 files &#42;&#42;from auto_examples/normal_mode_analysis&#42;&#42;:
-- [Computation times](auto_examples/readers_writers/sg_execution_times.html.md): &#42;&#42;00:04.199&#42;&#42; total execution time for 13 files &#42;&#42;from auto_examples/readers_writers&#42;&#42;:
-- [Computation times](auto_examples/rouse_simulations/sg_execution_times.html.md): &#42;&#42;00:03.914&#42;&#42; total execution time for 2 files &#42;&#42;from auto_examples/rouse_simulations&#42;&#42;:
+- [Computation times](auto_examples/dpd_simulations/sg_execution_times.html.md): &#42;&#42;00:05.804&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/dpd_simulations&#42;&#42;:
+- [Computation times](auto_examples/force_balance/sg_execution_times.html.md): &#42;&#42;00:08.791&#42;&#42; total execution time for 11 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
+- [Computation times](auto_examples/network_generator/sg_execution_times.html.md): &#42;&#42;00:57.202&#42;&#42; total execution time for 9 files &#42;&#42;from auto_examples/network_generator&#42;&#42;:
+- [Computation times](auto_examples/normal_mode_analysis/sg_execution_times.html.md): &#42;&#42;00:38.529&#42;&#42; total execution time for 2 files &#42;&#42;from auto_examples/normal_mode_analysis&#42;&#42;:
+- [Computation times](auto_examples/readers_writers/sg_execution_times.html.md): &#42;&#42;00:05.634&#42;&#42; total execution time for 13 files &#42;&#42;from auto_examples/readers_writers&#42;&#42;:
+- [Computation times](auto_examples/rouse_simulations/sg_execution_times.html.md): &#42;&#42;00:04.456&#42;&#42; total execution time for 2 files &#42;&#42;from auto_examples/rouse_simulations&#42;&#42;:
 - [Computation times](auto_examples/sg_execution_times.html.md): &#42;&#42;00:00.000&#42;&#42; total execution time for 0 files &#42;&#42;from auto_examples&#42;&#42;:
-- [Computation times](auto_examples/structure_analysis/sg_execution_times.html.md): &#42;&#42;00:01.633&#42;&#42; total execution time for 6 files &#42;&#42;from auto_examples/structure_analysis&#42;&#42;:
-- [Computation times](auto_examples/trajectory_analysis/sg_execution_times.html.md): &#42;&#42;03:31.036&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/trajectory_analysis&#42;&#42;:
+- [Computation times](auto_examples/structure_analysis/sg_execution_times.html.md): &#42;&#42;00:01.934&#42;&#42; total execution time for 6 files &#42;&#42;from auto_examples/structure_analysis&#42;&#42;:
+- [Computation times](auto_examples/trajectory_analysis/sg_execution_times.html.md): &#42;&#42;04:37.700&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/trajectory_analysis&#42;&#42;:
 
 ## Optional
 

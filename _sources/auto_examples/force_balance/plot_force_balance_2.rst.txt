@@ -188,7 +188,7 @@ We configure two simulations:
 
     Entangled final residual norm: 2.740e-10 (iterations: 361)
 
-    <pylimer_tools_cpp.MEHPSolveResult object at 0x7ee9e0a460f0>
+    <pylimer_tools_cpp.MEHPSolveResult object at 0x7da1a80f16f0>
 
 
 
@@ -368,7 +368,7 @@ We visualize:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.338 seconds)
+   **Total running time of the script:** (0 minutes 0.422 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_force_balance_2.py:

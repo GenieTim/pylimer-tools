@@ -154,7 +154,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 4.325 seconds)
+**Total running time of the script:** (0 minutes 5.804 seconds)
 
 <a id="sphx-glr-download-auto-examples-dpd-simulations-plot-dpd-simulation-py"></a>
 
