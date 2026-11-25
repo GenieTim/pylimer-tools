@@ -189,6 +189,23 @@ the current implementation is more powerful, as needed for :cite:t:`bernhard_pha
     </div>
 
 
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Accurate polymer network modeling requires not only physically sound force fields and topologies, but also awareness of two algorithmic shortcuts that trade exactness for speed or implementation simplicity:">
+
+.. only:: html
+
+  .. image:: /auto_examples/network_generator/images/thumb/sphx_glr_plot_mc_cutoff_and_pbc_artifacts_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/network_generator/plot_mc_cutoff_and_pbc_artifacts`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Algorithmic & PBC Failure Modes: MaxDistanceProvider Bias & assume_box_large_enough</div>
+    </div>
+
+
 .. thumbnail-parent-div-close
 
 .. raw:: html
@@ -208,4 +225,5 @@ the current implementation is more powerful, as needed for :cite:t:`bernhard_pha
    /auto_examples/network_generator/plot_multi_component_system
    /auto_examples/network_generator/plot_custom_crosslinking_callback
    /auto_examples/network_generator/plot_tetra_peg_network
+   /auto_examples/network_generator/plot_mc_cutoff_and_pbc_artifacts
 

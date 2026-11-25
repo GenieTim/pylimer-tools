@@ -94,5 +94,10 @@ analytical verifications, matrix diagnostics, and performance benchmarks on cros
 [Topological Resistance Distance & Commute Time Analysis](plot_resistance_distance_analysis.html.md)
 
   <div class="sphx-glr-thumbnail-title">Topological Resistance Distance & Commute Time Analysis</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="How accurately can purely topological descriptors derived from the strand-level weighted graph Laplacian \\mathbf{L} predict spatial mechanical load bearing in realistic, defect-rich polymer networks?">![](auto_examples/structure_analysis/images/thumb/sphx_glr_plot_resistance_vs_mehp_stress_thumb.png)
+
+[Topological Effective Resistance vs. Spatial Stress Concentration in Defect-Rich Networks](plot_resistance_vs_mehp_stress.html.md)
+
+  <div class="sphx-glr-thumbnail-title">Topological Effective Resistance vs. Spatial Stress Concentration in Defect-Rich Networks</div>
 </div>
 <!-- thumbnail-parent-div-close --></div>

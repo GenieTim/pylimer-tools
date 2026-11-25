@@ -231,6 +231,8 @@
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../index.html">Examples</a><input aria-label="Toggle navigation of Examples" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l2 has-children"><a class="reference internal" href="../dpd_simulations/index.html">Dissipative Particle Dynamics (DPD) Simulations</a><input aria-label="Toggle navigation of Dissipative Particle Dynamics (DPD) Simulations" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../dpd_simulations/plot_dpd_simulation.html">DPD Simulations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../dpd_simulations/plot_dpd_slipspring_rheology.html">Multi-Scale Rheology: DPD Slip-Spring Melt vs. Crosslinked Network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../dpd_simulations/plot_dpd_dynamic_curing_vs_mc.html">In-Situ DPD Dynamic Crosslinking vs. Instantaneous MC Network Synthesis</a></li>
 </ul>
 </li>
 <li class="toctree-l2 current has-children"><a class="reference internal" href="index.html">Force Balance, Maximum Entropy Homogenization Procedures</a><input aria-label="Toggle navigation of Force Balance, Maximum Entropy Homogenization Procedures" checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
@@ -245,6 +247,9 @@
 <li class="toctree-l3"><a class="reference internal" href="plot_force_balance.html">Force Balance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_force_relaxation.html">MEHP Force Relaxation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_force_balance_2.html">Force Balance 2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_mmt_vs_mehp_gelation_and_loops.html">Mean-Field Theory (MMT) vs. Spatial MC + MEHP Across Gelation &amp; Loop Regimes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_finite_extensibility_deformation.html">Finite Extensibility &amp; Large-Strain Stiffening</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_multichemistry_and_coarse_graining.html">Multi-Chemistry Crossover &amp; Coarse-Graining Invariance (GAUSSIAN vs. KUHN vs. KG_LJ)</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../network_generator/index.html">Network Generation</a><input aria-label="Toggle navigation of Network Generation" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
@@ -257,11 +262,13 @@
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_multi_component_system.html">Multi-Component System</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_custom_crosslinking_callback.html">Custom Crosslinking Callbacks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_tetra_peg_network.html">Tetra-PEG Network Generation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_mc_cutoff_and_pbc_artifacts.html">Algorithmic &amp; PBC Failure Modes: <code class="docutils literal notranslate"><span class="pre">MaxDistanceProvider</span></code> Bias &amp; <code class="docutils literal notranslate"><span class="pre">assume_box_large_enough</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../normal_mode_analysis/index.html">Normal Mode Analysis</a><input aria-label="Toggle navigation of Normal Mode Analysis" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../normal_mode_analysis/plot_normal_mode_analysis.html">Normal Mode Analysis (NMA)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../normal_mode_analysis/plot_kpm_vs_exact_pdms.html">KPM vs. Full Eigenvalue Normal Mode Analysis for PDMS Networks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../normal_mode_analysis/plot_kpm_limitations_and_hybrid.html">When KPM Fails in Normal Mode Analysis: Percolation, Dangling Modes &amp; HybridConfig</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../readers_writers/index.html">File I/O: Readers &amp; Writers</a><input aria-label="Toggle navigation of File I/O: Readers &amp; Writers" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
@@ -292,6 +299,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../structure_analysis/plot_structure_analysis.html">Extract Synthesis Parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../structure_analysis/plot_topological_leaf_pruning_vs_pbc.html">Topological Leaf Pruning vs. PBC-Aware Force Balance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../structure_analysis/plot_resistance_distance_analysis.html">Topological Resistance Distance &amp; Commute Time Analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../structure_analysis/plot_resistance_vs_mehp_stress.html">Topological Effective Resistance vs. Spatial Stress Concentration in Defect-Rich Networks</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../trajectory_analysis/index.html">Trajectory Analysis</a><input aria-label="Toggle navigation of Trajectory Analysis" class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
@@ -531,7 +539,7 @@ density because the intermediate spring adds series compliance.</p></li>
 <li><img src="../../_images/sphx_glr_plot_entanglement_link_vs_spring_001.png" srcset="../../_images/sphx_glr_plot_entanglement_link_vs_spring_001.png" alt="Equilibrium Shear Modulus vs. Entanglement Density" class = "sphx-glr-multi-img"/></li>
 <li><img src="../../_images/sphx_glr_plot_entanglement_link_vs_spring_002.png" srcset="../../_images/sphx_glr_plot_entanglement_link_vs_spring_002.png" alt="System Size / Extra Degrees of Freedom" class = "sphx-glr-multi-img"/></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.408 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.356 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-force-balance-plot-entanglement-link-vs-spring-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/d1b793fe6030327e226ac07181dc757b/plot_entanglement_link_vs_spring.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_entanglement_link_vs_spring.ipynb</span></code></a></p>

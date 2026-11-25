@@ -60,6 +60,23 @@ on-demand entanglement sampling.
     </div>
 
 
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="While the Kernel Polynomial Method (~pylimer_tools_cpp.KPMConfig) reproduces viscoelastic moduli accurately across the transition and Rouse regimes of well-crosslinked polymer networks (plot_kpm_vs_exact_pdms), its Chebyshev expansion has fundamental resolution limits near \lambda \to 0 (gusev_molecular_2024). Specifically:">
+
+.. only:: html
+
+  .. image:: /auto_examples/normal_mode_analysis/images/thumb/sphx_glr_plot_kpm_limitations_and_hybrid_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/normal_mode_analysis/plot_kpm_limitations_and_hybrid`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">When KPM Fails in Normal Mode Analysis: Percolation, Dangling Modes & HybridConfig</div>
+    </div>
+
+
 .. thumbnail-parent-div-close
 
 .. raw:: html
@@ -72,4 +89,5 @@ on-demand entanglement sampling.
 
    /auto_examples/normal_mode_analysis/plot_normal_mode_analysis
    /auto_examples/normal_mode_analysis/plot_kpm_vs_exact_pdms
+   /auto_examples/normal_mode_analysis/plot_kpm_limitations_and_hybrid
 

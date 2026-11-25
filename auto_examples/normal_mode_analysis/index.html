@@ -22,7 +22,7 @@
 <link rel="manifest" href="/_static/favicon/site.webmanifest" />
 
 <link rel="alternate" type="text/markdown" href="index.html.md">
-<link rel="describedby" href="llms.txt"><link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Normal Mode Analysis (NMA)" href="plot_normal_mode_analysis.html"><link rel="prev" title="Tetra-PEG Network Generation" href="../network_generator/plot_tetra_peg_network.html">
+<link rel="describedby" href="llms.txt"><link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Normal Mode Analysis (NMA)" href="plot_normal_mode_analysis.html"><link rel="prev" title="Algorithmic &amp; PBC Failure Modes: MaxDistanceProvider Bias &amp; assume_box_large_enough" href="../network_generator/plot_mc_cutoff_and_pbc_artifacts.html">
 
     <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
         <title>Normal Mode Analysis - pylimer-tools</title>
@@ -231,6 +231,8 @@
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../index.html">Examples</a><input aria-label="Toggle navigation of Examples" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l2 has-children"><a class="reference internal" href="../dpd_simulations/index.html">Dissipative Particle Dynamics (DPD) Simulations</a><input aria-label="Toggle navigation of Dissipative Particle Dynamics (DPD) Simulations" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../dpd_simulations/plot_dpd_simulation.html">DPD Simulations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../dpd_simulations/plot_dpd_slipspring_rheology.html">Multi-Scale Rheology: DPD Slip-Spring Melt vs. Crosslinked Network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../dpd_simulations/plot_dpd_dynamic_curing_vs_mc.html">In-Situ DPD Dynamic Crosslinking vs. Instantaneous MC Network Synthesis</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../force_balance/index.html">Force Balance, Maximum Entropy Homogenization Procedures</a><input aria-label="Toggle navigation of Force Balance, Maximum Entropy Homogenization Procedures" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
@@ -245,6 +247,9 @@
 <li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_force_balance.html">Force Balance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_force_relaxation.html">MEHP Force Relaxation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_force_balance_2.html">Force Balance 2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_mmt_vs_mehp_gelation_and_loops.html">Mean-Field Theory (MMT) vs. Spatial MC + MEHP Across Gelation &amp; Loop Regimes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_finite_extensibility_deformation.html">Finite Extensibility &amp; Large-Strain Stiffening</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_multichemistry_and_coarse_graining.html">Multi-Chemistry Crossover &amp; Coarse-Graining Invariance (GAUSSIAN vs. KUHN vs. KG_LJ)</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../network_generator/index.html">Network Generation</a><input aria-label="Toggle navigation of Network Generation" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
@@ -257,11 +262,13 @@
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_multi_component_system.html">Multi-Component System</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_custom_crosslinking_callback.html">Custom Crosslinking Callbacks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_tetra_peg_network.html">Tetra-PEG Network Generation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_mc_cutoff_and_pbc_artifacts.html">Algorithmic &amp; PBC Failure Modes: <code class="docutils literal notranslate"><span class="pre">MaxDistanceProvider</span></code> Bias &amp; <code class="docutils literal notranslate"><span class="pre">assume_box_large_enough</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2 current has-children current-page"><a class="current reference internal" href="#">Normal Mode Analysis</a><input aria-label="Toggle navigation of Normal Mode Analysis" checked="" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="plot_normal_mode_analysis.html">Normal Mode Analysis (NMA)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_kpm_vs_exact_pdms.html">KPM vs. Full Eigenvalue Normal Mode Analysis for PDMS Networks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_kpm_limitations_and_hybrid.html">When KPM Fails in Normal Mode Analysis: Percolation, Dangling Modes &amp; HybridConfig</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../readers_writers/index.html">File I/O: Readers &amp; Writers</a><input aria-label="Toggle navigation of File I/O: Readers &amp; Writers" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
@@ -292,6 +299,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../structure_analysis/plot_structure_analysis.html">Extract Synthesis Parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../structure_analysis/plot_topological_leaf_pruning_vs_pbc.html">Topological Leaf Pruning vs. PBC-Aware Force Balance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../structure_analysis/plot_resistance_distance_analysis.html">Topological Resistance Distance &amp; Commute Time Analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../structure_analysis/plot_resistance_vs_mehp_stress.html">Topological Effective Resistance vs. Spatial Stress Concentration in Defect-Rich Networks</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../trajectory_analysis/index.html">Trajectory Analysis</a><input aria-label="Toggle navigation of Trajectory Analysis" class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
@@ -452,6 +460,9 @@ on-demand entanglement sampling.</p>
 </div><div class="sphx-glr-thumbcontainer" tooltip="Normal Mode Analysis (NMA) in NormalModeAnalyzer predicts the linear viscoelastic storage modulus G&#x27;(\omega) and loss modulus G&#x27;&#x27;(\omega) of entangled polymer networks from their bead-spring connectivity graph (gusev_molecular_2024). Computing the full eigenvalue spectrum scales as \mathcal{O}(N_{\text{atoms}}^3), which quickly becomes prohibitive for realistic representative volume elements (RVEs). The Kernel Polynomial Method (KPM) approximates the spectral density using Chebyshev moments and stochastic trace estimation in \mathcal{O}(N_{\text{atoms}}) time."><img alt="" src="../../_images/sphx_glr_plot_kpm_vs_exact_pdms_thumb.png" />
 <p><a class="reference internal" href="plot_kpm_vs_exact_pdms.html"><span class="doc">KPM vs. Full Eigenvalue Normal Mode Analysis for PDMS Networks</span></a></p>
   <div class="sphx-glr-thumbnail-title">KPM vs. Full Eigenvalue Normal Mode Analysis for PDMS Networks</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="While the Kernel Polynomial Method (~pylimer_tools_cpp.KPMConfig) reproduces viscoelastic moduli accurately across the transition and Rouse regimes of well-crosslinked polymer networks (plot_kpm_vs_exact_pdms), its Chebyshev expansion has fundamental resolution limits near \lambda \to 0 (gusev_molecular_2024). Specifically:"><img alt="" src="../../_images/sphx_glr_plot_kpm_limitations_and_hybrid_thumb.png" />
+<p><a class="reference internal" href="plot_kpm_limitations_and_hybrid.html"><span class="doc">When KPM Fails in Normal Mode Analysis: Percolation, Dangling Modes &amp; HybridConfig</span></a></p>
+  <div class="sphx-glr-thumbnail-title">When KPM Fails in Normal Mode Analysis: Percolation, Dangling Modes & HybridConfig</div>
 </div></div><div class="toctree-wrapper compound">
 </div>
 </section>
@@ -470,14 +481,14 @@ on-demand entanglement sampling.</p>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="../network_generator/plot_tetra_peg_network.html">
+          <a class="prev-page" href="../network_generator/plot_mc_cutoff_and_pbc_artifacts.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Tetra-PEG Network Generation</div>
+                <div class="title">Algorithmic &amp; PBC Failure Modes: <code class="docutils literal notranslate"><span class="pre">MaxDistanceProvider</span></code> Bias &amp; <code class="docutils literal notranslate"><span class="pre">assume_box_large_enough</span></code></div>
                 
               </div>
             </a>

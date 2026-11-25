@@ -14,5 +14,15 @@ Refer to the full documentation of the DPD simulator in the [`DPDSimulator`](../
 [DPD Simulations](plot_dpd_simulation.html.md)
 
   <div class="sphx-glr-thumbnail-title">DPD Simulations</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Dissipative Particle Dynamics (DPD) with slip-springs bridges fast soft-core mesoscopic dynamics and entangled polymer rheology (langeloth_recovering_2013, schneider_simulation_2021). Here we perform a cross-scale comparison of the shear stress relaxation modulus G(t) across three methods in pylimer-tools:">![](auto_examples/dpd_simulations/images/thumb/sphx_glr_plot_dpd_slipspring_rheology_thumb.png)
+
+[Multi-Scale Rheology: DPD Slip-Spring Melt vs. Crosslinked Network](plot_dpd_slipspring_rheology.html.md)
+
+  <div class="sphx-glr-thumbnail-title">Multi-Scale Rheology: DPD Slip-Spring Melt vs. Crosslinked Network</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Polymer networks in pylimer-tools can be synthesized through two fundamentally different pathways:">![](auto_examples/dpd_simulations/images/thumb/sphx_glr_plot_dpd_dynamic_curing_vs_mc_thumb.png)
+
+[In-Situ DPD Dynamic Crosslinking vs. Instantaneous MC Network Synthesis](plot_dpd_dynamic_curing_vs_mc.html.md)
+
+  <div class="sphx-glr-thumbnail-title">In-Situ DPD Dynamic Crosslinking vs. Instantaneous MC Network Synthesis</div>
 </div>
 <!-- thumbnail-parent-div-close --></div>

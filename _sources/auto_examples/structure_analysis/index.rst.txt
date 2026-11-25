@@ -187,6 +187,23 @@ analytical verifications, matrix diagnostics, and performance benchmarks on cros
     </div>
 
 
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="How accurately can purely topological descriptors derived from the strand-level weighted graph Laplacian \mathbf{L} predict spatial mechanical load bearing in realistic, defect-rich polymer networks?">
+
+.. only:: html
+
+  .. image:: /auto_examples/structure_analysis/images/thumb/sphx_glr_plot_resistance_vs_mehp_stress_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/structure_analysis/plot_resistance_vs_mehp_stress`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Topological Effective Resistance vs. Spatial Stress Concentration in Defect-Rich Networks</div>
+    </div>
+
+
 .. thumbnail-parent-div-close
 
 .. raw:: html
@@ -203,4 +220,5 @@ analytical verifications, matrix diagnostics, and performance benchmarks on cros
    /auto_examples/structure_analysis/plot_structure_analysis
    /auto_examples/structure_analysis/plot_topological_leaf_pruning_vs_pbc
    /auto_examples/structure_analysis/plot_resistance_distance_analysis
+   /auto_examples/structure_analysis/plot_resistance_vs_mehp_stress
 

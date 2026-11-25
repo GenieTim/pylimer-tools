@@ -86,5 +86,20 @@ See:
 [Force Balance 2](plot_force_balance_2.md)
 
   <div class="sphx-glr-thumbnail-title">Force Balance 2</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Miller--Macosko recursive probability theory (MMT, macosko_new_1976, miller_new_1976a, miller_calculation_1979) provides closed-form mean-field predictions for the gelation threshold, soluble/dangling/active weight fractions, and equilibrium shear modulus of end-linked polymer networks (gusev_molecular_2022, tsimouri_comparison_2024). Because MMT treats the network as an infinite, loop-free Bethe tree, comparing its predictions against explicit 3D spatial networks generated with MCUniverseGenerator and evaluated with MEHPSimulator (gusev_numerical_2019, bernhard_phantom_2025, bernhard_pylimertools_2025) reveals both where mean-field theory excels and where spatial loops, dilution, and monofunctional dilution cause systematic deviations.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_mmt_vs_mehp_gelation_and_loops_thumb.png)
+
+[Mean-Field Theory (MMT) vs. Spatial MC + MEHP Across Gelation & Loop Regimes](plot_mmt_vs_mehp_gelation_and_loops.md)
+
+  <div class="sphx-glr-thumbnail-title">Mean-Field Theory (MMT) vs. Spatial MC + MEHP Across Gelation & Loop Regimes</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example investigates finite-chain extensibility and large-strain stiffening in end-linked PDMS networks using NonGaussianSpringForceEvaluator versus the Gaussian HookeanForceEvaluator inside the unified MEHPSimulator framework (gusev_numerical_2019, bernhard_phantom_2025, bernhard_pylimertools_2025).">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_finite_extensibility_deformation_thumb.png)
+
+[Finite Extensibility & Large-Strain Stiffening](plot_finite_extensibility_deformation.md)
+
+  <div class="sphx-glr-thumbnail-title">Finite Extensibility & Large-Strain Stiffening</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Real polymer elastomers span more than an order of magnitude in entanglement plateau modulus (G_e = 0.25\\text{--}4.38\\,\\text{MPa}) and entanglement molar mass (M_e = \\rho R T / G_e \\approx 480\\text{--}13{,}300\\,\\text{g/mol}). Using the Everaers et al. polymer property database bundled in pylimer_tools.io.bead_spring_parameter_provider together with MCUniverseGenerator and MEHPSimulator (gusev_numerical_2019, bernhard_phantom_2025, bernhard_pylimertools_2025), this example investigates two fundamental questions for predictive network modeling:">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_multichemistry_and_coarse_graining_thumb.png)
+
+[Multi-Chemistry Crossover & Coarse-Graining Invariance (GAUSSIAN vs. KUHN vs. KG_LJ)](plot_multichemistry_and_coarse_graining.md)
+
+  <div class="sphx-glr-thumbnail-title">Multi-Chemistry Crossover & Coarse-Graining Invariance (GAUSSIAN vs. KUHN vs. KG_LJ)</div>
 </div>
 <!-- thumbnail-parent-div-close --></div>

@@ -67,5 +67,10 @@ the current implementation is more powerful, as needed for Bernhard and Gusev [[
 [Tetra-PEG Network Generation](plot_tetra_peg_network.html.md)
 
   <div class="sphx-glr-thumbnail-title">Tetra-PEG Network Generation</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Accurate polymer network modeling requires not only physically sound force fields and topologies, but also awareness of two algorithmic shortcuts that trade exactness for speed or implementation simplicity:">![](auto_examples/network_generator/images/thumb/sphx_glr_plot_mc_cutoff_and_pbc_artifacts_thumb.png)
+
+[Algorithmic & PBC Failure Modes: MaxDistanceProvider Bias & assume_box_large_enough](plot_mc_cutoff_and_pbc_artifacts.html.md)
+
+  <div class="sphx-glr-thumbnail-title">Algorithmic & PBC Failure Modes: MaxDistanceProvider Bias & assume_box_large_enough</div>
 </div>
 <!-- thumbnail-parent-div-close --></div>

@@ -31,7 +31,7 @@ pylimer-generate-network [OPTIONS]
 Name of the polymer to generate the network for
 
 * **Options:**
-  pib | apoa | ips | app348 | cispi | apams | cispbd | apma | pbd98 | app413 | pbd20 | apea | pi34 | app | spp | ipp | apmma | ptfe | aps | pib413 | pdms | sbr | pe413 | peo | pe | app463 | apva | pi20 | p6n | pet | pom | aphma | pi7 | pi75 | pi50 | pc
+  pom | ptfe | pe413 | apoa | pbd20 | ips | app348 | pdms | pet | apams | pi34 | ipp | pi20 | pi7 | app463 | app413 | pi75 | p6n | pib413 | app | spp | sbr | cispbd | peo | apma | pe | apea | apmma | pib | aps | pi50 | cispi | pbd98 | pc | aphma | apva
 
 ### --parameter-type <parameter_type>
 
@@ -142,7 +142,7 @@ pylimer-analyse-networks [OPTIONS] [FILES]...
 Name of the polymer to use for parameter retrieval.
 
 * **Options:**
-  pib | apoa | ips | app348 | cispi | apams | cispbd | apma | pbd98 | app413 | pbd20 | apea | pi34 | app | spp | ipp | apmma | ptfe | aps | pib413 | pdms | sbr | pe413 | peo | pe | app463 | apva | pi20 | p6n | pet | pom | aphma | pi7 | pi75 | pi50 | pc
+  pom | ptfe | pe413 | apoa | pbd20 | ips | app348 | pdms | pet | apams | pi34 | ipp | pi20 | pi7 | app463 | app413 | pi75 | p6n | pib413 | app | spp | sbr | cispbd | peo | apma | pe | apea | apmma | pib | aps | pi50 | cispi | pbd98 | pc | aphma | apva
 
 ### --parameter-type <parameter_type>
 

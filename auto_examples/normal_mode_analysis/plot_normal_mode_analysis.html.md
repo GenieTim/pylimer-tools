@@ -138,10 +138,10 @@ print(summary_df.to_string(index=False))
 
 ```none
 Method Time [s] Speedup Mean Rel. Err. G' [%] Max Rel. Err. G' [%] Mean Rel. Err. G'' [%] Max Rel. Err. G'' [%]
- Exact   13.923    1.0x                  0.00                 0.00                   0.00                  0.00
-   KPM    0.090  154.9x                 20.36                87.70                   8.35                 54.80
-   SLQ    0.058  240.3x                  2.06                41.07                   1.03                  6.64
-Hybrid    0.253   55.0x                  0.44                 1.38                   0.49                  1.41
+ Exact   12.069    1.0x                  0.00                 0.00                   0.00                  0.00
+   KPM    0.089  135.9x                 20.36                87.70                   8.35                 54.80
+   SLQ    0.065  184.7x                  2.06                41.07                   1.03                  6.64
+Hybrid    0.230   52.5x                  0.44                 1.38                   0.49                  1.41
 ```
 
 <!-- GENERATED FROM PYTHON SOURCE LINES 124-131 -->
@@ -180,7 +180,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 15.268 seconds)
+**Total running time of the script:** (0 minutes 13.397 seconds)
 
 <a id="sphx-glr-download-auto-examples-normal-mode-analysis-plot-normal-mode-analysis-py"></a>
 

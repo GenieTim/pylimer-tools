@@ -36,6 +36,16 @@ Refer to the full documentation of the DPD simulator in the [`DPDSimulator`](../
 [DPD Simulations](dpd_simulations/plot_dpd_simulation.html.md)
 
   <div class="sphx-glr-thumbnail-title">DPD Simulations</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Dissipative Particle Dynamics (DPD) with slip-springs bridges fast soft-core mesoscopic dynamics and entangled polymer rheology (langeloth_recovering_2013, schneider_simulation_2021). Here we perform a cross-scale comparison of the shear stress relaxation modulus G(t) across three methods in pylimer-tools:">![](auto_examples/dpd_simulations/images/thumb/sphx_glr_plot_dpd_slipspring_rheology_thumb.png)
+
+[Multi-Scale Rheology: DPD Slip-Spring Melt vs. Crosslinked Network](dpd_simulations/plot_dpd_slipspring_rheology.html.md)
+
+  <div class="sphx-glr-thumbnail-title">Multi-Scale Rheology: DPD Slip-Spring Melt vs. Crosslinked Network</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Polymer networks in pylimer-tools can be synthesized through two fundamentally different pathways:">![](auto_examples/dpd_simulations/images/thumb/sphx_glr_plot_dpd_dynamic_curing_vs_mc_thumb.png)
+
+[In-Situ DPD Dynamic Crosslinking vs. Instantaneous MC Network Synthesis](dpd_simulations/plot_dpd_dynamic_curing_vs_mc.html.md)
+
+  <div class="sphx-glr-thumbnail-title">In-Situ DPD Dynamic Crosslinking vs. Instantaneous MC Network Synthesis</div>
 </div>
 <!-- thumbnail-parent-div-close --></div>
 
@@ -125,6 +135,21 @@ See:
 [Force Balance 2](force_balance/plot_force_balance_2.html.md)
 
   <div class="sphx-glr-thumbnail-title">Force Balance 2</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Miller--Macosko recursive probability theory (MMT, macosko_new_1976, miller_new_1976a, miller_calculation_1979) provides closed-form mean-field predictions for the gelation threshold, soluble/dangling/active weight fractions, and equilibrium shear modulus of end-linked polymer networks (gusev_molecular_2022, tsimouri_comparison_2024). Because MMT treats the network as an infinite, loop-free Bethe tree, comparing its predictions against explicit 3D spatial networks generated with MCUniverseGenerator and evaluated with MEHPSimulator (gusev_numerical_2019, bernhard_phantom_2025, bernhard_pylimertools_2025) reveals both where mean-field theory excels and where spatial loops, dilution, and monofunctional dilution cause systematic deviations.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_mmt_vs_mehp_gelation_and_loops_thumb.png)
+
+[Mean-Field Theory (MMT) vs. Spatial MC + MEHP Across Gelation & Loop Regimes](force_balance/plot_mmt_vs_mehp_gelation_and_loops.html.md)
+
+  <div class="sphx-glr-thumbnail-title">Mean-Field Theory (MMT) vs. Spatial MC + MEHP Across Gelation & Loop Regimes</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example investigates finite-chain extensibility and large-strain stiffening in end-linked PDMS networks using NonGaussianSpringForceEvaluator versus the Gaussian HookeanForceEvaluator inside the unified MEHPSimulator framework (gusev_numerical_2019, bernhard_phantom_2025, bernhard_pylimertools_2025).">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_finite_extensibility_deformation_thumb.png)
+
+[Finite Extensibility & Large-Strain Stiffening](force_balance/plot_finite_extensibility_deformation.html.md)
+
+  <div class="sphx-glr-thumbnail-title">Finite Extensibility & Large-Strain Stiffening</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Real polymer elastomers span more than an order of magnitude in entanglement plateau modulus (G_e = 0.25\\text{--}4.38\\,\\text{MPa}) and entanglement molar mass (M_e = \\rho R T / G_e \\approx 480\\text{--}13{,}300\\,\\text{g/mol}). Using the Everaers et al. polymer property database bundled in pylimer_tools.io.bead_spring_parameter_provider together with MCUniverseGenerator and MEHPSimulator (gusev_numerical_2019, bernhard_phantom_2025, bernhard_pylimertools_2025), this example investigates two fundamental questions for predictive network modeling:">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_multichemistry_and_coarse_graining_thumb.png)
+
+[Multi-Chemistry Crossover & Coarse-Graining Invariance (GAUSSIAN vs. KUHN vs. KG_LJ)](force_balance/plot_multichemistry_and_coarse_graining.html.md)
+
+  <div class="sphx-glr-thumbnail-title">Multi-Chemistry Crossover & Coarse-Graining Invariance (GAUSSIAN vs. KUHN vs. KG_LJ)</div>
 </div>
 <!-- thumbnail-parent-div-close --></div>
 
@@ -195,6 +220,11 @@ the current implementation is more powerful, as needed for Bernhard and Gusev [[
 [Tetra-PEG Network Generation](network_generator/plot_tetra_peg_network.html.md)
 
   <div class="sphx-glr-thumbnail-title">Tetra-PEG Network Generation</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Accurate polymer network modeling requires not only physically sound force fields and topologies, but also awareness of two algorithmic shortcuts that trade exactness for speed or implementation simplicity:">![](auto_examples/network_generator/images/thumb/sphx_glr_plot_mc_cutoff_and_pbc_artifacts_thumb.png)
+
+[Algorithmic & PBC Failure Modes: MaxDistanceProvider Bias & assume_box_large_enough](network_generator/plot_mc_cutoff_and_pbc_artifacts.html.md)
+
+  <div class="sphx-glr-thumbnail-title">Algorithmic & PBC Failure Modes: MaxDistanceProvider Bias & assume_box_large_enough</div>
 </div>
 <!-- thumbnail-parent-div-close --></div>
 
@@ -220,6 +250,11 @@ on-demand entanglement sampling.
 [KPM vs. Full Eigenvalue Normal Mode Analysis for PDMS Networks](normal_mode_analysis/plot_kpm_vs_exact_pdms.html.md)
 
   <div class="sphx-glr-thumbnail-title">KPM vs. Full Eigenvalue Normal Mode Analysis for PDMS Networks</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="While the Kernel Polynomial Method (~pylimer_tools_cpp.KPMConfig) reproduces viscoelastic moduli accurately across the transition and Rouse regimes of well-crosslinked polymer networks (plot_kpm_vs_exact_pdms), its Chebyshev expansion has fundamental resolution limits near \\lambda \\to 0 (gusev_molecular_2024). Specifically:">![](auto_examples/normal_mode_analysis/images/thumb/sphx_glr_plot_kpm_limitations_and_hybrid_thumb.png)
+
+[When KPM Fails in Normal Mode Analysis: Percolation, Dangling Modes & HybridConfig](normal_mode_analysis/plot_kpm_limitations_and_hybrid.html.md)
+
+  <div class="sphx-glr-thumbnail-title">When KPM Fails in Normal Mode Analysis: Percolation, Dangling Modes & HybridConfig</div>
 </div>
 <!-- thumbnail-parent-div-close --></div>
 
@@ -446,6 +481,11 @@ analytical verifications, matrix diagnostics, and performance benchmarks on cros
 [Topological Resistance Distance & Commute Time Analysis](structure_analysis/plot_resistance_distance_analysis.html.md)
 
   <div class="sphx-glr-thumbnail-title">Topological Resistance Distance & Commute Time Analysis</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="How accurately can purely topological descriptors derived from the strand-level weighted graph Laplacian \\mathbf{L} predict spatial mechanical load bearing in realistic, defect-rich polymer networks?">![](auto_examples/structure_analysis/images/thumb/sphx_glr_plot_resistance_vs_mehp_stress_thumb.png)
+
+[Topological Effective Resistance vs. Spatial Stress Concentration in Defect-Rich Networks](structure_analysis/plot_resistance_vs_mehp_stress.html.md)
+
+  <div class="sphx-glr-thumbnail-title">Topological Effective Resistance vs. Spatial Stress Concentration in Defect-Rich Networks</div>
 </div>
 <!-- thumbnail-parent-div-close --></div>
 

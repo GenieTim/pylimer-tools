@@ -231,6 +231,8 @@
 <li class="toctree-l1 current has-children current-page"><a class="current reference internal" href="#">Examples</a><input aria-label="Toggle navigation of Examples" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2 has-children"><a class="reference internal" href="dpd_simulations/index.html">Dissipative Particle Dynamics (DPD) Simulations</a><input aria-label="Toggle navigation of Dissipative Particle Dynamics (DPD) Simulations" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="dpd_simulations/plot_dpd_simulation.html">DPD Simulations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dpd_simulations/plot_dpd_slipspring_rheology.html">Multi-Scale Rheology: DPD Slip-Spring Melt vs. Crosslinked Network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dpd_simulations/plot_dpd_dynamic_curing_vs_mc.html">In-Situ DPD Dynamic Crosslinking vs. Instantaneous MC Network Synthesis</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="force_balance/index.html">Force Balance, Maximum Entropy Homogenization Procedures</a><input aria-label="Toggle navigation of Force Balance, Maximum Entropy Homogenization Procedures" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
@@ -245,6 +247,9 @@
 <li class="toctree-l3"><a class="reference internal" href="force_balance/plot_force_balance.html">Force Balance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="force_balance/plot_force_relaxation.html">MEHP Force Relaxation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="force_balance/plot_force_balance_2.html">Force Balance 2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="force_balance/plot_mmt_vs_mehp_gelation_and_loops.html">Mean-Field Theory (MMT) vs. Spatial MC + MEHP Across Gelation &amp; Loop Regimes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="force_balance/plot_finite_extensibility_deformation.html">Finite Extensibility &amp; Large-Strain Stiffening</a></li>
+<li class="toctree-l3"><a class="reference internal" href="force_balance/plot_multichemistry_and_coarse_graining.html">Multi-Chemistry Crossover &amp; Coarse-Graining Invariance (GAUSSIAN vs. KUHN vs. KG_LJ)</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="network_generator/index.html">Network Generation</a><input aria-label="Toggle navigation of Network Generation" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
@@ -257,11 +262,13 @@
 <li class="toctree-l3"><a class="reference internal" href="network_generator/plot_multi_component_system.html">Multi-Component System</a></li>
 <li class="toctree-l3"><a class="reference internal" href="network_generator/plot_custom_crosslinking_callback.html">Custom Crosslinking Callbacks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="network_generator/plot_tetra_peg_network.html">Tetra-PEG Network Generation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="network_generator/plot_mc_cutoff_and_pbc_artifacts.html">Algorithmic &amp; PBC Failure Modes: <code class="docutils literal notranslate"><span class="pre">MaxDistanceProvider</span></code> Bias &amp; <code class="docutils literal notranslate"><span class="pre">assume_box_large_enough</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="normal_mode_analysis/index.html">Normal Mode Analysis</a><input aria-label="Toggle navigation of Normal Mode Analysis" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="normal_mode_analysis/plot_normal_mode_analysis.html">Normal Mode Analysis (NMA)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="normal_mode_analysis/plot_kpm_vs_exact_pdms.html">KPM vs. Full Eigenvalue Normal Mode Analysis for PDMS Networks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="normal_mode_analysis/plot_kpm_limitations_and_hybrid.html">When KPM Fails in Normal Mode Analysis: Percolation, Dangling Modes &amp; HybridConfig</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="readers_writers/index.html">File I/O: Readers &amp; Writers</a><input aria-label="Toggle navigation of File I/O: Readers &amp; Writers" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
@@ -292,6 +299,7 @@
 <li class="toctree-l3"><a class="reference internal" href="structure_analysis/plot_structure_analysis.html">Extract Synthesis Parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="structure_analysis/plot_topological_leaf_pruning_vs_pbc.html">Topological Leaf Pruning vs. PBC-Aware Force Balance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="structure_analysis/plot_resistance_distance_analysis.html">Topological Resistance Distance &amp; Commute Time Analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="structure_analysis/plot_resistance_vs_mehp_stress.html">Topological Effective Resistance vs. Spatial Stress Concentration in Defect-Rich Networks</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="trajectory_analysis/index.html">Trajectory Analysis</a><input aria-label="Toggle navigation of Trajectory Analysis" class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
@@ -464,6 +472,12 @@ The implementation is based on <span class="bibtex-citation" id="id1">Langeloth 
 <div id='sg-tag-list' class='sphx-glr-tag-list'></div><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to set up and run a DPD simulation with slip-springs using pylimer-tools."><img alt="" src="../_images/sphx_glr_plot_dpd_simulation_thumb.png" />
 <p><a class="reference internal" href="dpd_simulations/plot_dpd_simulation.html"><span class="doc">DPD Simulations</span></a></p>
   <div class="sphx-glr-thumbnail-title">DPD Simulations</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Dissipative Particle Dynamics (DPD) with slip-springs bridges fast soft-core mesoscopic dynamics and entangled polymer rheology (langeloth_recovering_2013, schneider_simulation_2021). Here we perform a cross-scale comparison of the shear stress relaxation modulus G(t) across three methods in pylimer-tools:"><img alt="" src="../_images/sphx_glr_plot_dpd_slipspring_rheology_thumb.png" />
+<p><a class="reference internal" href="dpd_simulations/plot_dpd_slipspring_rheology.html"><span class="doc">Multi-Scale Rheology: DPD Slip-Spring Melt vs. Crosslinked Network</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Multi-Scale Rheology: DPD Slip-Spring Melt vs. Crosslinked Network</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Polymer networks in pylimer-tools can be synthesized through two fundamentally different pathways:"><img alt="" src="../_images/sphx_glr_plot_dpd_dynamic_curing_vs_mc_thumb.png" />
+<p><a class="reference internal" href="dpd_simulations/plot_dpd_dynamic_curing_vs_mc.html"><span class="doc">In-Situ DPD Dynamic Crosslinking vs. Instantaneous MC Network Synthesis</span></a></p>
+  <div class="sphx-glr-thumbnail-title">In-Situ DPD Dynamic Crosslinking vs. Instantaneous MC Network Synthesis</div>
 </div></div></section>
 <section id="force-balance-maximum-entropy-homogenization-procedures">
 <h2>Force Balance, Maximum Entropy Homogenization Procedures<a class="headerlink" href="#force-balance-maximum-entropy-homogenization-procedures" title="Link to this heading">¶</a></h2>
@@ -526,6 +540,15 @@ This is useful for predicting the (phantom) equilibrium shear modulus of the net
 </div><div class="sphx-glr-thumbcontainer" tooltip="MEHPSimulator paired with LinearSystemMEHPSolver provides a high-performance implementation of the Maximum Entropy Homogenization Procedure (MEHP) (gusev_numerical_2019, bernhard_phantom_2025)."><img alt="" src="../_images/sphx_glr_plot_force_balance_2_thumb.png" />
 <p><a class="reference internal" href="force_balance/plot_force_balance_2.html"><span class="doc">Force Balance 2</span></a></p>
   <div class="sphx-glr-thumbnail-title">Force Balance 2</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Miller--Macosko recursive probability theory (MMT, macosko_new_1976, miller_new_1976a, miller_calculation_1979) provides closed-form mean-field predictions for the gelation threshold, soluble/dangling/active weight fractions, and equilibrium shear modulus of end-linked polymer networks (gusev_molecular_2022, tsimouri_comparison_2024). Because MMT treats the network as an infinite, loop-free Bethe tree, comparing its predictions against explicit 3D spatial networks generated with MCUniverseGenerator and evaluated with MEHPSimulator (gusev_numerical_2019, bernhard_phantom_2025, bernhard_pylimertools_2025) reveals both where mean-field theory excels and where spatial loops, dilution, and monofunctional dilution cause systematic deviations."><img alt="" src="../_images/sphx_glr_plot_mmt_vs_mehp_gelation_and_loops_thumb.png" />
+<p><a class="reference internal" href="force_balance/plot_mmt_vs_mehp_gelation_and_loops.html"><span class="doc">Mean-Field Theory (MMT) vs. Spatial MC + MEHP Across Gelation &amp; Loop Regimes</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Mean-Field Theory (MMT) vs. Spatial MC + MEHP Across Gelation & Loop Regimes</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example investigates finite-chain extensibility and large-strain stiffening in end-linked PDMS networks using NonGaussianSpringForceEvaluator versus the Gaussian HookeanForceEvaluator inside the unified MEHPSimulator framework (gusev_numerical_2019, bernhard_phantom_2025, bernhard_pylimertools_2025)."><img alt="" src="../_images/sphx_glr_plot_finite_extensibility_deformation_thumb.png" />
+<p><a class="reference internal" href="force_balance/plot_finite_extensibility_deformation.html"><span class="doc">Finite Extensibility &amp; Large-Strain Stiffening</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Finite Extensibility & Large-Strain Stiffening</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Real polymer elastomers span more than an order of magnitude in entanglement plateau modulus (G_e = 0.25\text{--}4.38\,\text{MPa}) and entanglement molar mass (M_e = \rho R T / G_e \approx 480\text{--}13{,}300\,\text{g/mol}). Using the Everaers et al. polymer property database bundled in pylimer_tools.io.bead_spring_parameter_provider together with MCUniverseGenerator and MEHPSimulator (gusev_numerical_2019, bernhard_phantom_2025, bernhard_pylimertools_2025), this example investigates two fundamental questions for predictive network modeling:"><img alt="" src="../_images/sphx_glr_plot_multichemistry_and_coarse_graining_thumb.png" />
+<p><a class="reference internal" href="force_balance/plot_multichemistry_and_coarse_graining.html"><span class="doc">Multi-Chemistry Crossover &amp; Coarse-Graining Invariance (GAUSSIAN vs. KUHN vs. KG_LJ)</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Multi-Chemistry Crossover & Coarse-Graining Invariance (GAUSSIAN vs. KUHN vs. KG_LJ)</div>
 </div></div></section>
 </section>
 <section id="network-generation">
@@ -573,6 +596,9 @@ the current implementation is more powerful, as needed for <span class="bibtex-c
 </div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to create a tetra-PEG (tetra-functional polyethylene glycol) network using the add_star_crosslinkers and link_strands_to_strands_to_conversion methods."><img alt="" src="../_images/sphx_glr_plot_tetra_peg_network_thumb.png" />
 <p><a class="reference internal" href="network_generator/plot_tetra_peg_network.html"><span class="doc">Tetra-PEG Network Generation</span></a></p>
   <div class="sphx-glr-thumbnail-title">Tetra-PEG Network Generation</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Accurate polymer network modeling requires not only physically sound force fields and topologies, but also awareness of two algorithmic shortcuts that trade exactness for speed or implementation simplicity:"><img alt="" src="../_images/sphx_glr_plot_mc_cutoff_and_pbc_artifacts_thumb.png" />
+<p><a class="reference internal" href="network_generator/plot_mc_cutoff_and_pbc_artifacts.html"><span class="doc">Algorithmic &amp; PBC Failure Modes: MaxDistanceProvider Bias &amp; assume_box_large_enough</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Algorithmic & PBC Failure Modes: MaxDistanceProvider Bias & assume_box_large_enough</div>
 </div></div></section>
 <section id="normal-mode-analysis">
 <h2>Normal Mode Analysis<a class="headerlink" href="#normal-mode-analysis" title="Link to this heading">¶</a></h2>
@@ -589,6 +615,9 @@ on-demand entanglement sampling.</p>
 </div><div class="sphx-glr-thumbcontainer" tooltip="Normal Mode Analysis (NMA) in NormalModeAnalyzer predicts the linear viscoelastic storage modulus G&#x27;(\omega) and loss modulus G&#x27;&#x27;(\omega) of entangled polymer networks from their bead-spring connectivity graph (gusev_molecular_2024). Computing the full eigenvalue spectrum scales as \mathcal{O}(N_{\text{atoms}}^3), which quickly becomes prohibitive for realistic representative volume elements (RVEs). The Kernel Polynomial Method (KPM) approximates the spectral density using Chebyshev moments and stochastic trace estimation in \mathcal{O}(N_{\text{atoms}}) time."><img alt="" src="../_images/sphx_glr_plot_kpm_vs_exact_pdms_thumb.png" />
 <p><a class="reference internal" href="normal_mode_analysis/plot_kpm_vs_exact_pdms.html"><span class="doc">KPM vs. Full Eigenvalue Normal Mode Analysis for PDMS Networks</span></a></p>
   <div class="sphx-glr-thumbnail-title">KPM vs. Full Eigenvalue Normal Mode Analysis for PDMS Networks</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="While the Kernel Polynomial Method (~pylimer_tools_cpp.KPMConfig) reproduces viscoelastic moduli accurately across the transition and Rouse regimes of well-crosslinked polymer networks (plot_kpm_vs_exact_pdms), its Chebyshev expansion has fundamental resolution limits near \lambda \to 0 (gusev_molecular_2024). Specifically:"><img alt="" src="../_images/sphx_glr_plot_kpm_limitations_and_hybrid_thumb.png" />
+<p><a class="reference internal" href="normal_mode_analysis/plot_kpm_limitations_and_hybrid.html"><span class="doc">When KPM Fails in Normal Mode Analysis: Percolation, Dangling Modes &amp; HybridConfig</span></a></p>
+  <div class="sphx-glr-thumbnail-title">When KPM Fails in Normal Mode Analysis: Percolation, Dangling Modes & HybridConfig</div>
 </div></div></section>
 <section id="file-i-o-readers-writers">
 <h2>File I/O: Readers &amp; Writers<a class="headerlink" href="#file-i-o-readers-writers" title="Link to this heading">¶</a></h2>
@@ -752,6 +781,9 @@ analytical verifications, matrix diagnostics, and performance benchmarks on cros
 </div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use ResistanceDistanceAnalysis to analyze the connectivity, effective resistances, Kirchhoff index, random-walk commute times, and node resistance centrality of polymer architectures and crosslinked networks."><img alt="" src="../_images/sphx_glr_plot_resistance_distance_analysis_thumb.png" />
 <p><a class="reference internal" href="structure_analysis/plot_resistance_distance_analysis.html"><span class="doc">Topological Resistance Distance &amp; Commute Time Analysis</span></a></p>
   <div class="sphx-glr-thumbnail-title">Topological Resistance Distance & Commute Time Analysis</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="How accurately can purely topological descriptors derived from the strand-level weighted graph Laplacian \mathbf{L} predict spatial mechanical load bearing in realistic, defect-rich polymer networks?"><img alt="" src="../_images/sphx_glr_plot_resistance_vs_mehp_stress_thumb.png" />
+<p><a class="reference internal" href="structure_analysis/plot_resistance_vs_mehp_stress.html"><span class="doc">Topological Effective Resistance vs. Spatial Stress Concentration in Defect-Rich Networks</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Topological Effective Resistance vs. Spatial Stress Concentration in Defect-Rich Networks</div>
 </div></div></section>
 </section>
 <section id="trajectory-analysis">

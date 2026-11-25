@@ -22,5 +22,10 @@ on-demand entanglement sampling.
 [KPM vs. Full Eigenvalue Normal Mode Analysis for PDMS Networks](plot_kpm_vs_exact_pdms.html.md)
 
   <div class="sphx-glr-thumbnail-title">KPM vs. Full Eigenvalue Normal Mode Analysis for PDMS Networks</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="While the Kernel Polynomial Method (~pylimer_tools_cpp.KPMConfig) reproduces viscoelastic moduli accurately across the transition and Rouse regimes of well-crosslinked polymer networks (plot_kpm_vs_exact_pdms), its Chebyshev expansion has fundamental resolution limits near \\lambda \\to 0 (gusev_molecular_2024). Specifically:">![](auto_examples/normal_mode_analysis/images/thumb/sphx_glr_plot_kpm_limitations_and_hybrid_thumb.png)
+
+[When KPM Fails in Normal Mode Analysis: Percolation, Dangling Modes & HybridConfig](plot_kpm_limitations_and_hybrid.html.md)
+
+  <div class="sphx-glr-thumbnail-title">When KPM Fails in Normal Mode Analysis: Percolation, Dangling Modes & HybridConfig</div>
 </div>
 <!-- thumbnail-parent-div-close --></div>

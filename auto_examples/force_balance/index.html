@@ -22,7 +22,7 @@
 <link rel="manifest" href="/_static/favicon/site.webmanifest" />
 
 <link rel="alternate" type="text/markdown" href="index.html.md">
-<link rel="describedby" href="llms.txt"><link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Entanglement Links vs. Springs" href="plot_entanglement_link_vs_spring.html"><link rel="prev" title="DPD Simulations" href="../dpd_simulations/plot_dpd_simulation.html">
+<link rel="describedby" href="llms.txt"><link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Entanglement Links vs. Springs" href="plot_entanglement_link_vs_spring.html"><link rel="prev" title="In-Situ DPD Dynamic Crosslinking vs. Instantaneous MC Network Synthesis" href="../dpd_simulations/plot_dpd_dynamic_curing_vs_mc.html">
 
     <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
         <title>Force Balance, Maximum Entropy Homogenization Procedures - pylimer-tools</title>
@@ -231,6 +231,8 @@
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../index.html">Examples</a><input aria-label="Toggle navigation of Examples" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l2 has-children"><a class="reference internal" href="../dpd_simulations/index.html">Dissipative Particle Dynamics (DPD) Simulations</a><input aria-label="Toggle navigation of Dissipative Particle Dynamics (DPD) Simulations" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../dpd_simulations/plot_dpd_simulation.html">DPD Simulations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../dpd_simulations/plot_dpd_slipspring_rheology.html">Multi-Scale Rheology: DPD Slip-Spring Melt vs. Crosslinked Network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../dpd_simulations/plot_dpd_dynamic_curing_vs_mc.html">In-Situ DPD Dynamic Crosslinking vs. Instantaneous MC Network Synthesis</a></li>
 </ul>
 </li>
 <li class="toctree-l2 current has-children current-page"><a class="current reference internal" href="#">Force Balance, Maximum Entropy Homogenization Procedures</a><input aria-label="Toggle navigation of Force Balance, Maximum Entropy Homogenization Procedures" checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
@@ -245,6 +247,9 @@
 <li class="toctree-l3"><a class="reference internal" href="plot_force_balance.html">Force Balance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_force_relaxation.html">MEHP Force Relaxation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_force_balance_2.html">Force Balance 2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_mmt_vs_mehp_gelation_and_loops.html">Mean-Field Theory (MMT) vs. Spatial MC + MEHP Across Gelation &amp; Loop Regimes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_finite_extensibility_deformation.html">Finite Extensibility &amp; Large-Strain Stiffening</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_multichemistry_and_coarse_graining.html">Multi-Chemistry Crossover &amp; Coarse-Graining Invariance (GAUSSIAN vs. KUHN vs. KG_LJ)</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../network_generator/index.html">Network Generation</a><input aria-label="Toggle navigation of Network Generation" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
@@ -257,11 +262,13 @@
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_multi_component_system.html">Multi-Component System</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_custom_crosslinking_callback.html">Custom Crosslinking Callbacks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_tetra_peg_network.html">Tetra-PEG Network Generation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_mc_cutoff_and_pbc_artifacts.html">Algorithmic &amp; PBC Failure Modes: <code class="docutils literal notranslate"><span class="pre">MaxDistanceProvider</span></code> Bias &amp; <code class="docutils literal notranslate"><span class="pre">assume_box_large_enough</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../normal_mode_analysis/index.html">Normal Mode Analysis</a><input aria-label="Toggle navigation of Normal Mode Analysis" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../normal_mode_analysis/plot_normal_mode_analysis.html">Normal Mode Analysis (NMA)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../normal_mode_analysis/plot_kpm_vs_exact_pdms.html">KPM vs. Full Eigenvalue Normal Mode Analysis for PDMS Networks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../normal_mode_analysis/plot_kpm_limitations_and_hybrid.html">When KPM Fails in Normal Mode Analysis: Percolation, Dangling Modes &amp; HybridConfig</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../readers_writers/index.html">File I/O: Readers &amp; Writers</a><input aria-label="Toggle navigation of File I/O: Readers &amp; Writers" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
@@ -292,6 +299,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../structure_analysis/plot_structure_analysis.html">Extract Synthesis Parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../structure_analysis/plot_topological_leaf_pruning_vs_pbc.html">Topological Leaf Pruning vs. PBC-Aware Force Balance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../structure_analysis/plot_resistance_distance_analysis.html">Topological Resistance Distance &amp; Commute Time Analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../structure_analysis/plot_resistance_vs_mehp_stress.html">Topological Effective Resistance vs. Spatial Stress Concentration in Defect-Rich Networks</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../trajectory_analysis/index.html">Trajectory Analysis</a><input aria-label="Toggle navigation of Trajectory Analysis" class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
@@ -498,6 +506,15 @@ This is useful for predicting the (phantom) equilibrium shear modulus of the net
 </div><div class="sphx-glr-thumbcontainer" tooltip="MEHPSimulator paired with LinearSystemMEHPSolver provides a high-performance implementation of the Maximum Entropy Homogenization Procedure (MEHP) (gusev_numerical_2019, bernhard_phantom_2025)."><img alt="" src="../../_images/sphx_glr_plot_force_balance_2_thumb.png" />
 <p><a class="reference internal" href="plot_force_balance_2.html"><span class="doc">Force Balance 2</span></a></p>
   <div class="sphx-glr-thumbnail-title">Force Balance 2</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Miller--Macosko recursive probability theory (MMT, macosko_new_1976, miller_new_1976a, miller_calculation_1979) provides closed-form mean-field predictions for the gelation threshold, soluble/dangling/active weight fractions, and equilibrium shear modulus of end-linked polymer networks (gusev_molecular_2022, tsimouri_comparison_2024). Because MMT treats the network as an infinite, loop-free Bethe tree, comparing its predictions against explicit 3D spatial networks generated with MCUniverseGenerator and evaluated with MEHPSimulator (gusev_numerical_2019, bernhard_phantom_2025, bernhard_pylimertools_2025) reveals both where mean-field theory excels and where spatial loops, dilution, and monofunctional dilution cause systematic deviations."><img alt="" src="../../_images/sphx_glr_plot_mmt_vs_mehp_gelation_and_loops_thumb.png" />
+<p><a class="reference internal" href="plot_mmt_vs_mehp_gelation_and_loops.html"><span class="doc">Mean-Field Theory (MMT) vs. Spatial MC + MEHP Across Gelation &amp; Loop Regimes</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Mean-Field Theory (MMT) vs. Spatial MC + MEHP Across Gelation & Loop Regimes</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example investigates finite-chain extensibility and large-strain stiffening in end-linked PDMS networks using NonGaussianSpringForceEvaluator versus the Gaussian HookeanForceEvaluator inside the unified MEHPSimulator framework (gusev_numerical_2019, bernhard_phantom_2025, bernhard_pylimertools_2025)."><img alt="" src="../../_images/sphx_glr_plot_finite_extensibility_deformation_thumb.png" />
+<p><a class="reference internal" href="plot_finite_extensibility_deformation.html"><span class="doc">Finite Extensibility &amp; Large-Strain Stiffening</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Finite Extensibility & Large-Strain Stiffening</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Real polymer elastomers span more than an order of magnitude in entanglement plateau modulus (G_e = 0.25\text{--}4.38\,\text{MPa}) and entanglement molar mass (M_e = \rho R T / G_e \approx 480\text{--}13{,}300\,\text{g/mol}). Using the Everaers et al. polymer property database bundled in pylimer_tools.io.bead_spring_parameter_provider together with MCUniverseGenerator and MEHPSimulator (gusev_numerical_2019, bernhard_phantom_2025, bernhard_pylimertools_2025), this example investigates two fundamental questions for predictive network modeling:"><img alt="" src="../../_images/sphx_glr_plot_multichemistry_and_coarse_graining_thumb.png" />
+<p><a class="reference internal" href="plot_multichemistry_and_coarse_graining.html"><span class="doc">Multi-Chemistry Crossover &amp; Coarse-Graining Invariance (GAUSSIAN vs. KUHN vs. KG_LJ)</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Multi-Chemistry Crossover & Coarse-Graining Invariance (GAUSSIAN vs. KUHN vs. KG_LJ)</div>
 </div></div><div class="toctree-wrapper compound">
 </div>
 </section>
@@ -517,14 +534,14 @@ This is useful for predicting the (phantom) equilibrium shear modulus of the net
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="../dpd_simulations/plot_dpd_simulation.html">
+          <a class="prev-page" href="../dpd_simulations/plot_dpd_dynamic_curing_vs_mc.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">DPD Simulations</div>
+                <div class="title">In-Situ DPD Dynamic Crosslinking vs. Instantaneous MC Network Synthesis</div>
                 
               </div>
             </a>

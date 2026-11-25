@@ -2,7 +2,7 @@
 
 # Computation times
 
-**00:02.180** total execution time for 6 files **from auto_examples/structure_analysis**:
+**00:04.230** total execution time for 7 files **from auto_examples/structure_analysis**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -17,11 +17,12 @@ $(document).ready( function () {
 } );
 </script>
 
-| Example                                                                                                                                                                                                                           | Time      |   Mem (MB) |
-|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [Topological Resistance Distance & Commute Time Analysis](plot_resistance_distance_analysis.md#sphx-glr-auto-examples-structure-analysis-plot-resistance-distance-analysis-py) (`plot_resistance_distance_analysis.py`)    | 00:01.650 |          0 |
-| [Topological Leaf Pruning vs. PBC-Aware Force Balance](plot_topological_leaf_pruning_vs_pbc.md#sphx-glr-auto-examples-structure-analysis-plot-topological-leaf-pruning-vs-pbc-py) (`plot_topological_leaf_pruning_vs_pbc.py`) | 00:00.161 |          0 |
-| [End-to-End Distribution](plot_end_to_end_distribution.md#sphx-glr-auto-examples-structure-analysis-plot-end-to-end-distribution-py) (`plot_end_to_end_distribution.py`)                                              | 00:00.124 |          0 |
-| [Loop Finding and Analysis](plot_loop_analysis.md#sphx-glr-auto-examples-structure-analysis-plot-loop-analysis-py) (`plot_loop_analysis.py`)                                                                | 00:00.115 |          0 |
-| [Extract Synthesis Parameters](plot_structure_analysis.md#sphx-glr-auto-examples-structure-analysis-plot-structure-analysis-py) (`plot_structure_analysis.py`)                                                   | 00:00.066 |          0 |
-| [Decompose/Split Structure](plot_decompose_structure.md#sphx-glr-auto-examples-structure-analysis-plot-decompose-structure-py) (`plot_decompose_structure.py`)                                                    | 00:00.065 |          0 |
+| Example                                                                                                                                                                                                                                                    | Time      |   Mem (MB) |
+|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
+| [Topological Effective Resistance vs. Spatial Stress Concentration in Defect-Rich Networks](plot_resistance_vs_mehp_stress.md#sphx-glr-auto-examples-structure-analysis-plot-resistance-vs-mehp-stress-py) (`plot_resistance_vs_mehp_stress.py`) | 00:02.034 |          0 |
+| [Topological Resistance Distance & Commute Time Analysis](plot_resistance_distance_analysis.md#sphx-glr-auto-examples-structure-analysis-plot-resistance-distance-analysis-py) (`plot_resistance_distance_analysis.py`)                             | 00:01.665 |          0 |
+| [Topological Leaf Pruning vs. PBC-Aware Force Balance](plot_topological_leaf_pruning_vs_pbc.md#sphx-glr-auto-examples-structure-analysis-plot-topological-leaf-pruning-vs-pbc-py) (`plot_topological_leaf_pruning_vs_pbc.py`)                          | 00:00.161 |          0 |
+| [End-to-End Distribution](plot_end_to_end_distribution.md#sphx-glr-auto-examples-structure-analysis-plot-end-to-end-distribution-py) (`plot_end_to_end_distribution.py`)                                                                       | 00:00.123 |          0 |
+| [Loop Finding and Analysis](plot_loop_analysis.md#sphx-glr-auto-examples-structure-analysis-plot-loop-analysis-py) (`plot_loop_analysis.py`)                                                                                         | 00:00.117 |          0 |
+| [Extract Synthesis Parameters](plot_structure_analysis.md#sphx-glr-auto-examples-structure-analysis-plot-structure-analysis-py) (`plot_structure_analysis.py`)                                                                            | 00:00.066 |          0 |
+| [Decompose/Split Structure](plot_decompose_structure.md#sphx-glr-auto-examples-structure-analysis-plot-decompose-structure-py) (`plot_decompose_structure.py`)                                                                             | 00:00.065 |          0 |
