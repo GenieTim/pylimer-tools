@@ -72,6 +72,26 @@ struct TopologicalLeafPeelingResult
  * @brief Perform iterative 2-core topological leaf peeling on a
  * CrosslinkerUniverse.
  *
+ * Iteratively removes crosslinkers with at most one non-loop incident strand
+ * and no primary loops (`activeNonLoopDegree <= 1 && primaryLoopCount == 0`),
+ * as well as any free or dangling strands (`strandFrom < 0 || strandTo < 0`).
+ *
+ * @note This is a purely graph-theoretic operation on `strandFrom`/`strandTo`
+ * and does not inspect coordinates, box dimensions, or periodic boundary
+ * conditions (PBC). Consequently:
+ * - Crosslinker-less solvent rings (`strandFrom < 0 || strandTo < 0`) are
+ *   always pruned, even if they wrap across the PBC.
+ * - Primary loops (`strandFrom == strandTo >= 0`) and multi-crosslinker
+ *   cycles are always retained in the 2-core, even if they close locally
+ *   without crossing the PBC. Note that in an entangled network (e.g. with
+ *   entanglements or slip-links), even a non-PBC primary loop can become
+ *   elastically active if an entanglement is associated with it; in a pure
+ *   phantom network without entanglements, however, a non-PBC loop relaxes to
+ *   zero tension.
+ * To distinguish PBC-spanning (or entangled) active loops from local
+ * zero-tension loops, use force-balance relaxation (e.g., `MEHPNetwork` /
+ * `MEHPSimulator` with `assumeBoxLargeEnough = false`).
+ *
  * @param crosslinkerUniverse The crosslinker & strand representation
  * @return TopologicalLeafPeelingResult containing boolean flags for both
  * strands and crosslinkers
@@ -83,6 +103,10 @@ peelTopologicalLeavesDetailed(
 /**
  * @brief Perform iterative 2-core topological leaf peeling on a
  * CrosslinkerUniverse.
+ *
+ * @note Purely topological (ignores coordinates and PBC); see
+ * `peelTopologicalLeavesDetailed` for details on how local vs. PBC-spanning
+ * loops are treated.
  *
  * @param crosslinkerUniverse The crosslinker & strand representation
  * @return std::vector<bool> Boolean vector indicating which strands are peeled

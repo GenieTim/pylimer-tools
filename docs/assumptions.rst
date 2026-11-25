@@ -35,3 +35,14 @@ Note, however, that it assumes that the initial configuration of the structure h
 Relevant methods:
 - :func:`pylimer_tools_cpp.DPDSimulator.assume_box_large_enough()`
 - :func:`pylimer_tools_cpp.MEHPSimulator.config_assume_box_large_enough()`
+
+.. note::
+
+   Purely topological utilities such as :func:`pylimer_tools_cpp.Universe.peel_topological_leaves()`,
+   :func:`pylimer_tools_cpp.Universe.identify_active_atoms()`, and
+   :func:`pylimer_tools_cpp.peel_topological_leaves()` do not use coordinates or PBC at all:
+   they retain all 2-core cycles (including local non-PBC loops, which can still become
+   elastically active when an entanglement or slip-link is associated with them) and prune all
+   crosslinker-less rings (even PBC-spanning ones). See
+   :doc:`/auto_examples/structure_analysis/plot_topological_leaf_pruning_vs_pbc` for an
+   example comparing topological leaf pruning with PBC-aware MEHP force balance.
