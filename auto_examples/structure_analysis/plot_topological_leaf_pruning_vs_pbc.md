@@ -211,7 +211,7 @@ fig.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.093 seconds)
+**Total running time of the script:** (0 minutes 0.162 seconds)
 
 <a id="sphx-glr-download-auto-examples-structure-analysis-plot-topological-leaf-pruning-vs-pbc-py"></a>
 

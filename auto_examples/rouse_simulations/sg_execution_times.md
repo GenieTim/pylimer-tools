@@ -2,7 +2,7 @@
 
 # Computation times
 
-**00:03.177** total execution time for 2 files **from auto_examples/rouse_simulations**:
+**00:04.976** total execution time for 2 files **from auto_examples/rouse_simulations**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -19,5 +19,5 @@ $(document).ready( function () {
 
 | Example                                                                                                                                                                                                                                              | Time      |   Mem (MB) |
 |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [Polymer Architectures & Resistance-Fluctuation Duality in Rouse Dynamics](plot_rouse_topologies_and_resistance.md#sphx-glr-auto-examples-rouse-simulations-plot-rouse-topologies-and-resistance-py) (`plot_rouse_topologies_and_resistance.py`) | 00:02.077 |          0 |
-| [Rouse & Brownian Dynamics Simulation](plot_rouse_brownian_simulation.md#sphx-glr-auto-examples-rouse-simulations-plot-rouse-brownian-simulation-py) (`plot_rouse_brownian_simulation.py`)                                                 | 00:01.100 |          0 |
+| [Polymer Architectures & Resistance-Fluctuation Duality in Rouse Dynamics](plot_rouse_topologies_and_resistance.md#sphx-glr-auto-examples-rouse-simulations-plot-rouse-topologies-and-resistance-py) (`plot_rouse_topologies_and_resistance.py`) | 00:03.181 |          0 |
+| [Rouse & Brownian Dynamics Simulation](plot_rouse_brownian_simulation.md#sphx-glr-auto-examples-rouse-simulations-plot-rouse-brownian-simulation-py) (`plot_rouse_brownian_simulation.py`)                                                 | 00:01.796 |          0 |

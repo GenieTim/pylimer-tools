@@ -2,7 +2,7 @@
 
 # Computation times
 
-**00:03.330** total execution time for 13 files **from auto_examples/readers_writers**:
+**00:05.679** total execution time for 13 files **from auto_examples/readers_writers**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -19,16 +19,16 @@ $(document).ready( function () {
 
 | Example                                                                                                                                                                                                    | Time      |   Mem (MB) |
 |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [Streaming Dump File Reader](plot_memory_efficient_dump_file_reading.html.md#sphx-glr-auto-examples-readers-writers-plot-memory-efficient-dump-file-reading-py) (`plot_memory_efficient_dump_file_reading.py`) | 00:02.068 |          0 |
-| [Unit Conversion](plot_unit_conversion.html.md#sphx-glr-auto-examples-readers-writers-plot-unit-conversion-py) (`plot_unit_conversion.py`)                                                  | 00:00.293 |          0 |
-| [Data File Reader](plot_data_file_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-data-file-reader-py) (`plot_data_file_reader.py`)                                               | 00:00.235 |          0 |
-| [Extract Trajectory Frame](plot_convert_trajectory_to_frame.html.md#sphx-glr-auto-examples-readers-writers-plot-convert-trajectory-to-frame-py) (`plot_convert_trajectory_to_frame.py`)                 | 00:00.139 |          0 |
-| [Convert for Bond Swapping](plot_convert_for_bond_swapping.html.md#sphx-glr-auto-examples-readers-writers-plot-convert-for-bond-swapping-py) (`plot_convert_for_bond_swapping.py`)                    | 00:00.132 |          0 |
-| [Data File Writer](plot_data_file_writer.html.md#sphx-glr-auto-examples-readers-writers-plot-data-file-writer-py) (`plot_data_file_writer.py`)                                               | 00:00.092 |          0 |
-| [Correlated Averages Reader](plot_correlated_averages_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-correlated-averages-reader-py) (`plot_correlated_averages_reader.py`)                 | 00:00.071 |          0 |
-| [Log & Thermo File Reader](plot_log_thermo_file_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-log-thermo-file-reader-py) (`plot_log_thermo_file_reader.py`)                           | 00:00.069 |          0 |
-| [Time-Averaged Data Reader](plot_time_averaged_data_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-time-averaged-data-reader-py) (`plot_time_averaged_data_reader.py`)                    | 00:00.066 |          0 |
-| [Dump File Reader](plot_dump_file_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-dump-file-reader-py) (`plot_dump_file_reader.py`)                                               | 00:00.056 |          0 |
-| [Histogram Reader](plot_histogram_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-histogram-reader-py) (`plot_histogram_reader.py`)                                               | 00:00.045 |          0 |
-| [pylimer-tools Output Reader](plot_pylimer_tools_output_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-pylimer-tools-output-reader-py) (`plot_pylimer_tools_output_reader.py`)              | 00:00.034 |          0 |
-| [Performance and Caching](plot_performance_caching.html.md#sphx-glr-auto-examples-readers-writers-plot-performance-caching-py) (`plot_performance_caching.py`)                                  | 00:00.029 |          0 |
+| [Streaming Dump File Reader](plot_memory_efficient_dump_file_reading.html.md#sphx-glr-auto-examples-readers-writers-plot-memory-efficient-dump-file-reading-py) (`plot_memory_efficient_dump_file_reading.py`) | 00:03.631 |          0 |
+| [Unit Conversion](plot_unit_conversion.html.md#sphx-glr-auto-examples-readers-writers-plot-unit-conversion-py) (`plot_unit_conversion.py`)                                                  | 00:00.508 |          0 |
+| [Data File Reader](plot_data_file_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-data-file-reader-py) (`plot_data_file_reader.py`)                                               | 00:00.388 |          0 |
+| [Extract Trajectory Frame](plot_convert_trajectory_to_frame.html.md#sphx-glr-auto-examples-readers-writers-plot-convert-trajectory-to-frame-py) (`plot_convert_trajectory_to_frame.py`)                 | 00:00.226 |          0 |
+| [Data File Writer](plot_data_file_writer.html.md#sphx-glr-auto-examples-readers-writers-plot-data-file-writer-py) (`plot_data_file_writer.py`)                                               | 00:00.154 |          0 |
+| [Convert for Bond Swapping](plot_convert_for_bond_swapping.html.md#sphx-glr-auto-examples-readers-writers-plot-convert-for-bond-swapping-py) (`plot_convert_for_bond_swapping.py`)                    | 00:00.152 |          0 |
+| [Log & Thermo File Reader](plot_log_thermo_file_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-log-thermo-file-reader-py) (`plot_log_thermo_file_reader.py`)                           | 00:00.120 |          0 |
+| [Correlated Averages Reader](plot_correlated_averages_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-correlated-averages-reader-py) (`plot_correlated_averages_reader.py`)                 | 00:00.120 |          0 |
+| [Time-Averaged Data Reader](plot_time_averaged_data_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-time-averaged-data-reader-py) (`plot_time_averaged_data_reader.py`)                    | 00:00.116 |          0 |
+| [Dump File Reader](plot_dump_file_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-dump-file-reader-py) (`plot_dump_file_reader.py`)                                               | 00:00.096 |          0 |
+| [Histogram Reader](plot_histogram_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-histogram-reader-py) (`plot_histogram_reader.py`)                                               | 00:00.070 |          0 |
+| [pylimer-tools Output Reader](plot_pylimer_tools_output_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-pylimer-tools-output-reader-py) (`plot_pylimer_tools_output_reader.py`)              | 00:00.055 |          0 |
+| [Performance and Caching](plot_performance_caching.html.md#sphx-glr-auto-examples-readers-writers-plot-performance-caching-py) (`plot_performance_caching.py`)                                  | 00:00.045 |          0 |
