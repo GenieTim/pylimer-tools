@@ -1944,6 +1944,7 @@ TEST_CASE(
     linearConfig.simplificationMode =
       pylimer_tools::sim::mehp::StructureSimplificationMode::INACTIVE_THEN_X2F;
     linearConfig.inactiveRemovalCutoff = 1e-7;
+    linearConfig.residualReduction = 1e-12;
     fb2.run(linearConfig);
     fb2Univ.run(linearConfig);
 
@@ -1986,6 +1987,7 @@ TEST_CASE(
     linearConfig.simplificationMode =
       pylimer_tools::sim::mehp::StructureSimplificationMode::INACTIVE_THEN_X2F;
     linearConfig.inactiveRemovalCutoff = 1e-7;
+    linearConfig.residualReduction = 1e-12;
     fb2Springs.run(linearConfig);
     fb2UnivSprings.run(linearConfig);
 
@@ -2086,6 +2088,7 @@ TEST_CASE(
     linearConfig.simplificationMode =
       pylimer_tools::sim::mehp::StructureSimplificationMode::INACTIVE_THEN_X2F;
     linearConfig.inactiveRemovalCutoff = 1e-7;
+    linearConfig.residualReduction = 1e-12;
     fb2.run(linearConfig);
     CHECK_NOTHROW(fb2.validateNetwork());
     CHECK(fb2.getGammaFactor(1.0) > 0.0);

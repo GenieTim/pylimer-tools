@@ -441,15 +441,33 @@ namespace {
 
     const Eigen::Vector3d distanceAfter =
       (keptIsA ? -1.0 : 1.0) * net.evaluateSpringVector(u, keptSpringIdx);
+    auto formatDiag = [&]() {
+      return "totalDistance=(" + std::to_string(totalDistance[0]) + "," +
+             std::to_string(totalDistance[1]) + "," +
+             std::to_string(totalDistance[2]) + "), distanceAfter=(" +
+             std::to_string(distanceAfter[0]) + "," +
+             std::to_string(distanceAfter[1]) + "," +
+             std::to_string(distanceAfter[2]) +
+             "), kept=" + std::to_string(keptSpringIdx) +
+             ", removed=" + std::to_string(removedSpringIdx) +
+             ", link=" + std::to_string(linkToReduce) +
+             ", strandMerger=" + std::to_string(isStrandMerger) +
+             ", keptIsA=" + std::to_string(keptIsA) +
+             ", removedIsA=" + std::to_string(removedIsA);
+    };
     if (net.assumeBoxLargeEnough) {
       Eigen::Vector3d diff = distanceAfter - totalDistance;
       net.box.handlePBC(diff);
-      RUNTIME_EXP_IFN(diff.norm() < 1e-7,
-                      "Merged spring distance mismatch after merging springs.");
+      RUNTIME_EXP_IFN(
+        diff.norm() < 1e-7,
+        "Merged spring distance mismatch after merging springs: " +
+          formatDiag());
     } else {
-      RUNTIME_EXP_IFN(pylimer_tools::utils::vector_approx_equal(
-                        totalDistance, distanceAfter, 1e-7),
-                      "Merged spring distance mismatch after merging springs.");
+      RUNTIME_EXP_IFN(
+        pylimer_tools::utils::vector_approx_equal(
+          totalDistance, distanceAfter, 1e-7),
+        "Merged spring distance mismatch after merging springs: " +
+          formatDiag());
     }
   }
 
