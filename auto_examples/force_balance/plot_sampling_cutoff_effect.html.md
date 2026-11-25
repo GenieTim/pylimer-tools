@@ -82,8 +82,8 @@ data = load_or_compute_cache(cache_path, run_sampling_cutoff_simulation)
 ```
 
 ```none
-r_cut=1.2: sampled=253, iterations=399
-r_cut=2.6: sampled=241, iterations=333
+r_cut=1.2: sampled=253, iterations=205
+r_cut=2.6: sampled=241, iterations=169
 Loading cached example data from sampling_cutoff_effect_cache.npz...
 ```
 
@@ -128,7 +128,7 @@ plot_cutoff_pair_distance_distribution(data)
 plot_cutoff_solver_iterations(data)
 ```
 
-**Total running time of the script:** (0 minutes 0.841 seconds)
+**Total running time of the script:** (0 minutes 1.004 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-sampling-cutoff-effect-py"></a>
 

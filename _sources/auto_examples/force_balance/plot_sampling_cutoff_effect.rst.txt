@@ -109,8 +109,8 @@ compares rigid links (``EntanglementMode.MERGED_LINKS``) vs. compliant springs
 
  .. code-block:: none
 
-    r_cut=1.2: sampled=253, iterations=399
-    r_cut=2.6: sampled=241, iterations=333
+    r_cut=1.2: sampled=253, iterations=205
+    r_cut=2.6: sampled=241, iterations=169
     Loading cached example data from sampling_cutoff_effect_cache.npz...
 
 
@@ -237,7 +237,7 @@ and larger pre-strains require more relaxation iterations to converge.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.841 seconds)
+   **Total running time of the script:** (0 minutes 1.004 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_sampling_cutoff_effect.py:

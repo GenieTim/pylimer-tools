@@ -139,9 +139,9 @@ mehp_phantom.run(MEHPLinearSolverConfig())
 ```
 
 ```none
-Entangled final residual norm: 2.740e-10 (iterations: 361)
+Entangled final residual norm: 2.924e-04 (iterations: 176)
 
-<pylimer_tools_cpp.MEHPSolveResult object at 0x7da1a80f16f0>
+<pylimer_tools_cpp.MEHPSolveResult object at 0x75e559cfebf0>
 ```
 
 <!-- GENERATED FROM PYTHON SOURCE LINES 121-129 -->
@@ -281,7 +281,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.422 seconds)
+**Total running time of the script:** (0 minutes 0.507 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-force-balance-2-py"></a>
 

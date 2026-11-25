@@ -94,7 +94,7 @@ data = load_or_compute_cache(cache_path, run_slipping_vs_fixed_simulation)
 ```
 
 ```none
-Iterations — fixed: 512, slipping: 2350
+Iterations — fixed: 233, slipping: 713
 Loading cached example data from slipping_vs_fixed_cache.npz...
 ```
 
@@ -112,7 +112,7 @@ plot_slipping_vs_fixed_modulus(data)
 plot_slipping_vs_fixed_iterations(data)
 ```
 
-**Total running time of the script:** (0 minutes 0.546 seconds)
+**Total running time of the script:** (0 minutes 0.414 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-slipping-vs-fixed-links-py"></a>
 
