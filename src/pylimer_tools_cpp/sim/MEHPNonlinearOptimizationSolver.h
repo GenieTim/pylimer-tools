@@ -70,7 +70,8 @@ public:
    * @return MEHPSolveResult Summary containing exit reason, evaluation count,
    *         L2 gradient residual norm, and minimized elastic energy.
    * @throws std::invalid_argument on violated preconditions or invalid config.
-   * @throws std::runtime_error on network validation failure or non-finite energy.
+   * @throws std::runtime_error on network validation failure or non-finite
+   * energy.
    */
   [[nodiscard]] MEHPSolveResult solve(
     MEHPNetwork& net,

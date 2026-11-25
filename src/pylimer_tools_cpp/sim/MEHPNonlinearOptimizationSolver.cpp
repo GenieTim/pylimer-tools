@@ -12,152 +12,151 @@ namespace pylimer_tools::sim::mehp {
 
 namespace {
 
-[[nodiscard]] bool
-requiresFiniteBounds(const NLoptAlgorithm alg)
-{
-  switch (alg) {
-    case NLoptAlgorithm::GN_DIRECT:
-    case NLoptAlgorithm::GN_CRS2_LM:
-    case NLoptAlgorithm::GD_STOGO:
-      return true;
-    default:
-      return false;
-  }
-}
-
-[[nodiscard]] ExitReason
-mapNloptResultToExitReason(const nlopt::result nloptRes, const bool interrupted)
-{
-  if (interrupted) {
-    return ExitReason::INTERRUPT;
-  }
-  switch (nloptRes) {
-    case nlopt::FTOL_REACHED:
-    case nlopt::STOPVAL_REACHED:
-      return ExitReason::F_TOLERANCE;
-    case nlopt::XTOL_REACHED:
-    case nlopt::SUCCESS:
-      return ExitReason::X_TOLERANCE;
-    case nlopt::MAXEVAL_REACHED:
-    case nlopt::MAXTIME_REACHED:
-      return ExitReason::MAX_STEPS;
-    case nlopt::ROUNDOFF_LIMITED:
-      return ExitReason::NO_STEPS_POSSIBLE;
-    case nlopt::FORCED_STOP:
-      return ExitReason::OTHER;
-    case nlopt::FAILURE:
-    case nlopt::INVALID_ARGS:
-    case nlopt::OUT_OF_MEMORY:
-      return ExitReason::FAILURE;
-    default:
-      return ExitReason::OTHER;
-  }
-}
-
-void
-zeroZDisplacementsIf2D(Eigen::VectorXd& u,
-                       const size_t nrOfLinks,
-                       const bool is2D)
-{
-  if (!is2D) {
-    return;
-  }
-  for (size_t linkIdx = 0; linkIdx < nrOfLinks; ++linkIdx) {
-    u[3 * static_cast<Eigen::Index>(linkIdx) + 2] = 0.0;
-  }
-}
-
-struct ObjectiveContext
-{
-  const MEHPNetwork& net;
-  const MEHPForceEvaluator& forceEvaluator;
-  const MEHPSolveCallbacks& callbacks;
-  nlopt::opt& opt;
-  bool is2D;
-  size_t totalEvalBase;
-  bool interrupted;
-  std::exception_ptr callbackException;
-  size_t evalCount;
-  Eigen::VectorXd uBuffer;
-
-  ObjectiveContext(const MEHPNetwork& netRef,
-                   const MEHPForceEvaluator& evaluatorRef,
-                   const MEHPSolveCallbacks& callbacksRef,
-                   nlopt::opt& optRef,
-                   const bool is2DMode,
-                   const size_t evalBase)
-    : net(netRef)
-    , forceEvaluator(evaluatorRef)
-    , callbacks(callbacksRef)
-    , opt(optRef)
-    , is2D(is2DMode)
-    , totalEvalBase(evalBase)
-    , interrupted(false)
-    , callbackException(nullptr)
-    , evalCount(0)
-    , uBuffer(static_cast<Eigen::Index>(3 * netRef.nrOfLinks))
+  [[nodiscard]] bool requiresFiniteBounds(const NLoptAlgorithm alg)
   {
+    switch (alg) {
+      case NLoptAlgorithm::GN_DIRECT:
+      case NLoptAlgorithm::GN_CRS2_LM:
+      case NLoptAlgorithm::GD_STOGO:
+        return true;
+      default:
+        return false;
+    }
   }
 
-  ObjectiveContext(const ObjectiveContext&) = delete;
-  ObjectiveContext& operator=(const ObjectiveContext&) = delete;
-};
-
-double
-nloptObjectiveCallback(const unsigned n,
-                       const double* const x,
-                       double* const grad,
-                       void* const fData)
-{
-  ObjectiveContext* const ctx = static_cast<ObjectiveContext*>(fData);
-  if (ctx->interrupted) {
-    return HUGE_VAL;
+  [[nodiscard]] ExitReason mapNloptResultToExitReason(
+    const nlopt::result nloptRes,
+    const bool interrupted)
+  {
+    if (interrupted) {
+      return ExitReason::INTERRUPT;
+    }
+    switch (nloptRes) {
+      case nlopt::FTOL_REACHED:
+      case nlopt::STOPVAL_REACHED:
+        return ExitReason::F_TOLERANCE;
+      case nlopt::XTOL_REACHED:
+      case nlopt::SUCCESS:
+        return ExitReason::X_TOLERANCE;
+      case nlopt::MAXEVAL_REACHED:
+      case nlopt::MAXTIME_REACHED:
+        return ExitReason::MAX_STEPS;
+      case nlopt::ROUNDOFF_LIMITED:
+        return ExitReason::NO_STEPS_POSSIBLE;
+      case nlopt::FORCED_STOP:
+        return ExitReason::OTHER;
+      case nlopt::FAILURE:
+      case nlopt::INVALID_ARGS:
+      case nlopt::OUT_OF_MEMORY:
+        return ExitReason::FAILURE;
+      default:
+        return ExitReason::OTHER;
+    }
   }
 
-  try {
-    if (ctx->callbacks.shouldInterrupt && ctx->callbacks.shouldInterrupt()) {
-      ctx->interrupted = true;
-      ctx->opt.force_stop();
+  void zeroZDisplacementsIf2D(Eigen::VectorXd& u,
+                              const size_t nrOfLinks,
+                              const bool is2D)
+  {
+    if (!is2D) {
+      return;
+    }
+    for (size_t linkIdx = 0; linkIdx < nrOfLinks; ++linkIdx) {
+      u[3 * static_cast<Eigen::Index>(linkIdx) + 2] = 0.0;
+    }
+  }
+
+  struct ObjectiveContext
+  {
+    const MEHPNetwork& net;
+    const MEHPForceEvaluator& forceEvaluator;
+    const MEHPSolveCallbacks& callbacks;
+    nlopt::opt& opt;
+    bool is2D;
+    size_t totalEvalBase;
+    bool interrupted;
+    std::exception_ptr callbackException;
+    size_t evalCount;
+    Eigen::VectorXd uBuffer;
+
+    ObjectiveContext(const MEHPNetwork& netRef,
+                     const MEHPForceEvaluator& evaluatorRef,
+                     const MEHPSolveCallbacks& callbacksRef,
+                     nlopt::opt& optRef,
+                     const bool is2DMode,
+                     const size_t evalBase)
+      : net(netRef)
+      , forceEvaluator(evaluatorRef)
+      , callbacks(callbacksRef)
+      , opt(optRef)
+      , is2D(is2DMode)
+      , totalEvalBase(evalBase)
+      , interrupted(false)
+      , callbackException(nullptr)
+      , evalCount(0)
+      , uBuffer(static_cast<Eigen::Index>(3 * netRef.nrOfLinks))
+    {
+    }
+
+    ObjectiveContext(const ObjectiveContext&) = delete;
+    ObjectiveContext& operator=(const ObjectiveContext&) = delete;
+  };
+
+  double nloptObjectiveCallback(const unsigned n,
+                                const double* const x,
+                                double* const grad,
+                                void* const fData)
+  {
+    ObjectiveContext* const ctx = static_cast<ObjectiveContext*>(fData);
+    if (ctx->interrupted) {
       return HUGE_VAL;
     }
 
-    for (unsigned i = 0; i < n; ++i) {
-      ctx->uBuffer[static_cast<Eigen::Index>(i)] = x[i];
-    }
-    zeroZDisplacementsIf2D(ctx->uBuffer, ctx->net.nrOfLinks, ctx->is2D);
+    try {
+      if (ctx->callbacks.shouldInterrupt && ctx->callbacks.shouldInterrupt()) {
+        ctx->interrupted = true;
+        ctx->opt.force_stop();
+        return HUGE_VAL;
+      }
 
-    const Eigen::VectorXd springVectors =
-      ctx->net.evaluateSpringVectors(ctx->uBuffer, ctx->is2D);
-    const double energy = ctx->forceEvaluator.evaluateNetworkEnergyAndGradient(
-      ctx->net, springVectors, ctx->is2D, grad);
+      for (unsigned i = 0; i < n; ++i) {
+        ctx->uBuffer[static_cast<Eigen::Index>(i)] = x[i];
+      }
+      zeroZDisplacementsIf2D(ctx->uBuffer, ctx->net.nrOfLinks, ctx->is2D);
 
-    RUNTIME_EXP_IFN(
-      std::isfinite(energy),
-      "Non-finite energy encountered during nonlinear optimization.");
-    if (grad != nullptr) {
-      if (ctx->is2D) {
-        for (size_t linkIdx = 0; linkIdx < ctx->net.nrOfLinks; ++linkIdx) {
-          grad[3 * linkIdx + 2] = 0.0;
+      const Eigen::VectorXd springVectors =
+        ctx->net.evaluateSpringVectors(ctx->uBuffer, ctx->is2D);
+      const double energy =
+        ctx->forceEvaluator.evaluateNetworkEnergyAndGradient(
+          ctx->net, springVectors, ctx->is2D, grad);
+
+      RUNTIME_EXP_IFN(
+        std::isfinite(energy),
+        "Non-finite energy encountered during nonlinear optimization.");
+      if (grad != nullptr) {
+        if (ctx->is2D) {
+          for (size_t linkIdx = 0; linkIdx < ctx->net.nrOfLinks; ++linkIdx) {
+            grad[3 * linkIdx + 2] = 0.0;
+          }
+        }
+        for (unsigned i = 0; i < n; ++i) {
+          RUNTIME_EXP_IFN(
+            std::isfinite(grad[i]),
+            "Non-finite gradient encountered during nonlinear optimization.");
         }
       }
-      for (unsigned i = 0; i < n; ++i) {
-        RUNTIME_EXP_IFN(
-          std::isfinite(grad[i]),
-          "Non-finite gradient encountered during nonlinear optimization.");
-      }
-    }
 
-    ctx->evalCount += 1;
-    if (ctx->callbacks.onStep) {
-      ctx->callbacks.onStep(ctx->totalEvalBase + ctx->evalCount);
+      ctx->evalCount += 1;
+      if (ctx->callbacks.onStep) {
+        ctx->callbacks.onStep(ctx->totalEvalBase + ctx->evalCount);
+      }
+      return energy;
+    } catch (...) {
+      ctx->callbackException = std::current_exception();
+      ctx->opt.force_stop();
+      return HUGE_VAL;
     }
-    return energy;
-  } catch (...) {
-    ctx->callbackException = std::current_exception();
-    ctx->opt.force_stop();
-    return HUGE_VAL;
   }
-}
 
 } // namespace
 
@@ -257,12 +256,12 @@ NonlinearOptimizationSolver::solve(MEHPNetwork& net,
     "simplification is enabled.");
   INVALIDARG_EXP_IFN(this->config.maxNrOfSteps > 0,
                      "maxNrOfSteps must be positive.");
-  INVALIDARG_EXP_IFN(
-    std::isfinite(this->config.xtol) && this->config.xtol >= 0.0,
-    "xtol must be finite and non-negative.");
-  INVALIDARG_EXP_IFN(
-    std::isfinite(this->config.ftol) && this->config.ftol >= 0.0,
-    "ftol must be finite and non-negative.");
+  INVALIDARG_EXP_IFN(std::isfinite(this->config.xtol) &&
+                       this->config.xtol >= 0.0,
+                     "xtol must be finite and non-negative.");
+  INVALIDARG_EXP_IFN(std::isfinite(this->config.ftol) &&
+                       this->config.ftol >= 0.0,
+                     "ftol must be finite and non-negative.");
 
   const nlopt::algorithm nloptAlg =
     nloptAlgorithmToNlopt(this->config.algorithm);

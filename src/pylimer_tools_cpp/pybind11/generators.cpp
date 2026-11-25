@@ -778,9 +778,10 @@ init_pylimer_bound_generators(py::module_& m)
                 pylimer_tools::topo::entanglement_detection::
                   EntanglementFilteringMode::OMIT_INACTIVE,
                 "EntanglementFilteringMode.OMIT_INACTIVE"))
-    .def("get_mehp_network",
-         &MCUniverseGenerator::getMEHPNetwork,
-         R"pbdoc(
+    .def(
+      "get_mehp_network",
+      &MCUniverseGenerator::getMEHPNetwork,
+      R"pbdoc(
          Build a canonical MEHPNetwork from the current simplified universe and optional sampled entanglements.
 
          :param entanglements: Optional pre-sampled strand-pair entanglements.
@@ -790,16 +791,16 @@ init_pylimer_bound_generators(py::module_& m)
          :param include_free_chains: Include free/soluble chains when True (default: True).
          :return: Configured MEHPNetwork instance.
          )pbdoc",
-         py::arg_v("entanglements",
-                   pylimer_tools::topo::entanglement_detection::
-                     StrandPairEntanglements(),
-                   "StrandPairEntanglements()"),
-         py::arg_v("entanglement_mode",
-                   pylimer_tools::sim::mehp::EntanglementMode::MERGED_LINKS,
-                   "EntanglementMode.MERGED_LINKS"),
-         py::arg("crosslinker_type") = 2,
-         py::arg("remove_dangling_chains") = false,
-         py::arg("include_free_chains") = true)
+      py::arg_v(
+        "entanglements",
+        pylimer_tools::topo::entanglement_detection::StrandPairEntanglements(),
+        "StrandPairEntanglements()"),
+      py::arg_v("entanglement_mode",
+                pylimer_tools::sim::mehp::EntanglementMode::MERGED_LINKS,
+                "EntanglementMode.MERGED_LINKS"),
+      py::arg("crosslinker_type") = 2,
+      py::arg("remove_dangling_chains") = false,
+      py::arg("include_free_chains") = true)
     .def(
       "get_mehp_simulator",
       py::overload_cast<
@@ -824,10 +825,10 @@ init_pylimer_bound_generators(py::module_& m)
       :param include_free_chains: Include free/soluble chains when True (default: True).
       :return: Configured MEHPSimulator instance.
       )pbdoc",
-      py::arg_v("entanglements",
-                pylimer_tools::topo::entanglement_detection::
-                  StrandPairEntanglements(),
-                "StrandPairEntanglements()"),
+      py::arg_v(
+        "entanglements",
+        pylimer_tools::topo::entanglement_detection::StrandPairEntanglements(),
+        "StrandPairEntanglements()"),
       py::arg_v("entanglement_mode",
                 pylimer_tools::sim::mehp::EntanglementMode::MERGED_LINKS,
                 "EntanglementMode.MERGED_LINKS"),
@@ -836,21 +837,20 @@ init_pylimer_bound_generators(py::module_& m)
       py::arg("crosslinker_type") = 2,
       py::arg("remove_dangling_chains") = false,
       py::arg("include_free_chains") = true)
-    .def(
-      "get_mehp_simulator",
-      py::overload_cast<
-        size_t,
-        double,
-        double,
-        size_t,
-        double,
-        const std::string&,
-        bool,
-        pylimer_tools::sim::mehp::EntanglementMode,
-        std::shared_ptr<pylimer_tools::sim::mehp::MEHPForceEvaluator>,
-        bool,
-        int>(&MCUniverseGenerator::getMEHPSimulator, py::const_),
-      R"pbdoc(
+    .def("get_mehp_simulator",
+         py::overload_cast<
+           size_t,
+           double,
+           double,
+           size_t,
+           double,
+           const std::string&,
+           bool,
+           pylimer_tools::sim::mehp::EntanglementMode,
+           std::shared_ptr<pylimer_tools::sim::mehp::MEHPForceEvaluator>,
+           bool,
+           int>(&MCUniverseGenerator::getMEHPSimulator, py::const_),
+         R"pbdoc(
       Sample random entanglements from the simplified universe and construct a unified MEHPSimulator,
       bypassing the creation of a Universe.
 
@@ -867,19 +867,19 @@ init_pylimer_bound_generators(py::module_& m)
       :param crosslinker_type: Atom type identifying crosslinkers (default: 2).
       :return: Configured MEHPSimulator instance.
       )pbdoc",
-      py::arg("nr_of_entanglements_to_sample"),
-      py::arg("upper_cutoff"),
-      py::arg("lower_cutoff") = 0.0,
-      py::arg("minimum_nr_of_entanglements") = 0,
-      py::arg("same_strand_cutoff") = 3.0,
-      py::arg("seed") = "",
-      py::arg("filter_dangling_and_soluble") = true,
-      py::arg_v("entanglement_mode",
-                pylimer_tools::sim::mehp::EntanglementMode::MERGED_LINKS,
-                "EntanglementMode.MERGED_LINKS"),
-      py::arg("force_evaluator") = nullptr,
-      py::arg("is_2d") = false,
-      py::arg("crosslinker_type") = 2)
+         py::arg("nr_of_entanglements_to_sample"),
+         py::arg("upper_cutoff"),
+         py::arg("lower_cutoff") = 0.0,
+         py::arg("minimum_nr_of_entanglements") = 0,
+         py::arg("same_strand_cutoff") = 3.0,
+         py::arg("seed") = "",
+         py::arg("filter_dangling_and_soluble") = true,
+         py::arg_v("entanglement_mode",
+                   pylimer_tools::sim::mehp::EntanglementMode::MERGED_LINKS,
+                   "EntanglementMode.MERGED_LINKS"),
+         py::arg("force_evaluator") = nullptr,
+         py::arg("is_2d") = false,
+         py::arg("crosslinker_type") = 2)
 #ifdef CEREALIZABLE
     .def(py::pickle(
       [](const MCUniverseGenerator& gen) {

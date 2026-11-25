@@ -41,19 +41,22 @@ public:
   void setConfig(const MEHPLinearSolverConfig& newConfig);
 
   /**
-   * @brief Solve for static force equilibrium on a linear Hookean @ref MEHPNetwork.
+   * @brief Solve for static force equilibrium on a linear Hookean @ref
+   * MEHPNetwork.
    *
    * @param net Canonical polymer network (modified in-place if strand breaking
    *        or topology simplification is enabled).
    * @param u Link displacement vector of size `3 * net.nrOfLinks`, updated
    *        in-place with converged equilibrium displacements.
-   * @param forceEvaluator Constitutive model; must satisfy `isLinear() == true`.
+   * @param forceEvaluator Constitutive model; must satisfy `isLinear() ==
+   * true`.
    * @param is2D If true, constrain z-displacements and z-forces to zero.
    * @param callbacks Optional interrupt, cleanup, and step callbacks.
    * @return MEHPSolveResult Summary containing exit reason, iteration count,
    *         squared force residual norm, elastic energy, and fallback status.
    * @throws std::invalid_argument on violated preconditions or invalid config.
-   * @throws std::runtime_error on network validation failure or linear solver error.
+   * @throws std::runtime_error on network validation failure or linear solver
+   * error.
    */
   [[nodiscard]] MEHPSolveResult solve(
     MEHPNetwork& net,

@@ -1,6 +1,6 @@
 #include "MEHPForceEvaluator.h"
-#include "MEHPNetwork.h"
 #include "../utils/utilityMacros.h"
+#include "MEHPNetwork.h"
 #include <algorithm>
 #include <cmath>
 #include <limits>
@@ -11,99 +11,96 @@ namespace pylimer_tools::sim::mehp {
 
 namespace {
 
-void
-validateContourLength(const double contourLength)
-{
-  INVALIDARG_EXP_IFN(std::isfinite(contourLength) && contourLength > 0.0,
-                     "Spring contour length must be finite and positive.");
-}
+  void validateContourLength(const double contourLength)
+  {
+    INVALIDARG_EXP_IFN(std::isfinite(contourLength) && contourLength > 0.0,
+                       "Spring contour length must be finite and positive.");
+  }
 
-void
-validateNetworkAndSpringVectors(const MEHPNetwork& net,
-                                const Eigen::VectorXd& springVectors,
-                                const double* const grad)
-{
-  INVALIDARG_EXP_IFN(
-    springVectors.size() == static_cast<Eigen::Index>(3 * net.nrOfSprings),
-    "springVectors size (" + std::to_string(springVectors.size()) +
-      ") does not match 3 * net.nrOfSprings (" +
-      std::to_string(3 * net.nrOfSprings) + ").");
-  INVALIDARG_EXP_IFN(
-    net.springContourLength.size() == static_cast<Eigen::Index>(net.nrOfSprings),
-    "net.springContourLength size does not match net.nrOfSprings.");
-  INVALIDARG_EXP_IFN(
-    net.springIndexA.size() == static_cast<Eigen::Index>(net.nrOfSprings) &&
-      net.springIndexB.size() == static_cast<Eigen::Index>(net.nrOfSprings),
-    "net.springIndexA / springIndexB sizes do not match net.nrOfSprings.");
-  INVALIDARG_EXP_IFN(
-    net.springContourLength.allFinite() &&
-      (net.springContourLength.array() > 0.0).all(),
-    "All spring contour lengths must be finite and positive.");
-  if (grad != nullptr) {
-    for (Eigen::Index s = 0; s < static_cast<Eigen::Index>(net.nrOfSprings);
-         ++s) {
-      const int a = net.springIndexA[s];
-      const int b = net.springIndexB[s];
-      INVALIDARG_EXP_IFN(
-        a >= 0 && static_cast<size_t>(a) < net.nrOfLinks && b >= 0 &&
-          static_cast<size_t>(b) < net.nrOfLinks,
-        "Spring endpoint link index out of range [0, net.nrOfLinks).");
+  void validateNetworkAndSpringVectors(const MEHPNetwork& net,
+                                       const Eigen::VectorXd& springVectors,
+                                       const double* const grad)
+  {
+    INVALIDARG_EXP_IFN(
+      springVectors.size() == static_cast<Eigen::Index>(3 * net.nrOfSprings),
+      "springVectors size (" + std::to_string(springVectors.size()) +
+        ") does not match 3 * net.nrOfSprings (" +
+        std::to_string(3 * net.nrOfSprings) + ").");
+    INVALIDARG_EXP_IFN(
+      net.springContourLength.size() ==
+        static_cast<Eigen::Index>(net.nrOfSprings),
+      "net.springContourLength size does not match net.nrOfSprings.");
+    INVALIDARG_EXP_IFN(
+      net.springIndexA.size() == static_cast<Eigen::Index>(net.nrOfSprings) &&
+        net.springIndexB.size() == static_cast<Eigen::Index>(net.nrOfSprings),
+      "net.springIndexA / springIndexB sizes do not match net.nrOfSprings.");
+    INVALIDARG_EXP_IFN(
+      net.springContourLength.allFinite() &&
+        (net.springContourLength.array() > 0.0).all(),
+      "All spring contour lengths must be finite and positive.");
+    if (grad != nullptr) {
+      for (Eigen::Index s = 0; s < static_cast<Eigen::Index>(net.nrOfSprings);
+           ++s) {
+        const int a = net.springIndexA[s];
+        const int b = net.springIndexB[s];
+        INVALIDARG_EXP_IFN(
+          a >= 0 && static_cast<size_t>(a) < net.nrOfLinks && b >= 0 &&
+            static_cast<size_t>(b) < net.nrOfLinks,
+          "Spring endpoint link index out of range [0, net.nrOfLinks).");
+      }
     }
   }
-}
 
-[[nodiscard]] double
-computeNonGaussianSpringEnergyScalar(const double r,
-                                     const double contourLength,
-                                     const double oneOverl)
-{
-  if (r <= 0.0) {
-    return 0.0;
+  [[nodiscard]] double computeNonGaussianSpringEnergyScalar(
+    const double r,
+    const double contourLength,
+    const double oneOverl)
+  {
+    if (r <= 0.0) {
+      return 0.0;
+    }
+    const double rOverNl = (r * oneOverl) / contourLength;
+    const double beta = langevin_inv(rOverNl);
+    if (beta <= 0.0) {
+      return 0.0;
+    }
+    double logCschTerm = 0.0;
+    if (beta < 1e-8) {
+      logCschTerm = -(beta * beta) / 6.0;
+    } else if (beta <= 500.0) {
+      const double cschTerm = csch(beta) * beta;
+      logCschTerm = (cschTerm > 0.0 && std::isfinite(cschTerm))
+                      ? std::log(cschTerm)
+                      : (std::log(2.0 * beta) - beta);
+    } else if (std::isfinite(beta)) {
+      logCschTerm = std::log(2.0 * beta) - beta;
+    }
+    return contourLength * ((rOverNl * beta) + logCschTerm);
   }
-  const double rOverNl = (r * oneOverl) / contourLength;
-  const double beta = langevin_inv(rOverNl);
-  if (beta <= 0.0) {
-    return 0.0;
-  }
-  double logCschTerm = 0.0;
-  if (beta < 1e-8) {
-    logCschTerm = -(beta * beta) / 6.0;
-  } else if (beta <= 500.0) {
-    const double cschTerm = csch(beta) * beta;
-    logCschTerm = (cschTerm > 0.0 && std::isfinite(cschTerm))
-                    ? std::log(cschTerm)
-                    : (std::log(2.0 * beta) - beta);
-  } else if (std::isfinite(beta)) {
-    logCschTerm = std::log(2.0 * beta) - beta;
-  }
-  return contourLength * ((rOverNl * beta) + logCschTerm);
-}
 
-[[nodiscard]] double
-computeNonGaussianForceOverR(const double r,
-                             const double contourLength,
-                             const double oneOverl)
-{
-  if (r <= 0.0) {
-    return 0.0;
+  [[nodiscard]] double computeNonGaussianForceOverR(const double r,
+                                                    const double contourLength,
+                                                    const double oneOverl)
+  {
+    if (r <= 0.0) {
+      return 0.0;
+    }
+    const double x = (r * oneOverl) / contourLength;
+    if (x < 1e-8) {
+      return (3.0 * oneOverl * oneOverl) / contourLength;
+    }
+    return (oneOverl * langevin_inv(x)) / r;
   }
-  const double x = (r * oneOverl) / contourLength;
-  if (x < 1e-8) {
-    return (3.0 * oneOverl * oneOverl) / contourLength;
-  }
-  return (oneOverl * langevin_inv(x)) / r;
-}
 
-[[nodiscard]] double
-langevinInvDerivative(const double x)
-{
-  if (x > 0.99999) {
-    return 2.0e5 * x;
+  [[nodiscard]] double langevinInvDerivative(const double x)
+  {
+    if (x > 0.99999) {
+      return 2.0e5 * x;
+    }
+    const double x2 = x * x;
+    const double denom = (1.0 - x2) * (1.0 + (0.5 * x2));
+    return (3.0 * (1.0 + (0.5 * x2) + (1.5 * x2 * x2))) / (denom * denom);
   }
-  const double x2 = x * x;
-  const double denom = (1.0 - x2) * (1.0 + (0.5 * x2));
-  return (3.0 * (1.0 + (0.5 * x2) + (1.5 * x2 * x2))) / (denom * denom);
-}
 
 } // namespace
 

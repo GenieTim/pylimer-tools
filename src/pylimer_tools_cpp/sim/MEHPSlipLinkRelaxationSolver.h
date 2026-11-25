@@ -21,7 +21,8 @@ private:
 
 public:
   /**
-   * @brief Construct a slip-link relaxation solver with the given configuration.
+   * @brief Construct a slip-link relaxation solver with the given
+   * configuration.
    *
    * @param config Solver configuration parameters.
    */
@@ -55,14 +56,16 @@ public:
    * @param net Canonical polymer network (modified in-place by partition
    *        updates, slip-link swaps, strand breaking, and/or simplification)
    * @param u Link displacement vector of size `3 * net.nrOfLinks`, updated
-   *        in-place (and resized if simplification prunes zero-functional links)
+   *        in-place (and resized if simplification prunes zero-functional
+   * links)
    * @param forceEvaluator Linear constitutive evaluator (`isLinear() == true`)
    * @param is2D If true, keep z-displacements and z-forces constrained to zero
    * @param callbacks Optional interrupt and per-step monitoring hooks
    * @return MEHPSolveResult Convergence metrics, exit reason, energy, and swap
    *         counters
    * @throws std::invalid_argument on violated preconditions or invalid config
-   * @throws std::runtime_error on network validation failure or non-finite state
+   * @throws std::runtime_error on network validation failure or non-finite
+   * state
    */
   [[nodiscard]] MEHPSolveResult solve(
     MEHPNetwork& net,

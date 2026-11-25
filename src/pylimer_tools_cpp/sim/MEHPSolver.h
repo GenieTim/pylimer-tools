@@ -22,7 +22,7 @@ struct MEHPLinearSolverConfig
   StructureSimplificationMode simplificationMode =
     StructureSimplificationMode::NO_SIMPLIFICATION;
   double inactiveRemovalCutoff = 1e-6;
-  double residualReduction = 1e-12;
+  double residualReduction = 1e-6;
   int maxIterations = 50000;
   double springBreakingLength = -1.0;
   double inPlaceRebuildThreshold = 0.15;
@@ -42,7 +42,7 @@ struct MEHPLinearSolverConfig
 struct MEHPSlipLinkSolverConfig
 {
   long int maxNrOfSteps = 50000;
-  double xtol = 1e-9;
+  double xtol = 1e-5;
   double initialResidualToUse = -1.0;
   StructureSimplificationMode simplificationMode =
     StructureSimplificationMode::NO_SIMPLIFICATION;

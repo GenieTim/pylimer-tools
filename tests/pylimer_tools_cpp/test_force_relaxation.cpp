@@ -249,9 +249,8 @@ TEST_CASE("MEHP Force Relaxation does not collapse",
   }
 };
 
-TEST_CASE(
-  "MEHP Force Relaxation2 runs",
-  "[analysis][MEHPSimulator][HookeanForceEvaluator][long]")
+TEST_CASE("MEHP Force Relaxation2 runs",
+          "[analysis][MEHPSimulator][HookeanForceEvaluator][long]")
 {
   std::cout << "Running test \"MEHP Force Relaxation2 runs\"" << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
@@ -344,8 +343,8 @@ TEST_CASE(
         forceRelaxer2.getAverageContourLength() * bondR02;
       const double nb2Correction = strandR02 / expectedNb2;
       const double gammaCorrectionFactor = nb2Correction;
-      const double gammaFactor =
-        forceRelaxer2.getGammaFactor(bondR02, static_cast<long int>(nrOfChains));
+      const double gammaFactor = forceRelaxer2.getGammaFactor(
+        bondR02, static_cast<long int>(nrOfChains));
       CHECK(gammaFactor * strandR02 ==
             Catch::Approx(
               42.6130241132)); // as from conversion-less Mathematica script
@@ -465,9 +464,8 @@ TEST_CASE(
   }
 }
 
-TEST_CASE(
-  "MEHP Force Relaxation2 runs with non-gaussian force evaluator",
-  "[analysis][MEHPSimulator][NonGaussianSpringForceEvaluator][long]")
+TEST_CASE("MEHP Force Relaxation2 runs with non-gaussian force evaluator",
+          "[analysis][MEHPSimulator][NonGaussianSpringForceEvaluator][long]")
 {
   std::cout << "Running test \"MEHP Force Relaxation2 runs with non-gaussian "
                "force evaluator\""
@@ -572,8 +570,8 @@ TEST_CASE(
         forceRelaxer2.getAverageContourLength() * bondR02;
       const double nb2Correction = strandR02 / expectedNb2;
       const double gammaCorrectionFactor = nb2Correction;
-      const double gammaFactor =
-        forceRelaxer2.getGammaFactor(bondR02, static_cast<long int>(nrOfChains));
+      const double gammaFactor = forceRelaxer2.getGammaFactor(
+        bondR02, static_cast<long int>(nrOfChains));
       CHECK(gammaFactor * strandR02 == Catch::Approx(42.6136781099));
       CHECK(gammaFactor * gammaCorrectionFactor * kb * T * nu ==
             Catch::Approx(61308.980768089)); // ANT shear modulus, Pa
@@ -887,9 +885,8 @@ TEST_CASE("Force Relaxation free chains collapse",
   CHECK(universe.getVertexDegree(0) == 4);
 
   // check that the Hookean evaluator collapses free chains
-  const std::shared_ptr<pcm::HookeanForceEvaluator>
-    simpleSpringForceEvaluator =
-      std::make_shared<pcm::HookeanForceEvaluator>();
+  const std::shared_ptr<pcm::HookeanForceEvaluator> simpleSpringForceEvaluator =
+    std::make_shared<pcm::HookeanForceEvaluator>();
   pcm::MEHPSimulator forceRelaxerSimpleSpring =
     pcm::MEHPSimulator(universe,
                        {},
@@ -911,8 +908,7 @@ TEST_CASE("Force Relaxation free chains collapse",
   CHECK(forceRelaxerSimpleSpring.getAverageSpringLength() <= 1e-6);
 }
 
-TEST_CASE("Fully active chains are fully active",
-          "[analysis][MEHPSimulator]")
+TEST_CASE("Fully active chains are fully active", "[analysis][MEHPSimulator]")
 {
   std::cout << "Running test \"Fully active chains are fully active\""
             << std::endl;
@@ -959,8 +955,9 @@ TEST_CASE("MEHP Bugfixes and Regression Tests",
 {
   SECTION("1. Test langevin_inv symmetry and restorative force")
   {
-    const std::vector<double> testValues = { 0.0, 0.01, 0.1, 0.5, 0.8, 0.99,
-                                             1.5 };
+    const std::vector<double> testValues = {
+      0.0, 0.01, 0.1, 0.5, 0.8, 0.99, 1.5
+    };
     for (const double val : testValues) {
       const double pos = pcm::langevin_inv(val);
       const double neg = pcm::langevin_inv(-val);
@@ -972,9 +969,8 @@ TEST_CASE("MEHP Bugfixes and Regression Tests",
     }
   }
 
-  SECTION(
-    "2. Test evaluateNetworkEnergyAndGradient and csch at r=0: returns 0 "
-    "and no NaN")
+  SECTION("2. Test evaluateNetworkEnergyAndGradient and csch at r=0: returns 0 "
+          "and no NaN")
   {
     pcm::MEHPNetwork net;
     net.nrOfLinks = 2;

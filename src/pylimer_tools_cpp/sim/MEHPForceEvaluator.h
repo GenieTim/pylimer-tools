@@ -1,8 +1,8 @@
 #ifndef MEHP_FORCE_EVAL_H
 #define MEHP_FORCE_EVAL_H
 
-#include "./MEHPUtilityStructures.h"
 #include "../utils/utilityMacros.h"
+#include "./MEHPUtilityStructures.h"
 #include <Eigen/Dense>
 #include <cstddef>
 
@@ -27,7 +27,8 @@ struct MEHPNetwork;
 langevin_inv(double x);
 
 /**
- * @brief Compute the hyperbolic cosecant \f$\operatorname{csch}(x) = 1 / \sinh(x)\f$.
+ * @brief Compute the hyperbolic cosecant \f$\operatorname{csch}(x) = 1 /
+ * \sinh(x)\f$.
  *
  * @param x Input argument.
  * @return \f$\operatorname{csch}(x)\f$, or \f$+\infty\f$ when @p x is 0.
@@ -40,13 +41,16 @@ csch(double x);
  * stiffnesses, and virial stress tensors in MEHP networks.
  *
  * Geometry and sign convention:
- * - @p springVec is \f$\Delta\mathbf{r}_s = \mathbf{r}_B - \mathbf{r}_A + \mathbf{o}_s\f$.
- * - @ref evaluateSpringForce returns \f$\mathbf{F}_s = +\partial E_s / \partial(\Delta\mathbf{r}_s)\f$.
+ * - @p springVec is \f$\Delta\mathbf{r}_s = \mathbf{r}_B - \mathbf{r}_A +
+ * \mathbf{o}_s\f$.
+ * - @ref evaluateSpringForce returns \f$\mathbf{F}_s = +\partial E_s /
+ * \partial(\Delta\mathbf{r}_s)\f$.
  * - Consequently, for link displacements \f$\mathbf{u}\f$,
  *   \f$\partial E_s / \partial\mathbf{u}_A = -\mathbf{F}_s\f$ and
  *   \f$\partial E_s / \partial\mathbf{u}_B = +\mathbf{F}_s\f$.
  * - Virial stress uses the positive convention
- *   \f$\boldsymbol{\sigma} = +\frac{1}{V} \sum_s \Delta\mathbf{r}_s \mathbf{F}_s^T\f$.
+ *   \f$\boldsymbol{\sigma} = +\frac{1}{V} \sum_s \Delta\mathbf{r}_s
+ * \mathbf{F}_s^T\f$.
  */
 class MEHPForceEvaluator
 {
@@ -61,7 +65,8 @@ public:
   virtual ~MEHPForceEvaluator() = default;
 
   /**
-   * @brief Indicate whether the constitutive force law is linear in displacement.
+   * @brief Indicate whether the constitutive force law is linear in
+   * displacement.
    *
    * @return @c true for linear (Hookean) springs, @c false otherwise.
    */
@@ -86,7 +91,8 @@ public:
     double contourLength) const = 0;
 
   /**
-   * @brief Evaluate the spring force \f$\mathbf{F}_s = +\partial E_s / \partial(\Delta\mathbf{r}_s)\f$.
+   * @brief Evaluate the spring force \f$\mathbf{F}_s = +\partial E_s /
+   * \partial(\Delta\mathbf{r}_s)\f$.
    *
    * @param springVec Spring end-to-end vector \f$\Delta\mathbf{r}_s\f$.
    * @param contourLength Effective strand contour length \f$N_s > 0\f$.
@@ -101,7 +107,8 @@ public:
    * \f$\partial \mathbf{F}_s / \partial(\Delta\mathbf{r}_s)\f$.
    *
    * Default implementation uses symmetric central finite differences of
-   * @ref evaluateSpringForce with step \f$h = 10^{-6}\max(1, \|\Delta\mathbf{r}_s\|)\f$.
+   * @ref evaluateSpringForce with step \f$h = 10^{-6}\max(1,
+   * \|\Delta\mathbf{r}_s\|)\f$.
    *
    * @param springVec Spring end-to-end vector \f$\Delta\mathbf{r}_s\f$.
    * @param contourLength Effective strand contour length \f$N_s > 0\f$.
@@ -112,14 +119,16 @@ public:
     double contourLength) const;
 
   /**
-   * @brief Evaluate the \f$(i, j)\f$ virial stress contribution of a single spring.
+   * @brief Evaluate the \f$(i, j)\f$ virial stress contribution of a single
+   * spring.
    *
    * @param springVec Spring end-to-end vector \f$\Delta\mathbf{r}_s\f$.
    * @param i First Cartesian index in @c [0, 2].
    * @param j Second Cartesian index in @c [0, 2].
    * @param contourLength Effective strand contour length \f$N_s > 0\f$.
    * @return Stress contribution \f$\Delta r_{s,i} F_{s,j}\f$.
-   * @throws std::invalid_argument if @p i >= 3, @p j >= 3, or @p contourLength <= 0.
+   * @throws std::invalid_argument if @p i >= 3, @p j >= 3, or @p contourLength
+   * <= 0.
    */
   [[nodiscard]] virtual double evaluateStressContribution(
     const Eigen::Vector3d& springVec,
@@ -131,13 +140,16 @@ public:
    * @brief Evaluate total network elastic energy and optional link gradient.
    *
    * @param net Network topology and contour lengths.
-   * @param springVectors Flattened spring vectors of size \f$3 \cdot \text{nrOfSprings}\f$.
-   * @param is2D If @c true, treat the system as planar (ignore \f$z\f$-components).
-   * @param grad Optional output array of size \f$3 \cdot \text{nrOfLinks}\f$; if non-null,
-   * zeroed and populated with \f$\partial E / \partial \mathbf{u}\f$.
+   * @param springVectors Flattened spring vectors of size \f$3 \cdot
+   * \text{nrOfSprings}\f$.
+   * @param is2D If @c true, treat the system as planar (ignore
+   * \f$z\f$-components).
+   * @param grad Optional output array of size \f$3 \cdot \text{nrOfLinks}\f$;
+   * if non-null, zeroed and populated with \f$\partial E / \partial
+   * \mathbf{u}\f$.
    * @return Total network elastic energy.
-   * @throws std::invalid_argument on mismatched vector sizes, invalid contour lengths,
-   * or out-of-range link indices.
+   * @throws std::invalid_argument on mismatched vector sizes, invalid contour
+   * lengths, or out-of-range link indices.
    */
   [[nodiscard]] virtual double evaluateNetworkEnergyAndGradient(
     const MEHPNetwork& net,
@@ -147,14 +159,17 @@ public:
 
   /**
    * @brief Evaluate the network virial stress tensor
-   * \f$\boldsymbol{\sigma} = \frac{1}{V} \sum_s \Delta\mathbf{r}_s \mathbf{F}_s^T\f$.
+   * \f$\boldsymbol{\sigma} = \frac{1}{V} \sum_s \Delta\mathbf{r}_s
+   * \mathbf{F}_s^T\f$.
    *
    * @param net Network topology and contour lengths.
-   * @param springVectors Flattened spring vectors of size \f$3 \cdot \text{nrOfSprings}\f$.
+   * @param springVectors Flattened spring vectors of size \f$3 \cdot
+   * \text{nrOfSprings}\f$.
    * @param volume Simulation box volume \f$V > 0\f$.
    * @param is2D If @c true, ignore \f$z\f$-components and zero row/column 2.
    * @return \f$3 \times 3\f$ virial stress tensor.
-   * @throws std::invalid_argument if @p volume <= 0, sizes mismatch, or contour lengths are invalid.
+   * @throws std::invalid_argument if @p volume <= 0, sizes mismatch, or contour
+   * lengths are invalid.
    */
   [[nodiscard]] Eigen::Matrix3d evaluateStressTensor(
     const MEHPNetwork& net,
@@ -245,7 +260,8 @@ public:
    *
    * @param kappa Stiffness parameter (\f$\ge 0\f$).
    * @param l Kuhn segment length (\f$> 0\f$).
-   * @throws std::invalid_argument if parameters are out of domain or non-finite.
+   * @throws std::invalid_argument if parameters are out of domain or
+   * non-finite.
    */
   explicit NonGaussianSpringForceEvaluator(double kappa = 1.0, double l = 1.0);
 

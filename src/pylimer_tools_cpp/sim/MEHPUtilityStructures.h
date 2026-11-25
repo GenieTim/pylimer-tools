@@ -147,8 +147,10 @@ inline const SLESolver allSLESolvers[] = {
 enum class EntanglementMode
 {
   NONE,         ///< Phantom network (crosslinks only)
-  MERGED_LINKS, ///< Entanglement links lie directly on strand contour (no extra spring)
-  SPRING        ///< Entangled beads coupled by compliant Hookean spring (springIsEntanglement[s] == true)
+  MERGED_LINKS, ///< Entanglement links lie directly on strand contour (no extra
+                ///< spring)
+  SPRING        ///< Entangled beads coupled by compliant Hookean spring
+                ///< (springIsEntanglement[s] == true)
 };
 
 /**
@@ -187,33 +189,34 @@ enum class NLoptAlgorithm
 };
 
 namespace detail {
-inline constexpr std::array<std::pair<NLoptAlgorithm, std::string_view>, 19>
-  kNLoptAlgorithmNames = { {
-    { NLoptAlgorithm::LD_MMA, "LD_MMA" },
-    { NLoptAlgorithm::LD_LBFGS, "LD_LBFGS" },
-    { NLoptAlgorithm::LD_SLSQP, "LD_SLSQP" },
-    { NLoptAlgorithm::LD_TNEWTON, "LD_TNEWTON" },
-    { NLoptAlgorithm::LD_TNEWTON_RESTART, "LD_TNEWTON_RESTART" },
-    { NLoptAlgorithm::LD_TNEWTON_PRECOND, "LD_TNEWTON_PRECOND" },
-    { NLoptAlgorithm::LD_TNEWTON_PRECOND_RESTART,
-      "LD_TNEWTON_PRECOND_RESTART" },
-    { NLoptAlgorithm::LD_VAR1, "LD_VAR1" },
-    { NLoptAlgorithm::LD_VAR2, "LD_VAR2" },
-    { NLoptAlgorithm::LN_SBPLX, "LN_SBPLX" },
-    { NLoptAlgorithm::LN_BOBYQA, "LN_BOBYQA" },
-    { NLoptAlgorithm::LN_NELDERMEAD, "LN_NELDERMEAD" },
-    { NLoptAlgorithm::LN_COBYLA, "LN_COBYLA" },
-    { NLoptAlgorithm::LN_NEWUOA, "LN_NEWUOA" },
-    { NLoptAlgorithm::LN_NEWUOA_BOUND, "LN_NEWUOA_BOUND" },
-    { NLoptAlgorithm::LN_PRAXIS, "LN_PRAXIS" },
-    { NLoptAlgorithm::GN_DIRECT, "GN_DIRECT" },
-    { NLoptAlgorithm::GN_CRS2_LM, "GN_CRS2_LM" },
-    { NLoptAlgorithm::GD_STOGO, "GD_STOGO" },
-  } };
+  inline constexpr std::array<std::pair<NLoptAlgorithm, std::string_view>, 19>
+    kNLoptAlgorithmNames = { {
+      { NLoptAlgorithm::LD_MMA, "LD_MMA" },
+      { NLoptAlgorithm::LD_LBFGS, "LD_LBFGS" },
+      { NLoptAlgorithm::LD_SLSQP, "LD_SLSQP" },
+      { NLoptAlgorithm::LD_TNEWTON, "LD_TNEWTON" },
+      { NLoptAlgorithm::LD_TNEWTON_RESTART, "LD_TNEWTON_RESTART" },
+      { NLoptAlgorithm::LD_TNEWTON_PRECOND, "LD_TNEWTON_PRECOND" },
+      { NLoptAlgorithm::LD_TNEWTON_PRECOND_RESTART,
+        "LD_TNEWTON_PRECOND_RESTART" },
+      { NLoptAlgorithm::LD_VAR1, "LD_VAR1" },
+      { NLoptAlgorithm::LD_VAR2, "LD_VAR2" },
+      { NLoptAlgorithm::LN_SBPLX, "LN_SBPLX" },
+      { NLoptAlgorithm::LN_BOBYQA, "LN_BOBYQA" },
+      { NLoptAlgorithm::LN_NELDERMEAD, "LN_NELDERMEAD" },
+      { NLoptAlgorithm::LN_COBYLA, "LN_COBYLA" },
+      { NLoptAlgorithm::LN_NEWUOA, "LN_NEWUOA" },
+      { NLoptAlgorithm::LN_NEWUOA_BOUND, "LN_NEWUOA_BOUND" },
+      { NLoptAlgorithm::LN_PRAXIS, "LN_PRAXIS" },
+      { NLoptAlgorithm::GN_DIRECT, "GN_DIRECT" },
+      { NLoptAlgorithm::GN_CRS2_LM, "GN_CRS2_LM" },
+      { NLoptAlgorithm::GD_STOGO, "GD_STOGO" },
+    } };
 } // namespace detail
 
 /**
- * @brief Convert an @ref NLoptAlgorithm enumerator to its canonical string name.
+ * @brief Convert an @ref NLoptAlgorithm enumerator to its canonical string
+ * name.
  *
  * @param alg The NLopt algorithm enumerator.
  * @return Canonical string representation (e.g. "LD_LBFGS").
@@ -240,7 +243,8 @@ nloptAlgorithmToString(const NLoptAlgorithm alg)
  *
  * @param name Algorithm name string.
  * @return Matching @ref NLoptAlgorithm enumerator.
- * @throws std::invalid_argument if @p name does not match any supported algorithm.
+ * @throws std::invalid_argument if @p name does not match any supported
+ * algorithm.
  */
 [[nodiscard]] inline NLoptAlgorithm
 nloptAlgorithmFromString(const std::string_view name)
@@ -262,8 +266,8 @@ nloptAlgorithmFromString(const std::string_view name)
       return entry.first;
     }
   }
-  throw std::invalid_argument("Unknown NLopt algorithm: '" +
-                              std::string(name) + "'.");
+  throw std::invalid_argument("Unknown NLopt algorithm: '" + std::string(name) +
+                              "'.");
 }
 
 /**
