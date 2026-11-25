@@ -47,6 +47,9 @@ class CacheTask(Enum):
     SAMPLING_CUTOFF = "sampling_cutoff"
     POLYDISPERSITY = "polydispersity"
     RVE_PDMS = "rve_pdms"
+    MMT_GELATION = "mmt_gelation"
+    FINITE_EXTENSIBILITY = "finite_extensibility"
+    MULTICHEMISTRY = "multichemistry"
 
 
 def _recompute_cache(
@@ -164,6 +167,48 @@ def recompute_representative_volume_pdms(
     )
 
 
+def recompute_mmt_gelation(
+    max_workers: Optional[int] = None,
+) -> None:
+    """Recompute the multi-seed ensemble dataset for plot_mmt_vs_mehp_gelation_and_loops."""
+    from _mmt_gelation_runner import run_mmt_vs_mehp_study
+
+    _recompute_cache(
+        "mmt_vs_mehp_gelation_and_loops_cache.npz",
+        "MMT vs. MEHP Gelation & Loops",
+        run_mmt_vs_mehp_study,
+        max_workers=max_workers,
+    )
+
+
+def recompute_finite_extensibility(
+    max_workers: Optional[int] = None,
+) -> None:
+    """Recompute the multi-seed ensemble dataset for plot_finite_extensibility_deformation."""
+    from _finite_extensibility_runner import run_finite_extensibility_study
+
+    _recompute_cache(
+        "finite_extensibility_deformation_cache.npz",
+        "Finite Extensibility & Large-Strain Stiffening",
+        run_finite_extensibility_study,
+        max_workers=max_workers,
+    )
+
+
+def recompute_multichemistry(
+    max_workers: Optional[int] = None,
+) -> None:
+    """Recompute the multi-seed ensemble dataset for plot_multichemistry_and_coarse_graining."""
+    from _multichemistry_runner import run_multichemistry_study
+
+    _recompute_cache(
+        "multichemistry_and_coarse_graining_cache.npz",
+        "Multi-Chemistry & Coarse-Graining Invariance",
+        run_multichemistry_study,
+        max_workers=max_workers,
+    )
+
+
 _TASK_HANDLERS: Dict[CacheTask, Callable[[Optional[int]], None]] = {
     CacheTask.LINK_VS_SPRING: recompute_entanglement_link_vs_spring,
     CacheTask.SLIPPING_VS_FIXED: recompute_slipping_vs_fixed_links,
@@ -172,6 +217,9 @@ _TASK_HANDLERS: Dict[CacheTask, Callable[[Optional[int]], None]] = {
     CacheTask.SAMPLING_CUTOFF: recompute_sampling_cutoff_effect,
     CacheTask.POLYDISPERSITY: recompute_polydispersity_study,
     CacheTask.RVE_PDMS: recompute_representative_volume_pdms,
+    CacheTask.MMT_GELATION: recompute_mmt_gelation,
+    CacheTask.FINITE_EXTENSIBILITY: recompute_finite_extensibility,
+    CacheTask.MULTICHEMISTRY: recompute_multichemistry,
 }
 
 
@@ -235,6 +283,21 @@ def main() -> None:
         action="store_true",
         help="Recompute only representative volume PDMS study cache",
     )
+    parser.add_argument(
+        "--mmt-gelation-only",
+        action="store_true",
+        help="Recompute only MMT vs. MEHP gelation and loops cache",
+    )
+    parser.add_argument(
+        "--finite-extensibility-only",
+        action="store_true",
+        help="Recompute only finite extensibility deformation cache",
+    )
+    parser.add_argument(
+        "--multichemistry-only",
+        action="store_true",
+        help="Recompute only multi-chemistry and coarse-graining cache",
+    )
     args = parser.parse_args()
 
     total_workers = resolve_max_workers(args.workers)
@@ -248,6 +311,9 @@ def main() -> None:
         (args.sampling_cutoff_only, CacheTask.SAMPLING_CUTOFF),
         (args.polydispersity_only, CacheTask.POLYDISPERSITY),
         (args.rve_pdms_only, CacheTask.RVE_PDMS),
+        (args.mmt_gelation_only, CacheTask.MMT_GELATION),
+        (args.finite_extensibility_only, CacheTask.FINITE_EXTENSIBILITY),
+        (args.multichemistry_only, CacheTask.MULTICHEMISTRY),
     )
     run_all = not any(flag for flag, _ in flag_to_task)
     tasks_to_run = [task for flag, task in flag_to_task if run_all or flag]
