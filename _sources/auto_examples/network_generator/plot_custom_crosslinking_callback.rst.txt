@@ -208,7 +208,7 @@ and soluble fraction over the steps.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.423 seconds)
+   **Total running time of the script:** (0 minutes 0.430 seconds)
 
 
 .. _sphx_glr_download_auto_examples_network_generator_plot_custom_crosslinking_callback.py:

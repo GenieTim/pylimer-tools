@@ -89,7 +89,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.508 seconds)
+**Total running time of the script:** (0 minutes 0.484 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-unit-conversion-py"></a>
 

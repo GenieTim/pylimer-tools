@@ -142,7 +142,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.154 seconds)
+**Total running time of the script:** (0 minutes 0.155 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-data-file-writer-py"></a>
 

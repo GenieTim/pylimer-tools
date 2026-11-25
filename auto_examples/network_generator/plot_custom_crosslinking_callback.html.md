@@ -160,7 +160,7 @@ ax.legend()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.423 seconds)
+**Total running time of the script:** (0 minutes 0.430 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-custom-crosslinking-callback-py"></a>
 

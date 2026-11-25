@@ -131,7 +131,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.135 seconds)
+**Total running time of the script:** (0 minutes 0.136 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-add-angles-py"></a>
 
