@@ -2398,7 +2398,15 @@ class MEHPNetwork:
         """
     def get_gamma_factor(self, u: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], b02: typing.SupportsFloat | typing.SupportsIndex = -1.0, nr_of_chains: typing.SupportsInt | typing.SupportsIndex = -1, is_2d: bool = False) -> float:
         """
-        Compute the topological Gamma factor.
+        Compute the average topological Gamma factor ``sum(gamma_factors) / denom``.
+        
+        :param u: Displacement vector.
+        :param b02: Mean-squared bond length :math:`b_0^2` (defaults to network bond length squared).
+        :param nr_of_chains: Denominator for averaging. When ``< 1`` (default ``-1``), divides by
+                             ``nr_of_strands`` — note that in ``EntanglementMode.SPRING``,
+                             ``nr_of_strands`` includes entanglement coupling springs. Pass ``1`` (or
+                             sum ``get_gamma_factors``) for the unnormalized sum ``sum(gamma_factors)``.
+        :param is_2d: Whether to evaluate in 2D.
         """
     def simplify(self, u: typing.Any, mode: StructureSimplificationMode, tolerance: typing.SupportsFloat | typing.SupportsIndex = 1e-09, is_2d: bool = False, breaking_length: typing.SupportsFloat | typing.SupportsIndex = -1.0) -> int:
         """
@@ -2725,11 +2733,32 @@ class MEHPSimulator:
     def get_gamma(self) -> float:
         ...
     def get_gamma_factor(self, b02: typing.SupportsFloat | typing.SupportsIndex = -1.0, nr_of_chains: typing.SupportsInt | typing.SupportsIndex = -1) -> float:
-        ...
+        """
+        Compute the average topological Gamma factor ``sum(gamma_factors) / denom``.
+        
+        :param b02: Mean-squared bond length :math:`b_0^2` (defaults to network bond length squared).
+        :param nr_of_chains: Denominator for averaging. When ``< 1`` (default ``-1``), divides by
+                             ``network.nr_of_strands`` — note that in ``EntanglementMode.SPRING``,
+                             ``nr_of_strands`` includes entanglement coupling springs, so comparing
+                             ``MERGED_LINKS`` vs. ``SPRING`` with the default ``-1`` is not apples-to-apples.
+                             Pass ``1`` or use ``np.sum(get_gamma_factors(b02))`` when computing shear modulus.
+        """
     def get_gamma_factors(self, b02: typing.SupportsFloat | typing.SupportsIndex = -1.0) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
-        ...
+        """
+        Compute the per-spring topological Gamma factors :math:`\\Gamma_i = \\mathbf{r}_i^2 / (N_i b_0^2)`.
+        
+        Summing this vector (``np.sum(sim.get_gamma_factors(b02))``) gives the unnormalized total
+        needed to compute the shear modulus :math:`G = (k_B T / V) \\sum_i \\Gamma_i`.
+        
+        :param b02: Mean-squared bond length :math:`b_0^2` (defaults to network bond length squared).
+        """
     def get_gamma_factors_in_dir(self, dir: typing.SupportsInt | typing.SupportsIndex, b02: typing.SupportsFloat | typing.SupportsIndex = -1.0) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
-        ...
+        """
+        Compute the per-spring directional Gamma factors :math:`\\Gamma_{i,\\alpha} = r_{i,\\alpha}^2 / (N_i b_0^2)`.
+        
+        :param dir: Cartesian direction index (``0``, ``1``, or ``2``).
+        :param b02: Mean-squared bond length :math:`b_0^2` (defaults to network bond length squared).
+        """
     def get_indices_of_active_nodes(self, tolerance: typing.SupportsFloat | typing.SupportsIndex = 0.001) -> list[int]:
         ...
     def get_initial_coordinates(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:

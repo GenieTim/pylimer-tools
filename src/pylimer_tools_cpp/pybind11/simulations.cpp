@@ -690,7 +690,17 @@ the simulation or optimization procedure.)pbdoc")
          py::arg("is_2d") = false)
     .def("get_gamma_factor",
          &mehp::MEHPNetwork::getGammaFactor,
-         "Compute the topological Gamma factor.",
+         R"pbdoc(
+Compute the average topological Gamma factor ``sum(gamma_factors) / denom``.
+
+:param u: Displacement vector.
+:param b02: Mean-squared bond length :math:`b_0^2` (defaults to network bond length squared).
+:param nr_of_chains: Denominator for averaging. When ``< 1`` (default ``-1``), divides by
+                     ``nr_of_strands`` — note that in ``EntanglementMode.SPRING``,
+                     ``nr_of_strands`` includes entanglement coupling springs. Pass ``1`` (or
+                     sum ``get_gamma_factors``) for the unnormalized sum ``sum(gamma_factors)``.
+:param is_2d: Whether to evaluate in 2D.
+)pbdoc",
          py::arg("u"),
          py::arg("b02") = -1.0,
          py::arg("nr_of_chains") = -1,
@@ -1350,13 +1360,37 @@ the simulation or optimization procedure.)pbdoc")
     .def("get_pressure", &mehp::MEHPSimulator::getPressure)
     .def("get_gamma_factors",
          &mehp::MEHPSimulator::getGammaFactors,
+         R"pbdoc(
+Compute the per-spring topological Gamma factors :math:`\Gamma_i = \mathbf{r}_i^2 / (N_i b_0^2)`.
+
+Summing this vector (``np.sum(sim.get_gamma_factors(b02))``) gives the unnormalized total
+needed to compute the shear modulus :math:`G = (k_B T / V) \sum_i \Gamma_i`.
+
+:param b02: Mean-squared bond length :math:`b_0^2` (defaults to network bond length squared).
+)pbdoc",
          py::arg("b02") = -1.0)
     .def("get_gamma_factors_in_dir",
          &mehp::MEHPSimulator::getGammaFactorsInDir,
+         R"pbdoc(
+Compute the per-spring directional Gamma factors :math:`\Gamma_{i,\alpha} = r_{i,\alpha}^2 / (N_i b_0^2)`.
+
+:param dir: Cartesian direction index (``0``, ``1``, or ``2``).
+:param b02: Mean-squared bond length :math:`b_0^2` (defaults to network bond length squared).
+)pbdoc",
          py::arg("dir"),
          py::arg("b02") = -1.0)
     .def("get_gamma_factor",
          &mehp::MEHPSimulator::getGammaFactor,
+         R"pbdoc(
+Compute the average topological Gamma factor ``sum(gamma_factors) / denom``.
+
+:param b02: Mean-squared bond length :math:`b_0^2` (defaults to network bond length squared).
+:param nr_of_chains: Denominator for averaging. When ``< 1`` (default ``-1``), divides by
+                     ``network.nr_of_strands`` — note that in ``EntanglementMode.SPRING``,
+                     ``nr_of_strands`` includes entanglement coupling springs, so comparing
+                     ``MERGED_LINKS`` vs. ``SPRING`` with the default ``-1`` is not apples-to-apples.
+                     Pass ``1`` or use ``np.sum(get_gamma_factors(b02))`` when computing shear modulus.
+)pbdoc",
          py::arg("b02") = -1.0,
          py::arg("nr_of_chains") = -1)
     .def("get_soluble_weight_fraction",

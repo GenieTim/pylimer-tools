@@ -81,7 +81,7 @@ def _simulate_link_vs_spring_single_repeat(
             # Bare unentangled crosslinker network
             fb_bare = gen.get_mehp_simulator()
             fb_bare.run()
-            g_pa = (gamma_conv * fb_bare.get_gamma_factor(r02) / vol) * 1e6
+            g_pa = (gamma_conv * np.sum(fb_bare.get_gamma_factors(r02)) / vol) * 1e6
             g_links[i] = g_pa
             g_springs[i] = g_pa
             extra_links[i] = 0
@@ -106,7 +106,7 @@ def _simulate_link_vs_spring_single_repeat(
             )
             extra_links[i] = fb_l.get_nr_of_extra_atoms()
             fb_l.run()
-            g_links[i] = (gamma_conv * fb_l.get_gamma_factor(r02) / vol) * 1e6
+            g_links[i] = (gamma_conv * np.sum(fb_l.get_gamma_factors(r02)) / vol) * 1e6
 
             # 2. Entanglement Springs (explicit Hookean coupling springs)
             fb_s = gen.get_mehp_simulator(
@@ -116,7 +116,9 @@ def _simulate_link_vs_spring_single_repeat(
             )
             extra_springs[i] = fb_s.get_nr_of_extra_atoms()
             fb_s.run()
-            g_springs[i] = (gamma_conv * fb_s.get_gamma_factor(r02) / vol) * 1e6
+            g_springs[i] = (
+                gamma_conv * np.sum(fb_s.get_gamma_factors(r02)) / vol
+            ) * 1e6
 
     return r, g_links, g_springs, extra_links, extra_springs
 
