@@ -441,6 +441,10 @@ namespace {
 
     const Eigen::Vector3d distanceAfter =
       (keptIsA ? -1.0 : 1.0) * net.evaluateSpringVector(u, keptSpringIdx);
+    const Eigen::Vector3d linkPos =
+      net.coordinates.segment<3>(3 * static_cast<Eigen::Index>(linkToReduce)) +
+      u.segment<3>(3 * static_cast<Eigen::Index>(linkToReduce));
+    const double mergeTol = 1e-7 + 1e-12 * linkPos.norm();
     auto formatDiag = [&]() {
       return "totalDistance=(" + std::to_string(totalDistance[0]) + "," +
              std::to_string(totalDistance[1]) + "," +
@@ -459,13 +463,13 @@ namespace {
       Eigen::Vector3d diff = distanceAfter - totalDistance;
       net.box.handlePBC(diff);
       RUNTIME_EXP_IFN(
-        diff.norm() < 1e-7,
+        diff.norm() < mergeTol,
         "Merged spring distance mismatch after merging springs: " +
           formatDiag());
     } else {
       RUNTIME_EXP_IFN(
         pylimer_tools::utils::vector_approx_equal(
-          totalDistance, distanceAfter, 1e-7),
+          totalDistance, distanceAfter, mergeTol),
         "Merged spring distance mismatch after merging springs: " +
           formatDiag());
     }
