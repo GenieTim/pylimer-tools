@@ -77,8 +77,9 @@ data = load_or_compute_cache(cache_path, run_entanglement_link_vs_spring_simulat
 # -----------------------------------------------------
 # Multi-seed ensemble results (95% Student's t confidence intervals):
 #
-# - **Shear Modulus**: Merged entanglement links stiffen nearly linearly with entanglement density,
-#   whereas entanglement springs saturate because the intermediate spring adds series compliance.
+# - **Shear Modulus**: Both representations stiffen nearly linearly with entanglement density,
+#   with entanglement springs yielding a slightly (~5–10%) lower modulus at high entanglement
+#   density because the intermediate spring adds series compliance.
 # - **System Size**: Entanglement springs add twice as many extra nodes to the linear system.
 
 plot_link_vs_spring_modulus(data)

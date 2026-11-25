@@ -3777,7 +3777,7 @@ Construct an empty MEHPNetwork.
 | [`from_universe`](api/pylimer_tools_cpp.MEHPNetwork.html.md#pylimer_tools_cpp.MEHPNetwork.from_universe)(universe[, entanglements, ...])    | Build a canonical MEHPNetwork from an atomistic Universe using DFS strand contraction.                        |
 | [`from_universe_with_random_entanglements`](api/pylimer_tools_cpp.MEHPNetwork.html.md#pylimer_tools_cpp.MEHPNetwork.from_universe_with_random_entanglements)(...)     | Sample random entanglements from an atomistic Universe and build a canonical MEHPNetwork.                     |
 | [`get_crosslinker_verse`](api/pylimer_tools_cpp.MEHPNetwork.html.md#pylimer_tools_cpp.MEHPNetwork.get_crosslinker_verse)(self[, u])                 | Reconstruct a coarse-grained Universe of crosslinker nodes bonded by polymer strands.                         |
-| [`get_gamma_factor`](api/pylimer_tools_cpp.MEHPNetwork.html.md#pylimer_tools_cpp.MEHPNetwork.get_gamma_factor)(self, u[, b02, ...])            | Compute the topological Gamma factor.                                                                         |
+| [`get_gamma_factor`](api/pylimer_tools_cpp.MEHPNetwork.html.md#pylimer_tools_cpp.MEHPNetwork.get_gamma_factor)(self, u[, b02, ...])            | Compute the average topological Gamma factor `sum(gamma_factors) / denom`.                                    |
 | [`simplify`](api/pylimer_tools_cpp.MEHPNetwork.html.md#pylimer_tools_cpp.MEHPNetwork.simplify)(self, u, mode[, tolerance, is_2d, ...]) | Run iterative topology simplification until convergence.                                                      |
 | [`validate`](api/pylimer_tools_cpp.MEHPNetwork.html.md#pylimer_tools_cpp.MEHPNetwork.validate)(self[, u])                              | Validate network dimensions, index mappings, and contour invariants.                                          |
 
@@ -3945,7 +3945,16 @@ Reconstruct a coarse-grained Universe of crosslinker nodes bonded by polymer str
 
 #### get_gamma_factor(self: [pylimer_tools_cpp.MEHPNetwork](api/pylimer_tools_cpp.MEHPNetwork.html.md#pylimer_tools_cpp.MEHPNetwork), u: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], b02: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = -1.0, nr_of_chains: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = -1, is_2d: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
-Compute the topological Gamma factor.
+Compute the average topological Gamma factor `sum(gamma_factors) / denom`.
+
+* **Parameters:**
+  * **u** – Displacement vector.
+  * **b02** – Mean-squared bond length $b_0^2$ (defaults to network bond length squared).
+  * **nr_of_chains** – Denominator for averaging. When `< 1` (default `-1`), divides by
+    `nr_of_strands` — note that in `EntanglementMode.SPRING`,
+    `nr_of_strands` includes entanglement coupling springs. Pass `1` (or
+    sum `get_gamma_factors`) for the unnormalized sum `sum(gamma_factors)`.
+  * **is_2d** – Whether to evaluate in 2D.
 
 #### simplify(self: [pylimer_tools_cpp.MEHPNetwork](api/pylimer_tools_cpp.MEHPNetwork.html.md#pylimer_tools_cpp.MEHPNetwork), u: [object](https://docs.python.org/3/builtins/functions.html#object), mode: [pylimer_tools_cpp.StructureSimplificationMode](api/pylimer_tools_cpp.StructureSimplificationMode.html.md#pylimer_tools_cpp.StructureSimplificationMode), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1e-09, is_2d: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False, breaking_length: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = -1.0) → [int](https://docs.python.org/3/builtins/functions.html#int)
 
@@ -4033,96 +4042,96 @@ Instantiate MEHPSimulator from a Box and a CrosslinkerUniverse.
 
 ### Methods Summary
 
-| [`add_slip_links`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.add_slip_links)(\*args, \*\*kwargs)                | Overloaded function.                                                         |
-|----------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|
-| [`add_sliplinks`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.add_sliplinks)(\*args, \*\*kwargs)                 | Overloaded function.                                                         |
-| [`break_too_long_strands`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.break_too_long_strands)(self, breaking_length)     |                                                                              |
-| [`config_assume_box_large_enough`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.config_assume_box_large_enough)(self[, assume])    |                                                                              |
-| [`config_assume_network_is_complete`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.config_assume_network_is_complete)(self[, assume]) |                                                                              |
-| [`config_auto_correlator_output`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.config_auto_correlator_output)(self, values)       |                                                                              |
-| [`config_average_output`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.config_average_output)(self, values)               |                                                                              |
-| [`config_mean_bond_length`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.config_mean_bond_length)(self, mean_bond_length)   |                                                                              |
-| [`config_mean_squared_bond_length`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.config_mean_squared_bond_length)(self, r02)        |                                                                              |
-| [`config_remove_primary_loops`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.config_remove_primary_loops)(self[, remove])       |                                                                              |
-| [`config_restart_output`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.config_restart_output)(self, file[, output_every]) |                                                                              |
-| [`config_step_output`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.config_step_output)(self, output_configuration)    |                                                                              |
-| [`construct_from_string`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.construct_from_string)(s)                          |                                                                              |
-| [`construct_with_random_entanglements`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.construct_with_random_entanglements)(...[, ...])   | Construct MEHPSimulator from a Universe with randomly sampled entanglements. |
-| [`count_active_clustered_atoms`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.count_active_clustered_atoms)(self[, tolerance])   |                                                                              |
-| [`deform_to`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.deform_to)(self, target_box)                       |                                                                              |
-| [`get_active_weight_fraction`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_active_weight_fraction)(self[, tolerance])     |                                                                              |
-| [`get_average_contour_length`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_average_contour_length)(self)                  |                                                                              |
-| [`get_average_spring_length`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_average_spring_length)(self)                   |                                                                              |
-| [`get_bond_lengths`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_bond_lengths)(self)                            |                                                                              |
-| [`get_coordinates`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_coordinates)(self)                             |                                                                              |
-| [`get_crosslinker_universe`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_crosslinker_universe)(self)                    |                                                                              |
-| [`get_crosslinker_verse`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_crosslinker_verse)(self)                       |                                                                              |
-| [`get_current_displacements`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_current_displacements)(self)                   |                                                                              |
-| [`get_current_time`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_current_time)(self[, current_step])            |                                                                              |
-| [`get_dangling_weight_fraction`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_dangling_weight_fraction)(self[, tolerance])   |                                                                              |
-| [`get_default_bond_length`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_default_bond_length)(self)                     |                                                                              |
-| [`get_default_r0_square`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_default_r0_square)(self)                       |                                                                              |
-| [`get_effective_functionality_of_atoms`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_effective_functionality_of_atoms)(self[, ...]) |                                                                              |
-| [`get_energy`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_energy)(self)                                  |                                                                              |
-| [`get_exit_reason`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_exit_reason)(self)                             |                                                                              |
-| [`get_force_evaluator`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_force_evaluator)(self)                         |                                                                              |
-| [`get_gamma`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_gamma)(self)                                   |                                                                              |
-| [`get_gamma_factor`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_gamma_factor)(self[, b02, nr_of_chains])       |                                                                              |
-| [`get_gamma_factors`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_gamma_factors)(self[, b02])                    |                                                                              |
-| [`get_gamma_factors_in_dir`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_gamma_factors_in_dir)(self, dir[, b02])        |                                                                              |
-| [`get_indices_of_active_nodes`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_indices_of_active_nodes)(self[, tolerance])    |                                                                              |
-| [`get_initial_coordinates`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_initial_coordinates)(self)                     |                                                                              |
-| [`get_is_2d`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_is_2d)(self)                                   |                                                                              |
-| [`get_last_solve_result`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_last_solve_result)(self)                       |                                                                              |
-| [`get_network`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_network)(self)                                 |                                                                              |
-| [`get_nr_of_active_nodes`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_nr_of_active_nodes)(self[, tolerance])         |                                                                              |
-| [`get_nr_of_active_springs`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_nr_of_active_springs)(self[, tolerance])       |                                                                              |
-| [`get_nr_of_active_strands`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_nr_of_active_strands)(self[, tolerance])       |                                                                              |
-| [`get_nr_of_atoms`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_nr_of_atoms)(self)                             |                                                                              |
-| [`get_nr_of_bonds`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_nr_of_bonds)(self)                             |                                                                              |
-| [`get_nr_of_extra_atoms`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_nr_of_extra_atoms)(self)                       |                                                                              |
-| [`get_nr_of_extra_bonds`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_nr_of_extra_bonds)(self)                       |                                                                              |
-| [`get_nr_of_intra_chain_sliplinks`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_nr_of_intra_chain_sliplinks)(self)             |                                                                              |
-| [`get_nr_of_iterations`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_nr_of_iterations)(self)                        |                                                                              |
-| [`get_nr_of_links`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_nr_of_links)(self)                             |                                                                              |
-| [`get_nr_of_nodes`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_nr_of_nodes)(self)                             |                                                                              |
-| [`get_nr_of_particles`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_nr_of_particles)(self)                         |                                                                              |
-| [`get_nr_of_springs`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_nr_of_springs)(self)                           |                                                                              |
-| [`get_nr_of_strands`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_nr_of_strands)(self)                           |                                                                              |
-| [`get_num_bonds_to_form`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_num_bonds_to_form)(self)                       |                                                                              |
-| [`get_num_intra_chain_slip_links`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_num_intra_chain_slip_links)(self)              |                                                                              |
-| [`get_num_intra_chain_sliplinks`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_num_intra_chain_sliplinks)(self)               |                                                                              |
-| [`get_num_relocations`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_num_relocations)(self)                         |                                                                              |
-| [`get_num_shifts`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_num_shifts)(self)                              |                                                                              |
-| [`get_pressure`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_pressure)(self)                                |                                                                              |
-| [`get_residual`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_residual)(self)                                |                                                                              |
-| [`get_residual_norm`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_residual_norm)(self)                           |                                                                              |
-| [`get_residuals`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_residuals)(self)                               |                                                                              |
-| [`get_simulation_has_run`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_simulation_has_run)(self)                      |                                                                              |
-| [`get_soluble_weight_fraction`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_soluble_weight_fraction)(self[, tolerance])    |                                                                              |
-| [`get_spring_contour_length`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_spring_contour_length)(self)                   |                                                                              |
-| [`get_spring_lengths`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_spring_lengths)(self)                          |                                                                              |
-| [`get_spring_partitions`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_spring_partitions)(self)                       |                                                                              |
-| [`get_spring_vectors`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_spring_vectors)(self)                          |                                                                              |
-| [`get_strand_contour_length`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_strand_contour_length)(self)                   |                                                                              |
-| [`get_stress_tensor`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_stress_tensor)(self)                           |                                                                              |
-| [`get_temperature`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_temperature)(self)                             |                                                                              |
-| [`get_timestep`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_timestep)(self)                                |                                                                              |
-| [`get_volume`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_volume)(self)                                  |                                                                              |
-| [`has_outputs`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.has_outputs)(self)                                 |                                                                              |
-| [`randomly_add_slip_links`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.randomly_add_slip_links)(self, ...[, cutoff, ...]) |                                                                              |
-| [`randomly_add_sliplinks`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.randomly_add_sliplinks)(self, ...[, cutoff, ...])  |                                                                              |
-| [`read_restart_file`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.read_restart_file)(file)                           |                                                                              |
-| [`remove_inactive_links`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.remove_inactive_links)(self[, tolerance])          |                                                                              |
-| [`run`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.run)(\*args, \*\*kwargs)                           | Overloaded function.                                                         |
-| [`serialize_to_string`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.serialize_to_string)(self)                         |                                                                              |
-| [`set_current_displacements`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.set_current_displacements)(self, ...)              |                                                                              |
-| [`set_force_evaluator`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.set_force_evaluator)(self, force_evaluator)        |                                                                              |
-| [`set_is_2d`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.set_is_2d)(self, is_2d)                            |                                                                              |
-| [`simplify_network`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.simplify_network)(self, mode[, tolerance, ...])    |                                                                              |
-| [`unlink_bifunctional_links`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.unlink_bifunctional_links)(self[, ...])            |                                                                              |
-| [`validate_network`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.validate_network)(self)                            |                                                                              |
-| [`write_restart_file`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.write_restart_file)(self, file)                    |                                                                              |
+| [`add_slip_links`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.add_slip_links)(\*args, \*\*kwargs)                | Overloaded function.                                                                                 |
+|----------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
+| [`add_sliplinks`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.add_sliplinks)(\*args, \*\*kwargs)                 | Overloaded function.                                                                                 |
+| [`break_too_long_strands`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.break_too_long_strands)(self, breaking_length)     |                                                                                                      |
+| [`config_assume_box_large_enough`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.config_assume_box_large_enough)(self[, assume])    |                                                                                                      |
+| [`config_assume_network_is_complete`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.config_assume_network_is_complete)(self[, assume]) |                                                                                                      |
+| [`config_auto_correlator_output`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.config_auto_correlator_output)(self, values)       |                                                                                                      |
+| [`config_average_output`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.config_average_output)(self, values)               |                                                                                                      |
+| [`config_mean_bond_length`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.config_mean_bond_length)(self, mean_bond_length)   |                                                                                                      |
+| [`config_mean_squared_bond_length`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.config_mean_squared_bond_length)(self, r02)        |                                                                                                      |
+| [`config_remove_primary_loops`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.config_remove_primary_loops)(self[, remove])       |                                                                                                      |
+| [`config_restart_output`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.config_restart_output)(self, file[, output_every]) |                                                                                                      |
+| [`config_step_output`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.config_step_output)(self, output_configuration)    |                                                                                                      |
+| [`construct_from_string`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.construct_from_string)(s)                          |                                                                                                      |
+| [`construct_with_random_entanglements`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.construct_with_random_entanglements)(...[, ...])   | Construct MEHPSimulator from a Universe with randomly sampled entanglements.                         |
+| [`count_active_clustered_atoms`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.count_active_clustered_atoms)(self[, tolerance])   |                                                                                                      |
+| [`deform_to`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.deform_to)(self, target_box)                       |                                                                                                      |
+| [`get_active_weight_fraction`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_active_weight_fraction)(self[, tolerance])     |                                                                                                      |
+| [`get_average_contour_length`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_average_contour_length)(self)                  |                                                                                                      |
+| [`get_average_spring_length`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_average_spring_length)(self)                   |                                                                                                      |
+| [`get_bond_lengths`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_bond_lengths)(self)                            |                                                                                                      |
+| [`get_coordinates`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_coordinates)(self)                             |                                                                                                      |
+| [`get_crosslinker_universe`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_crosslinker_universe)(self)                    |                                                                                                      |
+| [`get_crosslinker_verse`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_crosslinker_verse)(self)                       |                                                                                                      |
+| [`get_current_displacements`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_current_displacements)(self)                   |                                                                                                      |
+| [`get_current_time`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_current_time)(self[, current_step])            |                                                                                                      |
+| [`get_dangling_weight_fraction`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_dangling_weight_fraction)(self[, tolerance])   |                                                                                                      |
+| [`get_default_bond_length`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_default_bond_length)(self)                     |                                                                                                      |
+| [`get_default_r0_square`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_default_r0_square)(self)                       |                                                                                                      |
+| [`get_effective_functionality_of_atoms`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_effective_functionality_of_atoms)(self[, ...]) |                                                                                                      |
+| [`get_energy`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_energy)(self)                                  |                                                                                                      |
+| [`get_exit_reason`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_exit_reason)(self)                             |                                                                                                      |
+| [`get_force_evaluator`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_force_evaluator)(self)                         |                                                                                                      |
+| [`get_gamma`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_gamma)(self)                                   |                                                                                                      |
+| [`get_gamma_factor`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_gamma_factor)(self[, b02, nr_of_chains])       | Compute the average topological Gamma factor `sum(gamma_factors) / denom`.                           |
+| [`get_gamma_factors`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_gamma_factors)(self[, b02])                    | Compute the per-spring topological Gamma factors $\Gamma_i = \mathbf{r}_i^2 / (N_i b_0^2)$.          |
+| [`get_gamma_factors_in_dir`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_gamma_factors_in_dir)(self, dir[, b02])        | Compute the per-spring directional Gamma factors $\Gamma_{i,\alpha} = r_{i,\alpha}^2 / (N_i b_0^2)$. |
+| [`get_indices_of_active_nodes`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_indices_of_active_nodes)(self[, tolerance])    |                                                                                                      |
+| [`get_initial_coordinates`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_initial_coordinates)(self)                     |                                                                                                      |
+| [`get_is_2d`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_is_2d)(self)                                   |                                                                                                      |
+| [`get_last_solve_result`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_last_solve_result)(self)                       |                                                                                                      |
+| [`get_network`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_network)(self)                                 |                                                                                                      |
+| [`get_nr_of_active_nodes`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_nr_of_active_nodes)(self[, tolerance])         |                                                                                                      |
+| [`get_nr_of_active_springs`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_nr_of_active_springs)(self[, tolerance])       |                                                                                                      |
+| [`get_nr_of_active_strands`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_nr_of_active_strands)(self[, tolerance])       |                                                                                                      |
+| [`get_nr_of_atoms`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_nr_of_atoms)(self)                             |                                                                                                      |
+| [`get_nr_of_bonds`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_nr_of_bonds)(self)                             |                                                                                                      |
+| [`get_nr_of_extra_atoms`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_nr_of_extra_atoms)(self)                       |                                                                                                      |
+| [`get_nr_of_extra_bonds`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_nr_of_extra_bonds)(self)                       |                                                                                                      |
+| [`get_nr_of_intra_chain_sliplinks`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_nr_of_intra_chain_sliplinks)(self)             |                                                                                                      |
+| [`get_nr_of_iterations`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_nr_of_iterations)(self)                        |                                                                                                      |
+| [`get_nr_of_links`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_nr_of_links)(self)                             |                                                                                                      |
+| [`get_nr_of_nodes`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_nr_of_nodes)(self)                             |                                                                                                      |
+| [`get_nr_of_particles`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_nr_of_particles)(self)                         |                                                                                                      |
+| [`get_nr_of_springs`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_nr_of_springs)(self)                           |                                                                                                      |
+| [`get_nr_of_strands`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_nr_of_strands)(self)                           |                                                                                                      |
+| [`get_num_bonds_to_form`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_num_bonds_to_form)(self)                       |                                                                                                      |
+| [`get_num_intra_chain_slip_links`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_num_intra_chain_slip_links)(self)              |                                                                                                      |
+| [`get_num_intra_chain_sliplinks`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_num_intra_chain_sliplinks)(self)               |                                                                                                      |
+| [`get_num_relocations`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_num_relocations)(self)                         |                                                                                                      |
+| [`get_num_shifts`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_num_shifts)(self)                              |                                                                                                      |
+| [`get_pressure`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_pressure)(self)                                |                                                                                                      |
+| [`get_residual`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_residual)(self)                                |                                                                                                      |
+| [`get_residual_norm`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_residual_norm)(self)                           |                                                                                                      |
+| [`get_residuals`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_residuals)(self)                               |                                                                                                      |
+| [`get_simulation_has_run`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_simulation_has_run)(self)                      |                                                                                                      |
+| [`get_soluble_weight_fraction`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_soluble_weight_fraction)(self[, tolerance])    |                                                                                                      |
+| [`get_spring_contour_length`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_spring_contour_length)(self)                   |                                                                                                      |
+| [`get_spring_lengths`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_spring_lengths)(self)                          |                                                                                                      |
+| [`get_spring_partitions`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_spring_partitions)(self)                       |                                                                                                      |
+| [`get_spring_vectors`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_spring_vectors)(self)                          |                                                                                                      |
+| [`get_strand_contour_length`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_strand_contour_length)(self)                   |                                                                                                      |
+| [`get_stress_tensor`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_stress_tensor)(self)                           |                                                                                                      |
+| [`get_temperature`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_temperature)(self)                             |                                                                                                      |
+| [`get_timestep`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_timestep)(self)                                |                                                                                                      |
+| [`get_volume`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.get_volume)(self)                                  |                                                                                                      |
+| [`has_outputs`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.has_outputs)(self)                                 |                                                                                                      |
+| [`randomly_add_slip_links`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.randomly_add_slip_links)(self, ...[, cutoff, ...]) |                                                                                                      |
+| [`randomly_add_sliplinks`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.randomly_add_sliplinks)(self, ...[, cutoff, ...])  |                                                                                                      |
+| [`read_restart_file`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.read_restart_file)(file)                           |                                                                                                      |
+| [`remove_inactive_links`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.remove_inactive_links)(self[, tolerance])          |                                                                                                      |
+| [`run`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.run)(\*args, \*\*kwargs)                           | Overloaded function.                                                                                 |
+| [`serialize_to_string`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.serialize_to_string)(self)                         |                                                                                                      |
+| [`set_current_displacements`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.set_current_displacements)(self, ...)              |                                                                                                      |
+| [`set_force_evaluator`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.set_force_evaluator)(self, force_evaluator)        |                                                                                                      |
+| [`set_is_2d`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.set_is_2d)(self, is_2d)                            |                                                                                                      |
+| [`simplify_network`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.simplify_network)(self, mode[, tolerance, ...])    |                                                                                                      |
+| [`unlink_bifunctional_links`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.unlink_bifunctional_links)(self[, ...])            |                                                                                                      |
+| [`validate_network`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.validate_network)(self)                            |                                                                                                      |
+| [`write_restart_file`](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator.write_restart_file)(self, file)                    |                                                                                                      |
 
 ### Attributes Documentation
 
@@ -4218,9 +4227,33 @@ Construct MEHPSimulator from a Universe with randomly sampled entanglements.
 
 #### get_gamma_factor(self: [pylimer_tools_cpp.MEHPSimulator](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator), b02: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = -1.0, nr_of_chains: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = -1) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
+Compute the average topological Gamma factor `sum(gamma_factors) / denom`.
+
+* **Parameters:**
+  * **b02** – Mean-squared bond length $b_0^2$ (defaults to network bond length squared).
+  * **nr_of_chains** – Denominator for averaging. When `< 1` (default `-1`), divides by
+    `network.nr_of_strands` — note that in `EntanglementMode.SPRING`,
+    `nr_of_strands` includes entanglement coupling springs, so comparing
+    `MERGED_LINKS` vs. `SPRING` with the default `-1` is not apples-to-apples.
+    Pass `1` or use `np.sum(get_gamma_factors(b02))` when computing shear modulus.
+
 #### get_gamma_factors(self: [pylimer_tools_cpp.MEHPSimulator](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator), b02: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = -1.0) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
 
+Compute the per-spring topological Gamma factors $\Gamma_i = \mathbf{r}_i^2 / (N_i b_0^2)$.
+
+Summing this vector (`np.sum(sim.get_gamma_factors(b02))`) gives the unnormalized total
+needed to compute the shear modulus $G = (k_B T / V) \sum_i \Gamma_i$.
+
+* **Parameters:**
+  **b02** – Mean-squared bond length $b_0^2$ (defaults to network bond length squared).
+
 #### get_gamma_factors_in_dir(self: [pylimer_tools_cpp.MEHPSimulator](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator), dir: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), b02: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = -1.0) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
+
+Compute the per-spring directional Gamma factors $\Gamma_{i,\alpha} = r_{i,\alpha}^2 / (N_i b_0^2)$.
+
+* **Parameters:**
+  * **dir** – Cartesian direction index (`0`, `1`, or `2`).
+  * **b02** – Mean-squared bond length $b_0^2$ (defaults to network bond length squared).
 
 #### get_indices_of_active_nodes(self: [pylimer_tools_cpp.MEHPSimulator](api/pylimer_tools_cpp.MEHPSimulator.html.md#pylimer_tools_cpp.MEHPSimulator), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.001) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[int](https://docs.python.org/3/builtins/functions.html#int)]
 
@@ -8329,7 +8362,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 5.030 seconds)
+**Total running time of the script:** (0 minutes 3.555 seconds)
 
 <a id="sphx-glr-download-auto-examples-dpd-simulations-plot-dpd-simulation-py"></a>
 
@@ -8348,7 +8381,7 @@ plt.show()
 
 # Computation times
 
-**00:05.030** total execution time for 1 file **from auto_examples/dpd_simulations**:
+**00:03.555** total execution time for 1 file **from auto_examples/dpd_simulations**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -8365,7 +8398,7 @@ $(document).ready( function () {
 
 | Example                                                                                                                                                 | Time      |   Mem (MB) |
 |---------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [DPD Simulations](auto_examples/dpd_simulations/plot_dpd_simulation.html.md#sphx-glr-auto-examples-dpd-simulations-plot-dpd-simulation-py) (`plot_dpd_simulation.py`) | 00:05.030 |          0 |
+| [DPD Simulations](auto_examples/dpd_simulations/plot_dpd_simulation.html.md#sphx-glr-auto-examples-dpd-simulations-plot-dpd-simulation-py) (`plot_dpd_simulation.py`) | 00:03.555 |          0 |
 
 
 # auto_examples/force_balance/index.html.md
@@ -8559,23 +8592,24 @@ Extra atoms — links: 245, springs: 490
 Loading cached example data from entanglement_link_vs_spring_cache.npz...
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 76-83 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 76-84 -->
 
 ## Equilibrium Shear Modulus & System Degrees of Freedom
 
 Multi-seed ensemble results (95% Student’s t confidence intervals):
 
-- **Shear Modulus**: Merged entanglement links stiffen nearly linearly with entanglement density,
-  whereas entanglement springs saturate because the intermediate spring adds series compliance.
+- **Shear Modulus**: Both representations stiffen nearly linearly with entanglement density,
+  with entanglement springs yielding a slightly (~5–10%) lower modulus at high entanglement
+  density because the intermediate spring adds series compliance.
 - **System Size**: Entanglement springs add twice as many extra nodes to the linear system.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 83-86 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 84-87 -->
 ```Python
 plot_link_vs_spring_modulus(data)
 plot_link_vs_spring_dof(data)
 ```
 
-**Total running time of the script:** (0 minutes 0.428 seconds)
+**Total running time of the script:** (0 minutes 0.236 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-entanglement-link-vs-spring-py"></a>
 
@@ -8805,7 +8839,7 @@ print(format_benchmark_footnote(data))
 Measured on: Apple M3 Pro (12 cores), 36 GB RAM, Mac15,7, macOS 27.2.1 (arm64), Python 3.13.18 (cached 2026-11-24).
 ```
 
-**Total running time of the script:** (0 minutes 1.817 seconds)
+**Total running time of the script:** (0 minutes 1.003 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-entanglement-sampling-comparison-py"></a>
 
@@ -8973,8 +9007,8 @@ plt.show()
 ```
 
 ```none
-Final residual (should be close to 0): 0.0002725628772126715
-Shear Modulus from Equilibrium [MPa]:  0.2783800703759115
+Final residual (should be close to 0): 0.00030354257141503255
+Shear Modulus from Equilibrium [MPa]:  0.32406686437579213
 ```
 
 <!-- GENERATED FROM PYTHON SOURCE LINES 142-145 -->
@@ -8983,7 +9017,7 @@ Rather than using the nominal stress, you can also use the
 stress tensor directly to compute the shear modulus.
 Therewith, you could try to investigate e.g. the Mooney-Rivlin behaviour.
 
-**Total running time of the script:** (0 minutes 0.286 seconds)
+**Total running time of the script:** (0 minutes 0.158 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-fb-deformation-exp-py"></a>
 
@@ -9104,8 +9138,8 @@ gz = (
 ```
 
 ```none
-Final residual (should be close to 0): 0.00031330154552272133
-Shear Modulus [MPa]: 0.2012
+Final residual (should be close to 0): 0.0003147909936216308
+Shear Modulus [MPa]: 0.1503
 ```
 
 <!-- GENERATED FROM PYTHON SOURCE LINES 96-101 -->
@@ -9187,7 +9221,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.564 seconds)
+**Total running time of the script:** (0 minutes 0.322 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-force-balance-py"></a>
 
@@ -9345,7 +9379,7 @@ mehp_phantom.run(MEHPLinearSolverConfig())
 ```none
 Entangled final residual norm: 2.924e-04 (iterations: 176)
 
-<pylimer_tools_cpp.MEHPSolveResult object at 0x75e559cfebf0>
+<pylimer_tools_cpp.MEHPSolveResult object at 0x7eae5028dcb0>
 ```
 
 <!-- GENERATED FROM PYTHON SOURCE LINES 121-129 -->
@@ -9485,7 +9519,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.507 seconds)
+**Total running time of the script:** (0 minutes 0.296 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-force-balance-2-py"></a>
 
@@ -9679,7 +9713,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.386 seconds)
+**Total running time of the script:** (0 minutes 0.226 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-force-relaxation-py"></a>
 
@@ -9827,7 +9861,7 @@ plot_inactive_topological_fractions(data)
 plot_inactive_solver_complexity(data)
 ```
 
-**Total running time of the script:** (0 minutes 0.914 seconds)
+**Total running time of the script:** (0 minutes 0.495 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-inactive-removal-and-sampling-py"></a>
 
@@ -9954,7 +9988,7 @@ plot_polydispersity_modulus(data)
 plot_polydispersity_fractions(data)
 ```
 
-**Total running time of the script:** (0 minutes 0.417 seconds)
+**Total running time of the script:** (0 minutes 0.247 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-polydispersity-study-py"></a>
 
@@ -10166,7 +10200,7 @@ uncertainty below 1–2%.
 plot_rve_sample_count_study(data)
 ```
 
-**Total running time of the script:** (0 minutes 3.273 seconds)
+**Total running time of the script:** (0 minutes 1.993 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-representative-volume-pdms-py"></a>
 
@@ -10311,7 +10345,7 @@ plot_cutoff_pair_distance_distribution(data)
 plot_cutoff_solver_iterations(data)
 ```
 
-**Total running time of the script:** (0 minutes 1.004 seconds)
+**Total running time of the script:** (0 minutes 0.584 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-sampling-cutoff-effect-py"></a>
 
@@ -10440,7 +10474,7 @@ plot_slipping_vs_fixed_modulus(data)
 plot_slipping_vs_fixed_iterations(data)
 ```
 
-**Total running time of the script:** (0 minutes 0.414 seconds)
+**Total running time of the script:** (0 minutes 0.240 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-slipping-vs-fixed-links-py"></a>
 
@@ -10459,7 +10493,7 @@ plot_slipping_vs_fixed_iterations(data)
 
 # Computation times
 
-**00:10.010** total execution time for 11 files **from auto_examples/force_balance**:
+**00:05.799** total execution time for 11 files **from auto_examples/force_balance**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -10476,17 +10510,17 @@ $(document).ready( function () {
 
 | Example                                                                                                                                                                                                     | Time      |   Mem (MB) |
 |-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [Representative Volume Study for PDMS Networks](auto_examples/force_balance/plot_representative_volume_pdms.html.md#sphx-glr-auto-examples-force-balance-plot-representative-volume-pdms-py) (`plot_representative_volume_pdms.py`) | 00:03.273 |          0 |
-| [Entanglement Sampling Methods](auto_examples/force_balance/plot_entanglement_sampling_comparison.html.md#sphx-glr-auto-examples-force-balance-plot-entanglement-sampling-comparison-py) (`plot_entanglement_sampling_comparison.py`)     | 00:01.817 |          0 |
-| [Sampling Cut-Off Effect](auto_examples/force_balance/plot_sampling_cutoff_effect.html.md#sphx-glr-auto-examples-force-balance-plot-sampling-cutoff-effect-py) (`plot_sampling_cutoff_effect.py`)                               | 00:01.004 |          0 |
-| [Inactive Removal & Sampling](auto_examples/force_balance/plot_inactive_removal_and_sampling.html.md#sphx-glr-auto-examples-force-balance-plot-inactive-removal-and-sampling-py) (`plot_inactive_removal_and_sampling.py`)             | 00:00.914 |          0 |
-| [Force Balance](auto_examples/force_balance/plot_force_balance.html.md#sphx-glr-auto-examples-force-balance-plot-force-balance-py) (`plot_force_balance.py`)                                                           | 00:00.564 |          0 |
-| [Force Balance 2](auto_examples/force_balance/plot_force_balance_2.html.md#sphx-glr-auto-examples-force-balance-plot-force-balance-2-py) (`plot_force_balance_2.py`)                                                     | 00:00.507 |          0 |
-| [Entanglement Links vs. Springs](auto_examples/force_balance/plot_entanglement_link_vs_spring.html.md#sphx-glr-auto-examples-force-balance-plot-entanglement-link-vs-spring-py) (`plot_entanglement_link_vs_spring.py`)              | 00:00.428 |          0 |
-| [Polydispersity Study](auto_examples/force_balance/plot_polydispersity_study.html.md#sphx-glr-auto-examples-force-balance-plot-polydispersity-study-py) (`plot_polydispersity_study.py`)                                      | 00:00.417 |          0 |
-| [Slipping vs. Fixed Entanglement Links](auto_examples/force_balance/plot_slipping_vs_fixed_links.html.md#sphx-glr-auto-examples-force-balance-plot-slipping-vs-fixed-links-py) (`plot_slipping_vs_fixed_links.py`)               | 00:00.414 |          0 |
-| [MEHP Force Relaxation](auto_examples/force_balance/plot_force_relaxation.html.md#sphx-glr-auto-examples-force-balance-plot-force-relaxation-py) (`plot_force_relaxation.py`)                                             | 00:00.386 |          0 |
-| [Deformation Experiment](auto_examples/force_balance/plot_fb_deformation_exp.html.md#sphx-glr-auto-examples-force-balance-plot-fb-deformation-exp-py) (`plot_fb_deformation_exp.py`)                                        | 00:00.286 |          0 |
+| [Representative Volume Study for PDMS Networks](auto_examples/force_balance/plot_representative_volume_pdms.html.md#sphx-glr-auto-examples-force-balance-plot-representative-volume-pdms-py) (`plot_representative_volume_pdms.py`) | 00:01.993 |          0 |
+| [Entanglement Sampling Methods](auto_examples/force_balance/plot_entanglement_sampling_comparison.html.md#sphx-glr-auto-examples-force-balance-plot-entanglement-sampling-comparison-py) (`plot_entanglement_sampling_comparison.py`)     | 00:01.003 |          0 |
+| [Sampling Cut-Off Effect](auto_examples/force_balance/plot_sampling_cutoff_effect.html.md#sphx-glr-auto-examples-force-balance-plot-sampling-cutoff-effect-py) (`plot_sampling_cutoff_effect.py`)                               | 00:00.584 |          0 |
+| [Inactive Removal & Sampling](auto_examples/force_balance/plot_inactive_removal_and_sampling.html.md#sphx-glr-auto-examples-force-balance-plot-inactive-removal-and-sampling-py) (`plot_inactive_removal_and_sampling.py`)             | 00:00.495 |          0 |
+| [Force Balance](auto_examples/force_balance/plot_force_balance.html.md#sphx-glr-auto-examples-force-balance-plot-force-balance-py) (`plot_force_balance.py`)                                                           | 00:00.322 |          0 |
+| [Force Balance 2](auto_examples/force_balance/plot_force_balance_2.html.md#sphx-glr-auto-examples-force-balance-plot-force-balance-2-py) (`plot_force_balance_2.py`)                                                     | 00:00.296 |          0 |
+| [Polydispersity Study](auto_examples/force_balance/plot_polydispersity_study.html.md#sphx-glr-auto-examples-force-balance-plot-polydispersity-study-py) (`plot_polydispersity_study.py`)                                      | 00:00.247 |          0 |
+| [Slipping vs. Fixed Entanglement Links](auto_examples/force_balance/plot_slipping_vs_fixed_links.html.md#sphx-glr-auto-examples-force-balance-plot-slipping-vs-fixed-links-py) (`plot_slipping_vs_fixed_links.py`)               | 00:00.240 |          0 |
+| [Entanglement Links vs. Springs](auto_examples/force_balance/plot_entanglement_link_vs_spring.html.md#sphx-glr-auto-examples-force-balance-plot-entanglement-link-vs-spring-py) (`plot_entanglement_link_vs_spring.py`)              | 00:00.236 |          0 |
+| [MEHP Force Relaxation](auto_examples/force_balance/plot_force_relaxation.html.md#sphx-glr-auto-examples-force-balance-plot-force-relaxation-py) (`plot_force_relaxation.py`)                                             | 00:00.226 |          0 |
+| [Deformation Experiment](auto_examples/force_balance/plot_fb_deformation_exp.html.md#sphx-glr-auto-examples-force-balance-plot-fb-deformation-exp-py) (`plot_fb_deformation_exp.py`)                                        | 00:00.158 |          0 |
 
 
 # auto_examples/index.html.md
@@ -11175,7 +11209,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.136 seconds)
+**Total running time of the script:** (0 minutes 0.081 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-add-angles-py"></a>
 
@@ -11352,7 +11386,7 @@ ax.legend()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.432 seconds)
+**Total running time of the script:** (0 minutes 0.252 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-custom-crosslinking-callback-py"></a>
 
@@ -11482,11 +11516,11 @@ plt.show()
 ```
 
 ```none
-Time without max distance:  28.80 seconds
-Time with z-score max distance: 8.61 seconds
+Time without max distance:  20.34 seconds
+Time with z-score max distance: 5.40 seconds
 ```
 
-**Total running time of the script:** (0 minutes 37.662 seconds)
+**Total running time of the script:** (0 minutes 25.881 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-monte-carlo-configuration-py"></a>
 
@@ -11600,11 +11634,11 @@ writer.write_to_file("generated_structures/multi_component_polymer_network.data"
 ```
 
 ```none
-Starting network generation at 2026-11-25 06:32:20.016666
+Starting network generation at 2026-11-25 09:34:18.559696
 Adding crosslinkers...
 Adding solvent chains...
 Adding and linking polymer strands...
-Network generation completed at 2026-11-25 06:32:20.018438
+Network generation completed at 2026-11-25 09:34:18.561132
 ```
 
 <!-- GENERATED FROM PYTHON SOURCE LINES 89-92 -->
@@ -11654,7 +11688,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.139 seconds)
+**Total running time of the script:** (0 minutes 0.080 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-multi-component-system-py"></a>
 
@@ -11772,7 +11806,7 @@ plt.title("Distribution of Strand Lengths in Polydisperse Network")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.437 seconds)
+**Total running time of the script:** (0 minutes 0.263 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-polydisperse-system-py"></a>
 
@@ -11874,7 +11908,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.097 seconds)
+**Total running time of the script:** (0 minutes 0.062 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-save-network-py"></a>
 
@@ -11998,7 +12032,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.134 seconds)
+**Total running time of the script:** (0 minutes 0.079 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-simple-crosslinked-network-py"></a>
 
@@ -12182,7 +12216,7 @@ print("Network saved to 'generated_structures/tetra_peg_network.data'")
 ```
 
 ```none
-Starting tetra-PEG network generation at 2026-11-25 06:32:20.925586
+Starting tetra-PEG network generation at 2026-11-25 09:34:19.282363
 System parameters:
   Box size: 80.0³
   Star crosslinkers: 150
@@ -12202,7 +12236,7 @@ System after strand-strand linking:
   Final strand conversion: 0.822
 Relaxing crosslink positions...
 Generating final universe with bead coordinates...
-Network generation completed at 2026-11-25 06:32:20.945457
+Network generation completed at 2026-11-25 09:34:19.295438
 Final network statistics:
   Total atoms: 12900
   Total bonds: 12985
@@ -12270,7 +12304,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.169 seconds)
+**Total running time of the script:** (0 minutes 0.108 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-tetra-peg-network-py"></a>
 
@@ -12410,7 +12444,7 @@ plt.title("Distribution of Strand Lengths in Vulcanized Network")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 22.198 seconds)
+**Total running time of the script:** (0 minutes 14.467 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-vulcanized-network-py"></a>
 
@@ -12429,7 +12463,7 @@ plt.show()
 
 # Computation times
 
-**01:01.404** total execution time for 9 files **from auto_examples/network_generator**:
+**00:41.271** total execution time for 9 files **from auto_examples/network_generator**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -12446,15 +12480,15 @@ $(document).ready( function () {
 
 | Example                                                                                                                                                                                             | Time      |   Mem (MB) |
 |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [Monte Carlo Configuration](auto_examples/network_generator/plot_monte_carlo_configuration.html.md#sphx-glr-auto-examples-network-generator-plot-monte-carlo-configuration-py) (`plot_monte_carlo_configuration.py`)           | 00:37.662 |          0 |
-| [Generate Vulcanized Networks](auto_examples/network_generator/plot_vulcanized_network.html.md#sphx-glr-auto-examples-network-generator-plot-vulcanized-network-py) (`plot_vulcanized_network.py`)                      | 00:22.198 |          0 |
-| [Polydisperse Network](auto_examples/network_generator/plot_polydisperse_system.html.md#sphx-glr-auto-examples-network-generator-plot-polydisperse-system-py) (`plot_polydisperse_system.py`)                            | 00:00.437 |          0 |
-| [Custom Crosslinking Callbacks](auto_examples/network_generator/plot_custom_crosslinking_callback.html.md#sphx-glr-auto-examples-network-generator-plot-custom-crosslinking-callback-py) (`plot_custom_crosslinking_callback.py`) | 00:00.432 |          0 |
-| [Tetra-PEG Network Generation](auto_examples/network_generator/plot_tetra_peg_network.html.md#sphx-glr-auto-examples-network-generator-plot-tetra-peg-network-py) (`plot_tetra_peg_network.py`)                        | 00:00.169 |          0 |
-| [Multi-Component System](auto_examples/network_generator/plot_multi_component_system.html.md#sphx-glr-auto-examples-network-generator-plot-multi-component-system-py) (`plot_multi_component_system.py`)                    | 00:00.139 |          0 |
-| [Adding Topology Information](auto_examples/network_generator/plot_add_angles.html.md#sphx-glr-auto-examples-network-generator-plot-add-angles-py) (`plot_add_angles.py`)                                       | 00:00.136 |          0 |
-| [Simple Crosslinked Network](auto_examples/network_generator/plot_simple_crosslinked_network.html.md#sphx-glr-auto-examples-network-generator-plot-simple-crosslinked-network-py) (`plot_simple_crosslinked_network.py`)        | 00:00.134 |          0 |
-| [Save Generated Network](auto_examples/network_generator/plot_save_network.html.md#sphx-glr-auto-examples-network-generator-plot-save-network-py) (`plot_save_network.py`)                                        | 00:00.097 |          0 |
+| [Monte Carlo Configuration](auto_examples/network_generator/plot_monte_carlo_configuration.html.md#sphx-glr-auto-examples-network-generator-plot-monte-carlo-configuration-py) (`plot_monte_carlo_configuration.py`)           | 00:25.881 |          0 |
+| [Generate Vulcanized Networks](auto_examples/network_generator/plot_vulcanized_network.html.md#sphx-glr-auto-examples-network-generator-plot-vulcanized-network-py) (`plot_vulcanized_network.py`)                      | 00:14.467 |          0 |
+| [Polydisperse Network](auto_examples/network_generator/plot_polydisperse_system.html.md#sphx-glr-auto-examples-network-generator-plot-polydisperse-system-py) (`plot_polydisperse_system.py`)                            | 00:00.263 |          0 |
+| [Custom Crosslinking Callbacks](auto_examples/network_generator/plot_custom_crosslinking_callback.html.md#sphx-glr-auto-examples-network-generator-plot-custom-crosslinking-callback-py) (`plot_custom_crosslinking_callback.py`) | 00:00.252 |          0 |
+| [Tetra-PEG Network Generation](auto_examples/network_generator/plot_tetra_peg_network.html.md#sphx-glr-auto-examples-network-generator-plot-tetra-peg-network-py) (`plot_tetra_peg_network.py`)                        | 00:00.108 |          0 |
+| [Adding Topology Information](auto_examples/network_generator/plot_add_angles.html.md#sphx-glr-auto-examples-network-generator-plot-add-angles-py) (`plot_add_angles.py`)                                       | 00:00.081 |          0 |
+| [Multi-Component System](auto_examples/network_generator/plot_multi_component_system.html.md#sphx-glr-auto-examples-network-generator-plot-multi-component-system-py) (`plot_multi_component_system.py`)                    | 00:00.080 |          0 |
+| [Simple Crosslinked Network](auto_examples/network_generator/plot_simple_crosslinked_network.html.md#sphx-glr-auto-examples-network-generator-plot-simple-crosslinked-network-py) (`plot_simple_crosslinked_network.py`)        | 00:00.079 |          0 |
+| [Save Generated Network](auto_examples/network_generator/plot_save_network.html.md#sphx-glr-auto-examples-network-generator-plot-save-network-py) (`plot_save_network.py`)                                        | 00:00.062 |          0 |
 
 
 # auto_examples/normal_mode_analysis/index.html.md
@@ -12665,10 +12699,10 @@ data = load_or_compute_cache(cache_path, run_kpm_vs_exact_pdms_study)
 Demo PDMS box (L=12 nm, N_atoms=3819, N_ent=84):
 Method   | Time [s] |  Speedup | Mean Rel. Err. G' [%] | Max Rel. Err. G' [%]
 -----------------------------------------------------------------------------
-Exact    |    7.976 |     1.0x |                  0.00 |                 0.00
-KPM      |    0.148 |    53.8x |                  2.69 |                 9.99
-SLQ      |    0.049 |   163.8x |                  0.68 |                 4.79
-Hybrid   |    0.139 |    57.2x |                  0.64 |                 1.80
+Exact    |    7.713 |     1.0x |                  0.00 |                 0.00
+KPM      |    0.106 |    72.7x |                  2.69 |                 9.99
+SLQ      |    0.032 |   240.4x |                  0.68 |                 4.79
+Hybrid   |    0.091 |    84.5x |                  0.64 |                 1.80
 Loading cached example data from kpm_vs_exact_pdms_cache.npz...
 ```
 
@@ -12840,7 +12874,7 @@ print(format_benchmark_footnote(data))
 Measured on: Apple M3 Pro (12 cores), 36 GB RAM, Mac15,7, macOS 27.2.1 (arm64), Python 3.13.18 (cached 2026-11-17).
 ```
 
-**Total running time of the script:** (0 minutes 11.951 seconds)
+**Total running time of the script:** (0 minutes 10.126 seconds)
 
 <a id="sphx-glr-download-auto-examples-normal-mode-analysis-plot-kpm-vs-exact-pdms-py"></a>
 
@@ -12995,10 +13029,10 @@ print(summary_df.to_string(index=False))
 
 ```none
 Method Time [s] Speedup Mean Rel. Err. G' [%] Max Rel. Err. G' [%] Mean Rel. Err. G'' [%] Max Rel. Err. G'' [%]
- Exact   13.612    1.0x                  0.00                 0.00                   0.00                  0.00
-   KPM    0.116  117.7x                 20.36                87.70                   8.35                 54.80
-   SLQ    0.079  172.8x                  2.06                41.07                   1.03                  6.64
-Hybrid    0.265   51.3x                  0.44                 1.38                   0.49                  1.41
+ Exact   14.377    1.0x                  0.00                 0.00                   0.00                  0.00
+   KPM    0.054  264.5x                 20.36                87.70                   8.35                 54.80
+   SLQ    0.039  371.0x                  2.06                41.07                   1.03                  6.64
+Hybrid    0.174   82.9x                  0.44                 1.38                   0.49                  1.41
 ```
 
 <!-- GENERATED FROM PYTHON SOURCE LINES 124-131 -->
@@ -13037,7 +13071,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 15.069 seconds)
+**Total running time of the script:** (0 minutes 15.148 seconds)
 
 <a id="sphx-glr-download-auto-examples-normal-mode-analysis-plot-normal-mode-analysis-py"></a>
 
@@ -13056,7 +13090,7 @@ plt.show()
 
 # Computation times
 
-**00:27.020** total execution time for 2 files **from auto_examples/normal_mode_analysis**:
+**00:25.274** total execution time for 2 files **from auto_examples/normal_mode_analysis**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -13073,8 +13107,8 @@ $(document).ready( function () {
 
 | Example                                                                                                                                                                                                           | Time      |   Mem (MB) |
 |-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [Normal Mode Analysis (NMA)](auto_examples/normal_mode_analysis/plot_normal_mode_analysis.html.md#sphx-glr-auto-examples-normal-mode-analysis-plot-normal-mode-analysis-py) (`plot_normal_mode_analysis.py`)                               | 00:15.069 |          0 |
-| [KPM vs. Full Eigenvalue Normal Mode Analysis for PDMS Networks](auto_examples/normal_mode_analysis/plot_kpm_vs_exact_pdms.html.md#sphx-glr-auto-examples-normal-mode-analysis-plot-kpm-vs-exact-pdms-py) (`plot_kpm_vs_exact_pdms.py`) | 00:11.951 |          0 |
+| [Normal Mode Analysis (NMA)](auto_examples/normal_mode_analysis/plot_normal_mode_analysis.html.md#sphx-glr-auto-examples-normal-mode-analysis-plot-normal-mode-analysis-py) (`plot_normal_mode_analysis.py`)                               | 00:15.148 |          0 |
+| [KPM vs. Full Eigenvalue Normal Mode Analysis for PDMS Networks](auto_examples/normal_mode_analysis/plot_kpm_vs_exact_pdms.html.md#sphx-glr-auto-examples-normal-mode-analysis-plot-kpm-vs-exact-pdms-py) (`plot_kpm_vs_exact_pdms.py`) | 00:10.126 |          0 |
 
 
 # auto_examples/readers_writers/index.html.md
@@ -13259,7 +13293,7 @@ plt.show()
 To convert it back to the molecule index relating to their current connectivity,
 simply repeat the process with `config_molecule_idx_for_swap(False)`
 
-**Total running time of the script:** (0 minutes 0.153 seconds)
+**Total running time of the script:** (0 minutes 0.132 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-convert-for-bond-swapping-py"></a>
 
@@ -13364,7 +13398,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.227 seconds)
+**Total running time of the script:** (0 minutes 0.139 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-convert-trajectory-to-frame-py"></a>
 
@@ -13438,7 +13472,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.119 seconds)
+**Total running time of the script:** (0 minutes 0.071 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-correlated-averages-reader-py"></a>
 
@@ -13567,7 +13601,7 @@ If your data files don’t hint the atom style in the line that starts with “A
 you should specify it manually, see [`read()`](api/pylimer_tools_cpp.DataFileReader.html.md#pylimer_tools_cpp.DataFileReader.read)
 and [`set_data_file_atom_style()`](api/pylimer_tools_cpp.UniverseSequence.html.md#pylimer_tools_cpp.UniverseSequence.set_data_file_atom_style).
 
-**Total running time of the script:** (0 minutes 0.387 seconds)
+**Total running time of the script:** (0 minutes 0.235 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-data-file-reader-py"></a>
 
@@ -13726,7 +13760,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.155 seconds)
+**Total running time of the script:** (0 minutes 0.092 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-data-file-writer-py"></a>
 
@@ -13827,7 +13861,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.095 seconds)
+**Total running time of the script:** (0 minutes 0.056 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-dump-file-reader-py"></a>
 
@@ -13896,7 +13930,7 @@ plt.title(f"Density Distribution at Step {final_timestep}")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.069 seconds)
+**Total running time of the script:** (0 minutes 0.045 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-histogram-reader-py"></a>
 
@@ -13988,7 +14022,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.116 seconds)
+**Total running time of the script:** (0 minutes 0.069 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-log-thermo-file-reader-py"></a>
 
@@ -21517,8 +21551,8 @@ Processing frame 74310 with 32 atoms
 Processing frame 74320 with 32 atoms
 
 --- Memory Usage Report ---
-Memory before processing: 977.79 MB
-Memory after processing:  977.79 MB
+Memory before processing: 973.79 MB
+Memory after processing:  973.79 MB
 Memory used by script:    0.00 MB
 ```
 
@@ -21548,7 +21582,7 @@ print(f"Dump file size:           {dump_file_size / (1024 * 1024):.2f} MB")
 Dump file size:           83.32 MB
 ```
 
-**Total running time of the script:** (0 minutes 3.642 seconds)
+**Total running time of the script:** (0 minutes 2.068 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-memory-efficient-dump-file-reading-py"></a>
 
@@ -21632,7 +21666,7 @@ plt.ylabel("Time [s]")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.044 seconds)
+**Total running time of the script:** (0 minutes 0.029 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-performance-caching-py"></a>
 
@@ -21706,7 +21740,7 @@ plt.ylabel("Temperature")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.054 seconds)
+**Total running time of the script:** (0 minutes 0.034 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-pylimer-tools-output-reader-py"></a>
 
@@ -21803,7 +21837,7 @@ for timestep, group in sectioned_data.groupby("TimeStep"):
     print(f"Timestep {timestep}: {len(group)} data points")
 ```
 
-**Total running time of the script:** (0 minutes 0.118 seconds)
+**Total running time of the script:** (0 minutes 0.066 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-time-averaged-data-reader-py"></a>
 
@@ -21909,7 +21943,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.486 seconds)
+**Total running time of the script:** (0 minutes 0.293 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-unit-conversion-py"></a>
 
@@ -21928,7 +21962,7 @@ plt.show()
 
 # Computation times
 
-**00:05.666** total execution time for 13 files **from auto_examples/readers_writers**:
+**00:03.330** total execution time for 13 files **from auto_examples/readers_writers**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -21945,19 +21979,19 @@ $(document).ready( function () {
 
 | Example                                                                                                                                                                                                    | Time      |   Mem (MB) |
 |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [Streaming Dump File Reader](auto_examples/readers_writers/plot_memory_efficient_dump_file_reading.html.md#sphx-glr-auto-examples-readers-writers-plot-memory-efficient-dump-file-reading-py) (`plot_memory_efficient_dump_file_reading.py`) | 00:03.642 |          0 |
-| [Unit Conversion](auto_examples/readers_writers/plot_unit_conversion.html.md#sphx-glr-auto-examples-readers-writers-plot-unit-conversion-py) (`plot_unit_conversion.py`)                                                  | 00:00.486 |          0 |
-| [Data File Reader](auto_examples/readers_writers/plot_data_file_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-data-file-reader-py) (`plot_data_file_reader.py`)                                               | 00:00.387 |          0 |
-| [Extract Trajectory Frame](auto_examples/readers_writers/plot_convert_trajectory_to_frame.html.md#sphx-glr-auto-examples-readers-writers-plot-convert-trajectory-to-frame-py) (`plot_convert_trajectory_to_frame.py`)                 | 00:00.227 |          0 |
-| [Data File Writer](auto_examples/readers_writers/plot_data_file_writer.html.md#sphx-glr-auto-examples-readers-writers-plot-data-file-writer-py) (`plot_data_file_writer.py`)                                               | 00:00.155 |          0 |
-| [Convert for Bond Swapping](auto_examples/readers_writers/plot_convert_for_bond_swapping.html.md#sphx-glr-auto-examples-readers-writers-plot-convert-for-bond-swapping-py) (`plot_convert_for_bond_swapping.py`)                    | 00:00.153 |          0 |
-| [Correlated Averages Reader](auto_examples/readers_writers/plot_correlated_averages_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-correlated-averages-reader-py) (`plot_correlated_averages_reader.py`)                 | 00:00.119 |          0 |
-| [Time-Averaged Data Reader](auto_examples/readers_writers/plot_time_averaged_data_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-time-averaged-data-reader-py) (`plot_time_averaged_data_reader.py`)                    | 00:00.118 |          0 |
-| [Log & Thermo File Reader](auto_examples/readers_writers/plot_log_thermo_file_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-log-thermo-file-reader-py) (`plot_log_thermo_file_reader.py`)                           | 00:00.116 |          0 |
-| [Dump File Reader](auto_examples/readers_writers/plot_dump_file_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-dump-file-reader-py) (`plot_dump_file_reader.py`)                                               | 00:00.095 |          0 |
-| [Histogram Reader](auto_examples/readers_writers/plot_histogram_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-histogram-reader-py) (`plot_histogram_reader.py`)                                               | 00:00.069 |          0 |
-| [pylimer-tools Output Reader](auto_examples/readers_writers/plot_pylimer_tools_output_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-pylimer-tools-output-reader-py) (`plot_pylimer_tools_output_reader.py`)              | 00:00.054 |          0 |
-| [Performance and Caching](auto_examples/readers_writers/plot_performance_caching.html.md#sphx-glr-auto-examples-readers-writers-plot-performance-caching-py) (`plot_performance_caching.py`)                                  | 00:00.044 |          0 |
+| [Streaming Dump File Reader](auto_examples/readers_writers/plot_memory_efficient_dump_file_reading.html.md#sphx-glr-auto-examples-readers-writers-plot-memory-efficient-dump-file-reading-py) (`plot_memory_efficient_dump_file_reading.py`) | 00:02.068 |          0 |
+| [Unit Conversion](auto_examples/readers_writers/plot_unit_conversion.html.md#sphx-glr-auto-examples-readers-writers-plot-unit-conversion-py) (`plot_unit_conversion.py`)                                                  | 00:00.293 |          0 |
+| [Data File Reader](auto_examples/readers_writers/plot_data_file_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-data-file-reader-py) (`plot_data_file_reader.py`)                                               | 00:00.235 |          0 |
+| [Extract Trajectory Frame](auto_examples/readers_writers/plot_convert_trajectory_to_frame.html.md#sphx-glr-auto-examples-readers-writers-plot-convert-trajectory-to-frame-py) (`plot_convert_trajectory_to_frame.py`)                 | 00:00.139 |          0 |
+| [Convert for Bond Swapping](auto_examples/readers_writers/plot_convert_for_bond_swapping.html.md#sphx-glr-auto-examples-readers-writers-plot-convert-for-bond-swapping-py) (`plot_convert_for_bond_swapping.py`)                    | 00:00.132 |          0 |
+| [Data File Writer](auto_examples/readers_writers/plot_data_file_writer.html.md#sphx-glr-auto-examples-readers-writers-plot-data-file-writer-py) (`plot_data_file_writer.py`)                                               | 00:00.092 |          0 |
+| [Correlated Averages Reader](auto_examples/readers_writers/plot_correlated_averages_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-correlated-averages-reader-py) (`plot_correlated_averages_reader.py`)                 | 00:00.071 |          0 |
+| [Log & Thermo File Reader](auto_examples/readers_writers/plot_log_thermo_file_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-log-thermo-file-reader-py) (`plot_log_thermo_file_reader.py`)                           | 00:00.069 |          0 |
+| [Time-Averaged Data Reader](auto_examples/readers_writers/plot_time_averaged_data_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-time-averaged-data-reader-py) (`plot_time_averaged_data_reader.py`)                    | 00:00.066 |          0 |
+| [Dump File Reader](auto_examples/readers_writers/plot_dump_file_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-dump-file-reader-py) (`plot_dump_file_reader.py`)                                               | 00:00.056 |          0 |
+| [Histogram Reader](auto_examples/readers_writers/plot_histogram_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-histogram-reader-py) (`plot_histogram_reader.py`)                                               | 00:00.045 |          0 |
+| [pylimer-tools Output Reader](auto_examples/readers_writers/plot_pylimer_tools_output_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-pylimer-tools-output-reader-py) (`plot_pylimer_tools_output_reader.py`)              | 00:00.034 |          0 |
+| [Performance and Caching](auto_examples/readers_writers/plot_performance_caching.html.md#sphx-glr-auto-examples-readers-writers-plot-performance-caching-py) (`plot_performance_caching.py`)                                  | 00:00.029 |          0 |
 
 
 # auto_examples/rouse_simulations/index.html.md
@@ -22640,7 +22674,7 @@ Stochastic Rouse chain (N=16, tau_1=26.02):
   CM MSD at t=tau_1: 8.900 (exact 6*D_CM*tau_1 = 9.758)
 ```
 
-**Total running time of the script:** (0 minutes 1.846 seconds)
+**Total running time of the script:** (0 minutes 1.100 seconds)
 
 <a id="sphx-glr-download-auto-examples-rouse-simulations-plot-rouse-brownian-simulation-py"></a>
 
@@ -23117,7 +23151,7 @@ plt.show()
 Crosslinked network (N=38, edges=40): mean relative error of <|r_i - r_CM|^2> vs (3 kB T / k) L^+_ii = 4.63%
 ```
 
-**Total running time of the script:** (0 minutes 3.225 seconds)
+**Total running time of the script:** (0 minutes 2.077 seconds)
 
 <a id="sphx-glr-download-auto-examples-rouse-simulations-plot-rouse-topologies-and-resistance-py"></a>
 
@@ -23136,7 +23170,7 @@ Crosslinked network (N=38, edges=40): mean relative error of <|r_i - r_CM|^2> vs
 
 # Computation times
 
-**00:05.071** total execution time for 2 files **from auto_examples/rouse_simulations**:
+**00:03.177** total execution time for 2 files **from auto_examples/rouse_simulations**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -23153,8 +23187,8 @@ $(document).ready( function () {
 
 | Example                                                                                                                                                                                                                                              | Time      |   Mem (MB) |
 |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [Polymer Architectures & Resistance-Fluctuation Duality in Rouse Dynamics](auto_examples/rouse_simulations/plot_rouse_topologies_and_resistance.html.md#sphx-glr-auto-examples-rouse-simulations-plot-rouse-topologies-and-resistance-py) (`plot_rouse_topologies_and_resistance.py`) | 00:03.225 |          0 |
-| [Rouse & Brownian Dynamics Simulation](auto_examples/rouse_simulations/plot_rouse_brownian_simulation.html.md#sphx-glr-auto-examples-rouse-simulations-plot-rouse-brownian-simulation-py) (`plot_rouse_brownian_simulation.py`)                                                 | 00:01.846 |          0 |
+| [Polymer Architectures & Resistance-Fluctuation Duality in Rouse Dynamics](auto_examples/rouse_simulations/plot_rouse_topologies_and_resistance.html.md#sphx-glr-auto-examples-rouse-simulations-plot-rouse-topologies-and-resistance-py) (`plot_rouse_topologies_and_resistance.py`) | 00:02.077 |          0 |
+| [Rouse & Brownian Dynamics Simulation](auto_examples/rouse_simulations/plot_rouse_brownian_simulation.html.md#sphx-glr-auto-examples-rouse-simulations-plot-rouse-brownian-simulation-py) (`plot_rouse_brownian_simulation.py`)                                                 | 00:01.100 |          0 |
 
 
 # auto_examples/sg_execution_times.html.md
@@ -23372,7 +23406,7 @@ plt.ylabel("Count")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.065 seconds)
+**Total running time of the script:** (0 minutes 0.043 seconds)
 
 <a id="sphx-glr-download-auto-examples-structure-analysis-plot-decompose-structure-py"></a>
 
@@ -23468,7 +23502,7 @@ plt.ylabel("Frequency")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.123 seconds)
+**Total running time of the script:** (0 minutes 0.066 seconds)
 
 <a id="sphx-glr-download-auto-examples-structure-analysis-plot-end-to-end-distribution-py"></a>
 
@@ -23560,7 +23594,7 @@ shortest_loop = universe.find_minimal_order_loop_from(loop_start=1, loop_step1=1
 print(f"Shortest loop involving atom 1: {shortest_loop}")
 ```
 
-**Total running time of the script:** (0 minutes 0.116 seconds)
+**Total running time of the script:** (0 minutes 0.068 seconds)
 
 <a id="sphx-glr-download-auto-examples-structure-analysis-plot-loop-analysis-py"></a>
 
@@ -23912,7 +23946,7 @@ plt.show()
 ```none
 Star polymer (N=21) matrix checks:
   ||L L+ L - L||_F           = 9.67e-15
-  ||L+ 1||_2                 = 5.06e-15
+  ||L+ 1||_2                 = 5.67e-15
   ||L_pinned X - I||_F       = 0.00e+00
   max |C - 2*M*R|            = 0.00e+00 (C(0,5) = 200.0 steps)
   max |tot_res - rowsum(R)|  = 0.00e+00
@@ -24228,19 +24262,19 @@ plt.show()
 ```none
 Loaded polymer network: 4590 atoms, 4600 bonds, 3 connected components (largest: 4542 atoms).
 Evaluated 1540 crosslinker pairs (56 crosslinkers):
-  Individual solves: 58.29 ms
-  Batched multi-RHS: 45.75 ms (speedup: 1.27x)
+  Individual solves: 38.00 ms
+  Batched multi-RHS: 31.39 ms (speedup: 1.21x)
   Max difference:    0.00e+00
 
 All-pairs & Kirchhoff benchmarks on 300-node crosslinked ring:
-  Pairwise loop (44,850 pairs):   140.58 ms
-  All-pairs chunk_size=1:         0.75 ms
-  All-pairs chunk_size=128:       1.19 ms (vs loop: 118.4x, vs chunk=1: 0.63x, max diff: 0.00e+00)
-  Kirchhoff spectral (O(N^3)):    14.44 ms
-  Kirchhoff fast (chunked):       1.01 ms (speedup: 14.3x, |diff|: 1.80e-07)
+  Pairwise loop (44,850 pairs):   92.50 ms
+  All-pairs chunk_size=1:         0.38 ms
+  All-pairs chunk_size=128:       0.50 ms (vs loop: 183.4x, vs chunk=1: 0.76x, max diff: 0.00e+00)
+  Kirchhoff spectral (O(N^3)):    9.03 ms
+  Kirchhoff fast (chunked):       0.50 ms (speedup: 18.0x, |diff|: 1.80e-07)
 ```
 
-**Total running time of the script:** (0 minutes 1.673 seconds)
+**Total running time of the script:** (0 minutes 0.974 seconds)
 
 <a id="sphx-glr-download-auto-examples-structure-analysis-plot-resistance-distance-analysis-py"></a>
 
@@ -24350,7 +24384,7 @@ plt.ylabel("Count")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.067 seconds)
+**Total running time of the script:** (0 minutes 0.040 seconds)
 
 <a id="sphx-glr-download-auto-examples-structure-analysis-plot-structure-analysis-py"></a>
 
@@ -24578,7 +24612,7 @@ fig.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.164 seconds)
+**Total running time of the script:** (0 minutes 0.093 seconds)
 
 <a id="sphx-glr-download-auto-examples-structure-analysis-plot-topological-leaf-pruning-vs-pbc-py"></a>
 
@@ -24597,7 +24631,7 @@ plt.show()
 
 # Computation times
 
-**00:02.206** total execution time for 6 files **from auto_examples/structure_analysis**:
+**00:01.284** total execution time for 6 files **from auto_examples/structure_analysis**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -24614,12 +24648,12 @@ $(document).ready( function () {
 
 | Example                                                                                                                                                                                                                           | Time      |   Mem (MB) |
 |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [Topological Resistance Distance & Commute Time Analysis](auto_examples/structure_analysis/plot_resistance_distance_analysis.html.md#sphx-glr-auto-examples-structure-analysis-plot-resistance-distance-analysis-py) (`plot_resistance_distance_analysis.py`)    | 00:01.673 |          0 |
-| [Topological Leaf Pruning vs. PBC-Aware Force Balance](auto_examples/structure_analysis/plot_topological_leaf_pruning_vs_pbc.html.md#sphx-glr-auto-examples-structure-analysis-plot-topological-leaf-pruning-vs-pbc-py) (`plot_topological_leaf_pruning_vs_pbc.py`) | 00:00.164 |          0 |
-| [End-to-End Distribution](auto_examples/structure_analysis/plot_end_to_end_distribution.html.md#sphx-glr-auto-examples-structure-analysis-plot-end-to-end-distribution-py) (`plot_end_to_end_distribution.py`)                                              | 00:00.123 |          0 |
-| [Loop Finding and Analysis](auto_examples/structure_analysis/plot_loop_analysis.html.md#sphx-glr-auto-examples-structure-analysis-plot-loop-analysis-py) (`plot_loop_analysis.py`)                                                                | 00:00.116 |          0 |
-| [Extract Synthesis Parameters](auto_examples/structure_analysis/plot_structure_analysis.html.md#sphx-glr-auto-examples-structure-analysis-plot-structure-analysis-py) (`plot_structure_analysis.py`)                                                   | 00:00.067 |          0 |
-| [Decompose/Split Structure](auto_examples/structure_analysis/plot_decompose_structure.html.md#sphx-glr-auto-examples-structure-analysis-plot-decompose-structure-py) (`plot_decompose_structure.py`)                                                    | 00:00.065 |          0 |
+| [Topological Resistance Distance & Commute Time Analysis](auto_examples/structure_analysis/plot_resistance_distance_analysis.html.md#sphx-glr-auto-examples-structure-analysis-plot-resistance-distance-analysis-py) (`plot_resistance_distance_analysis.py`)    | 00:00.974 |          0 |
+| [Topological Leaf Pruning vs. PBC-Aware Force Balance](auto_examples/structure_analysis/plot_topological_leaf_pruning_vs_pbc.html.md#sphx-glr-auto-examples-structure-analysis-plot-topological-leaf-pruning-vs-pbc-py) (`plot_topological_leaf_pruning_vs_pbc.py`) | 00:00.093 |          0 |
+| [Loop Finding and Analysis](auto_examples/structure_analysis/plot_loop_analysis.html.md#sphx-glr-auto-examples-structure-analysis-plot-loop-analysis-py) (`plot_loop_analysis.py`)                                                                | 00:00.068 |          0 |
+| [End-to-End Distribution](auto_examples/structure_analysis/plot_end_to_end_distribution.html.md#sphx-glr-auto-examples-structure-analysis-plot-end-to-end-distribution-py) (`plot_end_to_end_distribution.py`)                                              | 00:00.066 |          0 |
+| [Decompose/Split Structure](auto_examples/structure_analysis/plot_decompose_structure.html.md#sphx-glr-auto-examples-structure-analysis-plot-decompose-structure-py) (`plot_decompose_structure.py`)                                                    | 00:00.043 |          0 |
+| [Extract Synthesis Parameters](auto_examples/structure_analysis/plot_structure_analysis.html.md#sphx-glr-auto-examples-structure-analysis-plot-structure-analysis-py) (`plot_structure_analysis.py`)                                                   | 00:00.040 |          0 |
 
 
 # auto_examples/trajectory_analysis/index.html.md
@@ -24799,7 +24833,7 @@ msd_result = tidynamics.msd(
  )
 ```
 
-**Total running time of the script:** (4 minutes 25.045 seconds)
+**Total running time of the script:** (2 minutes 58.279 seconds)
 
 <a id="sphx-glr-download-auto-examples-trajectory-analysis-plot-trajectory-analysis-py"></a>
 
@@ -24818,7 +24852,7 @@ msd_result = tidynamics.msd(
 
 # Computation times
 
-**04:25.045** total execution time for 1 file **from auto_examples/trajectory_analysis**:
+**02:58.279** total execution time for 1 file **from auto_examples/trajectory_analysis**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -24835,7 +24869,7 @@ $(document).ready( function () {
 
 | Example                                                                                                                                                                   | Time      |   Mem (MB) |
 |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [Trajectory Analysis](auto_examples/trajectory_analysis/plot_trajectory_analysis.html.md#sphx-glr-auto-examples-trajectory-analysis-plot-trajectory-analysis-py) (`plot_trajectory_analysis.py`) | 04:25.045 |          0 |
+| [Trajectory Analysis](auto_examples/trajectory_analysis/plot_trajectory_analysis.html.md#sphx-glr-auto-examples-trajectory-analysis-plot-trajectory-analysis-py) (`plot_trajectory_analysis.py`) | 02:58.279 |          0 |
 
 
 # cli.html.md
@@ -24873,7 +24907,7 @@ pylimer-generate-network [OPTIONS]
 Name of the polymer to generate the network for
 
 * **Options:**
-  app463 | pi7 | app | pbd20 | apoa | pc | apams | pe | pi50 | pe413 | p6n | pom | apmma | aps | pi75 | pet | spp | pbd98 | peo | pi20 | apva | pi34 | pib | ptfe | sbr | apma | cispi | cispbd | app413 | ips | ipp | pdms | aphma | app348 | apea | pib413
+  pbd98 | pi34 | peo | pib | app348 | sbr | apea | pc | pi75 | apma | cispbd | pe | ips | apva | pi50 | aps | pib413 | pet | apams | app | pom | app413 | aphma | apmma | pi20 | p6n | ipp | pdms | cispi | pi7 | pbd20 | apoa | app463 | ptfe | spp | pe413
 
 ### --parameter-type <parameter_type>
 
@@ -24984,7 +25018,7 @@ pylimer-analyse-networks [OPTIONS] [FILES]...
 Name of the polymer to use for parameter retrieval.
 
 * **Options:**
-  app463 | pi7 | app | pbd20 | apoa | pc | apams | pe | pi50 | pe413 | p6n | pom | apmma | aps | pi75 | pet | spp | pbd98 | peo | pi20 | apva | pi34 | pib | ptfe | sbr | apma | cispi | cispbd | app413 | ips | ipp | pdms | aphma | app348 | apea | pib413
+  pbd98 | pi34 | peo | pib | app348 | sbr | apea | pc | pi75 | apma | cispbd | pe | ips | apva | pi50 | aps | pib413 | pet | apams | app | pom | app413 | aphma | apmma | pi20 | p6n | ipp | pdms | cispi | pi7 | pbd20 | apoa | app463 | ptfe | spp | pe413
 
 ### --parameter-type <parameter_type>
 

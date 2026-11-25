@@ -748,7 +748,7 @@ commute times <span class="math notranslate nohighlight">\(C_{ij} = 2 M R_{ij}\)
 </span></pre></div></div>
 <img src="../../_images/sphx_glr_plot_resistance_distance_analysis_002.png" srcset="../../_images/sphx_glr_plot_resistance_distance_analysis_002.png" alt="All-Pairs Effective Resistance $R_{ij}$, Moore-Penrose Pseudo-Inverse $L^+_{ij}$, Node Resistance Centrality" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Star polymer (N=21) matrix checks:
   ||L L+ L - L||_F           = 9.67e-15
-  ||L+ 1||_2                 = 5.06e-15
+  ||L+ 1||_2                 = 5.67e-15
   ||L_pinned X - I||_F       = 0.00e+00
   max |C - 2*M*R|            = 0.00e+00 (C(0,5) = 200.0 steps)
   max |tot_res - rowsum(R)|  = 0.00e+00
@@ -1052,19 +1052,19 @@ solves.</p>
 </span></pre></div></div>
 <img src="../../_images/sphx_glr_plot_resistance_distance_analysis_003.png" srcset="../../_images/sphx_glr_plot_resistance_distance_analysis_003.png" alt="Parallel Network Pathways Lower Resistance Below $d_{\mathrm{graph}}$, Crosslinker Resistance Distribution & Solver Speedup" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Loaded polymer network: 4590 atoms, 4600 bonds, 3 connected components (largest: 4542 atoms).
 Evaluated 1540 crosslinker pairs (56 crosslinkers):
-  Individual solves: 58.29 ms
-  Batched multi-RHS: 45.75 ms (speedup: 1.27x)
+  Individual solves: 38.00 ms
+  Batched multi-RHS: 31.39 ms (speedup: 1.21x)
   Max difference:    0.00e+00
 
 All-pairs &amp; Kirchhoff benchmarks on 300-node crosslinked ring:
-  Pairwise loop (44,850 pairs):   140.58 ms
-  All-pairs chunk_size=1:         0.75 ms
-  All-pairs chunk_size=128:       1.19 ms (vs loop: 118.4x, vs chunk=1: 0.63x, max diff: 0.00e+00)
-  Kirchhoff spectral (O(N^3)):    14.44 ms
-  Kirchhoff fast (chunked):       1.01 ms (speedup: 14.3x, |diff|: 1.80e-07)
+  Pairwise loop (44,850 pairs):   92.50 ms
+  All-pairs chunk_size=1:         0.38 ms
+  All-pairs chunk_size=128:       0.50 ms (vs loop: 183.4x, vs chunk=1: 0.76x, max diff: 0.00e+00)
+  Kirchhoff spectral (O(N^3)):    9.03 ms
+  Kirchhoff fast (chunked):       0.50 ms (speedup: 18.0x, |diff|: 1.80e-07)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.673 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.974 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-structure-analysis-plot-resistance-distance-analysis-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/6e97a52096dbb670ad83c28e1d77a6f9/plot_resistance_distance_analysis.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_resistance_distance_analysis.ipynb</span></code></a></p>

@@ -580,13 +580,13 @@ and an interchangeable MEHPSolver strategy.</p>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPSimulator.get_gamma_factor" title="pylimer_tools_cpp.MEHPSimulator.get_gamma_factor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_gamma_factor</span></code></a>(self[, b02, nr_of_chains])</p></td>
-<td><p></p></td>
+<td><p>Compute the average topological Gamma factor <code class="docutils literal notranslate"><span class="pre">sum(gamma_factors)</span> <span class="pre">/</span> <span class="pre">denom</span></code>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPSimulator.get_gamma_factors" title="pylimer_tools_cpp.MEHPSimulator.get_gamma_factors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_gamma_factors</span></code></a>(self[, b02])</p></td>
-<td><p></p></td>
+<td><p>Compute the per-spring topological Gamma factors <span class="math notranslate nohighlight">\(\Gamma_i = \mathbf{r}_i^2 / (N_i b_0^2)\)</span>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPSimulator.get_gamma_factors_in_dir" title="pylimer_tools_cpp.MEHPSimulator.get_gamma_factors_in_dir"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_gamma_factors_in_dir</span></code></a>(self, dir[, b02])</p></td>
-<td><p></p></td>
+<td><p>Compute the per-spring directional Gamma factors <span class="math notranslate nohighlight">\(\Gamma_{i,\alpha} = r_{i,\alpha}^2 / (N_i b_0^2)\)</span>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPSimulator.get_indices_of_active_nodes" title="pylimer_tools_cpp.MEHPSimulator.get_indices_of_active_nodes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_indices_of_active_nodes</span></code></a>(self[, tolerance])</p></td>
 <td><p></p></td>
@@ -953,17 +953,47 @@ and an interchangeable MEHPSolver strategy.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPSimulator.get_gamma_factor">
 <span class="sig-name descname"><span class="pre">get_gamma_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPSimulator" title="pylimer_tools_cpp.MEHPSimulator"><span class="pre">pylimer_tools_cpp.MEHPSimulator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">b02</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsFloat" title="(in Python v3.15)"><span class="pre">SupportsFloat</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsIndex" title="(in Python v3.15)"><span class="pre">SupportsIndex</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nr_of_chains</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsInt" title="(in Python v3.15)"><span class="pre">SupportsInt</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsIndex" title="(in Python v3.15)"><span class="pre">SupportsIndex</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPSimulator.get_gamma_factor" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the average topological Gamma factor <code class="docutils literal notranslate"><span class="pre">sum(gamma_factors)</span> <span class="pre">/</span> <span class="pre">denom</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPSimulator.get_gamma_factor.params.b02"></span><strong>b02</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPSimulator.get_gamma_factor.params.b02">¶</a> – Mean-squared bond length <span class="math notranslate nohighlight">\(b_0^2\)</span> (defaults to network bond length squared).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPSimulator.get_gamma_factor.params.nr_of_chains"></span><strong>nr_of_chains</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPSimulator.get_gamma_factor.params.nr_of_chains">¶</a> – Denominator for averaging. When <code class="docutils literal notranslate"><span class="pre">&lt;</span> <span class="pre">1</span></code> (default <code class="docutils literal notranslate"><span class="pre">-1</span></code>), divides by
+<code class="docutils literal notranslate"><span class="pre">network.nr_of_strands</span></code> — note that in <code class="docutils literal notranslate"><span class="pre">EntanglementMode.SPRING</span></code>,
+<code class="docutils literal notranslate"><span class="pre">nr_of_strands</span></code> includes entanglement coupling springs, so comparing
+<code class="docutils literal notranslate"><span class="pre">MERGED_LINKS</span></code> vs. <code class="docutils literal notranslate"><span class="pre">SPRING</span></code> with the default <code class="docutils literal notranslate"><span class="pre">-1</span></code> is not apples-to-apples.
+Pass <code class="docutils literal notranslate"><span class="pre">1</span></code> or use <code class="docutils literal notranslate"><span class="pre">np.sum(get_gamma_factors(b02))</span></code> when computing shear modulus.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPSimulator.get_gamma_factors">
 <span class="sig-name descname"><span class="pre">get_gamma_factors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPSimulator" title="pylimer_tools_cpp.MEHPSimulator"><span class="pre">pylimer_tools_cpp.MEHPSimulator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">b02</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsFloat" title="(in Python v3.15)"><span class="pre">SupportsFloat</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsIndex" title="(in Python v3.15)"><span class="pre">SupportsIndex</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.15)"><span class="pre">Annotated</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.typing.NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'[m,</span> <span class="pre">1]'</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPSimulator.get_gamma_factors" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the per-spring topological Gamma factors <span class="math notranslate nohighlight">\(\Gamma_i = \mathbf{r}_i^2 / (N_i b_0^2)\)</span>.</p>
+<p>Summing this vector (<code class="docutils literal notranslate"><span class="pre">np.sum(sim.get_gamma_factors(b02))</span></code>) gives the unnormalized total
+needed to compute the shear modulus <span class="math notranslate nohighlight">\(G = (k_B T / V) \sum_i \Gamma_i\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.MEHPSimulator.get_gamma_factors.params.b02"></span><strong>b02</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPSimulator.get_gamma_factors.params.b02">¶</a> – Mean-squared bond length <span class="math notranslate nohighlight">\(b_0^2\)</span> (defaults to network bond length squared).</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPSimulator.get_gamma_factors_in_dir">
 <span class="sig-name descname"><span class="pre">get_gamma_factors_in_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPSimulator" title="pylimer_tools_cpp.MEHPSimulator"><span class="pre">pylimer_tools_cpp.MEHPSimulator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsInt" title="(in Python v3.15)"><span class="pre">SupportsInt</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsIndex" title="(in Python v3.15)"><span class="pre">SupportsIndex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">b02</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsFloat" title="(in Python v3.15)"><span class="pre">SupportsFloat</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsIndex" title="(in Python v3.15)"><span class="pre">SupportsIndex</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.15)"><span class="pre">Annotated</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.typing.NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'[m,</span> <span class="pre">1]'</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPSimulator.get_gamma_factors_in_dir" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the per-spring directional Gamma factors <span class="math notranslate nohighlight">\(\Gamma_{i,\alpha} = r_{i,\alpha}^2 / (N_i b_0^2)\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPSimulator.get_gamma_factors_in_dir.params.dir"></span><strong>dir</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPSimulator.get_gamma_factors_in_dir.params.dir">¶</a> – Cartesian direction index (<code class="docutils literal notranslate"><span class="pre">0</span></code>, <code class="docutils literal notranslate"><span class="pre">1</span></code>, or <code class="docutils literal notranslate"><span class="pre">2</span></code>).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPSimulator.get_gamma_factors_in_dir.params.b02"></span><strong>b02</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPSimulator.get_gamma_factors_in_dir.params.b02">¶</a> – Mean-squared bond length <span class="math notranslate nohighlight">\(b_0^2\)</span> (defaults to network bond length squared).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPSimulator.get_indices_of_active_nodes">
@@ -1412,5 +1442,6 @@ and an interchangeable MEHPSolver strategy.</p>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/sg-tags.js?v=d80f6fa4"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     </body>
 </html>

@@ -335,7 +335,7 @@ plt.show()
 ```none
 Star polymer (N=21) matrix checks:
   ||L L+ L - L||_F           = 9.67e-15
-  ||L+ 1||_2                 = 5.06e-15
+  ||L+ 1||_2                 = 5.67e-15
   ||L_pinned X - I||_F       = 0.00e+00
   max |C - 2*M*R|            = 0.00e+00 (C(0,5) = 200.0 steps)
   max |tot_res - rowsum(R)|  = 0.00e+00
@@ -651,19 +651,19 @@ plt.show()
 ```none
 Loaded polymer network: 4590 atoms, 4600 bonds, 3 connected components (largest: 4542 atoms).
 Evaluated 1540 crosslinker pairs (56 crosslinkers):
-  Individual solves: 58.29 ms
-  Batched multi-RHS: 45.75 ms (speedup: 1.27x)
+  Individual solves: 38.00 ms
+  Batched multi-RHS: 31.39 ms (speedup: 1.21x)
   Max difference:    0.00e+00
 
 All-pairs & Kirchhoff benchmarks on 300-node crosslinked ring:
-  Pairwise loop (44,850 pairs):   140.58 ms
-  All-pairs chunk_size=1:         0.75 ms
-  All-pairs chunk_size=128:       1.19 ms (vs loop: 118.4x, vs chunk=1: 0.63x, max diff: 0.00e+00)
-  Kirchhoff spectral (O(N^3)):    14.44 ms
-  Kirchhoff fast (chunked):       1.01 ms (speedup: 14.3x, |diff|: 1.80e-07)
+  Pairwise loop (44,850 pairs):   92.50 ms
+  All-pairs chunk_size=1:         0.38 ms
+  All-pairs chunk_size=128:       0.50 ms (vs loop: 183.4x, vs chunk=1: 0.76x, max diff: 0.00e+00)
+  Kirchhoff spectral (O(N^3)):    9.03 ms
+  Kirchhoff fast (chunked):       0.50 ms (speedup: 18.0x, |diff|: 1.80e-07)
 ```
 
-**Total running time of the script:** (0 minutes 1.673 seconds)
+**Total running time of the script:** (0 minutes 0.974 seconds)
 
 <a id="sphx-glr-download-auto-examples-structure-analysis-plot-resistance-distance-analysis-py"></a>
 

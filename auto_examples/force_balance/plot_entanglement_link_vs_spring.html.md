@@ -93,23 +93,24 @@ Extra atoms — links: 245, springs: 490
 Loading cached example data from entanglement_link_vs_spring_cache.npz...
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 76-83 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 76-84 -->
 
 ## Equilibrium Shear Modulus & System Degrees of Freedom
 
 Multi-seed ensemble results (95% Student’s t confidence intervals):
 
-- **Shear Modulus**: Merged entanglement links stiffen nearly linearly with entanglement density,
-  whereas entanglement springs saturate because the intermediate spring adds series compliance.
+- **Shear Modulus**: Both representations stiffen nearly linearly with entanglement density,
+  with entanglement springs yielding a slightly (~5–10%) lower modulus at high entanglement
+  density because the intermediate spring adds series compliance.
 - **System Size**: Entanglement springs add twice as many extra nodes to the linear system.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 83-86 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 84-87 -->
 ```Python
 plot_link_vs_spring_modulus(data)
 plot_link_vs_spring_dof(data)
 ```
 
-**Total running time of the script:** (0 minutes 0.428 seconds)
+**Total running time of the script:** (0 minutes 0.236 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-entanglement-link-vs-spring-py"></a>
 

@@ -58,7 +58,7 @@ Construct an empty MEHPNetwork.
 | [`from_universe`](#pylimer_tools_cpp.MEHPNetwork.from_universe)(universe[, entanglements, ...])    | Build a canonical MEHPNetwork from an atomistic Universe using DFS strand contraction.                        |
 | [`from_universe_with_random_entanglements`](#pylimer_tools_cpp.MEHPNetwork.from_universe_with_random_entanglements)(...)     | Sample random entanglements from an atomistic Universe and build a canonical MEHPNetwork.                     |
 | [`get_crosslinker_verse`](#pylimer_tools_cpp.MEHPNetwork.get_crosslinker_verse)(self[, u])                 | Reconstruct a coarse-grained Universe of crosslinker nodes bonded by polymer strands.                         |
-| [`get_gamma_factor`](#pylimer_tools_cpp.MEHPNetwork.get_gamma_factor)(self, u[, b02, ...])            | Compute the topological Gamma factor.                                                                         |
+| [`get_gamma_factor`](#pylimer_tools_cpp.MEHPNetwork.get_gamma_factor)(self, u[, b02, ...])            | Compute the average topological Gamma factor `sum(gamma_factors) / denom`.                                    |
 | [`simplify`](#pylimer_tools_cpp.MEHPNetwork.simplify)(self, u, mode[, tolerance, is_2d, ...]) | Run iterative topology simplification until convergence.                                                      |
 | [`validate`](#pylimer_tools_cpp.MEHPNetwork.validate)(self[, u])                              | Validate network dimensions, index mappings, and contour invariants.                                          |
 
@@ -226,7 +226,16 @@ Reconstruct a coarse-grained Universe of crosslinker nodes bonded by polymer str
 
 #### get_gamma_factor(self: [pylimer_tools_cpp.MEHPNetwork](#pylimer_tools_cpp.MEHPNetwork), u: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], b02: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = -1.0, nr_of_chains: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = -1, is_2d: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
-Compute the topological Gamma factor.
+Compute the average topological Gamma factor `sum(gamma_factors) / denom`.
+
+* **Parameters:**
+  * **u** – Displacement vector.
+  * **b02** – Mean-squared bond length $b_0^2$ (defaults to network bond length squared).
+  * **nr_of_chains** – Denominator for averaging. When `< 1` (default `-1`), divides by
+    `nr_of_strands` — note that in `EntanglementMode.SPRING`,
+    `nr_of_strands` includes entanglement coupling springs. Pass `1` (or
+    sum `get_gamma_factors`) for the unnormalized sum `sum(gamma_factors)`.
+  * **is_2d** – Whether to evaluate in 2D.
 
 #### simplify(self: [pylimer_tools_cpp.MEHPNetwork](#pylimer_tools_cpp.MEHPNetwork), u: [object](https://docs.python.org/3/builtins/functions.html#object), mode: [pylimer_tools_cpp.StructureSimplificationMode](pylimer_tools_cpp.StructureSimplificationMode.md#pylimer_tools_cpp.StructureSimplificationMode), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1e-09, is_2d: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False, breaking_length: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = -1.0) → [int](https://docs.python.org/3/builtins/functions.html#int)
 

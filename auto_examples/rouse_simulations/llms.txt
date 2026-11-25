@@ -10,7 +10,7 @@
 - [Rouse &amp; Brownian Dynamics Simulations](index.html.md): pylimer-tools provides an implicit time-stepping Rouse and Brownian dynamics
 - [NOTE](plot_rouse_topologies_and_resistance.html.md): Go to the end
 - [NOTE](plot_rouse_brownian_simulation.html.md): Go to the end
-- [Computation times](sg_execution_times.html.md): &#42;&#42;00:05.071&#42;&#42; total execution time for 2 files &#42;&#42;from auto_examples/rouse_simulations&#42;&#42;:
+- [Computation times](sg_execution_times.html.md): &#42;&#42;00:03.177&#42;&#42; total execution time for 2 files &#42;&#42;from auto_examples/rouse_simulations&#42;&#42;:
 
 ## Optional
 
