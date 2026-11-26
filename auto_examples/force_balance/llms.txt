@@ -22,7 +22,7 @@
 - [NOTE](plot_mmt_vs_mehp_gelation_and_loops.html.md): Go to the end
 - [NOTE](plot_finite_extensibility_deformation.html.md): Go to the end
 - [NOTE](plot_multichemistry_and_coarse_graining.html.md): Go to the end
-- [Computation times](sg_execution_times.html.md): &#42;&#42;00:14.877&#42;&#42; total execution time for 14 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
+- [Computation times](sg_execution_times.html.md): &#42;&#42;00:08.749&#42;&#42; total execution time for 14 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
 
 ## Optional
 

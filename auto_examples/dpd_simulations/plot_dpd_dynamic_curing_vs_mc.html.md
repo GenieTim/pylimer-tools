@@ -703,7 +703,7 @@ print(summary_df.to_string(index=False))
 0.94    89.2          2.33         5.17      0.76     0.91      6.06     4.68    0.0615   0.0348     0.2451    0.1774
 ```
 
-**Total running time of the script:** (0 minutes 1.114 seconds)
+**Total running time of the script:** (0 minutes 0.619 seconds)
 
 <a id="sphx-glr-download-auto-examples-dpd-simulations-plot-dpd-dynamic-curing-vs-mc-py"></a>
 

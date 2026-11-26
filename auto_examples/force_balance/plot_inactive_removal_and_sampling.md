@@ -99,7 +99,7 @@ data = load_or_compute_cache(cache_path, run_inactive_removal_and_sampling_simul
 ```
 
 ```none
-Springs — naive: 700, simplified: 257
+Springs — naive: 700, simplified: 280
 Loading cached example data from inactive_removal_and_sampling_cache.npz...
 ```
 
@@ -131,7 +131,7 @@ plot_inactive_topological_fractions(data)
 plot_inactive_solver_complexity(data)
 ```
 
-**Total running time of the script:** (0 minutes 0.792 seconds)
+**Total running time of the script:** (0 minutes 0.510 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-inactive-removal-and-sampling-py"></a>
 

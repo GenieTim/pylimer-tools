@@ -10,6 +10,8 @@ SLESolver
 
    .. autosummary::
 
+      ~SLESolver.ACCELERATE_LDLT
+      ~SLESolver.ACCELERATE_LLT
       ~SLESolver.AUTO
       ~SLESolver.BICGSTAB
       ~SLESolver.BICGSTAB_DIAGONALIZED
@@ -36,6 +38,8 @@ SLESolver
 
    .. rubric:: Attributes Documentation
 
+   .. autoattribute:: ACCELERATE_LDLT
+   .. autoattribute:: ACCELERATE_LLT
    .. autoattribute:: AUTO
    .. autoattribute:: BICGSTAB
    .. autoattribute:: BICGSTAB_DIAGONALIZED

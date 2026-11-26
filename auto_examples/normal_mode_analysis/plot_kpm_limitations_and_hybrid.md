@@ -670,7 +670,7 @@ print(format_benchmark_footnote(data))
 Measured on: Apple M3 Pro (12 cores), 36 GB RAM, Mac15,7, macOS 27.2.1 (arm64), Python 3.13.18 (cached 2026-11-26).
 ```
 
-**Total running time of the script:** (0 minutes 4.948 seconds)
+**Total running time of the script:** (0 minutes 2.619 seconds)
 
 <a id="sphx-glr-download-auto-examples-normal-mode-analysis-plot-kpm-limitations-and-hybrid-py"></a>
 
