@@ -80,4 +80,39 @@ The `bin/` directory contains standard helper scripts for builds, testing, forma
 ## System Sizes
 
 This library is designed for realistic polymer simulations, which typically involve large systems with many chains and entanglements. When investigating performance, target system sizes should be on the order of approx 1e5 chains, each with 1e2 to 1e3 beads.
-The stoichiometric imbalance $r$ and the degree of polymerization $p$ (see also docs/nomenclature.rst) can vary widely.
+The stoichiometric imbalance $r$ and the degree of polymerization $p$ (see also `docs/nomenclature.rst`) can vary widely.
+
+## Dangers of This Codebase
+
+Polymer network topology and mechanics contain subtle physical and algorithmic edge cases. Read `docs/nomenclature.rst` and `docs/assumptions.rst` before modifying topology, network construction, or force-balance code, and always respect the following invariants:
+
+### 1. Periodic Boundary Conditions (PBC) & `assume_box_large_enough`
+
+PBC handling is one of the easiest places to introduce silent, catastrophic physics bugs (see `docs/assumptions.rst`):
+
+- **Coarse-grained springs can exceed half the box length ($L/2$)**: In bead-spring MD, individual covalent bonds are much shorter than $L/2$. In `MEHPNetwork` / `MEHPSimulator` (and coarse-grained `DPDSimulator` setups), a single spring represents an entire polymer strand (or sub-strand) whose end-to-end vector can legitimately exceed $L/2$ or wrap multiple times across the periodic box.
+- **Two PBC modes (`assume_box_large_enough`)**:
+  - `assume_box_large_enough = False` (**default**, tracked periodic offsets): Walks the initial bead-by-bead contour to bake per-spring periodic box offsets (`springBoxOffset`, still assuming initial *atomistic* bonds are shorter than $L/2$). Strands longer than $L/2$ and PBC-wrapping loops stay stretched instead of collapsing. Any topology change (inserting, removing, or merging springs; sliding or swapping slip-links; flipping spring endpoint order `A <-> B`) or box deformation (`Box::adjustCoordinatesTo`) **must** preserve, split, negate, or scale `springBoxOffset` consistently.
+  - `assume_box_large_enough = True` (minimum-image convention): Applies `Box::handlePBC` directly to endpoint coordinate differences on every evaluation, clamping vectors to $[-L/2, L/2]$ per axis. Any spring exceeding $L/2$ flips direction across the boundary, causing box-spanning strands and PBC-wrapping self-loops to collapse. Watch out for the API default asymmetry: constructors default to `assume_box_large_enough=False`, whereas calling `config_assume_box_large_enough()` with no arguments defaults its `assume` parameter to `True`.
+- **Wrapped coordinates, image flags, and simple shear**: `Atom` stores wrapped coordinates alongside integer image flags (`nx`, `ny`, `nz`)—be careful to distinguish wrapped (`getCoordinates()`, `vectorTo()`) from unwrapped (`getUnwrappedCoordinates(box)`, `vectorToUnwrapped()`) queries. `Box` also supports simple shear (`isSheared()`, un-shearing coordinates before minimum-image wrapping in `Box::handlePBC`), though general triclinic tilt is not supported.
+
+### 2. Primary Loops (Self-Loops) & Topological vs. Elastic Activity
+
+- **Primary loops are NOT universally elastically inactive**: A primary loop (a strand starting and ending at the *same* crosslink) relaxes to zero tension only if it closes locally without entanglements. It becomes **elastically effective** in two critical situations:
+  1. **Entangled primary loops**: When an entanglement link, entanglement spring, or slip-link is associated with the loop, coupling it to surrounding strands so it carries tension.
+  2. **PBC-spanning self-loops**: Under `assume_box_large_enough = False`, even an entanglement-free self-loop (or crosslinker-less ring) that wraps through the periodic box carries a non-zero `springBoxOffset` and cannot collapse to zero length, contributing directly to network elasticity.
+- **Never blindly strip self-loops or multi-edges**: Calling `Universe::simplify` (`igraph_simplify`) or passing `remove_primary_loops = True` deletes primary loops (and in `MEHPNetwork`, also removes any entanglement springs attached to them). Never assume self-loops or parallel strands (secondary loops) are disposable graph artifacts.
+- **Purely topological pruning vs. PBC-aware relaxation**: `peel_topological_leaves` and `identify_active_atoms` perform 2-core peeling strictly on crosslinker connectivity (`strand_from` / `strand_to`), ignoring coordinates and PBC completely. Consequently, they intentionally **keep** all primary and multi-crosslinker loops (even local unentangled ones, because entanglements could activate them) and **prune** crosslinker-less solvent rings (even PBC-spanning ones). Distinguishing local zero-tension loops from PBC-spanning or entangled active loops requires PBC-aware force relaxation (`MEHPSimulator` with `assume_box_large_enough = False`).
+
+### 3. Entanglements, Slip-Links, Strands & Springs
+
+Several distinct physical models share similar names—follow `docs/nomenclature.rst` strictly:
+
+- **Entanglement representation (`EntanglementMode`)**: `NONE` (phantom crosslink-only network), `MERGED_LINKS` (**entanglement links**: a single 4-functional merged node shared directly on two chains' contours), and `SPRING` (**entanglement springs**: chains remain separate and are coupled by a compliant Hookean spring flagged via `springIsEntanglement`).
+- **Contour mobility (`SlipMode`)**: `FIXED` (contour fractions $\alpha$ are frozen—used by `LinearSystemMEHPSolver` and `NonlinearOptimizationSolver`) vs. `SLIDING` (**slip-links / slip-springs** in `SlipLinkRelaxationSolver`, where links slide along chain contours to equalize tension, redistributing `springPartitions` / `springContourLength` and updating `springBoxOffset` when links cross).
+- **Strand vs. Spring & link indexing in `MEHPNetwork`**: A **strand** is a full polymer chain between chemical crosslinks (or an entanglement coupling strand in `SPRING` mode), whereas a **spring** is an individual sub-segment between two adjacent links (crosslinks or entanglement links) along that strand. All links (chemical crosslinks, chain ends, and entanglement links) live in `[0, nrOfLinks)`—always check `linkIsEntanglement` rather than assuming crosslinks and entanglements occupy separate index ranges.
+
+### 4. Dual Indexing Schemes & Graph Assumptions
+
+- **Atom IDs ("bonds") vs. Graph Vertex IDs ("edges")**: As detailed in `docs/nomenclature.rst`, methods referring to **bonds** or **atom IDs** use LAMMPS atom IDs (`Atom::getId()`, typically 1-based and potentially non-contiguous), whereas methods referring to **vertices** or **edges** use `igraph`'s contiguous `0`-based `[0, N)` indices (which shift whenever vertices or edges are deleted). Mixing the two silently corrupts or crashes lookups.
+- **Bifunctional strands & cache invalidation**: Strand-decomposition routines assume interior chain beads have degree $\le 2$ and expect a single crosslinker atom type per call (`docs/assumptions.rst`). When mutating the underlying `igraph_t` of `Universe` / `Molecule` (`AtomGraphParent`), always use the `GraphMutator` RAII guard so cached properties are invalidated.
