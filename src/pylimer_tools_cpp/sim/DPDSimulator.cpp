@@ -238,12 +238,10 @@ DPDSimulator::runSimulation(const long int nSteps,
 
     // kinetic term of the stress/pressure
     const double m_over_boxv = 1. / (this->box.getVolume());
-    for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(this->numAtoms);
-         ++i) {
-      this->currentStressTensor +=
-        m_over_boxv * this->currentVelocities.segment(3 * i, 3) *
-        this->currentVelocities.segment(3 * i, 3).transpose();
-    }
+    const auto velMat = this->currentVelocities.reshaped(
+      3, static_cast<Eigen::Index>(this->numAtoms));
+    this->currentStressTensor.noalias() +=
+      m_over_boxv * (velMat * velMat.transpose());
 
     // bond formation
     if (this->bondsToForm > 0 && step % this->formBondsEvery == 0) {
@@ -299,11 +297,10 @@ DPDSimulator::refreshCurrentState()
                                         1.0);
   // kinetic term of the stress/pressure
   const double m_over_boxv = 1. / (this->box.getVolume());
-  for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(this->numAtoms); ++i) {
-    this->currentStressTensor +=
-      (m_over_boxv * this->currentVelocities.segment(3 * i, 3) *
-       this->currentVelocities.segment(3 * i, 3).transpose());
-  }
+  const auto velMat = this->currentVelocities.reshaped(
+    3, static_cast<Eigen::Index>(this->numAtoms));
+  this->currentStressTensor.noalias() +=
+    m_over_boxv * (velMat * velMat.transpose());
 }
 
 /**
@@ -584,27 +581,18 @@ DPDSimulator::deformBoxImmediately(const pylimer_tools::entities::Box& newBox)
   // rescale box offsets
   this->box = newBox;
   assert(newBox == this->box);
-  const Eigen::VectorXd newOffsets =
-    (this->bondBoxOffsets.array() *
-     (this->box.getL() / previousBox.getL())
-       .replicate((this->numBonds + this->numSlipSprings), 1))
-      .matrix();
-  this->bondBoxOffsets = newOffsets;
-
-  // rescale coordinates
-  Eigen::VectorXd previousCoords = this->coordinates;
-
-  Eigen::Array3d scalingFactor = newBox.getL() / previousBox.getL();
-
-  // rescale per-atom quantities
-  for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(this->numAtoms); ++i) {
-    for (Eigen::Index dir = 0; dir < 3; ++dir) {
-      this->coordinates[3 * i + dir] *= scalingFactor[dir];
-      this->currentVelocities[3 * i + dir] *= scalingFactor[dir];
-      this->currentVelocitiesPlus[3 * i + dir] *= scalingFactor[dir];
-      this->currentForces[3 * i + dir] *= scalingFactor[dir];
-    }
-  }
+  const Eigen::Array3d scalingFactor = newBox.getL() / previousBox.getL();
+  const Eigen::Index nBondsTotal =
+    static_cast<Eigen::Index>(this->numBonds + this->numSlipSprings);
+  const Eigen::Index nAtomsIdx = static_cast<Eigen::Index>(this->numAtoms);
+  this->bondBoxOffsets.reshaped(3, nBondsTotal).array().colwise() *=
+    scalingFactor;
+  this->coordinates.reshaped(3, nAtomsIdx).array().colwise() *= scalingFactor;
+  this->currentVelocities.reshaped(3, nAtomsIdx).array().colwise() *=
+    scalingFactor;
+  this->currentVelocitiesPlus.reshaped(3, nAtomsIdx).array().colwise() *=
+    scalingFactor;
+  this->currentForces.reshaped(3, nAtomsIdx).array().colwise() *= scalingFactor;
 
   // reset neighbour-list.
   // *maybe* it would be faster to implement a way to adjust the box, but
@@ -784,7 +772,7 @@ DPDSimulator::computeForces(
       // pair forces
       for (Eigen::Index neigh_idx = 0; neigh_idx < numNeighbors; ++neigh_idx) {
         const Eigen::Index j = static_cast<Eigen::Index>(neighbors[neigh_idx]);
-        pairdistance = coords.segment(3 * i, 3) - coords.segment(3 * j, 3);
+        pairdistance = coords.segment<3>(3 * i) - coords.segment<3>(3 * j);
         this->box.handlePBC(pairdistance);
         // slight performance improvement, taking the square norm here
         const double rNorm2 = pairdistance.squaredNorm();
@@ -801,7 +789,7 @@ DPDSimulator::computeForces(
 
         // dissipative/drag force
         velocitydiff =
-          velocities.segment(3 * i, 3) - velocities.segment(3 * j, 3);
+          velocities.segment<3>(3 * i) - velocities.segment<3>(3 * j);
         const double rij_dot_vij = pairdistanceNormed.dot(velocitydiff);
         const double gamma_weighted_rij_dot_vij =
           this->gamma * one_minus_rnorm2 * rij_dot_vij;
@@ -821,13 +809,13 @@ DPDSimulator::computeForces(
         pairForce = pairForceConst * pairdistanceNormed;
 
         // actually assign the new forces
-        forces.segment(3 * i, 3) += pairForce;
-        forces.segment(3 * j, 3) -= pairForce;
+        forces.segment<3>(3 * i) += pairForce;
+        forces.segment<3>(3 * j) -= pairForce;
 
         // pressure update: repulsive force -> increases pressure
         pressure += pairForce.dot(pairdistance);
         assert(std::isfinite(pressure));
-        stressTensor += pairForce * pairdistance.transpose();
+        stressTensor.noalias() += pairForce * pairdistance.transpose();
       }
     }
   }
@@ -1696,13 +1684,12 @@ DPDSimulator::getBondLengths()
     this->box.handlePBC(bondDistances);
   }
 
-  Eigen::VectorXd bondLengths(this->numBonds + this->numSlipSprings);
-#pragma omp parallel for if ((this->numBonds + this->numSlipSprings) > 1000)
-  for (Eigen::Index i = 0; i < (this->numBonds + this->numSlipSprings); ++i) {
-    const double b = bondDistances.segment(3 * i, 3).norm();
-    bondLengths[i] = b;
-  }
-  return bondLengths;
+  return bondDistances
+    .reshaped(3,
+              static_cast<Eigen::Index>(this->numBonds + this->numSlipSprings))
+    .colwise()
+    .norm()
+    .transpose();
 }
 
 Eigen::VectorXd

@@ -106,10 +106,10 @@ namespace {
       const Eigen::Vector3d offset = net.springBoxOffset.segment<3>(3 * sIdx);
       constants.segment<3>(3 * idxA) -= offset * multiplier;
       constants.segment<3>(3 * idxB) += offset * multiplier;
-      if (is2D) {
-        constants[3 * idxA + 2] = 0.0;
-        constants[3 * idxB + 2] = 0.0;
-      }
+    }
+
+    if (is2D && nLinks > 0) {
+      constants.reshaped(3, nLinks).row(2).setZero();
     }
 
     for (size_t linkIdx = 0; linkIdx < net.nrOfLinks; ++linkIdx) {
@@ -204,16 +204,11 @@ namespace {
     const Eigen::MatrixX3d rhs = unpackVectorToMatrixX3(constants, nLinks);
     Eigen::MatrixX3d sol(nLinks, 3);
     if (is2D) {
-      Eigen::MatrixX2d rhs2D(nLinks, 2);
-      rhs2D.col(0) = rhs.col(0);
-      rhs2D.col(1) = rhs.col(1);
-      const Eigen::MatrixX2d sol2D = solver.solve(rhs2D);
+      sol.leftCols<2>().noalias() = solver.solve(rhs.leftCols<2>());
       if (solver.info() != Eigen::Success) {
         throwSolverFailure(
           "System could not be solved", effectiveSolverChoice, solver.info());
       }
-      sol.col(0) = sol2D.col(0);
-      sol.col(1) = sol2D.col(1);
     } else {
       sol = solver.solve(rhs);
       if (solver.info() != Eigen::Success) {

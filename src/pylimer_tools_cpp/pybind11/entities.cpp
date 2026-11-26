@@ -143,7 +143,7 @@ init_pylimer_bound_entities(py::module_& m)
     )pbdoc")
     .def(
       "apply_pbc",
-      [](const Box& box, const Eigen::VectorXd& distances) {
+      [](const Box& box, const Eigen::Ref<const Eigen::VectorXd>& distances) {
         Eigen::VectorXd dist = distances;
         box.handlePBC(dist);
         return dist;

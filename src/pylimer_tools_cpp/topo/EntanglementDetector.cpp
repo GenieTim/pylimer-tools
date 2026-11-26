@@ -875,7 +875,7 @@ sampleStrandBeadsOnDemand(
                                                  false,
                                                  static_cast<size_t>(nMcSteps));
     }
-    positions += rAnchor.replicate(nBeads, 1);
+    positions.reshaped(3, nBeads).colwise() += rAnchor;
     return positions;
   } else {
     std::uniform_real_distribution<double> distX(box.getLowX(), box.getHighX());
@@ -893,7 +893,7 @@ sampleStrandBeadsOnDemand(
                                                  false,
                                                  static_cast<size_t>(nMcSteps));
     }
-    positions += rFrom.replicate(nBeads, 1);
+    positions.reshaped(3, nBeads).colwise() += rFrom;
     return positions;
   }
 }
@@ -1015,13 +1015,11 @@ randomlyFindEntanglementsOnDemand(
       continue;
     }
 
-    Eigen::Vector3d minCoord = coords.segment<3>(3 * firstBeadOffset);
-    Eigen::Vector3d maxCoord = minCoord;
-    for (int i = 1; i < nInternalBeads; ++i) {
-      const Eigen::Vector3d pt = coords.segment<3>(3 * (firstBeadOffset + i));
-      minCoord = minCoord.cwiseMin(pt);
-      maxCoord = maxCoord.cwiseMax(pt);
-    }
+    const auto beadBlock =
+      coords.segment(3 * firstBeadOffset, 3 * nInternalBeads)
+        .reshaped(3, nInternalBeads);
+    const Eigen::Vector3d minCoord = beadBlock.rowwise().minCoeff();
+    const Eigen::Vector3d maxCoord = beadBlock.rowwise().maxCoeff();
 
     Eigen::Vector3d unwrappedCenter = 0.5 * (minCoord + maxCoord);
     bboxes[s].halfExtents = 0.5 * (maxCoord - minCoord);

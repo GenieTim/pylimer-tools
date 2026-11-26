@@ -206,14 +206,15 @@ MEHPForceEvaluator::evaluateStressTensor(const MEHPNetwork& net,
                      "Volume must be finite and positive.");
   validateNetworkAndSpringVectors(net, springVectors, nullptr);
   Eigen::Matrix3d stress = Eigen::Matrix3d::Zero();
+  const auto springMat =
+    springVectors.reshaped(3, static_cast<Eigen::Index>(net.nrOfSprings));
   for (Eigen::Index s = 0; s < static_cast<Eigen::Index>(net.nrOfSprings);
        ++s) {
-    const Eigen::Vector3d springVec(springVectors[3 * s],
-                                    springVectors[3 * s + 1],
-                                    is2D ? 0.0 : springVectors[3 * s + 2]);
+    const Eigen::Vector3d springVec(
+      springMat(0, s), springMat(1, s), is2D ? 0.0 : springMat(2, s));
     const Eigen::Vector3d force =
       this->evaluateSpringForce(springVec, net.springContourLength[s]);
-    stress += springVec * force.transpose();
+    stress.noalias() += springVec * force.transpose();
   }
   if (is2D) {
     stress.row(2).setZero();

@@ -35,7 +35,8 @@ namespace utils {
       std::normal_distribution<double>(
         beadDistance, hasStepSizeVariance ? std::sqrt(variance) : 1.0);
 
-    Eigen::VectorXd coordinates = Eigen::VectorXd(3 * chainLen);
+    Eigen::VectorXd coordinates(3 * chainLen);
+    auto coordsMat = coordinates.reshaped(3, chainLen);
 
     Eigen::Vector3d lastPosition = Eigen::Vector3d::Zero();
 
@@ -53,17 +54,18 @@ namespace utils {
       // coordinate system conversion: confirmation e.g. in
       // https://math.stackexchange.com/a/1385150/738831 or
       // https://en.wikipedia.org/wiki/Spherical_coordinate_system
-      Eigen::Vector3d displacement(stepSize * std::cos(beta) * std::sin(alpha),
-                                   stepSize * std::sin(beta) * std::sin(alpha),
-                                   stepSize * std::cos(alpha));
-      coordinates.segment(3 * i, 3) = lastPosition + displacement;
+      const Eigen::Vector3d displacement(
+        stepSize * std::cos(beta) * std::sin(alpha),
+        stepSize * std::sin(beta) * std::sin(alpha),
+        stepSize * std::cos(alpha));
+      coordsMat.col(i) = lastPosition + displacement;
 
 #ifndef NDEBUG
       assert(APPROX_EQUAL(displacement.norm(), std::abs(stepSize), 1e-10));
 #endif
 
-      lastPosition = coordinates.segment(3 * i, 3);
-      assert(!lastPosition.array().isNaN().any());
+      lastPosition = coordsMat.col(i);
+      assert(!lastPosition.hasNaN());
     }
 
     return coordinates;
@@ -121,7 +123,8 @@ namespace utils {
     // include the first and the last positions
     Eigen::VectorXd coordinates = doRandomWalkChain(
       chainLen + 2, beadDistance, meanSquaredBeadDistance, rng);
-    coordinates += from.replicate(chainLen + 2, 1);
+    auto coordsMat = coordinates.reshaped(3, chainLen + 2);
+    coordsMat.colwise() += from;
 
     assert(coordinates.size() == 3 * (chainLen + 2));
 
@@ -130,14 +133,10 @@ namespace utils {
     // note that the bond size gets a bit destroyed
     // inspiration:
     // https://medium.com/@christopher.tabori/bridging-the-gap-an-introduction-to-brownian-bridge-simulations-10655b0baf02
-    for (int i = 1; i < chainLen + 2; ++i) {
-      double pathFraction =
-        static_cast<double>(i) / static_cast<double>(chainLen + 1);
-      Eigen::Vector3d deterministicPosition = (from + dist) * pathFraction;
-      coordinates.segment(3 * i, 3) +=
-        deterministicPosition -
-        pathFraction * coordinates.segment(3 * (chainLen + 1), 3);
-    }
+    const Eigen::Vector3d bridgeShift =
+      (from + dist) - coordsMat.col(chainLen + 1);
+    coordsMat.noalias() +=
+      bridgeShift * Eigen::RowVectorXd::LinSpaced(chainLen + 2, 0.0, 1.0);
 
     if (includeEnds) {
       return coordinates;
@@ -264,13 +263,11 @@ namespace utils {
     Eigen::Vector3d dist = to - from;
     box.handlePBC(dist);
 
-    Eigen::VectorXd results = Eigen::VectorXd::Zero(3 * (chainLen + 2));
-
-    for (Eigen::Index i = 0; i < chainLen + 2; ++i) {
-      double denominator =
-        static_cast<double>(i) / static_cast<double>(chainLen + 1);
-      results.segment(3 * i, 3) = from + denominator * dist;
-    }
+    Eigen::VectorXd results(3 * (chainLen + 2));
+    auto resMat = results.reshaped(3, chainLen + 2);
+    resMat.colwise() = from;
+    resMat.noalias() +=
+      dist * Eigen::RowVectorXd::LinSpaced(chainLen + 2, 0.0, 1.0);
 
     if (includeEnds) {
       return results;

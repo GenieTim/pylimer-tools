@@ -121,7 +121,8 @@ NormalModeSpectrum::getNumZeroModes() const
 }
 
 Eigen::ArrayXd
-NormalModeSpectrum::stressAutocorrelation(const Eigen::ArrayXd& t) const
+NormalModeSpectrum::stressAutocorrelation(
+  const Eigen::Ref<const Eigen::ArrayXd>& t) const
 {
   Eigen::ArrayXd result = Eigen::ArrayXd::Zero(t.size());
   for (Eigen::Index i = 0; i < this->eigenvalues_.size(); ++i) {
@@ -141,15 +142,20 @@ NormalModeSpectrum::stressAutocorrelation(const Eigen::ArrayXd& t) const
 }
 
 std::pair<Eigen::ArrayXd, Eigen::ArrayXd>
-NormalModeSpectrum::evaluateModuli(const Eigen::ArrayXd& omega,
-                                   const bool computeStorage,
-                                   const bool computeLoss) const
+NormalModeSpectrum::evaluateModuli(
+  const Eigen::Ref<const Eigen::ArrayXd>& omega,
+  const bool computeStorage,
+  const bool computeLoss) const
 {
   const Eigen::Index nFreq = omega.size();
   Eigen::ArrayXd storage =
     computeStorage ? Eigen::ArrayXd::Zero(nFreq) : Eigen::ArrayXd();
   Eigen::ArrayXd loss =
     computeLoss ? Eigen::ArrayXd::Zero(nFreq) : Eigen::ArrayXd();
+
+  Eigen::ArrayXd r(nFreq);
+  Eigen::ArrayXd r2(nFreq);
+  Eigen::ArrayXd invDenom(nFreq);
 
   for (Eigen::Index i = 0; i < this->eigenvalues_.size(); ++i) {
     const double lambda = this->eigenvalues_[i];
@@ -161,16 +167,14 @@ NormalModeSpectrum::evaluateModuli(const Eigen::ArrayXd& omega,
       continue;
     }
     const double invTwoLambda = 0.5 / lambda;
-    for (Eigen::Index j = 0; j < nFreq; ++j) {
-      const double r = omega[j] * invTwoLambda;
-      const double r2 = r * r;
-      const double invDenom = w / (1.0 + r2);
-      if (computeStorage) {
-        storage[j] += r2 * invDenom;
-      }
-      if (computeLoss) {
-        loss[j] += r * invDenom;
-      }
+    r = omega * invTwoLambda;
+    r2 = r.square();
+    invDenom = w / (1.0 + r2);
+    if (computeStorage) {
+      storage += r2 * invDenom;
+    }
+    if (computeLoss) {
+      loss += r * invDenom;
     }
   }
 
@@ -185,19 +189,21 @@ NormalModeSpectrum::evaluateModuli(const Eigen::ArrayXd& omega,
 }
 
 Eigen::ArrayXd
-NormalModeSpectrum::storageModulus(const Eigen::ArrayXd& omega) const
+NormalModeSpectrum::storageModulus(
+  const Eigen::Ref<const Eigen::ArrayXd>& omega) const
 {
   return this->evaluateModuli(omega, true, false).first;
 }
 
 Eigen::ArrayXd
-NormalModeSpectrum::lossModulus(const Eigen::ArrayXd& omega) const
+NormalModeSpectrum::lossModulus(
+  const Eigen::Ref<const Eigen::ArrayXd>& omega) const
 {
   return this->evaluateModuli(omega, false, true).second;
 }
 
 std::pair<Eigen::ArrayXd, Eigen::ArrayXd>
-NormalModeSpectrum::moduli(const Eigen::ArrayXd& omega) const
+NormalModeSpectrum::moduli(const Eigen::Ref<const Eigen::ArrayXd>& omega) const
 {
   return this->evaluateModuli(omega, true, true);
 }
@@ -462,20 +468,36 @@ NormalModeAnalyzer::computeAllEigenvaluesSparseSlicing(
   const double bUpper = 2.0 * maxDiag + 0.1;
   const double aLower = -1e-7;
 
+  Eigen::SparseMatrix<double> shifted = mat;
+  for (Eigen::Index i = 0; i < n; ++i) {
+    shifted.coeffRef(i, i) += 0.0;
+  }
+  shifted.makeCompressed();
+  const Eigen::VectorXd origDiag = shifted.diagonal();
+  std::vector<double*> diagValPtrs(static_cast<size_t>(n), nullptr);
+  for (Eigen::Index col = 0; col < shifted.outerSize(); ++col) {
+    for (Eigen::SparseMatrix<double>::InnerIterator it(shifted, col); it;
+         ++it) {
+      if (it.row() == col) {
+        diagValPtrs[static_cast<size_t>(col)] = &it.valueRef();
+        break;
+      }
+    }
+  }
+  Eigen::SimplicialLDLT<Eigen::SparseMatrix<double>> ldlt;
+  ldlt.analyzePattern(shifted);
+
   auto countLessThan = [&](const double sigma) -> size_t {
     const double perturbations[] = {
       0.0, 1.234567e-8, -2.345678e-8, 5.678901e-7
     };
     for (const double pert : perturbations) {
       const double currentSigma = sigma + pert;
-      Eigen::SparseMatrix<double> shifted = mat;
-      for (Eigen::Index i = 0; i < shifted.rows(); ++i) {
-        shifted.coeffRef(i, i) -= currentSigma;
+      for (Eigen::Index i = 0; i < n; ++i) {
+        *diagValPtrs[static_cast<size_t>(i)] = origDiag[i] - currentSigma;
       }
-      shifted.makeCompressed();
 
-      Eigen::SimplicialLDLT<Eigen::SparseMatrix<double>> ldlt;
-      ldlt.compute(shifted);
+      ldlt.factorize(shifted);
       if (ldlt.info() == Eigen::Success) {
         const auto& D = ldlt.vectorD();
         return static_cast<size_t>((D.array() < 0.0).count());
@@ -1062,8 +1084,8 @@ NormalModeAnalyzer::computeChebyshevMomentsCPU(
         y.noalias() = this->assembledConnectivityMatrix_ * uCurr;
         uNext = (2.0 / w) * (y - c * uCurr) - uPrev;
         avgMoments[m + 1] += v.dot(uNext);
-        uPrev = std::move(uCurr);
-        uCurr = std::move(uNext);
+        uPrev.swap(uCurr);
+        uCurr.swap(uNext);
       }
     }
   }
@@ -1110,8 +1132,9 @@ NormalModeAnalyzer::chebyshevMoments(const KPMConfig& config) const
 }
 
 Eigen::ArrayXd
-NormalModeAnalyzer::densityOfStates(const Eigen::ArrayXd& lambdaGrid,
-                                    const KPMConfig& config) const
+NormalModeAnalyzer::densityOfStates(
+  const Eigen::Ref<const Eigen::ArrayXd>& lambdaGrid,
+  const KPMConfig& config) const
 {
   const Eigen::Index n = this->assembledConnectivityMatrix_.rows();
   if (n == 0) {
@@ -1298,7 +1321,7 @@ NormalModeAnalyzer::runDeflatedSLQ(const size_t numSteps,
           break;
         }
         beta.push_back(b);
-        qPrev = q;
+        qPrev.swap(q);
         q = w / b;
       }
     }

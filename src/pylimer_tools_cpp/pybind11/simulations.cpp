@@ -135,16 +135,16 @@ public:
             "evaluate_network_energy_and_gradient returned None for gradient "
             "when compute_gradient=True");
         }
-        const Eigen::VectorXd gradVec = t[1].cast<Eigen::VectorXd>();
+        const Eigen::Ref<const Eigen::VectorXd> gradVec =
+          t[1].cast<Eigen::Ref<const Eigen::VectorXd>>();
         const size_t expectedSize = 3 * net.nrOfLinks;
         if (static_cast<size_t>(gradVec.size()) != expectedSize) {
           throw std::runtime_error("Gradient size mismatch: expected " +
                                    std::to_string(expectedSize) + ", got " +
                                    std::to_string(gradVec.size()));
         }
-        for (size_t i = 0; i < expectedSize; ++i) {
-          grad[i] = gradVec[static_cast<Eigen::Index>(i)];
-        }
+        Eigen::Map<Eigen::VectorXd>(
+          grad, static_cast<Eigen::Index>(expectedSize)) = gradVec;
       }
       return energy;
     }

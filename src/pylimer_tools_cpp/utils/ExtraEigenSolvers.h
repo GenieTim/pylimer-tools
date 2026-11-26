@@ -47,25 +47,29 @@ gradientDescent(const MatrixType& A,
       ? initialX
       : Eigen::VectorXd::Zero(b.size()); // Initialize solution vector
   Eigen::VectorXd residual = b - A * x;  // Compute initial residual r = b - Ax
+  Eigen::VectorXd Ar(b.size());
 
   const double initialNorm =
     initialResidual > 0.0 ? initialResidual : residual.norm();
+  double residualNorm = residual.norm();
 
-  while ((residual.norm() / initialNorm) > tolerance &&
+  while ((residualNorm / initialNorm) > tolerance &&
          iteration < maxIterations) {
-    Eigen::VectorXd Ar = A * residual;
-    double stepSize = residual.dot(residual) /
-                      residual.dot(Ar); // Optimal step size for SPD systems
-    x = x + stepSize * residual;
+    Ar.noalias() = A * residual;
+    const double rDotR = residual.squaredNorm();
+    const double stepSize =
+      rDotR / residual.dot(Ar); // Optimal step size for SPD systems
+    x += stepSize * residual;
     iteration += 1;
 
     // Recompute residual periodically to prevent floating point drift
     if (iteration % 50 == 0) {
-      residual = b - A * x;
+      residual.noalias() = b - A * x;
     } else {
       // Efficient residual update: r_{k+1} = r_k - alpha * A * r_k
-      residual = residual - stepSize * Ar;
+      residual -= stepSize * Ar;
     }
+    residualNorm = residual.norm();
 
     // Call iteration callback if provided
     if (iterationCallback && iterationCallback(iteration, x)) {
@@ -127,22 +131,30 @@ gradientDescentBarzilaiBorwein(
   Eigen::VectorXd gradient = A * x - b; // Compute initial gradient: ∇f = Ax - b
   double alpha = learningRate;          // Initial step size
 
+  Eigen::VectorXd nextX(b.size());
+  Eigen::VectorXd nextGradient(b.size());
+  Eigen::VectorXd deltaGradient(b.size());
+
   const double initialNorm =
     initialResidual > 0.0 ? initialResidual : gradient.norm();
-  while ((gradient.norm() / initialNorm) > tolerance &&
+  double gradientNorm = gradient.norm();
+  while ((gradientNorm / initialNorm) > tolerance &&
          iteration < maxIterations) {
-    Eigen::VectorXd nextX = x - alpha * gradient;
-    Eigen::VectorXd nextGradient = A * nextX - b;
+    nextX.noalias() = x - alpha * gradient;
+    nextGradient.noalias() = A * nextX - b;
+    deltaGradient.noalias() = nextGradient - gradient;
 
-    Eigen::VectorXd deltaX = nextX - x;
-    Eigen::VectorXd deltaGradient = nextGradient - gradient;
+    // Since deltaX = nextX - x = -alpha * gradient:
+    // deltaX . deltaX = alpha^2 * gradient.squaredNorm()
+    // deltaX . deltaGradient = -alpha * gradient.dot(deltaGradient)
+    const double sTs = alpha * alpha * gradient.squaredNorm();
+    const double sTy = -alpha * gradient.dot(deltaGradient);
+    const double alphaLong = sTs / sTy;
+    const double alphaShort = sTy / deltaGradient.squaredNorm();
 
-    const double alphaLong = (deltaX.dot(deltaX)) / (deltaX.dot(deltaGradient));
-    const double alphaShort =
-      (deltaX.dot(deltaGradient)) / (deltaGradient.dot(deltaGradient));
-
-    x = nextX;
-    gradient = nextGradient;
+    x.swap(nextX);
+    gradient.swap(nextGradient);
+    gradientNorm = gradient.norm();
     alpha = shortAlpha ? alphaShort : alphaLong;
     if (!std::isfinite(alpha)) {
       alpha = learningRate; // Reset alpha to a reasonable value
@@ -228,6 +240,10 @@ gradientDescentHeavyBallBarzilaiBorwein(
   }
 
   double bestGradientNorm = gradientNorm;
+  Eigen::VectorXd step(b.size());
+  Eigen::VectorXd nextX(b.size());
+  Eigen::VectorXd nextGradient(b.size());
+  Eigen::VectorXd deltaGradient(b.size());
 
   while ((gradientNorm / initialNorm) > tolerance &&
          iteration < maxIterations) {
@@ -243,15 +259,14 @@ gradientDescentHeavyBallBarzilaiBorwein(
     // Heavy Ball update: step = -(1 - beta)*alpha*g + beta*momentum.
     // Scaling the gradient term by (1 - beta) when momentum is active makes the
     // steady-state effective step size match alpha.
-    Eigen::VectorXd step;
     if (hasMomentum) {
-      step = -(1.0 - beta) * alpha * gradient + beta * momentum;
+      step.noalias() = -(1.0 - beta) * alpha * gradient + beta * momentum;
     } else {
-      step = -alpha * gradient;
+      step.noalias() = -alpha * gradient;
     }
 
-    Eigen::VectorXd nextX = x + step;
-    Eigen::VectorXd nextGradient = A * nextX - b;
+    nextX.noalias() = x + step;
+    nextGradient.noalias() = A * nextX - b;
     double nextGradientNorm = nextGradient.norm();
     const double currentGradientNorm = gradientNorm;
 
@@ -266,9 +281,9 @@ gradientDescentHeavyBallBarzilaiBorwein(
         if (bt > 0) {
           safeAlpha *= 0.5;
         }
-        step = -safeAlpha * gradient;
-        nextX = x + step;
-        nextGradient = A * nextX - b;
+        step.noalias() = -safeAlpha * gradient;
+        nextX.noalias() = x + step;
+        nextGradient.noalias() = A * nextX - b;
         nextGradientNorm = nextGradient.norm();
         iteration++;
         if (std::isfinite(nextGradientNorm) &&
@@ -279,7 +294,7 @@ gradientDescentHeavyBallBarzilaiBorwein(
       alpha = safeAlpha;
     }
 
-    Eigen::VectorXd deltaGradient = nextGradient - gradient;
+    deltaGradient.noalias() = nextGradient - gradient;
 
     // Barzilai-Borwein step size (scale-invariant curvature check, preserving
     // sign of sTy for both positive- and negative-definite systems)

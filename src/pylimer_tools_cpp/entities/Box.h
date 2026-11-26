@@ -246,31 +246,31 @@ public:
    * @return Eigen::VectorXd
    */
   [[nodiscard]] Eigen::VectorXd getOffset(
-    const Eigen::VectorXd& distanceVec) const
+    const Eigen::Ref<const Eigen::VectorXd>& distanceVec) const
   {
-    return -(this->L.replicate(distanceVec.size() / 3, 1) *
-             (distanceVec.array() *
-              this->oneOverL.replicate(distanceVec.size() / 3, 1))
-               .rint())
-              .matrix();
+    const Eigen::Index nVecs = distanceVec.size() / 3;
+    Eigen::VectorXd offset(distanceVec.size());
+    offset.reshaped(3, nVecs) =
+      -((distanceVec.reshaped(3, nVecs).array().colwise() * this->oneOverL)
+          .rint()
+          .colwise() *
+        this->L)
+         .matrix();
+    return offset;
   }
 
-  [[nodiscard]] bool isValidOffset(const Eigen::VectorXd& offset,
-                                   const double precision = 1e-5) const
+  [[nodiscard]] bool isValidOffset(
+    const Eigen::Ref<const Eigen::VectorXd>& offset,
+    const double precision = 1e-5) const
   {
-    if (!(offset.size() % 3 == 0)) {
+    if (offset.size() % 3 != 0) {
       return false;
     }
-    for (int i = 0; i < offset.size(); ++i) {
-      if (std::abs(offset[i]) > precision) {
-        double multiple = offset[i] / this->L[i % 3];
-        bool rowIsValid = std::abs(multiple - round(multiple)) < precision;
-        if (!rowIsValid) {
-          return false;
-        }
-      }
-    }
-    return true;
+    const auto reshapedOffset = offset.reshaped(3, offset.size() / 3).array();
+    const auto multiples = reshapedOffset.colwise() / this->L;
+    return ((reshapedOffset.abs() <= precision) ||
+            ((multiples - multiples.round()).abs() < precision))
+      .all();
   }
 
   template<typename VectorType>
@@ -280,9 +280,9 @@ public:
       coords.size() % 3 == 0,
       "Expect coordinates to be in order x, y, z, repeatedly.");
 
-    double scalingFactorX = newBox.getLx() / this->L[0];
-    double scalingFactorY = newBox.getLy() / this->L[1];
-    double scalingFactorZ = newBox.getLz() / this->L[2];
+    const double scalingFactorX = newBox.getLx() / this->L[0];
+    const double scalingFactorY = newBox.getLy() / this->L[1];
+    const double scalingFactorZ = newBox.getLz() / this->L[2];
     RUNTIME_EXP_IFN(scalingFactorX > 0.,
                     "Requiring scaling factor to be > 0, got in x-direction " +
                       std::to_string(scalingFactorX) + ".");
@@ -293,41 +293,24 @@ public:
                     "Requiring scaling factor to be > 0, got in z-direction " +
                       std::to_string(scalingFactorZ) + ".");
 
-    // first, scale back to non-sheared.
-    if (this->shearDirection >= 0 && this->shearDirection <= 3) {
-      for (int i = 0; i < coords.size() / 3; ++i) {
-        if (this->getShearDirection() == 0) {
-          coords[3 * i] -=
-            this->getShearMagnitude() * coords[3 * i + 1]; // x' = x + ɣ*y
-        }
-        if (this->getShearDirection() == 1) {
-          coords[3 * i + 1] -=
-            this->getShearMagnitude() * coords[3 * i + 2]; // y' = y + ɣ*z
-        }
-        if (this->getShearDirection() == 2) {
-          coords[3 * i + 2] -=
-            this->getShearMagnitude() * coords[3 * i]; // z' = z + ɣ*x
-        }
+    auto applyDeform = [&](auto mat) {
+      if (this->shearDirection >= 0 && this->shearDirection <= 2) {
+        const Eigen::Index d = this->shearDirection;
+        mat.row(d) -= this->getShearMagnitude() * mat.row((d + 1) % 3);
       }
-    }
+      mat.array().colwise() *= (newBox.getL() / this->L);
+      if (newBox.getShearDirection() >= 0 && newBox.getShearDirection() <= 2) {
+        const Eigen::Index d = newBox.getShearDirection();
+        mat.row(d) += newBox.getShearMagnitude() * mat.row((d + 1) % 3);
+      }
+    };
 
-    // actually do the deformation as appropriate
-    for (int i = 0; i < coords.size() / 3; ++i) {
-      coords[3 * i] *= scalingFactorX;
-      coords[3 * i + 1] *= scalingFactorY;
-      coords[3 * i + 2] *= scalingFactorZ;
-      if (newBox.getShearDirection() == 0) {
-        coords[3 * i] +=
-          newBox.getShearMagnitude() * coords[3 * i + 1]; // x' = x + ɣ*y
-      }
-      if (newBox.getShearDirection() == 1) {
-        coords[3 * i + 1] +=
-          newBox.getShearMagnitude() * coords[3 * i + 2]; // y' = y + ɣ*z
-      }
-      if (newBox.getShearDirection() == 2) {
-        coords[3 * i + 2] +=
-          newBox.getShearMagnitude() * coords[3 * i]; // z' = z + ɣ*x
-      }
+    if constexpr (std::is_base_of_v<Eigen::MatrixBase<std::decay_t<VectorType>>,
+                                    std::decay_t<VectorType>>) {
+      applyDeform(coords.reshaped(3, coords.size() / 3));
+    } else {
+      applyDeform(Eigen::Map<Eigen::Matrix3Xd>(
+        coords.data(), 3, static_cast<Eigen::Index>(coords.size() / 3)));
     }
   };
 
@@ -339,36 +322,34 @@ public:
       INVALIDARG_EXP_IFN(distances.size() % 3 == 0,
                          "Require distances to be a multiple of 3 to handle "
                          "PBC for sheared box.");
-      // scaled coordinates in the initial cubic box
-      for (decltype(distances.size()) j = 0; j < distances.size() / 3; ++j) {
-        if (this->getShearDirection() == 0) {
-          distances[3 * j] -= this->getShearMagnitude() * distances[3 * j + 1];
-        }
-        if (this->getShearDirection() == 1) {
-          distances[3 * j + 1] -=
-            this->getShearMagnitude() * distances[3 * j + 2];
-        }
-        if (this->getShearDirection() == 2) {
-          distances[3 * j + 2] -= this->getShearMagnitude() * distances[3 * j];
-        }
+      const Eigen::Index d = this->shearDirection;
+      const Eigen::Index nextD = (d + 1) % 3;
+      if constexpr (std::is_base_of_v<
+                      Eigen::MatrixBase<std::decay_t<VectorType>>,
+                      std::decay_t<VectorType>>) {
+        auto mat = distances.reshaped(3, distances.size() / 3);
+        mat.row(d) -= this->getShearMagnitude() * mat.row(nextD);
+      } else {
+        auto mat = Eigen::Map<Eigen::Matrix3Xd>(
+          distances.data(), 3, static_cast<Eigen::Index>(distances.size() / 3));
+        mat.row(d) -= this->getShearMagnitude() * mat.row(nextD);
       }
     }
     // actually do PBC
     this->minImageDistances(distances);
     // back to the physical space
     if (sheared) {
-      // scaled coordinates in the initial cubic box
-      for (decltype(distances.size()) j = 0; j < distances.size() / 3; ++j) {
-        if (this->getShearDirection() == 0) {
-          distances[3 * j] += this->getShearMagnitude() * distances[3 * j + 1];
-        }
-        if (this->getShearDirection() == 1) {
-          distances[3 * j + 1] +=
-            this->getShearMagnitude() * distances[3 * j + 2];
-        }
-        if (this->getShearDirection() == 2) {
-          distances[3 * j + 2] += this->getShearMagnitude() * distances[3 * j];
-        }
+      const Eigen::Index d = this->shearDirection;
+      const Eigen::Index nextD = (d + 1) % 3;
+      if constexpr (std::is_base_of_v<
+                      Eigen::MatrixBase<std::decay_t<VectorType>>,
+                      std::decay_t<VectorType>>) {
+        auto mat = distances.reshaped(3, distances.size() / 3);
+        mat.row(d) += this->getShearMagnitude() * mat.row(nextD);
+      } else {
+        auto mat = Eigen::Map<Eigen::Matrix3Xd>(
+          distances.data(), 3, static_cast<Eigen::Index>(distances.size() / 3));
+        mat.row(d) += this->getShearMagnitude() * mat.row(nextD);
       }
     }
   }

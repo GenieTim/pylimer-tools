@@ -315,11 +315,7 @@ RouseBrownianSimulator::setPositionsFlattened(const Eigen::VectorXd& r,
     "Flattened positions vector must contain only finite values");
 
   if (interleaved) {
-    for (Eigen::Index i = 0; i < numNodes_; ++i) {
-      positions_(i, 0) = r(3 * i);
-      positions_(i, 1) = r(3 * i + 1);
-      positions_(i, 2) = r(3 * i + 2);
-    }
+    positions_.noalias() = r.reshaped<Eigen::RowMajor>(numNodes_, 3);
   } else {
     positions_.col(0) = r.segment(0, numNodes_);
     positions_.col(1) = r.segment(numNodes_, numNodes_);
@@ -332,11 +328,7 @@ RouseBrownianSimulator::getPositionsFlattened(const bool interleaved) const
 {
   Eigen::VectorXd r(numNodes_ * 3);
   if (interleaved) {
-    for (Eigen::Index i = 0; i < numNodes_; ++i) {
-      r(3 * i) = positions_(i, 0);
-      r(3 * i + 1) = positions_(i, 1);
-      r(3 * i + 2) = positions_(i, 2);
-    }
+    r.reshaped(3, numNodes_).noalias() = positions_.transpose();
   } else {
     r.segment(0, numNodes_) = positions_.col(0);
     r.segment(numNodes_, numNodes_) = positions_.col(1);
@@ -509,12 +501,7 @@ RouseBrownianSimulator::getRadiusOfGyration() const
 double
 RouseBrownianSimulator::getPotentialEnergy() const
 {
-  double u = 0.0;
-  for (int c = 0; c < 3; ++c) {
-    const Eigen::VectorXd Lr = L_ * positions_.col(c);
-    u += positions_.col(c).dot(Lr);
-  }
-  return 0.5 * k_ * u;
+  return 0.5 * k_ * positions_.cwiseProduct(L_ * positions_).sum();
 }
 
 RouseSimulationResult

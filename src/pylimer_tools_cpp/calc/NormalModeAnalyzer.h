@@ -141,24 +141,27 @@ public:
    * @brief Evaluate stress autocorrelation $G(t) = \sum_i w_i e^{-2\lambda_i
    * t}$.
    */
-  Eigen::ArrayXd stressAutocorrelation(const Eigen::ArrayXd& t) const;
+  Eigen::ArrayXd stressAutocorrelation(
+    const Eigen::Ref<const Eigen::ArrayXd>& t) const;
 
   /**
    * @brief Evaluate storage modulus $G'(\omega)$.
    */
-  Eigen::ArrayXd storageModulus(const Eigen::ArrayXd& omega) const;
+  Eigen::ArrayXd storageModulus(
+    const Eigen::Ref<const Eigen::ArrayXd>& omega) const;
 
   /**
    * @brief Evaluate loss modulus $G''(\omega)$.
    */
-  Eigen::ArrayXd lossModulus(const Eigen::ArrayXd& omega) const;
+  Eigen::ArrayXd lossModulus(
+    const Eigen::Ref<const Eigen::ArrayXd>& omega) const;
 
   /**
    * @brief Evaluate both storage and loss moduli $(G'(\omega), G''(\omega))$
    *        in a single pass over the spectrum.
    */
   std::pair<Eigen::ArrayXd, Eigen::ArrayXd> moduli(
-    const Eigen::ArrayXd& omega) const;
+    const Eigen::Ref<const Eigen::ArrayXd>& omega) const;
 
 #ifdef CEREALIZABLE
   static NormalModeSpectrum fromString(std::string in)
@@ -177,7 +180,7 @@ private:
   bool isComplete_ = true;
 
   std::pair<Eigen::ArrayXd, Eigen::ArrayXd> evaluateModuli(
-    const Eigen::ArrayXd& omega,
+    const Eigen::Ref<const Eigen::ArrayXd>& omega,
     bool computeStorage,
     bool computeLoss) const;
 
@@ -295,8 +298,9 @@ public:
   /**
    * @brief Compute continuous density of states (DOS) on lambdaGrid using KPM.
    */
-  Eigen::ArrayXd densityOfStates(const Eigen::ArrayXd& lambdaGrid,
-                                 const KPMConfig& config = KPMConfig{}) const;
+  Eigen::ArrayXd densityOfStates(
+    const Eigen::Ref<const Eigen::ArrayXd>& lambdaGrid,
+    const KPMConfig& config = KPMConfig{}) const;
 
 #ifdef CEREALIZABLE
   static NormalModeAnalyzer fromString(std::string in)

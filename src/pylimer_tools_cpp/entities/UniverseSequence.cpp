@@ -787,8 +787,7 @@ UniverseSequence::computeMsdForAtomProperties(
   // optimizations)
   const size_t stepSize =
     computeStepSize(this->getLength() - startingIndex, nrOfOrigins);
-  Eigen::VectorXd distance =
-    Eigen::VectorXd::Zero(static_cast<Eigen::Index>(3 * atomIds.size()));
+  const double invNumAtoms = 1.0 / static_cast<double>(atomIds.size());
   for (size_t parent_universe_idx = startingIndex;
        parent_universe_idx < this->getLength();
        parent_universe_idx += stepSize) {
@@ -811,15 +810,11 @@ UniverseSequence::computeMsdForAtomProperties(
         continue;
       }
 
-      distance = coordinates[universe_idx - startingIndex] -
-                 coordinates[parent_universe_idx - startingIndex];
-      double localMean = 0.0;
-      double localMeanDenominator = 1. / static_cast<double>(atomIds.size());
-      for (size_t atom_id = 0; atom_id < atomIds.size(); ++atom_id) {
-        localMean += distance.segment(static_cast<Eigen::Index>(3 * atom_id), 3)
-                       .squaredNorm() *
-                     localMeanDenominator;
-      }
+      const double localMean =
+        (coordinates[universe_idx - startingIndex] -
+         coordinates[parent_universe_idx - startingIndex])
+          .squaredNorm() *
+        invNumAtoms;
       results[delta_t].push_back(localMean);
     }
     std::cout << "Universe " << parent_universe_idx
@@ -830,13 +825,13 @@ UniverseSequence::computeMsdForAtomProperties(
   std::unordered_map<long int, double> actual_means;
   actual_means.reserve(results.size());
   for (const auto& result_pair : results) {
-    std::vector<double> sds = result_pair.second;
-    if (sds.size() == 0) {
+    const std::vector<double>& sds = result_pair.second;
+    if (sds.empty()) {
       continue;
     }
     actual_means[result_pair.first] =
-      (Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
-         sds.data(), static_cast<Eigen::Index>(sds.size())))
+      Eigen::Map<const Eigen::VectorXd, Eigen::Unaligned>(
+        sds.data(), static_cast<Eigen::Index>(sds.size()))
         .mean();
   }
 
@@ -932,8 +927,7 @@ UniverseSequence::computeMsdForAtomsFromDumpFile(
   // optimizations)
   const size_t stepSize =
     computeStepSize(this->getLength() - startingIndex, nrOfOrigins);
-  Eigen::VectorXd distance =
-    Eigen::VectorXd::Zero(static_cast<Eigen::Index>(3 * atomIds.size()));
+  const double invNumAtoms = 1.0 / static_cast<double>(atomIds.size());
   for (size_t parent_universe_idx = startingIndex;
        parent_universe_idx < this->getLength();
        parent_universe_idx += stepSize) {
@@ -956,15 +950,11 @@ UniverseSequence::computeMsdForAtomsFromDumpFile(
         continue;
       }
 
-      distance = coordinates[universe_idx - startingIndex] -
-                 coordinates[parent_universe_idx - startingIndex];
-      double localMean = 0.0;
-      double localMeanDenominator = 1. / static_cast<double>(atomIds.size());
-      for (size_t atom_id = 0; atom_id < atomIds.size(); ++atom_id) {
-        localMean += distance.segment(static_cast<Eigen::Index>(3 * atom_id), 3)
-                       .squaredNorm() *
-                     localMeanDenominator;
-      }
+      const double localMean =
+        (coordinates[universe_idx - startingIndex] -
+         coordinates[parent_universe_idx - startingIndex])
+          .squaredNorm() *
+        invNumAtoms;
       results[delta_t].push_back(localMean);
     }
     std::cout << "Universe " << parent_universe_idx
@@ -975,13 +965,13 @@ UniverseSequence::computeMsdForAtomsFromDumpFile(
   std::unordered_map<long int, double> actual_means;
   actual_means.reserve(results.size());
   for (const auto& result_pair : results) {
-    std::vector<double> sds = result_pair.second;
-    if (sds.size() == 0) {
+    const std::vector<double>& sds = result_pair.second;
+    if (sds.empty()) {
       continue;
     }
     actual_means[result_pair.first] =
-      (Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
-         sds.data(), static_cast<Eigen::Index>(sds.size())))
+      Eigen::Map<const Eigen::VectorXd, Eigen::Unaligned>(
+        sds.data(), static_cast<Eigen::Index>(sds.size()))
         .mean();
   }
 
@@ -1047,8 +1037,7 @@ UniverseSequence::computeMsdForAtomsFromDataFiles(
   // (except for omitting some data, skipping the graph, or other minor
   // optimizations)
   const size_t stepSize = computeStepSize(this->getLength(), nrOfOrigins);
-  Eigen::VectorXd distance =
-    Eigen::VectorXd::Zero(static_cast<Eigen::Index>(3 * atomIds.size()));
+  const double invNumAtoms = 1.0 / static_cast<double>(atomIds.size());
   for (size_t parent_universe_idx = 0; parent_universe_idx < this->getLength();
        parent_universe_idx += stepSize) {
 
@@ -1064,12 +1053,11 @@ UniverseSequence::computeMsdForAtomsFromDataFiles(
         continue;
       }
 
-      distance = coordinates[parent_universe_idx] - coordinates[universe_idx];
-      for (size_t atom_id = 0; atom_id < atomIds.size(); ++atom_id) {
-        results[delta_t].push_back(
-          distance.segment(static_cast<Eigen::Index>(3 * atom_id), 3)
-            .squaredNorm());
-      }
+      const double localMean =
+        (coordinates[parent_universe_idx] - coordinates[universe_idx])
+          .squaredNorm() *
+        invNumAtoms;
+      results[delta_t].push_back(localMean);
     }
     std::cout << "Universe " << parent_universe_idx
               << " as basis has been handled." << std::endl;
@@ -1080,13 +1068,13 @@ UniverseSequence::computeMsdForAtomsFromDataFiles(
   std::unordered_map<long int, double> actual_means;
   actual_means.reserve(this->getLength());
   for (const auto& result_pair : results) {
-    std::vector<double> sds = result_pair.second;
-    if (sds.size() == 0) {
+    const std::vector<double>& sds = result_pair.second;
+    if (sds.empty()) {
       continue;
     }
     actual_means[result_pair.first] =
-      (Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
-         sds.data(), static_cast<Eigen::Index>(sds.size())))
+      Eigen::Map<const Eigen::VectorXd, Eigen::Unaligned>(
+        sds.data(), static_cast<Eigen::Index>(sds.size()))
         .mean();
   }
 

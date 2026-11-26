@@ -347,17 +347,17 @@ OutputSupportingSimulation::doOutputValues(
                       std::to_string(doubleValues[val]) + " for property " +
                       ComputedDoubleValuesNames[val] + ".");
     switch (val) {
-      case ComputedDoubleValues::MSD:
+      case ComputedDoubleValues::MSD: {
         // compute MSD
+        const Eigen::VectorXd relCoords = this->getCoordinates();
         for (size_t msdIdx = 0; msdIdx < this->msdMeasuredIndices.size();
              ++msdIdx) {
           assert(this->msdOrigins.size() > msdIdx);
           assert(this->msdOrigins[msdIdx].size() ==
                  this->msdMeasuredIndices[msdIdx].size());
-          Eigen::VectorXd relCoords = this->getCoordinates();
           assert(relCoords.size() >
                  this->msdMeasuredIndices[msdIdx].maxCoeff());
-          Eigen::ArrayXi nIndices = this->msdMeasuredIndices[msdIdx];
+          const Eigen::ArrayXi& nIndices = this->msdMeasuredIndices[msdIdx];
           assert(nIndices.size() > 0);
           assert(nIndices.size() == this->msdOrigins[msdIdx].size());
           assert(nIndices.minCoeff() >= 0 &&
@@ -368,6 +368,7 @@ OutputSupportingSimulation::doOutputValues(
           outputBuffer += std::to_string(result) + "\t";
         }
         break;
+      }
       default:
         outputBuffer += //"(" + std::to_string(val) + ")" +
           std::to_string(doubleValues[val]) + "\t";

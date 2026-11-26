@@ -20,7 +20,7 @@ namespace entities {
   {
   public:
     EigenNeighbourList() {}
-    EigenNeighbourList(const Eigen::VectorXd& coordinates,
+    EigenNeighbourList(const Eigen::Ref<const Eigen::VectorXd>& coordinates,
                        const Box& boxGeometry,
                        double cutoffDistance,
                        double scalingParam = 1.);
@@ -41,7 +41,7 @@ namespace entities {
      */
     bool operator!=(const EigenNeighbourList& other) const;
 
-    void initialize(const Eigen::VectorXd& coordinates,
+    void initialize(const Eigen::Ref<const Eigen::VectorXd>& coordinates,
                     const Box& box,
                     double cutoff,
                     double scalingFactor = 1.);
@@ -51,13 +51,16 @@ namespace entities {
      *
      * @param newCoordinates
      */
-    void resetCoordinates(Eigen::VectorXd& newCoordinates);
+    void resetCoordinates(
+      const Eigen::Ref<const Eigen::VectorXd>& newCoordinates);
 
-    bool checkIfCoordinatesAreCurrent(Eigen::VectorXd& newCoordinates);
+    bool checkIfCoordinatesAreCurrent(
+      const Eigen::Ref<const Eigen::VectorXd>& newCoordinates);
 
-    void validateWhyNotIncluded(Eigen::Vector3d sourceCoords,
-                                Eigen::Vector3d targetCoords,
-                                double newCutoff = -1.0) const;
+    void validateWhyNotIncluded(
+      const Eigen::Ref<const Eigen::Vector3d>& sourceCoords,
+      const Eigen::Ref<const Eigen::Vector3d>& targetCoords,
+      double newCutoff = -1.0) const;
 
     /**
      * @brief Get the Indices Close To Coordinates with the Default Cut-Off
@@ -65,8 +68,9 @@ namespace entities {
      * @param coordinates
      * @return Eigen::ArrayXi
      */
-    Eigen::ArrayXi getIndicesCloseToCoordinates(Eigen::Vector3d coordinates,
-                                                double newCutoff = -1.) const;
+    Eigen::ArrayXi getIndicesCloseToCoordinates(
+      const Eigen::Ref<const Eigen::Vector3d>& coordinates,
+      double newCutoff = -1.) const;
 
     long int getNumBinnedCoordinates() const;
 
@@ -85,15 +89,17 @@ namespace entities {
      * resized if needed. It will not be downsized, only upsized; the returned
      * int is the actual remaining size.
      */
-    int getIndicesCloseToCoordinates(Eigen::ArrayXi& result,
-                                     const Eigen::Vector3d coordinates,
-                                     const double upperCutoff,
-                                     bool expectDefault = false) const;
+    int getIndicesCloseToCoordinates(
+      Eigen::ArrayXi& result,
+      const Eigen::Ref<const Eigen::Vector3d>& coordinates,
+      const double upperCutoff,
+      bool expectDefault = false) const;
 
-    int getHigherIndicesWithinCutoff(Eigen::ArrayXi& result,
-                                     const Eigen::VectorXd& coordinates,
-                                     const int source,
-                                     const double cutoff) const;
+    int getHigherIndicesWithinCutoff(
+      Eigen::ArrayXi& result,
+      const Eigen::Ref<const Eigen::VectorXd>& coordinates,
+      const int source,
+      const double cutoff) const;
 
     /**
      * @brief For debugging/test purposes: The actual buckets

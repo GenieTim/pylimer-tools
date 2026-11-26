@@ -289,9 +289,7 @@ ResistanceDistanceAnalysis::solveIdentityChunked(const size_t chunkSize) const
     const Eigen::Index colStart = chunkIdx * chunkSizeIdx;
     const Eigen::Index curChunk = std::min(chunkSizeIdx, N - colStart);
     Eigen::MatrixXd I_chunk = Eigen::MatrixXd::Zero(N, curChunk);
-    for (Eigen::Index c = 0; c < curChunk; ++c) {
-      I_chunk(colStart + c, c) = 1.0;
-    }
+    I_chunk.middleRows(colStart, curChunk).setIdentity();
     X.middleCols(colStart, curChunk).noalias() = solver_.solve(I_chunk);
   }
 
@@ -312,6 +310,15 @@ ResistanceDistanceAnalysis::computeAllPairsEffectiveResistance(
 
   const Eigen::VectorXd diagX = X.diagonal();
   const Eigen::Index N = static_cast<Eigen::Index>(numNodes_);
+  if (connectedComponents_.size() == 1) {
+    Eigen::MatrixXd R = -2.0 * X;
+    R.colwise() += diagX;
+    R.rowwise() += diagX.transpose();
+    R = R.cwiseMax(0.0);
+    R.diagonal().setZero();
+    return R;
+  }
+
   Eigen::MatrixXd R(N, N);
 #ifdef OPENMP_FOUND
 #pragma omp parallel for schedule(static) if (N > 128)
@@ -509,25 +516,19 @@ ResistanceDistanceAnalysis::computeTotalResistancePerNode(
     const Eigen::Index colStart = chunkIdx * chunkSizeIdx;
     const Eigen::Index curChunk = std::min(chunkSizeIdx, N - colStart);
     Eigen::MatrixXd I_chunk = Eigen::MatrixXd::Zero(N, curChunk);
-    for (Eigen::Index c = 0; c < curChunk; ++c) {
-      I_chunk(colStart + c, c) = 1.0;
-    }
+    I_chunk.middleRows(colStart, curChunk).setIdentity();
 
     const Eigen::MatrixXd X_chunk = solver_.solve(I_chunk);
-    for (Eigen::Index c = 0; c < curChunk; ++c) {
-      const Eigen::Index globalCol = colStart + c;
-      diagX(globalCol) = (globalCol == rIdx) ? 0.0 : X_chunk(globalCol, c);
-    }
+    diagX.segment(colStart, curChunk) =
+      X_chunk.middleRows(colStart, curChunk).diagonal();
   }
+  diagX(rIdx) = 0.0;
 
   const double traceX = diagX.sum();
-  Eigen::VectorXd tot = Eigen::VectorXd::Zero(N);
-  for (Eigen::Index i = 0; i < N; ++i) {
-    tot(i) = std::max(0.0,
-                      static_cast<double>(numNodes_) * diagX(i) + traceX -
-                        2.0 * rowSumsX(i));
-  }
-  return tot;
+  return (static_cast<double>(numNodes_) * diagX.array() + traceX -
+          2.0 * rowSumsX.array())
+    .max(0.0)
+    .matrix();
 }
 
 Eigen::VectorXd
@@ -536,16 +537,11 @@ ResistanceDistanceAnalysis::computeResistanceCentrality(
 {
   const Eigen::VectorXd tot = computeTotalResistancePerNode(chunkSize);
   const Eigen::Index N = tot.size();
-  Eigen::VectorXd centrality = Eigen::VectorXd::Zero(N);
   const double nMinusOne = static_cast<double>(N > 1 ? N - 1 : 1);
-
-  for (Eigen::Index i = 0; i < N; ++i) {
-    const double s = tot(i);
-    if (s > 0.0 && !std::isinf(s)) {
-      centrality(i) = nMinusOne / s;
-    }
-  }
-  return centrality;
+  const Eigen::ArrayXd totArr = tot.array();
+  return (totArr > 0.0 && totArr.isFinite())
+    .select(nMinusOne / totArr, 0.0)
+    .matrix();
 }
 
 ResistanceDistanceAnalysis

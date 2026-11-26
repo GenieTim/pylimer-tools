@@ -214,7 +214,8 @@ equal(const std::vector<T>& vec1, const std::vector<T>& vec2)
  * input vector's size is not a multiple of segmentSize.
  */
 static inline std::vector<double>
-segmentwise_norm(const Eigen::VectorXd& vecs, const size_t segmentSize = 3)
+segmentwise_norm(const Eigen::Ref<const Eigen::VectorXd>& vecs,
+                 const size_t segmentSize = 3)
 {
   INVALIDARG_EXP_IFN(segmentSize > 0, "Segmentwise requires a usable size");
   const size_t vecSize = static_cast<size_t>(vecs.size());
@@ -251,7 +252,8 @@ segmentwise_norm(const Eigen::VectorXd& vecs, const size_t segmentSize = 3)
  * input vector's size is not a multiple of segmentSize.
  */
 static inline double
-segmentwise_norm_max(const Eigen::VectorXd& vecs, const size_t segmentSize = 3)
+segmentwise_norm_max(const Eigen::Ref<const Eigen::VectorXd>& vecs,
+                     const size_t segmentSize = 3)
 {
   INVALIDARG_EXP_IFN(segmentSize > 0, "Segmentwise requires a usable size");
   const size_t vecSize = static_cast<size_t>(vecs.size());
@@ -284,7 +286,8 @@ segmentwise_norm_max(const Eigen::VectorXd& vecs, const size_t segmentSize = 3)
  * input vector's size is not a multiple of segmentSize.
  */
 static inline double
-segmentwise_norm_mean(const Eigen::VectorXd& vecs, const size_t segmentSize = 3)
+segmentwise_norm_mean(const Eigen::Ref<const Eigen::VectorXd>& vecs,
+                      const size_t segmentSize = 3)
 {
   INVALIDARG_EXP_IFN(segmentSize > 0, "Segmentwise requires a usable size");
   const size_t vecSize = static_cast<size_t>(vecs.size());

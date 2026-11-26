@@ -59,12 +59,10 @@ namespace {
                               const size_t nrOfLinks,
                               const bool is2D)
   {
-    if (!is2D) {
+    if (!is2D || nrOfLinks == 0) {
       return;
     }
-    for (size_t linkIdx = 0; linkIdx < nrOfLinks; ++linkIdx) {
-      u[3 * static_cast<Eigen::Index>(linkIdx) + 2] = 0.0;
-    }
+    u.reshaped(3, static_cast<Eigen::Index>(nrOfLinks)).row(2).setZero();
   }
 
   struct ObjectiveContext
@@ -120,9 +118,8 @@ namespace {
         return HUGE_VAL;
       }
 
-      for (unsigned i = 0; i < n; ++i) {
-        ctx->uBuffer[static_cast<Eigen::Index>(i)] = x[i];
-      }
+      ctx->uBuffer =
+        Eigen::Map<const Eigen::VectorXd>(x, static_cast<Eigen::Index>(n));
       zeroZDisplacementsIf2D(ctx->uBuffer, ctx->net.nrOfLinks, ctx->is2D);
 
       const Eigen::VectorXd springVectors =
@@ -135,16 +132,15 @@ namespace {
         std::isfinite(energy),
         "Non-finite energy encountered during nonlinear optimization.");
       if (grad != nullptr) {
-        if (ctx->is2D) {
-          for (size_t linkIdx = 0; linkIdx < ctx->net.nrOfLinks; ++linkIdx) {
-            grad[3 * linkIdx + 2] = 0.0;
-          }
+        Eigen::Map<Eigen::VectorXd> gradMap(grad, static_cast<Eigen::Index>(n));
+        if (ctx->is2D && ctx->net.nrOfLinks > 0) {
+          gradMap.reshaped(3, static_cast<Eigen::Index>(ctx->net.nrOfLinks))
+            .row(2)
+            .setZero();
         }
-        for (unsigned i = 0; i < n; ++i) {
-          RUNTIME_EXP_IFN(
-            std::isfinite(grad[i]),
-            "Non-finite gradient encountered during nonlinear optimization.");
-        }
+        RUNTIME_EXP_IFN(
+          gradMap.allFinite(),
+          "Non-finite gradient encountered during nonlinear optimization.");
       }
 
       ctx->evalCount += 1;
@@ -302,9 +298,8 @@ NonlinearOptimizationSolver::solve(MEHPNetwork& net,
 
     const size_t nDofs = 3 * net.nrOfLinks;
     std::vector<double> uVec(nDofs, 0.0);
-    for (size_t i = 0; i < nDofs; ++i) {
-      uVec[i] = u[static_cast<Eigen::Index>(i)];
-    }
+    Eigen::Map<Eigen::VectorXd>(uVec.data(), static_cast<Eigen::Index>(nDofs)) =
+      u;
 
     std::vector<double> lowerBounds(nDofs, -HUGE_VAL);
     std::vector<double> upperBounds(nDofs, HUGE_VAL);
@@ -346,9 +341,8 @@ NonlinearOptimizationSolver::solve(MEHPNetwork& net,
 
     totalEvaluations += static_cast<size_t>(std::max(0, opt.get_numevals()));
 
-    for (size_t i = 0; i < nDofs; ++i) {
-      u[static_cast<Eigen::Index>(i)] = uVec[i];
-    }
+    u = Eigen::Map<const Eigen::VectorXd>(uVec.data(),
+                                          static_cast<Eigen::Index>(nDofs));
     zeroZDisplacementsIf2D(u, net.nrOfLinks, is2D);
 
     result.exitReason = mapNloptResultToExitReason(nloptRes, ctx.interrupted);

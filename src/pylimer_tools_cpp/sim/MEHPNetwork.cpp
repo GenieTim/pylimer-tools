@@ -2113,7 +2113,7 @@ MEHPNetwork::displaceToMeanPosition(
 
   const Eigen::Index nSpringsE = static_cast<Eigen::Index>(this->nrOfSprings);
   const Eigen::Index nLinksE = static_cast<Eigen::Index>(this->nrOfLinks);
-  Eigen::ArrayXd springWeights = Eigen::ArrayXd::Zero(3 * nSpringsE);
+  Eigen::ArrayXd springWeights(nSpringsE);
 
   for (size_t i = 0; i < this->nrOfSprings; ++i) {
     const Eigen::Index sIdx = static_cast<Eigen::Index>(i);
@@ -2126,48 +2126,52 @@ MEHPNetwork::displaceToMeanPosition(
       (strandIdxInt >= 0)
         ? this->strandContourLength[static_cast<Eigen::Index>(strandIdxInt)]
         : this->springContourLength[sIdx];
-    const double w = computeClampedInverseSpringContourLength(
+    springWeights[sIdx] = computeClampedInverseSpringContourLength(
       isPartial,
       this->springContourLength[sIdx],
       strandN,
       oneOverSpringPartitionUpperLimit);
-    springWeights.segment<3>(3 * sIdx) = w;
   }
 
-  const Eigen::ArrayXd springDistances =
-    this->evaluateSpringVectors(u, is2D).array();
-  Eigen::ArrayXd objectiveDisp = Eigen::ArrayXd::Zero(3 * nLinksE);
-  objectiveDisp(this->springCoordinateIndexA) +=
-    springWeights * springDistances;
-  objectiveDisp(this->springCoordinateIndexB) -=
-    springWeights * springDistances;
+  const Eigen::VectorXd springDistances = this->evaluateSpringVectors(u, is2D);
+  const auto springDistMat = springDistances.reshaped(3, nSpringsE).array();
+  Eigen::Array3Xd objectiveDisp = Eigen::Array3Xd::Zero(3, nLinksE);
+  Eigen::ArrayXd weightSum = Eigen::ArrayXd::Zero(nLinksE);
+  Eigen::ArrayXd nSpringsPerLink = Eigen::ArrayXd::Zero(nLinksE);
 
-  const Eigen::ArrayXd nonLoopMask =
-    (this->springCoordinateIndexA != this->springCoordinateIndexB)
-      .cast<double>();
-  Eigen::ArrayXd weightSum = Eigen::ArrayXd::Zero(3 * nLinksE);
-  weightSum(this->springCoordinateIndexA) += springWeights * nonLoopMask;
-  weightSum(this->springCoordinateIndexB) += springWeights * nonLoopMask;
-  weightSum =
-    weightSum.unaryExpr([](const double v) { return v > 0.0 ? v : 1.0; });
+  for (Eigen::Index s = 0; s < nSpringsE; ++s) {
+    const Eigen::Index a = static_cast<Eigen::Index>(this->springIndexA[s]);
+    const Eigen::Index b = static_cast<Eigen::Index>(this->springIndexB[s]);
+    const double w = springWeights[s];
+    const Eigen::Array3d weighted = w * springDistMat.col(s);
+    objectiveDisp.col(a) += weighted;
+    objectiveDisp.col(b) -= weighted;
+    if (a != b) {
+      weightSum[a] += w;
+      weightSum[b] += w;
+      nSpringsPerLink[a] += 1.0;
+      nSpringsPerLink[b] += 1.0;
+    }
+  }
 
-  const Eigen::ArrayXd remainingDisp = objectiveDisp / weightSum;
+  weightSum = (weightSum > 0.0).select(weightSum, 1.0);
+  nSpringsPerLink = (nSpringsPerLink > 0.0).select(nSpringsPerLink, 1.0);
 
-  Eigen::ArrayXd nSpringsPerLink = Eigen::ArrayXd::Zero(3 * nLinksE);
-  nSpringsPerLink(this->springCoordinateIndexA) += nonLoopMask;
-  nSpringsPerLink(this->springCoordinateIndexB) += nonLoopMask;
-  nSpringsPerLink =
-    nSpringsPerLink.unaryExpr([](const double v) { return v > 0.0 ? v : 1.0; });
+  const Eigen::Array3Xd remainingDisp =
+    objectiveDisp.rowwise() / weightSum.transpose();
 
-  Eigen::ArrayXd backForthDisp = Eigen::ArrayXd::Zero(3 * nLinksE);
-  backForthDisp(this->springCoordinateIndexA) +=
-    nonLoopMask * (remainingDisp(this->springCoordinateIndexB) /
-                   (nSpringsPerLink(this->springCoordinateIndexA) * 2.0));
-  backForthDisp(this->springCoordinateIndexB) +=
-    nonLoopMask * (remainingDisp(this->springCoordinateIndexA) /
-                   (nSpringsPerLink(this->springCoordinateIndexB) * 2.0));
+  Eigen::Array3Xd backForthDisp = Eigen::Array3Xd::Zero(3, nLinksE);
+  for (Eigen::Index s = 0; s < nSpringsE; ++s) {
+    const Eigen::Index a = static_cast<Eigen::Index>(this->springIndexA[s]);
+    const Eigen::Index b = static_cast<Eigen::Index>(this->springIndexB[s]);
+    if (a != b) {
+      backForthDisp.col(a) += remainingDisp.col(b) / (nSpringsPerLink[a] * 2.0);
+      backForthDisp.col(b) += remainingDisp.col(a) / (nSpringsPerLink[b] * 2.0);
+    }
+  }
 
-  const Eigen::VectorXd finalDisp = (remainingDisp + backForthDisp).matrix();
+  Eigen::VectorXd finalDisp(3 * nLinksE);
+  finalDisp.reshaped(3, nLinksE) = (remainingDisp + backForthDisp).matrix();
   RUNTIME_EXP_IFN(
     pylimer_tools::utils::all_components_finite(finalDisp),
     "Non-finite displacement computed in displaceToMeanPosition.");
@@ -4763,18 +4767,13 @@ MEHPNetwork::validate(const Eigen::VectorXd& u) const
     }
   }
 
-  for (Eigen::Index idx = 0; idx < this->coordinates.size(); ++idx) {
-    RUNTIME_EXP_IFN(std::isfinite(this->coordinates[idx]),
-                    "Non-finite link coordinate detected.");
-    if (u.size() > 0) {
-      RUNTIME_EXP_IFN(std::isfinite(u[idx]),
-                      "Non-finite displacement detected.");
-    }
+  RUNTIME_EXP_IFN(this->coordinates.allFinite(),
+                  "Non-finite link coordinate detected.");
+  if (u.size() > 0) {
+    RUNTIME_EXP_IFN(u.allFinite(), "Non-finite displacement detected.");
   }
-  for (Eigen::Index idx = 0; idx < this->springBoxOffset.size(); ++idx) {
-    RUNTIME_EXP_IFN(std::isfinite(this->springBoxOffset[idx]),
-                    "Non-finite springBoxOffset detected.");
-  }
+  RUNTIME_EXP_IFN(this->springBoxOffset.allFinite(),
+                  "Non-finite springBoxOffset detected.");
 }
 
 } // namespace pylimer_tools::sim::mehp

@@ -14,10 +14,11 @@
 
 namespace pylimer_tools {
 namespace entities {
-  EigenNeighbourList::EigenNeighbourList(const Eigen::VectorXd& coordinates,
-                                         const Box& boxGeometry,
-                                         const double cutoffDistance,
-                                         const double scalingParam)
+  EigenNeighbourList::EigenNeighbourList(
+    const Eigen::Ref<const Eigen::VectorXd>& coordinates,
+    const Box& boxGeometry,
+    const double cutoffDistance,
+    const double scalingParam)
   {
     this->initialize(coordinates, boxGeometry, cutoffDistance, scalingParam);
   }
@@ -86,10 +87,11 @@ namespace entities {
     return !(*this == other);
   }
 
-  void EigenNeighbourList::initialize(const Eigen::VectorXd& coordinates,
-                                      const Box& newBox,
-                                      const double newCutoff,
-                                      const double newScalingFactor)
+  void EigenNeighbourList::initialize(
+    const Eigen::Ref<const Eigen::VectorXd>& coordinates,
+    const Box& newBox,
+    const double newCutoff,
+    const double newScalingFactor)
   {
     INVALIDARG_EXP_IFN(newCutoff > 1e-3, "Cutoff must be larger than zero");
     INVALIDARG_EXP_IFN(coordinates.size() % 3 == 0,
@@ -177,7 +179,7 @@ namespace entities {
       Eigen::ArrayXi::Zero(static_cast<Eigen::Index>(this->totalNrOfBuckets));
     for (Eigen::Index i = 0; i < (coordinates.size() / 3); ++i) {
       bucket_idx_t bucketIndex = this->getBucketIndexForTriplet(
-        this->getBucketTripletForCoordinates(coordinates.segment(3 * i, 3)));
+        this->getBucketTripletForCoordinates(coordinates.segment<3>(3 * i)));
       assert(bucketIndex >= 0 &&
              static_cast<size_t>(bucketIndex) < this->totalNrOfBuckets);
       this->neighbourBuckets[static_cast<size_t>(bucketIndex)].push_back(i);
@@ -190,13 +192,14 @@ namespace entities {
    *
    * @param newCoordinates
    */
-  void EigenNeighbourList::resetCoordinates(Eigen::VectorXd& newCoordinates)
+  void EigenNeighbourList::resetCoordinates(
+    const Eigen::Ref<const Eigen::VectorXd>& newCoordinates)
   {
     // just override all the buckets.
     this->neighbourBucketSizes.setZero();
     for (Eigen::Index i = 0; i < (newCoordinates.size() / 3); ++i) {
       const bucket_idx_t bucketIndex = this->getBucketIndexForTriplet(
-        this->getBucketTripletForCoordinates(newCoordinates.segment(3 * i, 3)));
+        this->getBucketTripletForCoordinates(newCoordinates.segment<3>(3 * i)));
       const size_t bucketIdx = static_cast<size_t>(bucketIndex);
       if (static_cast<int>(this->neighbourBuckets[bucketIdx].size()) <=
           this->neighbourBucketSizes[bucketIndex]) {
@@ -210,7 +213,7 @@ namespace entities {
   }
 
   bool EigenNeighbourList::checkIfCoordinatesAreCurrent(
-    Eigen::VectorXd& newCoordinates)
+    const Eigen::Ref<const Eigen::VectorXd>& newCoordinates)
   {
     Eigen::ArrayXi neighbourBucketSizes2 =
       Eigen::ArrayXi::Zero(static_cast<Eigen::Index>(this->totalNrOfBuckets));
@@ -218,7 +221,7 @@ namespace entities {
       neighbourBuckets2;
     for (Eigen::Index i = 0; i < (newCoordinates.size() / 3); ++i) {
       const bucket_idx_t bucketIndex = this->getBucketIndexForTriplet(
-        this->getBucketTripletForCoordinates(newCoordinates.segment(3 * i, 3)));
+        this->getBucketTripletForCoordinates(newCoordinates.segment<3>(3 * i)));
       if (neighbourBuckets2[bucketIndex].size() <=
           static_cast<size_t>(neighbourBucketSizes2[bucketIndex])) {
         neighbourBuckets2[bucketIndex].push_back(i);
@@ -242,9 +245,10 @@ namespace entities {
     return true;
   }
 
-  void EigenNeighbourList::validateWhyNotIncluded(Eigen::Vector3d sourceCoords,
-                                                  Eigen::Vector3d targetCoords,
-                                                  double newCutoff) const
+  void EigenNeighbourList::validateWhyNotIncluded(
+    const Eigen::Ref<const Eigen::Vector3d>& sourceCoords,
+    const Eigen::Ref<const Eigen::Vector3d>& targetCoords,
+    double newCutoff) const
   {
     if (newCutoff <= 0.) {
       newCutoff = this->cutoff;
@@ -333,7 +337,7 @@ namespace entities {
    * @return Eigen::ArrayXi
    */
   Eigen::ArrayXi EigenNeighbourList::getIndicesCloseToCoordinates(
-    Eigen::Vector3d coordinates,
+    const Eigen::Ref<const Eigen::Vector3d>& coordinates,
     double newCutoff) const
   {
     if (newCutoff == -1.) {
@@ -370,19 +374,20 @@ namespace entities {
    */
   int EigenNeighbourList::getHigherIndicesWithinCutoff(
     Eigen::ArrayXi& result,
-    const Eigen::VectorXd& coordinates,
+    const Eigen::Ref<const Eigen::VectorXd>& coordinates,
     const int source,
     const double newCutoff) const
   {
-    int numNeighbours = this->getIndicesCloseToCoordinates(
-      result, coordinates.segment(3 * source, 3), newCutoff);
+    const Eigen::Vector3d sourceCoords = coordinates.segment<3>(3 * source);
+    int numNeighbours =
+      this->getIndicesCloseToCoordinates(result, sourceCoords, newCutoff);
     int actualNumNeighbours = 0;
     const double cutoff2 = newCutoff * newCutoff;
     for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(numNeighbours);
          ++i) {
       if (result[i] > source) {
-        Eigen::Vector3d dist = coordinates.segment(3 * source, 3) -
-                               coordinates.segment(result[i] * 3, 3);
+        Eigen::Vector3d dist =
+          sourceCoords - coordinates.segment<3>(result[i] * 3);
         this->box.handlePBC(dist);
         if (dist.squaredNorm() < cutoff2) {
           result[actualNumNeighbours] = result[i];
@@ -410,7 +415,7 @@ namespace entities {
    */
   int EigenNeighbourList::getIndicesCloseToCoordinates(
     Eigen::ArrayXi& result,
-    const Eigen::Vector3d coordinates,
+    const Eigen::Ref<const Eigen::Vector3d>& coordinates,
     const double upperCutoff,
     const bool expectDefault) const
   {
