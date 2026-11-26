@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:08.749** total execution time for 14 files **from auto_examples/force_balance**:
+**00:12.052** total execution time for 14 files **from auto_examples/force_balance**:
 
 .. container::
 
@@ -33,44 +33,44 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_multichemistry_and_coarse_graining.py` (``plot_multichemistry_and_coarse_graining.py``)
-     - 00:01.801
+     - 00:02.453
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_representative_volume_pdms.py` (``plot_representative_volume_pdms.py``)
-     - 00:01.743
+     - 00:02.352
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_finite_extensibility_deformation.py` (``plot_finite_extensibility_deformation.py``)
-     - 00:01.005
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_force_balance_plot_mmt_vs_mehp_gelation_and_loops.py` (``plot_mmt_vs_mehp_gelation_and_loops.py``)
-     - 00:00.861
+     - 00:01.467
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_entanglement_sampling_comparison.py` (``plot_entanglement_sampling_comparison.py``)
-     - 00:00.856
+     - 00:01.224
      - 0.0
-   * - :ref:`sphx_glr_auto_examples_force_balance_plot_inactive_removal_and_sampling.py` (``plot_inactive_removal_and_sampling.py``)
-     - 00:00.510
+   * - :ref:`sphx_glr_auto_examples_force_balance_plot_mmt_vs_mehp_gelation_and_loops.py` (``plot_mmt_vs_mehp_gelation_and_loops.py``)
+     - 00:01.209
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_sampling_cutoff_effect.py` (``plot_sampling_cutoff_effect.py``)
-     - 00:00.475
+     - 00:00.690
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_force_balance_plot_inactive_removal_and_sampling.py` (``plot_inactive_removal_and_sampling.py``)
+     - 00:00.632
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_balance.py` (``plot_force_balance.py``)
-     - 00:00.304
+     - 00:00.383
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_balance_2.py` (``plot_force_balance_2.py``)
-     - 00:00.251
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_force_balance_plot_polydispersity_study.py` (``plot_polydispersity_study.py``)
-     - 00:00.209
+     - 00:00.332
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_slipping_vs_fixed_links.py` (``plot_slipping_vs_fixed_links.py``)
-     - 00:00.208
+     - 00:00.301
      - 0.0
-   * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_relaxation.py` (``plot_force_relaxation.py``)
-     - 00:00.194
+   * - :ref:`sphx_glr_auto_examples_force_balance_plot_polydispersity_study.py` (``plot_polydispersity_study.py``)
+     - 00:00.288
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_entanglement_link_vs_spring.py` (``plot_entanglement_link_vs_spring.py``)
-     - 00:00.192
+     - 00:00.268
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_relaxation.py` (``plot_force_relaxation.py``)
+     - 00:00.265
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_fb_deformation_exp.py` (``plot_fb_deformation_exp.py``)
-     - 00:00.140
+     - 00:00.188
      - 0.0

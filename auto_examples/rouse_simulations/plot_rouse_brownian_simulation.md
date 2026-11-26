@@ -622,7 +622,7 @@ Stochastic Rouse chain (N=16, tau_1=26.02):
   CM MSD at t=tau_1: 8.900 (exact 6*D_CM*tau_1 = 9.758)
 ```
 
-**Total running time of the script:** (0 minutes 0.923 seconds)
+**Total running time of the script:** (0 minutes 1.311 seconds)
 
 <a id="sphx-glr-download-auto-examples-rouse-simulations-plot-rouse-brownian-simulation-py"></a>
 

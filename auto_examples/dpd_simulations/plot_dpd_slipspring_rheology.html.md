@@ -157,7 +157,7 @@ print(
 ```
 
 ```none
-Demo melt (N_atoms=1125, SS=225): G_GK(0)=16.080, NMA modes=1125, static MEHP plateau=0.5476
+Demo melt (N_atoms=1125, SS=225): G_GK(0)=16.420, NMA modes=1125, static MEHP plateau=0.5609
 ```
 
 <!-- GENERATED FROM PYTHON SOURCE LINES 147-152 -->
@@ -596,7 +596,7 @@ plt.tight_layout(rect=(0.0, 0.03, 1.0, 1.0))
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 1.072 seconds)
+**Total running time of the script:** (0 minutes 1.466 seconds)
 
 <a id="sphx-glr-download-auto-examples-dpd-simulations-plot-dpd-slipspring-rheology-py"></a>
 

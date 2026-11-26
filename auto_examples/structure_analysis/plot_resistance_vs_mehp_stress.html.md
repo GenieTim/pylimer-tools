@@ -760,7 +760,7 @@ Bimodal + Defects (p=0.92, N=15/90):
 Measured on: Apple M3 Pro (12 cores), 36 GB RAM, Mac15,7, macOS 27.2.1 (arm64), Python 3.13.18 (cached 2026-11-26).
 ```
 
-**Total running time of the script:** (0 minutes 0.980 seconds)
+**Total running time of the script:** (0 minutes 1.414 seconds)
 
 <a id="sphx-glr-download-auto-examples-structure-analysis-plot-resistance-vs-mehp-stress-py"></a>
 

@@ -69,15 +69,15 @@
 - [NOTE](structure_analysis/plot_resistance_vs_mehp_stress.html.md): Go to the end
 - [Trajectory Analysis](trajectory_analysis/index.html.md): pylimer-tools provides advanced tools for analyzing molecular dynamics trajectories, particularly fo...
 - [NOTE](trajectory_analysis/plot_trajectory_analysis.html.md): Go to the end
-- [Computation times](dpd_simulations/sg_execution_times.html.md): &#42;&#42;00:04.882&#42;&#42; total execution time for 3 files &#42;&#42;from auto_examples/dpd_simulations&#42;&#42;:
-- [Computation times](force_balance/sg_execution_times.html.md): &#42;&#42;00:08.749&#42;&#42; total execution time for 14 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
-- [Computation times](network_generator/sg_execution_times.html.md): &#42;&#42;00:42.510&#42;&#42; total execution time for 10 files &#42;&#42;from auto_examples/network_generator&#42;&#42;:
-- [Computation times](normal_mode_analysis/sg_execution_times.html.md): &#42;&#42;00:24.135&#42;&#42; total execution time for 3 files &#42;&#42;from auto_examples/normal_mode_analysis&#42;&#42;:
-- [Computation times](readers_writers/sg_execution_times.html.md): &#42;&#42;00:02.928&#42;&#42; total execution time for 13 files &#42;&#42;from auto_examples/readers_writers&#42;&#42;:
-- [Computation times](rouse_simulations/sg_execution_times.html.md): &#42;&#42;00:02.746&#42;&#42; total execution time for 2 files &#42;&#42;from auto_examples/rouse_simulations&#42;&#42;:
+- [Computation times](dpd_simulations/sg_execution_times.html.md): &#42;&#42;00:05.969&#42;&#42; total execution time for 3 files &#42;&#42;from auto_examples/dpd_simulations&#42;&#42;:
+- [Computation times](force_balance/sg_execution_times.html.md): &#42;&#42;00:12.052&#42;&#42; total execution time for 14 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
+- [Computation times](network_generator/sg_execution_times.html.md): &#42;&#42;00:57.871&#42;&#42; total execution time for 10 files &#42;&#42;from auto_examples/network_generator&#42;&#42;:
+- [Computation times](normal_mode_analysis/sg_execution_times.html.md): &#42;&#42;00:34.094&#42;&#42; total execution time for 3 files &#42;&#42;from auto_examples/normal_mode_analysis&#42;&#42;:
+- [Computation times](readers_writers/sg_execution_times.html.md): &#42;&#42;00:04.209&#42;&#42; total execution time for 13 files &#42;&#42;from auto_examples/readers_writers&#42;&#42;:
+- [Computation times](rouse_simulations/sg_execution_times.html.md): &#42;&#42;00:03.801&#42;&#42; total execution time for 2 files &#42;&#42;from auto_examples/rouse_simulations&#42;&#42;:
 - [Computation times](sg_execution_times.html.md): &#42;&#42;00:00.000&#42;&#42; total execution time for 0 files &#42;&#42;from auto_examples&#42;&#42;:
-- [Computation times](structure_analysis/sg_execution_times.html.md): &#42;&#42;00:02.105&#42;&#42; total execution time for 7 files &#42;&#42;from auto_examples/structure_analysis&#42;&#42;:
-- [Computation times](trajectory_analysis/sg_execution_times.html.md): &#42;&#42;01:12.317&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/trajectory_analysis&#42;&#42;:
+- [Computation times](structure_analysis/sg_execution_times.html.md): &#42;&#42;00:03.014&#42;&#42; total execution time for 7 files &#42;&#42;from auto_examples/structure_analysis&#42;&#42;:
+- [Computation times](trajectory_analysis/sg_execution_times.html.md): &#42;&#42;01:42.735&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/trajectory_analysis&#42;&#42;:
 
 ## Optional
 

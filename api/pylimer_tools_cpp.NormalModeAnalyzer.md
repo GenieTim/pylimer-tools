@@ -58,7 +58,7 @@ Compute Jackson-damped Chebyshev moments using KPM.
 * **Returns:**
   Vector of damped Chebyshev moments
 
-#### density_of_states(self: [pylimer_tools_cpp.NormalModeAnalyzer](#pylimer_tools_cpp.NormalModeAnalyzer), lambda_grid: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], config: [pylimer_tools_cpp.KPMConfig](pylimer_tools_cpp.KPMConfig.md#pylimer_tools_cpp.KPMConfig) = KPMConfig()) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
+#### density_of_states(self: [pylimer_tools_cpp.NormalModeAnalyzer](#pylimer_tools_cpp.NormalModeAnalyzer), lambda_grid: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]'], config: [pylimer_tools_cpp.KPMConfig](pylimer_tools_cpp.KPMConfig.md#pylimer_tools_cpp.KPMConfig) = KPMConfig()) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
 
 Compute continuous density of states (DOS) on lambda_grid using KPM.
 

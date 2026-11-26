@@ -36,7 +36,7 @@ Overloaded function.
 
 ### Methods Documentation
 
-#### apply_pbc(self: [pylimer_tools_cpp.Box](#pylimer_tools_cpp.Box), distances: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]']) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
+#### apply_pbc(self: [pylimer_tools_cpp.Box](#pylimer_tools_cpp.Box), distances: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
 
 Apply periodic boundary conditions (PBC): adjust the specified distances to fit into this box.
 
@@ -138,7 +138,7 @@ Get the length of the box in z direction.
 * **Returns:**
   The z-dimension length of the box
 
-#### get_offset(self: [pylimer_tools_cpp.Box](#pylimer_tools_cpp.Box), distances: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]']) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
+#### get_offset(self: [pylimer_tools_cpp.Box](#pylimer_tools_cpp.Box), distances: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
 
 Compute the offset required to compensate for periodic boundary conditions.
 
@@ -160,7 +160,7 @@ $V = L_x \cdot L_y \cdot L_z$
 * **Returns:**
   The volume of the box
 
-#### is_valid_offset(self: [pylimer_tools_cpp.Box](#pylimer_tools_cpp.Box), potential_offset: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], abs_precision: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1e-05) → [bool](https://docs.python.org/3/builtins/functions.html#bool)
+#### is_valid_offset(self: [pylimer_tools_cpp.Box](#pylimer_tools_cpp.Box), potential_offset: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]'], abs_precision: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1e-05) → [bool](https://docs.python.org/3/builtins/functions.html#bool)
 
 Check whether the passed offset is a valid one in this box.
 

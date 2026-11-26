@@ -62,7 +62,7 @@ Quadrature weights of the spectrum.
 
 ### Methods Documentation
 
-#### loss_modulus(self: [pylimer_tools_cpp.NormalModeSpectrum](#pylimer_tools_cpp.NormalModeSpectrum), omega: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]']) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
+#### loss_modulus(self: [pylimer_tools_cpp.NormalModeSpectrum](#pylimer_tools_cpp.NormalModeSpectrum), omega: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
 
 Evaluate the loss modulus $G''(\omega)$ (without prefactor).
 
@@ -71,7 +71,7 @@ Evaluate the loss modulus $G''(\omega)$ (without prefactor).
 * **Returns:**
   Loss modulus values
 
-#### moduli(self: [pylimer_tools_cpp.NormalModeSpectrum](#pylimer_tools_cpp.NormalModeSpectrum), omega: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]']) → [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]'], [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']]
+#### moduli(self: [pylimer_tools_cpp.NormalModeSpectrum](#pylimer_tools_cpp.NormalModeSpectrum), omega: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']) → [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]'], [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']]
 
 Evaluate both storage and loss moduli $(G'(\omega), G''(\omega))$
 in a single pass.
@@ -81,7 +81,7 @@ in a single pass.
 * **Returns:**
   Tuple of (storage_modulus, loss_modulus)
 
-#### storage_modulus(self: [pylimer_tools_cpp.NormalModeSpectrum](#pylimer_tools_cpp.NormalModeSpectrum), omega: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]']) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
+#### storage_modulus(self: [pylimer_tools_cpp.NormalModeSpectrum](#pylimer_tools_cpp.NormalModeSpectrum), omega: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
 
 Evaluate the storage modulus $G'(\omega)$ (without prefactor).
 
@@ -90,7 +90,7 @@ Evaluate the storage modulus $G'(\omega)$ (without prefactor).
 * **Returns:**
   Storage modulus values
 
-#### stress_autocorrelation(self: [pylimer_tools_cpp.NormalModeSpectrum](#pylimer_tools_cpp.NormalModeSpectrum), t: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]']) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
+#### stress_autocorrelation(self: [pylimer_tools_cpp.NormalModeSpectrum](#pylimer_tools_cpp.NormalModeSpectrum), t: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
 
 Evaluate stress autocorrelation $G(t)$.
 

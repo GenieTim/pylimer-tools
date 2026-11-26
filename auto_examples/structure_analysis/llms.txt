@@ -15,7 +15,7 @@
 - [NOTE](plot_topological_leaf_pruning_vs_pbc.html.md): Go to the end
 - [NOTE](plot_resistance_distance_analysis.html.md): Go to the end
 - [NOTE](plot_resistance_vs_mehp_stress.html.md): Go to the end
-- [Computation times](sg_execution_times.html.md): &#42;&#42;00:02.105&#42;&#42; total execution time for 7 files &#42;&#42;from auto_examples/structure_analysis&#42;&#42;:
+- [Computation times](sg_execution_times.html.md): &#42;&#42;00:03.014&#42;&#42; total execution time for 7 files &#42;&#42;from auto_examples/structure_analysis&#42;&#42;:
 
 ## Optional
 
