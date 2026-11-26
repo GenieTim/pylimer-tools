@@ -68,7 +68,16 @@ def cli(
         polymer_name=polymer_name,
         parameter_type=ParameterType[parameter_type.upper()],
     )
-    base_distance_unit = params.get_base_distance_units().units
+    base_distance_quantity = params.get_base_distance_units()
+    base_distance_unit = base_distance_quantity.units
+    sim_length_unit = (
+        str(base_distance_unit)
+        if (
+            not base_distance_quantity.dimensionless
+            and base_distance_quantity.magnitude == 1
+        )
+        else "u"
+    )
 
     for file_path in files:
         click.echo(
@@ -81,9 +90,9 @@ def cli(
             "Size: {}. Volume: {} {}^3 (ρ = {} atoms/{}^3)".format(
                 universe.get_nr_of_atoms(),
                 universe.get_volume(),
-                base_distance_unit,
+                sim_length_unit,
                 universe.get_nr_of_atoms() / universe.get_volume(),
-                base_distance_unit,
+                sim_length_unit,
             )
         )
         click.echo(
@@ -97,44 +106,56 @@ def cli(
         molecules = universe.get_molecules(crosslinker_type)
         bond_lengths = universe.compute_bond_lengths()
         non_none_bond_lengths = [bl for bl in bond_lengths if bl is not None and bl > 0]
-        click.echo(
-            "Bond length b: <b> = {} {}, (min: {}, max: {}, median: {}) {}, <b^2> = {} {}^2".format(
-                statistics.mean(non_none_bond_lengths),
-                base_distance_unit,
-                min(non_none_bond_lengths),
-                max(non_none_bond_lengths),
-                statistics.median(non_none_bond_lengths),
-                base_distance_unit,
-                statistics.mean(bl**2 for bl in bond_lengths if bl is not None),
-                base_distance_unit,
+        if non_none_bond_lengths:
+            click.echo(
+                "Bond length b: <b> = {} {}, (min: {}, max: {}, median: {}) {}, <b^2> = {} {}^2".format(
+                    statistics.mean(non_none_bond_lengths),
+                    sim_length_unit,
+                    min(non_none_bond_lengths),
+                    max(non_none_bond_lengths),
+                    statistics.median(non_none_bond_lengths),
+                    sim_length_unit,
+                    statistics.mean(bl**2 for bl in non_none_bond_lengths),
+                    sim_length_unit,
+                )
             )
-        )
+        else:
+            click.echo("Bond length b: n/a (no positive bond lengths)")
+
         end_to_end_distances = universe.compute_end_to_end_distances(
             crosslinker_type=crosslinker_type, derive_image_flags=True
         )
         non_none_end_to_end_distances = [
             e for e in end_to_end_distances if e is not None and e > 0
         ]
-        click.echo(
-            "End to end distance R_ee: <R_ee> = {} {}, <R_ee^2> = {}".format(
-                statistics.mean(non_none_end_to_end_distances),
-                base_distance_unit,
-                statistics.mean(e**2 for e in non_none_end_to_end_distances),
+        if non_none_end_to_end_distances:
+            click.echo(
+                "End to end distance R_ee: <R_ee> = {} {}, <R_ee^2> = {} {}^2".format(
+                    statistics.mean(non_none_end_to_end_distances),
+                    sim_length_unit,
+                    statistics.mean(e**2 for e in non_none_end_to_end_distances),
+                    sim_length_unit,
+                )
             )
+        else:
+            click.echo("End to end distance R_ee: n/a")
+
+        mean_mol_len = (
+            statistics.mean([m.get_nr_of_atoms() for m in molecules])
+            if molecules
+            else 0.0
         )
         click.echo(
             "For {} molecules of mean length of {} atoms".format(
                 len(molecules),
-                statistics.mean([m.get_nr_of_atoms() for m in molecules]),
+                mean_mol_len,
             )
         )
         click.echo(
             "f = {}, r = {}, p = {} ({}), D = {}".format(
-                universe.determine_functionality_per_type()[crosslinker_type],
+                universe.determine_functionality_per_type().get(crosslinker_type, 0),
                 compute_stoichiometric_imbalance(universe, crosslinker_type),
                 compute_extent_of_reaction(universe, crosslinker_type),
-                # mehp.calculateEffectiveCrosslinkerFunctionality(
-                #     universe, crosslinker_type),
                 compute_crosslinker_conversion(universe, crosslinker_type),
                 universe.compute_polydispersity_index(crosslinker_type),
             )
@@ -180,7 +201,26 @@ def cli(
         )
 
         click.echo("")
-    click.echo("Arbitrary units used. E.g.: Length: u")
+    if base_distance_quantity.dimensionless:
+        click.echo(
+            "Reduced/arbitrary length units used ({}), Shear Modulus: MPa".format(
+                params.get_name()
+            )
+        )
+    elif base_distance_quantity.magnitude == 1:
+        click.echo(
+            "Units used ({}): Length: {}, Shear Modulus: MPa".format(
+                params.get_name(), base_distance_unit
+            )
+        )
+    else:
+        click.echo(
+            "Units used ({}): 1 simulation length unit = {:.4g} {}, Shear Modulus: MPa".format(
+                params.get_name(),
+                base_distance_quantity.magnitude,
+                base_distance_unit,
+            )
+        )
 
 
 if __name__ == "__main__":

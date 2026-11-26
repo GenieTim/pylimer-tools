@@ -129,6 +129,33 @@ class TestCliAndGenerate(unittest.TestCase):
             self.assertIn("Bond length b:", res.output)
             self.assertIn("Shear Modulus [MPa]:", res.output)
             self.assertIn("w_sol =", res.output)
+            self.assertIn(
+                "Units used (si-pdms): Length: nanometer, Shear Modulus: MPa",
+                res.output,
+            )
+            self.assertIn("nanometer^2", res.output)
+            self.assertNotIn("Arbitrary units used", res.output)
+
+            res_lj = runner.invoke(
+                analyse_networks_cli,
+                [
+                    "--polymer-name",
+                    "PDMS",
+                    "--parameter-type",
+                    "KG_LJ",
+                    net_file,
+                ],
+            )
+            self.assertEqual(res_lj.exit_code, 0, msg=res_lj.output)
+            self.assertIn("u^3", res_lj.output)
+            self.assertIn("u^2", res_lj.output)
+            self.assertNotIn("nanometer^3", res_lj.output)
+            self.assertIn(
+                "Units used (kg-lj-pdms): 1 simulation length unit =",
+                res_lj.output,
+            )
+            self.assertIn("Shear Modulus: MPa", res_lj.output)
+            self.assertNotIn("Arbitrary units used", res_lj.output)
 
     def test_basic_lammps_structure_stats_cli(self) -> None:
         runner = CliRunner()

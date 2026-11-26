@@ -152,12 +152,15 @@ namespace dpd {
      * supported)
      * @param seed Random seed for reproducibility (default: empty string for
      * random seed)
+     * @param assumeBoxLargeEnough Whether to assume minimum-image PBC is
+     * sufficient for all bonds (default: false)
      */
     DPDSimulator(const pylimer_tools::entities::Universe& u,
                  const int crossLinkerType = 2,
                  const int slipspringBondType = 9,
                  const bool is2D = false,
-                 const std::string& seed = "");
+                 const std::string& seed = "",
+                 const bool assumeBoxLargeEnough = false);
 
     /**
      * @brief Run the main simulation loop with DPD and optionally Monte Carlo
@@ -171,7 +174,7 @@ namespace dpd {
      * interruption
      */
     void runSimulation(const long int nSteps,
-                       bool withMC,
+                       const bool withMC,
                        const std::function<bool()>& shouldInterrupt,
                        const std::function<void()>& cleanupInterrupt);
 
@@ -281,10 +284,11 @@ namespace dpd {
      * @brief Randomly add new slip-springs between neighboring nodes
      *
      * @param num Number of slip-springs to attempt to create
-     * @param bondType Type identifier for the slip-spring bonds (default: 0)
+     * @param bondType Type identifier for the slip-spring bonds (default: 0,
+     * which inherits slipspringBondType)
      * @return Number of slip-springs actually created
      */
-    int createSlipSprings(const int num, int bondType = 0);
+    int createSlipSprings(const int num, const int bondType = 0);
 
     /**
      * @brief Perform Monte Carlo moves to shift slip-springs along polymer
@@ -310,22 +314,32 @@ namespace dpd {
     // configuration
 
     /**
-     * @brief Configure whether to assume the simulation box is large enough
+     * @brief Configure whether to assume the simulation box is large enough for
+     * minimum-image PBC on bonds
      *
-     * If bonds could get larger than half the box length, this must be kept
-     * false (default). If true, periodic boundary condition handling for bonds
-     * is disabled for performance.
+     * If false (default), periodic box offsets are tracked per bond so bonds
+     * may exceed half the box length without collapsing or flipping direction.
+     * If true, minimum-image periodic boundary conditions are applied on every
+     * bond evaluation (requires all bonds to remain shorter than half the box
+     * length).
+     *
+     * @param assume Whether to enable the large-box minimum-image assumption
+     * (default: true)
      */
-    void configAssumeBoxLargeEnough()
+    void configAssumeBoxLargeEnough(const bool assume = true)
     {
-      this->assumeBoxLargeEnough = true;
-      // this->bondBoxOffsets.setZero();
+      if (!assume && this->assumeBoxLargeEnough) {
+        this->resetBondOffsets();
+      }
+      this->assumeBoxLargeEnough = assume;
     }
 
     /**
-     * @brief Check if the simulator assumes the box is large enough
+     * @brief Check if the simulator assumes the box is large enough for
+     * minimum-image PBC on bonds
      *
-     * @return true if PBC handling for bonds is disabled, false otherwise
+     * @return true if minimum-image PBC is applied on bonds, false if per-bond
+     * periodic box offsets are tracked
      */
     bool assumesBoxLargeEnough() const { return this->assumeBoxLargeEnough; }
 
@@ -361,12 +375,15 @@ namespace dpd {
     /**
      * @brief Configure the lower cutoff distance for slip-spring creation
      *
-     * @param lowC Lower cutoff distance (must be less than high cutoff)
+     * @param lowC Lower cutoff distance (must be non-negative and less than
+     * high cutoff)
      */
     void configSlipspringLowCutoff(const double lowC)
     {
-      INVALIDARG_EXP_IFN(lowC < this->highCutoff,
-                         "The low cutoff must be lower than the high cutoff.");
+      INVALIDARG_EXP_IFN(
+        std::isfinite(lowC) && lowC >= 0.0 && lowC < this->highCutoff,
+        "The low cutoff must be finite, non-negative, and lower than the high "
+        "cutoff.");
       this->lowCutoff = lowC;
     }
 
@@ -377,23 +394,44 @@ namespace dpd {
      */
     void configSlipspringHighCutoff(const double highC)
     {
-      INVALIDARG_EXP_IFN(this->lowCutoff < highC,
-                         "The low cutoff must be lower than the high cutoff.");
+      INVALIDARG_EXP_IFN(
+        std::isfinite(highC) && this->lowCutoff < highC,
+        "The high cutoff must be finite and greater than the low cutoff.");
       this->highCutoff = highC;
     }
 
     /**
      * @brief Configure the sigma parameter for DPD interactions
      *
-     * This also automatically updates gamma = 0.5 * sigma^2
+     * This also automatically updates gamma = 0.5 * sigma^2 (target k_B T = 1).
+     * Call configGamma afterwards if a non-unit target k_B T is desired.
      *
      * @param newSigma Sigma parameter value for noise strength
      */
     void configSigma(const double newSigma)
     {
+      INVALIDARG_EXP_IFN(std::isfinite(newSigma) && newSigma >= 0.0,
+                         "Sigma must be finite and non-negative.");
       this->sigma = newSigma;
       this->gamma = 0.5 * newSigma * newSigma;
     }
+
+    /**
+     * @brief Configure the dissipative friction parameter gamma for DPD
+     * interactions independently of sigma.
+     *
+     * @param newGamma Friction coefficient gamma (must be finite and >= 0)
+     */
+    void configGamma(const double newGamma)
+    {
+      INVALIDARG_EXP_IFN(std::isfinite(newGamma) && newGamma >= 0.0,
+                         "Gamma must be finite and non-negative.");
+      this->gamma = newGamma;
+    }
+
+    double getSigma() const { return this->sigma; }
+
+    double getDpdGamma() const { return this->gamma; }
 
     /**
      * @brief Configure the A parameter for DPD repulsive interactions
@@ -501,7 +539,7 @@ namespace dpd {
                            std::to_string(formBondEvery) + ".");
       const std::map<int, int> functionalities =
         this->universe.determineFunctionalityPerType();
-      for (const auto& type : functionalities) {
+      for (const std::pair<const int, int>& type : functionalities) {
         INVALIDARG_EXP_IFN(
           numBondsPerType.at(type.first) >= type.second,
           "Number of bonds per type must be bigger than their current "
@@ -536,7 +574,7 @@ namespace dpd {
      */
     void resetBondDuplicationPenalty();
 
-    void resetBondDuplicationPenalty(size_t atomIdx);
+    void resetBondDuplicationPenalty(const size_t atomIdx);
 
     ////////////////////////////////////////////////////////////////
     // results access & export
@@ -688,6 +726,19 @@ namespace dpd {
      * @return Vector of particle velocities (vx1,vy1,vz1,vx2,vy2,vz2,...)
      */
     Eigen::VectorXd getVelocities() const;
+
+    /**
+     * @brief Get the target thermal energy k_B T from the DPD thermostat
+     * parameters (sigma^2 / (2 * gamma)).
+     *
+     * @return Target k_B T (defaults to 1.0 if gamma <= 0)
+     */
+    double getTargetKbT() const
+    {
+      return this->gamma > 0.0
+               ? (this->sigma * this->sigma) / (2.0 * this->gamma)
+               : 1.0;
+    }
 
     /**
      * @brief Get the current system temperature
@@ -898,6 +949,23 @@ namespace dpd {
     void addSlipSprings(std::vector<size_t>& partnerA,
                         std::vector<size_t>& partnerB,
                         const int bondType = 9);
+
+    bool acceptMetropolisMove(const double deltaEnergy, const double kbT);
+
+    int collectSlipSpringPartnerCandidates(const size_t centerAtom,
+                                           Eigen::ArrayXi& neighbours,
+                                           std::vector<size_t>& candidates);
+
+    bool proposeRailStep(const size_t partner,
+                         size_t& newPartner,
+                         Eigen::Vector3d& deltaR,
+                         Eigen::Vector3d& deltaOffset);
+
+    void setSlipSpringPartners(
+      const size_t springIdx,
+      const size_t newPartnerA,
+      const size_t newPartnerB,
+      const Eigen::Vector3d* const explicitOffset = nullptr);
 
     bool attemptSlipSpringShift(const size_t springIdx,
                                 const size_t endToShift,

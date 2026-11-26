@@ -1239,7 +1239,7 @@ Compute the average topological Gamma factor ``sum(gamma_factors) / denom``.
          py::arg("r02"))
     .def("config_assume_box_large_enough",
          &mehp::MEHPSimulator::configAssumeBoxLargeEnough,
-         py::arg("assume") = false)
+         py::arg("assume") = true)
     .def("config_assume_network_is_complete",
          &mehp::MEHPSimulator::configAssumeNetworkIsComplete,
          py::arg("assume") = false)
@@ -1509,25 +1509,19 @@ Compute the average topological Gamma factor ``sum(gamma_factors) / denom``.
      with slip-springs as presented by :cite:t:`langeloth_recovering_2013` 
      and :cite:t:`schneider_simulation_2021`.
      )pbdoc")
-    .def(py::init<const pe::Universe,
+    .def(py::init<const pe::Universe&,
                   const int,
                   const int,
                   const bool,
-                  const std::string>(),
+                  const std::string&,
+                  const bool>(),
          "Get an instance of this class",
          py::arg("universe"),
          py::arg("crosslinker_type") = 2,
          py::arg("slipspring_bond_type") = 9,
          py::arg("is_2d") = false,
-         py::arg("seed") = "")
-    //     .def("runSimulation",
-    //          &dpd::DPDSimulator::runSimulation,
-    //          R"pbdoc(
-    //           Actually do some simulation steps.
-    //      )pbdoc",
-    //          py::arg("n_steps"),
-    //          py::arg("dt") = 0.06,
-    //          py::arg("with_MC") = false)
+         py::arg("seed") = "",
+         py::arg("assume_box_large_enough") = false)
     .def(
       "run_simulation",
       [](dpd::DPDSimulator& sim,
@@ -1547,18 +1541,55 @@ Compute the average topological Gamma factor ``sum(gamma_factors) / denom``.
     .def("assume_box_large_enough",
          &dpd::DPDSimulator::configAssumeBoxLargeEnough,
          R"pbdoc(
-          Configure whether to run PBC on the bonds or not.
+          Configure whether to assume minimum-image PBC is sufficient for all bonds.
 
-          If your bonds could get larger than half the box length, this must be kept false (default).
-          Otherwise, you can set it to true and therewith get some securities.
+          If your bonds could exceed half the box length, keep this ``False`` (default) so per-bond periodic box offsets are tracked.
+          Set to ``True`` to apply minimum-image PBC on every bond evaluation.
+         )pbdoc",
+         py::arg("assume") = true)
+    .def("config_assume_box_large_enough",
+         &dpd::DPDSimulator::configAssumeBoxLargeEnough,
+         R"pbdoc(
+          Configure whether to assume minimum-image PBC is sufficient for all bonds.
+
+          If your bonds could exceed half the box length, keep this ``False`` (default) so per-bond periodic box offsets are tracked.
+          Set to ``True`` to apply minimum-image PBC on every bond evaluation.
+         )pbdoc",
+         py::arg("assume") = true)
+    .def("assumes_box_large_enough",
+         &dpd::DPDSimulator::assumesBoxLargeEnough,
+         R"pbdoc(
+          Return ``True`` if minimum-image PBC is assumed sufficient for bonds, ``False`` if per-bond periodic box offsets are tracked.
          )pbdoc")
     .def("create_slip_springs",
          &dpd::DPDSimulator::createSlipSprings,
          R"pbdoc(
-          Randomly add the specified number of slip-springs to neighbours within the specified cut-offs.
+          Randomly add up to the specified number of slip-springs to eligible neighbours within the configured cut-offs.
+
+          :param num: Maximum number of slip-springs to create
+          :param bond_type: Bond type for created slip-springs (``0`` inherits ``slipspring_bond_type``)
+          :return: Number of slip-springs actually created
      )pbdoc",
          py::arg("num"),
-         py::arg("bond_type") = 9)
+         py::arg("bond_type") = 0)
+    .def("shift_slip_springs",
+         &dpd::DPDSimulator::shiftSlipSprings,
+         R"pbdoc(
+          Perform one sweep of Monte Carlo slip-spring shift moves along polymer chains.
+
+          :param kbt: Thermal energy scale :math:`k_B T` for Metropolis acceptance (must be ``>= 0``)
+          :return: Number of accepted shift moves
+     )pbdoc",
+         py::arg("kbt") = 1.0)
+    .def("relocate_slip_springs",
+         &dpd::DPDSimulator::relocateSlipSprings,
+         R"pbdoc(
+          Perform one sweep of Monte Carlo slip-spring chain-end relocation moves.
+
+          :param kbt: Thermal energy scale :math:`k_B T` for Metropolis acceptance (must be ``>= 0``)
+          :return: Number of accepted relocation moves
+     )pbdoc",
+         py::arg("kbt") = 1.0)
     .def("config_a",
          &dpd::DPDSimulator::configA,
          R"pbdoc(
@@ -1568,9 +1599,15 @@ Compute the average topological Gamma factor ``sum(gamma_factors) / denom``.
     .def("config_sigma",
          &dpd::DPDSimulator::configSigma,
          R"pbdoc(
-          Configure the force-field (pair-style) parameter `\sigma`.
+          Configure the force-field (pair-style) parameter `\sigma` (and set `\gamma = 0.5 \sigma^2`).
      )pbdoc",
          py::arg("sigma") = 3.)
+    .def("config_gamma",
+         &dpd::DPDSimulator::configGamma,
+         R"pbdoc(
+          Configure the DPD dissipative friction parameter `\gamma` independently of `\sigma`.
+     )pbdoc",
+         py::arg("gamma") = 4.5)
     .def("config_spring_constant",
          &dpd::DPDSimulator::configSpringConstant,
          R"pbdoc(
@@ -1602,14 +1639,17 @@ Compute the average topological Gamma factor ``sum(gamma_factors) / denom``.
      )pbdoc",
          py::arg("target_box"))
 #ifdef CEREALIZABLE
-    .def_static("read_restart_file",
-                &dpd::DPDSimulator::readRestartFile,
-                R"pbdoc(
+    .def_static(
+      "read_restart_file",
+      [](const std::string& filename) {
+        return dpd::DPDSimulator::readRestartFile(filename);
+      },
+      R"pbdoc(
           Read a restart file in order to continue a simulation.
 
           :param file: The file path to the restart file to read
      )pbdoc",
-                py::arg("file"))
+      py::arg("file"))
     .def("config_restart_output",
          &dpd::DPDSimulator::configRestartOutput,
          R"pbdoc(
@@ -1628,15 +1668,19 @@ Compute the average topological Gamma factor ``sum(gamma_factors) / denom``.
      )pbdoc",
          py::arg("file"),
          py::arg("output_every") = 50000)
-    .def("write_restart_file",
-         &dpd::DPDSimulator::writeRestartFile,
-         R"pbdoc(
+    .def(
+      "write_restart_file",
+      [](dpd::DPDSimulator& self, const std::string& filename) {
+        std::string filenameCopy = filename;
+        self.writeRestartFile(filenameCopy);
+      },
+      R"pbdoc(
           Explicitly force the writing of a restart file, now!
 
           :param file: The file path and name of the restart file to be written.
                        Can end in .xml, .json or anything else (-> binary)
      )pbdoc",
-         py::arg("file"))
+      py::arg("file"))
 #endif
     .def("config_average_output",
          &dpd::DPDSimulator::configAverageOutput,
@@ -1873,6 +1917,40 @@ Compute the average topological Gamma factor ``sum(gamma_factors) / denom``.
 
           :return: Bond type for slip-springs
          )pbdoc")
+    .def("get_velocities",
+         &dpd::DPDSimulator::getVelocities,
+         R"pbdoc(
+          Get the current particle velocities.
+
+          :return: Vector of particle velocities (vx1,vy1,vz1,vx2,vy2,vz2,...)
+         )pbdoc")
+    .def("get_target_kbt",
+         &dpd::DPDSimulator::getTargetKbT,
+         R"pbdoc(
+          Get the target thermal energy :math:`k_B T = \sigma^2 / (2 \gamma)` configured on the DPD thermostat.
+
+          :return: Target thermal energy :math:`k_B T`
+         )pbdoc")
+    .def("get_sigma",
+         &dpd::DPDSimulator::getSigma,
+         R"pbdoc(
+          Get the configured DPD random force noise amplitude `\sigma`.
+         )pbdoc")
+    .def("get_dpd_gamma",
+         &dpd::DPDSimulator::getDpdGamma,
+         R"pbdoc(
+          Get the configured DPD dissipative friction coefficient `\gamma`.
+         )pbdoc")
+    .def("get_num_shifts",
+         &dpd::DPDSimulator::getNumShifts,
+         R"pbdoc(
+          Get the number of accepted slip-spring shift moves in the most recent MC sequence.
+         )pbdoc")
+    .def("get_num_relocations",
+         &dpd::DPDSimulator::getNumRelocations,
+         R"pbdoc(
+          Get the number of accepted slip-spring relocation moves in the most recent MC sequence.
+         )pbdoc")
     .def("get_shift_possibility_empty",
          &dpd::DPDSimulator::getShiftPossibilityEmpty,
          R"pbdoc(
@@ -1880,17 +1958,6 @@ Compute the average topological Gamma factor ``sum(gamma_factors) / denom``.
 
           :return: True if shifting to empty positions is allowed
          )pbdoc")
-#ifdef CEREALIZABLE
-    .def("write_restart_file",
-         &dpd::DPDSimulator::writeRestartFile,
-         R"pbdoc(
-          Explicitly force the writing of a restart file, now!
-
-          :param file: The file path and name of the restart file to be written.
-                       Can end in .xml, .json or anything else (-> binary)
-     )pbdoc",
-         py::arg("file"))
-#endif
     .def("validate_neighbour_list",
          &dpd::DPDSimulator::validateNeighbourlist,
          R"pbdoc(

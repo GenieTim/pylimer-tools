@@ -613,6 +613,336 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
                 self.saturatedTestUniverse, 2, functionality_per_type={1: 2, 2: 4}
             )
 
+    def test_modulus_decomposition_matches_junction_modulus_with_b2(self):
+        """compute_modulus_decomposition must agree with compute_junction_modulus for b2 < 1."""
+        from pylimer_tools_cpp import Universe
+
+        unit_style = UnitStyleFactory().get_unit_style("si")
+        ureg = unit_style.get_underlying_unit_registry()
+        temperature = 298.15 * ureg("kelvin")
+        nu = 6.0e25 * (ureg("meter") ** -3)
+
+        for f in [3, 4]:
+            for r in [0.9, 1.0, 1.1]:
+                for b2 in [0.6, 0.8, 0.9, 1.0]:
+                    p = min(0.95, predict_maximum_p(r=r, f=f, b2=b2))
+                    # [A_f]_0 = (2 * r / (f * (2 - b2))) * nu
+                    xlink_conc_0 = (2 * r / (f * (2 - b2))) * nu
+                    g_mmt_phantom, _, _, _ = compute_modulus_decomposition(
+                        network=None,
+                        unit_style=unit_style,
+                        crosslinker_type=2,
+                        r=r,
+                        p=p,
+                        f=f,
+                        nu=nu,
+                        temperature=temperature,
+                        b2=b2,
+                    )
+                    g_junction = compute_junction_modulus(
+                        p=p,
+                        r=r,
+                        xlink_concentration_0=xlink_conc_0,
+                        ureg=ureg,
+                        f=f,
+                        temperature=temperature,
+                        b2=b2,
+                    )
+                    self.assertAlmostEqual(
+                        g_mmt_phantom.to("MPa").magnitude,
+                        g_junction.to("MPa").magnitude,
+                        places=10,
+                        msg=f"Mismatch for f={f}, r={r}, b2={b2}",
+                    )
+
+        # Also verify end-to-end on a Universe with B2, multi-bead B1, and multi-bead B0
+        net = Universe(10, 10, 10)
+        # 2 crosslinkers (type 2, f=4): ids 1, 2
+        # 3 B2 chains (type 1, 3 beads each): ids 10..18 -> 6 B sites
+        # 2 B1 chains (type 3, 3 beads each): ids 20..25 -> 2 B sites
+        # 2 B0 solvent chains (type 4, 3 beads each): ids 30..35 -> 0 B sites
+        # Total B sites = 8, total A sites = 8 => r = 1.0, b2 = 6/8 = 0.75, p = 1.0
+        atom_ids = (
+            [1, 2] + list(range(10, 19)) + list(range(20, 26)) + list(range(30, 36))
+        )
+        atom_types = [2, 2] + [1] * 9 + [3] * 6 + [4] * 6
+        n_atoms = len(atom_ids)
+        net.add_atoms(
+            atom_ids,
+            atom_types,
+            [float(i) for i in range(n_atoms)],
+            [0.0] * n_atoms,
+            [0.0] * n_atoms,
+            [0] * n_atoms,
+            [0] * n_atoms,
+            [0] * n_atoms,
+        )
+        # Internal chain bonds
+        bonds_from = [10, 11, 13, 14, 16, 17, 20, 21, 23, 24, 30, 31, 33, 34]
+        bonds_to = [11, 12, 14, 15, 17, 18, 21, 22, 24, 25, 31, 32, 34, 35]
+        # Crosslinker bonds:
+        # B2 chains (10-11-12, 13-14-15, 16-17-18) all connect xlink 1 and xlink 2
+        bonds_from += [1, 12, 1, 15, 1, 18]
+        bonds_to += [10, 2, 13, 2, 16, 2]
+        # B1 chains (20-21-22 -> xlink 1; 23-24-25 -> xlink 2)
+        bonds_from += [1, 2]
+        bonds_to += [20, 23]
+        net.add_bonds(bonds_from, bonds_to)
+        net.set_masses({1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0})
+
+        g_mmt_phantom, _, _, _ = compute_modulus_decomposition(
+            network=net,
+            unit_style=unit_style,
+            crosslinker_type=2,
+            temperature=temperature,
+        )
+        xlink_conc_net = 2 / (net.get_volume() * unit_style.get_base_unit_of("volume"))
+        g_junction_net = compute_junction_modulus(
+            p=1.0,
+            r=1.0,
+            xlink_concentration_0=xlink_conc_net,
+            ureg=ureg,
+            f=4,
+            temperature=temperature,
+            b2=0.75,
+        )
+        self.assertAlmostEqual(
+            g_mmt_phantom.to("MPa").magnitude,
+            g_junction_net.to("MPa").magnitude,
+            places=10,
+        )
+
+    def test_weight_fractions_from_universe_with_multibead_b1_and_b0(self):
+        """MMT weight fractions from a Universe must use chain functionality, not bead degree."""
+        from pylimer_tools_cpp import Universe
+
+        # Construct a network with A4 (type 2), multi-bead B2 (type 1),
+        # multi-bead B1 (type 3), and multi-bead B0 solvent (type 4).
+        # 2 crosslinkers (f=4): 8 A sites; 7 bonds formed => p = 7/8 = 0.875
+        # 3 B2 chains (3 beads each): 6 B sites
+        # 2 B1 chains (3 beads each): 2 B sites
+        # 2 B0 chains (3 beads each): 0 B sites
+        # r = 8 / 8 = 1.0, b2 = 6 / 8 = 0.75
+        net = Universe(10, 10, 10)
+        atom_ids = (
+            [1, 2] + list(range(10, 19)) + list(range(20, 26)) + list(range(30, 36))
+        )
+        atom_types = [2, 2] + [1] * 9 + [3] * 6 + [4] * 6
+        n_atoms = len(atom_ids)
+        net.add_atoms(
+            atom_ids,
+            atom_types,
+            [float(i) for i in range(n_atoms)],
+            [0.0] * n_atoms,
+            [0.0] * n_atoms,
+            [0] * n_atoms,
+            [0] * n_atoms,
+            [0] * n_atoms,
+        )
+        # Internal chain bonds (all chains have 3 beads => internal bead degree == 2)
+        bonds_from = [10, 11, 13, 14, 16, 17, 20, 21, 23, 24, 30, 31, 33, 34]
+        bonds_to = [11, 12, 14, 15, 17, 18, 21, 22, 24, 25, 31, 32, 34, 35]
+        # Crosslinker bonds:
+        # xlink 1 gets 4 bonds (f=4): B2 ends 10, 13, 16 and B1 end 20
+        # xlink 2 gets 3 bonds: B2 ends 12, 15 and B1 end 23 (B2 end 18 left unreacted)
+        bonds_from += [1, 12, 1, 15, 1, 1, 2]
+        bonds_to += [10, 2, 13, 2, 16, 20, 23]
+        net.add_bonds(bonds_from, bonds_to)
+        net.set_masses({1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0})
+
+        # Confirm bead degree is 2 for B1 (type 3) and B0 (type 4)
+        bead_func = net.determine_functionality_per_type()
+        self.assertEqual(bead_func[3], 2)
+        self.assertEqual(bead_func[4], 2)
+
+        # Compute MMT weight fractions directly from the Universe (functionality_per_type=None)
+        w_sol_auto = compute_weight_fraction_of_soluble_material(
+            net, crosslinker_type=2
+        )
+        w_dang_auto = compute_weight_fraction_of_dangling_chains(
+            net, crosslinker_type=2
+        )
+        w_bb_auto = compute_weight_fraction_of_backbone(net, crosslinker_type=2)
+
+        # Mass conservation must hold exactly
+        self.assertAlmostEqual(w_sol_auto + w_dang_auto + w_bb_auto, 1.0, places=10)
+
+        # Compare against explicit analytical parameters
+        wf = net.compute_weight_fractions()
+        explicit_params = {
+            "crosslinker_type": 2,
+            "functionality_per_type": {1: 2, 2: 4, 3: 1, 4: 0},
+            "weight_fractions": wf,
+            "r": 1.0,
+            "p": 7.0 / 8.0,
+            "b2": 0.75,
+        }
+        w_sol_ref = compute_weight_fraction_of_soluble_material(None, **explicit_params)
+        w_dang_ref = compute_weight_fraction_of_dangling_chains(None, **explicit_params)
+        w_bb_ref = compute_weight_fraction_of_backbone(None, **explicit_params)
+
+        self.assertAlmostEqual(w_sol_auto, w_sol_ref, places=10)
+        self.assertAlmostEqual(w_dang_auto, w_dang_ref, places=10)
+        self.assertAlmostEqual(w_bb_auto, w_bb_ref, places=10)
+
+        # Verify solvent contributes its full weight fraction to w_sol and 0 to w_dang & w_bb
+        _, beta = compute_miller_macosko_probabilities(r=1.0, p=7.0 / 8.0, f=4, b2=0.75)
+        self.assertGreater(w_sol_auto, wf[4] + wf[3] * beta)
+        # If B1/B0 were mistakenly treated as B2 (beta^2 instead of beta and 1.0),
+        # w_sol would be strictly smaller since beta < 1.
+        wrong_w_sol = compute_weight_fraction_of_soluble_material(
+            None,
+            crosslinker_type=2,
+            functionality_per_type={1: 2, 2: 4, 3: 2, 4: 2},
+            weight_fractions=wf,
+            r=1.0,
+            p=7.0 / 8.0,
+            b2=0.75,
+        )
+        self.assertGreater(w_sol_auto, wrong_w_sol)
+
+        # Partial functionality_per_type={2: 4} with network must infer B2/B1/B0
+        # without KeyError and without counting solvent (type 4) in nu
+        self.assertAlmostEqual(
+            compute_weight_fraction_of_soluble_material(
+                net, crosslinker_type=2, functionality_per_type={2: 4}
+            ),
+            w_sol_ref,
+            places=10,
+        )
+        self.assertAlmostEqual(
+            compute_weight_fraction_of_dangling_chains(
+                net, crosslinker_type=2, functionality_per_type={2: 4}
+            ),
+            w_dang_ref,
+            places=10,
+        )
+        self.assertAlmostEqual(
+            compute_weight_fraction_of_backbone(
+                net, crosslinker_type=2, functionality_per_type={2: 4}
+            ),
+            w_bb_ref,
+            places=10,
+        )
+        unit_style = UnitStyleFactory().get_unit_style("si")
+        g_auto_partial, _, g_anm_partial, _ = compute_modulus_decomposition(
+            network=net,
+            unit_style=unit_style,
+            crosslinker_type=2,
+            functionality_per_type={2: 4},
+        )
+        g_auto_full, _, g_anm_full, _ = compute_modulus_decomposition(
+            network=net,
+            unit_style=unit_style,
+            crosslinker_type=2,
+            functionality_per_type={1: 2, 2: 4, 3: 1, 4: 0},
+        )
+        self.assertAlmostEqual(
+            g_auto_partial.to("MPa").magnitude,
+            g_auto_full.to("MPa").magnitude,
+            places=10,
+        )
+        self.assertAlmostEqual(
+            g_anm_partial.to("MPa").magnitude,
+            g_anm_full.to("MPa").magnitude,
+            places=10,
+        )
+
+    def test_pure_monofunctional_b2_zero_and_ulp_p_max(self) -> None:
+        """Pure A_f + B_1 (b2 == 0) and 1-ULP saturated r > 1 networks must not crash."""
+        from pylimer_tools_cpp import Universe
+
+        unit_style = UnitStyleFactory().get_unit_style("si")
+        ureg = unit_style.get_underlying_unit_registry()
+
+        alpha, beta = compute_miller_macosko_probabilities(r=1.0, p=0.8, f=4, b2=0.0)
+        self.assertEqual((alpha, beta), (1.0, 1.0))
+        self.assertTrue(np.isinf(predict_gelation_point(r=1.0, f=4, b2=0.0)))
+
+        with self.assertRaises(ValueError):
+            compute_miller_macosko_probabilities(r=1.0, p=0.8, f=4, b2=-0.1)
+
+        with self.assertRaises(ValueError):
+            predict_p_from_w_sol(
+                w_sol=0.5,
+                network=None,
+                crosslinker_type=2,
+                functionality_per_type={2: 4, 3: 1},
+                weight_fractions={2: 0.2, 3: 0.8},
+                r=1.0,
+                b2=0.0,
+            )
+
+        # Build a pure A4 + B1 Universe (1 crosslinker, 4 2-bead B1 chains)
+        b1_net = Universe(10, 10, 10)
+        b1_ids = [1, 10, 11, 12, 13, 14, 15, 16, 17]
+        b1_types = [2] + [3] * 8
+        b1_net.add_atoms(
+            b1_ids,
+            b1_types,
+            [float(i) for i in range(len(b1_ids))],
+            [0.0] * len(b1_ids),
+            [0.0] * len(b1_ids),
+            [0] * len(b1_ids),
+            [0] * len(b1_ids),
+            [0] * len(b1_ids),
+        )
+        b1_net.add_bonds([10, 12, 14, 16, 1, 1, 1, 1], [11, 13, 15, 17, 10, 12, 14, 16])
+        b1_net.set_masses({2: 1.0, 3: 1.0})
+
+        self.assertAlmostEqual(
+            compute_weight_fraction_of_soluble_material(b1_net, crosslinker_type=2),
+            1.0,
+            places=10,
+        )
+        self.assertAlmostEqual(
+            compute_weight_fraction_of_dangling_chains(b1_net, crosslinker_type=2),
+            0.0,
+            places=10,
+        )
+        self.assertAlmostEqual(
+            compute_weight_fraction_of_backbone(b1_net, crosslinker_type=2),
+            0.0,
+            places=10,
+        )
+        g_ph, g_ent, _, _ = compute_modulus_decomposition(
+            network=b1_net, unit_style=unit_style, crosslinker_type=2
+        )
+        self.assertAlmostEqual(g_ph.to("MPa").magnitude, 0.0, places=10)
+        self.assertAlmostEqual(g_ent.to("MPa").magnitude, 0.0, places=10)
+
+        # Saturated r > 1 network where (10 / 7) / 3 exceeds 1 / 2.1 by 1 ULP in IEEE-754
+        r_ulp = 21.0 / 10.0
+        p_ulp = (10.0 / 7.0) / 3.0
+        alpha_u, beta_u = compute_miller_macosko_probabilities(r=r_ulp, p=p_ulp, f=3)
+        self.assertTrue(0.0 <= alpha_u <= 1.0)
+        self.assertTrue(0.0 <= beta_u <= 1.0)
+
+        # Explicit f=4 override on a network whose max observed crosslinker degree is 3
+        partial_deg_net = Universe(10, 10, 10)
+        partial_deg_net.add_atoms(
+            [1, 2, 10, 11, 12, 13],
+            [2, 2, 1, 1, 1, 1],
+            [0.0, 1.0, 2.0, 3.0, 4.0, 5.0],
+            [0.0] * 6,
+            [0.0] * 6,
+            [0] * 6,
+            [0] * 6,
+            [0] * 6,
+        )
+        # xlink 1 has 3 bonds (10, 11, 12), xlink 2 has 3 bonds (10, 11, 13) -> max deg = 3
+        partial_deg_net.add_bonds([1, 10, 1, 11, 1, 2], [10, 2, 11, 2, 12, 13])
+        partial_deg_net.set_masses({1: 1.0, 2: 1.0})
+        g_ent_f4 = compute_entanglement_modulus(
+            0.5 * ureg("MPa"), network=partial_deg_net, crosslinker_type=2, f=4
+        )
+        g_ent_ref = compute_entanglement_modulus(
+            0.5 * ureg("MPa"), p=6.0 / 8.0, r=8.0 / 8.0, f=4, b2=1.0
+        )
+        self.assertAlmostEqual(
+            g_ent_f4.to("MPa").magnitude, g_ent_ref.to("MPa").magnitude, places=10
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

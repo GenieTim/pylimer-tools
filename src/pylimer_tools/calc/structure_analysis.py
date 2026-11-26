@@ -4,10 +4,10 @@ This module provides functions to compute various quantities related to polymer 
 
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
 import math
 import warnings
-from typing import TYPE_CHECKING, Sequence, Tuple, Union
-
+from typing import TYPE_CHECKING, Tuple, Union
 
 from pylimer_tools_cpp import MoleculeType
 
@@ -15,11 +15,187 @@ if TYPE_CHECKING:
     from pylimer_tools_cpp import Molecule, Universe
 
 
+def determine_chain_functionality_per_type(
+    network: Universe,
+    crosslinker_type: int = 2,
+) -> dict[int, int]:
+    """
+    Determine the reactive chain functionality for each atom type in the network.
+
+    Unlike :meth:`pylimer_tools_cpp.Universe.determine_functionality_per_type`, which
+    returns the maximum vertex degree per atom type (and therefore reports ``2`` for
+    internal beads of multi-bead monofunctional and solvent chains), this function
+    infers non-crosslinker chain functionalities from the maximum number of bonds
+    to crosslinker atoms observed across chains of each atom type:
+
+    - ``crosslinker_type``: maximum vertex degree of crosslinker atoms (:math:`f`)
+    - bifunctional (:math:`B_2`) chain types: ``2`` (up to 2 crosslinker bonds per chain)
+    - monofunctional (:math:`B_1`) chain types: ``1`` (at most 1 crosslinker bond per chain)
+    - solvent (:math:`B_0`) chain types: ``0`` (no crosslinker bonds)
+
+    If no bonds between crosslinkers and non-crosslinker chains exist anywhere in the
+    network (completely unreacted system), non-crosslinker atom types default to ``2``.
+
+    .. note::
+        - Each chain species (:math:`B_2`, :math:`B_1`, :math:`B_0`) is assumed to have
+          distinct atom type(s) representing the chain's reactive functionality (rather
+          than sharing interior backbone atom types across species or using distinct
+          per-bead end-cap types).
+        - Because functionalities are inferred from *observed* attachments in ``network``,
+          partially reacted / low-conversion networks in which no chain or crosslinker of a
+          given type has yet formed its maximum number of bonds will underestimate that
+          type's target functionality; pass ``functionality_per_type`` explicitly in those
+          cases.
+
+    :param network: The polymer network to analyze
+    :param crosslinker_type: The atom type of crosslinker beads
+    :return: Dictionary mapping atom type to its chain/crosslinker functionality
+    :rtype: dict[int, int]
+    """
+    bead_func: dict[int, int] = network.determine_functionality_per_type()
+    if network.get_nr_of_atoms() == 0:
+        return bead_func
+
+    chains = network.get_chains_with_crosslinker(crosslinker_type=crosslinker_type)
+    max_xlink_bonds_per_type: dict[int, int] = {}
+    total_xlink_bonds = 0
+
+    for chain in chains:
+        xlink_atoms = chain.get_atoms_by_type(crosslinker_type)
+        n_xlink_bonds = sum(
+            1
+            for a in xlink_atoms
+            for nbr in chain.get_atoms_connected_to(a)
+            if nbr.get_type() != crosslinker_type
+        )
+        total_xlink_bonds += n_xlink_bonds
+        for atype in set(chain.get_atom_types()):
+            if atype != crosslinker_type:
+                if (
+                    atype not in max_xlink_bonds_per_type
+                    or n_xlink_bonds > max_xlink_bonds_per_type[atype]
+                ):
+                    max_xlink_bonds_per_type[atype] = n_xlink_bonds
+
+    result: dict[int, int] = {}
+    for atype, deg in bead_func.items():
+        if atype == crosslinker_type:
+            result[atype] = deg
+        elif total_xlink_bonds == 0:
+            result[atype] = 2
+        else:
+            result[atype] = max_xlink_bonds_per_type.get(atype, 0)
+
+    return result
+
+
+def _resolve_chain_functionality_per_type(
+    network: Universe,
+    crosslinker_type: int,
+    functionality_per_type: Mapping[int, int | None] | None,
+    warn_missing_crosslinker: bool = False,
+) -> dict[int, int]:
+    """
+    Resolve a complete chain functionality map for all atom types in ``network``.
+
+    Explicit entries in ``functionality_per_type`` take precedence; any missing
+    atom types are inferred via :func:`determine_chain_functionality_per_type`.
+    When ``functionality_per_type`` already covers every atom type present in
+    ``network``, chain decomposition is skipped entirely.
+    """
+    if functionality_per_type is not None:
+        if warn_missing_crosslinker and (
+            crosslinker_type not in functionality_per_type
+            or functionality_per_type[crosslinker_type] is None
+        ):
+            warnings.warn(
+                f"Crosslinker type {crosslinker_type} not found in passed "
+                "functionality_per_type; inferring its functionality from the network."
+            )
+        atom_types_in_net = network.count_atom_types()
+        if all(
+            t in functionality_per_type and functionality_per_type[t] is not None
+            for t in atom_types_in_net
+        ):
+            return {
+                int(atype): int(func)
+                for atype, func in functionality_per_type.items()
+                if func is not None
+            }
+
+    inferred = determine_chain_functionality_per_type(
+        network, crosslinker_type=crosslinker_type
+    )
+    if functionality_per_type is None:
+        return inferred
+    resolved = dict(inferred)
+    for atype, func in functionality_per_type.items():
+        if func is not None:
+            resolved[int(atype)] = int(func)
+    return resolved
+
+
+def _get_strand_functionality(
+    strand: Molecule,
+    functionality_per_type: Mapping[int, int],
+    ignore_types_set: set[int],
+) -> int:
+    """
+    Determine the number of reactive sites (functionality) of a single strand.
+
+    Strands composed solely of ignored atom types contribute 0.
+    """
+    atom_types = set(strand.get_atom_types())
+    if not atom_types or atom_types.issubset(ignore_types_set):
+        return 0
+    relevant_types = atom_types - ignore_types_set
+    funcs = [
+        int(functionality_per_type[t])
+        for t in relevant_types
+        if t in functionality_per_type and functionality_per_type[t] is not None
+    ]
+    if not funcs:
+        return 2
+    return min(funcs)
+
+
+def count_strands_by_functionality(
+    network: Universe,
+    crosslinker_type: int = 2,
+    functionality_per_type: Mapping[int, int | None] | None = None,
+    ignore_types: Sequence[int] | None = None,
+) -> dict[int, int]:
+    """
+    Count precursor strands (after splitting at ``crosslinker_type``) grouped by
+    their reactive functionality (e.g. ``0`` for solvent, ``1`` for :math:`B_1`,
+    ``2`` for :math:`B_2`).
+
+    :param network: The polymer network to analyze
+    :param crosslinker_type: The atom type of crosslinker beads
+    :param functionality_per_type: Optional mapping from atom type to functionality
+    :param ignore_types: Optional sequence of atom types to treat as non-reactive (functionality 0)
+    :return: Dictionary mapping strand functionality to number of strands
+    :rtype: dict[int, int]
+    """
+    if network.get_nr_of_atoms() == 0:
+        return {}
+    chain_func_per_type = _resolve_chain_functionality_per_type(
+        network, crosslinker_type, functionality_per_type
+    )
+    ignore_types_set = set(ignore_types) if ignore_types is not None else set()
+    ignore_types_set.discard(crosslinker_type)
+    counts_by_func: dict[int, int] = {}
+    for strand in network.get_molecules(crosslinker_type):
+        func = _get_strand_functionality(strand, chain_func_per_type, ignore_types_set)
+        counts_by_func[func] = counts_by_func.get(func, 0) + 1
+    return counts_by_func
+
+
 def compute_stoichiometric_imbalance(
     network: Universe,
     crosslinker_type: int = 2,
-    functionality_per_type: Union[dict, None] = None,
-    ignore_types: Union[list, None] = None,
+    functionality_per_type: Mapping[int, int | None] | None = None,
+    ignore_types: Sequence[int] | None = None,
     effective: bool = False,
 ) -> float:
     """
@@ -31,15 +207,17 @@ def compute_stoichiometric_imbalance(
     .. note::
         - if your system has a non-integer number of possible bonds (e.g. one site non-bonded),
           this will not be rounded/respected in any way.
-        - Currently, only g = 2 chains are respected yet, and only one type of crosslinker is supported.
-        - If you have e.g. solvent chains in the network, use `ignore_types` to not count them.
+        - Only one type of crosslinker is supported.
+        - Monofunctional (:math:`B_1`) and solvent (:math:`B_0`) chains are accounted for
+          using ``functionality_per_type`` or inferred from crosslinker attachments;
+          you can also use ``ignore_types`` to explicitly exclude atom types.
 
     :param network: The polymer network to do the computation for
     :param crosslinker_type: The type of the junctions/crosslinkers to select them in the network
     :param functionality_per_type: A dictionary with key: type, and value: functionality of this atom type.
-        If `None`: will use max functionality per type.
-    :param ignore_types: A list of integers, the types to ignore for the imbalance (e.g. solvent atom types)
-    :param effective: Whether to use the effective functionality (if functionality_per_type is not passed)
+        If `None`: will infer chain functionalities from the network.
+    :param ignore_types: A sequence of integers, the types to ignore for the imbalance (e.g. solvent atom types)
+    :param effective: Whether to use the effective functionality (if crosslinker functionality is not passed)
         or the maximum functionality of the crosslinkers.
     :return: The stoichiometric imbalance. If the network is empty, or no crosslinkers are present 0. is returned.
     :rtype: float
@@ -48,57 +226,50 @@ def compute_stoichiometric_imbalance(
         return 0.0
 
     counts = network.count_atom_types()
+    crosslinker_explicit = (
+        functionality_per_type is not None
+        and crosslinker_type in functionality_per_type
+        and functionality_per_type[crosslinker_type] is not None
+    )
 
-    if functionality_per_type is not None and (
-        crosslinker_type not in functionality_per_type
-        or functionality_per_type[crosslinker_type] is None
-    ):
-        functionality_per_type = None
-        warnings.warn(
-            "Crosslink's atom type not found in functionality_per_type, "
-            + "will ignore passed argument `functionality_per_type`."
-        )
-
-    if functionality_per_type is None:
-        functionality_per_type = (
-            network.determine_effective_functionality_per_type()
-            if effective
-            else network.determine_functionality_per_type()
-        )
+    chain_func_per_type = _resolve_chain_functionality_per_type(
+        network,
+        crosslinker_type,
+        functionality_per_type,
+        warn_missing_crosslinker=True,
+    )
 
     if crosslinker_type not in counts:
         return 0.0
 
-    # TODO: use the data from the functionality_per_type to determine the
-    # functionality per strand, maybe?
-    strands = network.get_molecules(crosslinker_type)
-    ignore_types_set = set(ignore_types) if ignore_types is not None else set()
-    ignore_types_set.discard(crosslinker_type)
-    if not ignore_types_set:
-        num_relevant_strands = len(strands)
-    else:
-        num_relevant_strands = sum(
-            1
-            for m in strands
-            if not all(a.get_type() in ignore_types_set for a in m.get_atoms())
+    if not crosslinker_explicit and effective:
+        crosslinker_func: float = (
+            network.determine_effective_functionality_per_type().get(
+                crosslinker_type, 0.0
+            )
         )
+    else:
+        crosslinker_func = float(chain_func_per_type[crosslinker_type])
 
-    crosslinker_formable_bonds = (
-        counts[crosslinker_type] * functionality_per_type[crosslinker_type]
+    strand_counts = count_strands_by_functionality(
+        network, crosslinker_type, chain_func_per_type, ignore_types
     )
-    other_formable_bonds = num_relevant_strands * 2
+    crosslinker_formable_bonds = counts[crosslinker_type] * crosslinker_func
+    other_formable_bonds = sum(
+        func * cnt for func, cnt in strand_counts.items() if func > 0
+    )
 
     if other_formable_bonds == 0:
         return math.inf
 
-    # division by 2 is implicit
-    return crosslinker_formable_bonds / (other_formable_bonds)
+    return crosslinker_formable_bonds / other_formable_bonds
 
 
 def compute_extent_of_reaction(
     network: Universe,
     crosslinker_type: int = 2,
-    functionality_per_type: Union[dict, None] = None,
+    functionality_per_type: Mapping[int, int | None] | None = None,
+    ignore_types: Sequence[int] | None = None,
 ) -> float:
     """
     Compute the extent of polymerization reaction
@@ -107,69 +278,85 @@ def compute_extent_of_reaction(
     .. note::
         - if your system has a non-integer number of possible bonds (e.g. one site non-bonded),
           this will not be rounded/respected in any way
-        - if the system contains solvent or other molecules that should not be binding to
-          crosslinkers, make sure to remove them before calling this function
+        - Monofunctional (:math:`B_1`) and solvent (:math:`B_0`) chains are accounted for
+          using ``functionality_per_type`` or inferred from crosslinker attachments;
+          you can also use ``ignore_types`` to explicitly exclude atom types.
         - if you have multiple crosslinker types, be sure to replace them by one type only
 
     :param network: The polymer network to do the computation for
     :param crosslinker_type: The atom type of crosslinker beads
     :param functionality_per_type: A dictionary with key: type, and value: functionality of this atom type.
-        If None: will use max functionality per type.
+        If None: will infer chain functionalities from the network.
+    :param ignore_types: A sequence of integers, the types to ignore (e.g. solvent atom types)
     :return: The extent of reaction
     :rtype: float
     """
     if network.get_nr_of_atoms() == 0:
-        return 1
+        return 1.0
 
-    if len(network.get_atoms_by_type(crosslinker_type)) == 0:
-        return 0
-
-    if (functionality_per_type is not None) and (
-        crosslinker_type not in functionality_per_type
-    ):
-        functionality_per_type = None
-        warnings.warn(
-            "Crosslinker type {} not found in passed functionality_per_type, ".format(
-                crosslinker_type
-            )
-            + "will ignore passed argument `functionality_per_type`."
-        )
-
-    if functionality_per_type is None:
-        functionality_per_type = network.determine_functionality_per_type()
-
-    num_strands = len(network.get_molecules(crosslinker_type))
     crosslinks = network.get_atoms_by_type(crosslinker_type)
     num_crosslinkers = len(crosslinks)
+    if num_crosslinkers == 0:
+        return 0.0
 
-    # assuming strand has functionality 2
-    max_formable_bonds = min(
-        num_strands * 2, num_crosslinkers * functionality_per_type[crosslinker_type]
+    crosslinker_explicit = (
+        functionality_per_type is not None
+        and crosslinker_type in functionality_per_type
+        and functionality_per_type[crosslinker_type] is not None
     )
+    chain_func_per_type = _resolve_chain_functionality_per_type(
+        network,
+        crosslinker_type,
+        functionality_per_type,
+        warn_missing_crosslinker=True,
+    )
+    ignore_types_set = set(ignore_types) if ignore_types is not None else set()
+    ignore_types_set.discard(crosslinker_type)
 
-    if max_formable_bonds == 0:
-        return 1
+    strand_counts = count_strands_by_functionality(
+        network, crosslinker_type, chain_func_per_type, ignore_types
+    )
+    other_formable_bonds = sum(
+        func * cnt for func, cnt in strand_counts.items() if func > 0
+    )
 
     actually_formed_bonds = 0
     for crosslink in crosslinks:
         connected_to = network.get_atoms_connected_to(atom=crosslink)
-        actually_formed_bonds += len(
-            [a for a in connected_to if a.get_type() != crosslinker_type]
+        actually_formed_bonds += sum(
+            1
+            for a in connected_to
+            if a.get_type() != crosslinker_type and a.get_type() not in ignore_types_set
         )
 
-    return actually_formed_bonds / (max_formable_bonds)
+    crosslinker_formable_bonds = (
+        num_crosslinkers * chain_func_per_type[crosslinker_type]
+    )
+    max_formable_bonds = min(other_formable_bonds, crosslinker_formable_bonds)
+
+    if max_formable_bonds == 0:
+        if (
+            not crosslinker_explicit
+            and chain_func_per_type[crosslinker_type] == 0
+            and other_formable_bonds > 0
+            and actually_formed_bonds == 0
+        ):
+            return 0.0
+        return 1.0
+
+    return actually_formed_bonds / max_formable_bonds
 
 
 def compute_fraction_of_bifunctional_reactive_sites(
     network: Universe,
     crosslinker_type: int = 2,
-    functionality_per_type: Union[dict, None] = None,
+    functionality_per_type: Mapping[int, int | None] | None = None,
 ) -> float:
     """
     Compute the mole fraction of reactive sites in B2
     among all reactive sites in a mixture of B1 and B2.
-    Uses the network to detect what might be monofunctional chains,
-    and then counts them and the bifunctional ones.
+    Uses the network to detect monofunctional and solvent chains,
+    and then counts the monofunctional and bifunctional ones.
 
     :param network: The polymer network to do the computation for
     :param crosslinker_type: The atom type of crosslinker beads
@@ -177,61 +364,15 @@ def compute_fraction_of_bifunctional_reactive_sites(
     :return: The mole fraction of reactive sites in B2 among all reactive sites in a mixture of B1 and B2
     :rtype: float
     """
-    functionality_per_type_given = functionality_per_type is not None
-    if functionality_per_type is None:
-        functionality_per_type = network.determine_functionality_per_type()
-
-    monofunctional_types = [t for t, f in functionality_per_type.items() if f == 1]
-    if len(monofunctional_types) == 0 and not functionality_per_type_given:
-        """
-        Assume the whole monofunctional chain has the same atom type
-        """
-        chains_with_crosslinks = network.get_chains_with_crosslinker(
-            crosslinker_type=crosslinker_type
-        )
-        all_atom_types = network.count_atom_types().keys()
-        atom_type_has_only_monofunctional = {
-            atype: True
-            for atype in all_atom_types
-            if atype != crosslinker_type and functionality_per_type.get(atype, 0) != 0
-        }
-        for chain in chains_with_crosslinks:
-            n_xlinks = len(chain.get_atoms_by_type(crosslinker_type))
-            atom_types_in_chain = set(chain.get_atom_types())
-            if n_xlinks > 1:
-                for atype in atom_types_in_chain:
-                    if atype in atom_type_has_only_monofunctional:
-                        atom_type_has_only_monofunctional[atype] = False
-
-        # the atom_type_has_only_monofunctional is now a dictionary that indicates
-        # the atom types belonging to a monofunctional chain
-        monofunctional_types = [
-            t for t, i in atom_type_has_only_monofunctional.items() if i
-        ]
-
-    if len(monofunctional_types) == 0:
+    if network.get_nr_of_atoms() == 0:
         return 1.0
 
-    # then, count the number of chains where one end is of the monofunctional
-    # type
-    chains_with_crosslinks = network.get_chains_with_crosslinker(
-        crosslinker_type=crosslinker_type
+    strand_counts = count_strands_by_functionality(
+        network, crosslinker_type, functionality_per_type
     )
+    n_monofunctional_chains = strand_counts.get(1, 0)
+    n_bifunctional_chains = strand_counts.get(2, 0)
 
-    n_monofunctional_chains = sum(
-        1
-        for chain in chains_with_crosslinks
-        if any(
-            a.get_type() in monofunctional_types
-            for a in chain.get_strand_ends(
-                crosslinker_type=crosslinker_type, close_loop=True
-            )
-        )
-        and chain.get_nr_of_atoms() > 1
-    )
-    n_bifunctional_chains = (
-        len(network.get_molecules(crosslinker_type)) - n_monofunctional_chains
-    )
     total_reactive_sites = n_monofunctional_chains + 2 * n_bifunctional_chains
     if total_reactive_sites == 0:
         return 1.0
@@ -355,8 +496,8 @@ def compute_end_to_end_vectors(network: Universe, crosslinker_type: int = 2) -> 
 def compute_crosslinker_conversion(
     network: Universe,
     crosslinker_type: int = 2,
-    f: Union[int, None] = None,
-    functionality_per_type: Union[dict, None] = None,
+    f: int | None = None,
+    functionality_per_type: Mapping[int, int | None] | None = None,
 ) -> float:
     """
     Compute the extent of reaction of the crosslinkers
@@ -370,11 +511,22 @@ def compute_crosslinker_conversion(
     :rtype: float
     """
     if f is None:
+        inferred_from_network = functionality_per_type is None
         if functionality_per_type is None:
             functionality_per_type = network.determine_functionality_per_type()
-        if crosslinker_type not in functionality_per_type:
+        if (
+            crosslinker_type not in functionality_per_type
+            or functionality_per_type[crosslinker_type] is None
+        ):
             return 0.0
         f = functionality_per_type[crosslinker_type]
+        if (
+            inferred_from_network
+            and f == 0
+            and compute_effective_crosslinker_functionality(network, crosslinker_type)
+            == 0.0
+        ):
+            return 0.0
 
     if f is None or f <= 0.0 or not math.isfinite(f):
         raise ValueError("Crosslinker functionality = {} is not reasonable.".format(f))

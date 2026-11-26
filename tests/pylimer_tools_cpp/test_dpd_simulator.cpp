@@ -1129,3 +1129,320 @@ TEST_CASE(
   CHECK(sim2.getVolume() > 0.0);
 #endif
 }
+
+TEST_CASE("DPD Simulator slip-spring MC physics and edge cases",
+          "[analysis][DPDSimulator]")
+{
+  SECTION("Defect-free network relocateSlipSprings does not underflow or crash")
+  {
+    // Closed ring of 6 beads: all atoms have functionality 2 -> chainEndIndices
+    // is empty when allowRelocationInNetwork == false.
+    pe::Universe u(10.0, 10.0, 10.0);
+    u.addAtoms({ 1, 2, 3, 4, 5, 6 },
+               { 1, 1, 1, 1, 1, 1 },
+               { 1.0, 2.0, 3.0, 3.0, 2.0, 1.0 },
+               { 1.0, 1.0, 1.0, 2.0, 2.0, 2.0 },
+               { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 },
+               { 0, 0, 0, 0, 0, 0 },
+               { 0, 0, 0, 0, 0, 0 },
+               { 0, 0, 0, 0, 0, 0 });
+    u.addBonds({ 1, 2, 3, 4, 5, 6 }, { 2, 3, 4, 5, 6, 1 });
+
+    pcd::DPDSimulator sim(u, 2, 9, false, "defect_free_seed");
+    sim.configSlipspringLowCutoff(0.5);
+    sim.configSlipspringHighCutoff(2.5);
+    REQUIRE(sim.createSlipSprings(2) == 2);
+    REQUIRE_NOTHROW(sim.validateState());
+    CHECK(sim.relocateSlipSprings(1.0) == 0);
+    REQUIRE_NOTHROW(sim.validateState());
+  }
+
+  SECTION("Zero-velocity step 0 uses target kbT and kbT <= 0 is handled safely")
+  {
+    pe::Universe u(10.0, 10.0, 10.0);
+    u.addAtoms({ 1, 2, 3, 4 },
+               { 1, 1, 1, 1 },
+               { 1.0, 2.0, 1.0, 2.0 },
+               { 1.0, 1.0, 2.0, 3.0 },
+               { 1.0, 1.0, 1.0, 1.0 },
+               { 0, 0, 0, 0 },
+               { 0, 0, 0, 0 },
+               { 0, 0, 0, 0 });
+    u.addBonds({ 1, 3 }, { 2, 4 });
+    // Add slip-spring (type 9) between atom 1 and atom 3 (distance 1.0)
+    u.addBonds(1, { 1 }, { 3 }, { 9 });
+
+    pcd::DPDSimulator sim(u, 2, 9, false, "zero_vel_seed");
+    CHECK(sim.getTemperature() == Catch::Approx(0.0));
+    CHECK(sim.getTargetKbT() == Catch::Approx(1.0));
+    sim.configNumStepsDPD(10);
+    sim.configNumStepsMC(5);
+    sim.configShiftOneAtATime(false);
+    sim.configShiftPossibilityEmpty(false);
+
+    // Negative kbT must throw
+    CHECK_THROWS_AS(sim.shiftSlipSprings(-1.0), std::invalid_argument);
+    CHECK_THROWS_AS(sim.relocateSlipSprings(-1.0), std::invalid_argument);
+
+    // kbT == 0.0 must not divide by zero or accept uphill moves
+    for (int i = 0; i < 50; ++i) {
+      CHECK(sim.shiftSlipSprings(0.0) == 0);
+    }
+    CHECK_NOTHROW(sim.relocateSlipSprings(0.0));
+
+    // Running simulation from zero initial velocities with MC enabled at step 0
+    REQUIRE_NOTHROW(sim.runSimulation(2, true));
+    REQUIRE_NOTHROW(sim.validateState());
+  }
+
+  SECTION("Slip-spring shift forwards kbT and uses 0.5 * k * r^2 energy")
+  {
+    // Two 2-bead chains:
+    //   Chain A: atom 1 at (1, 1, 1) -- atom 2 at (2, 1, 1)
+    //   Chain B: atom 3 at (1, 2, 1) -- atom 4 at (2, 3, 1)
+    // Slip-spring initially between (1, 3): r0^2 = 1.0
+    // Shifting both ends simultaneously always proposes (2, 4): r1^2 = 4.0
+    // With k = 2.0: dU = 0.5 * k * (4.0 - 1.0) = 3.0.
+    // At kbT = 3.0, acceptance probability = exp(-3.0 / 3.0) = exp(-1) ~=
+    // 0.3679 (Without the 0.5 factor, it would be exp(-2) ~= 0.1353.)
+    pe::Universe u(10.0, 10.0, 10.0);
+    u.addAtoms({ 1, 2, 3, 4 },
+               { 1, 1, 1, 1 },
+               { 1.0, 2.0, 1.0, 2.0 },
+               { 1.0, 1.0, 2.0, 3.0 },
+               { 1.0, 1.0, 1.0, 1.0 },
+               { 0, 0, 0, 0 },
+               { 0, 0, 0, 0 },
+               { 0, 0, 0, 0 });
+    u.addBonds({ 1, 3 }, { 2, 4 });
+    u.addBonds(1, { 1 }, { 3 }, { 9 });
+
+    pcd::DPDSimulator sim(u, 2, 9, false, "detailed_balance_seed");
+    sim.configSpringConstant(2.0);
+    sim.configShiftOneAtATime(false);
+    sim.configShiftPossibilityEmpty(false);
+
+    const int numTrials = 2000;
+    int numAccepted = 0;
+    for (int trial = 0; trial < numTrials; ++trial) {
+      const int accepted = sim.shiftSlipSprings(3.0);
+      numAccepted += accepted;
+      if (accepted == 1) {
+        // Return move (2, 4) -> (1, 3) is strictly downhill (dU = -3.0)
+        // and must always be accepted.
+        REQUIRE(sim.shiftSlipSprings(3.0) == 1);
+      }
+    }
+    const double acceptanceRate =
+      static_cast<double>(numAccepted) / static_cast<double>(numTrials);
+    CHECK_THAT(acceptanceRate,
+               Catch::Matchers::WithinAbs(std::exp(-1.0), 0.05));
+
+    // With kbT = 0.0, uphill move must never be accepted (verifies kbT is
+    // forwarded rather than defaulting to 1.0)
+    int acceptedAtZeroT = 0;
+    for (int trial = 0; trial < 200; ++trial) {
+      acceptedAtZeroT += sim.shiftSlipSprings(0.0);
+    }
+    CHECK(acceptedAtZeroT == 0);
+  }
+
+  SECTION("shiftOneAtATime handles spring collapse without stale partner state")
+  {
+    // Single 4-bead chain: 1 - 2 - 3 - 4.
+    // Slip-spring between atom 1 (end) and atom 2: shifting partner A (atom 1)
+    // deterministically moves it onto atom 2 (collapse: A == B), which must
+    // trigger full relocation without operating on stale partner state.
+    pe::Universe u(10.0, 10.0, 10.0);
+    u.addAtoms({ 1, 2, 3, 4 },
+               { 1, 1, 1, 1 },
+               { 1.0, 2.0, 3.0, 4.0 },
+               { 1.0, 1.0, 1.0, 1.0 },
+               { 1.0, 1.0, 1.0, 1.0 },
+               { 0, 0, 0, 0 },
+               { 0, 0, 0, 0 },
+               { 0, 0, 0, 0 });
+    u.addBonds({ 1, 2, 3 }, { 2, 3, 4 });
+    u.addBonds(1, { 1 }, { 2 }, { 9 });
+
+    pcd::DPDSimulator sim(u, 2, 9, false, "collapse_seed");
+    sim.configSlipspringLowCutoff(0.5);
+    sim.configSlipspringHighCutoff(2.5);
+    sim.configShiftOneAtATime(true);
+    sim.configShiftPossibilityEmpty(false);
+
+    REQUIRE_NOTHROW(sim.shiftSlipSprings(1.0));
+    REQUIRE_NOTHROW(sim.validateState());
+  }
+
+  SECTION(
+    "resetBondDuplicationPenalty covers last atom and bondType=0 sentinel")
+  {
+    pe::Universe u(10.0, 10.0, 10.0);
+    u.addAtoms({ 1, 2, 3 },
+               { 1, 1, 1 },
+               { 1.0, 2.0, 3.0 },
+               { 1.0, 1.0, 1.0 },
+               { 1.0, 1.0, 1.0 },
+               { 0, 0, 0 },
+               { 0, 0, 0 },
+               { 0, 0, 0 });
+    // Normal bonds (1-2, 2-3) and duplicate slip-spring on last atom (2-3)
+    u.addBonds(2, { 1, 2 }, { 2, 3 }, { 1, 1 });
+    u.addBonds(1, { 2 }, { 3 }, { 7 });
+
+    pcd::DPDSimulator sim(u, 2, 7, false, "penalty_and_bondtype_seed");
+    REQUIRE_NOTHROW(sim.resetBondDuplicationPenalty());
+    REQUIRE_NOTHROW(sim.validateState());
+
+    // bondType = 0 sentinel should inherit slipspringBondType (7)
+    sim.configSlipspringLowCutoff(0.5);
+    sim.configSlipspringHighCutoff(2.5);
+    REQUIRE(sim.createSlipSprings(1, 0) == 1);
+    pe::Universe uAfterDefault = sim.getUniverse(true);
+    std::map<std::string, std::vector<long int>> edgesDefault =
+      uAfterDefault.getEdges();
+    REQUIRE(edgesDefault["edge_type"].size() == 4);
+    CHECK(edgesDefault["edge_type"].back() == 7);
+
+    // Explicit non-zero bondType should be preserved
+    REQUIRE(sim.createSlipSprings(1, 5) == 1);
+    pe::Universe uAfterExplicit = sim.getUniverse(true);
+    std::map<std::string, std::vector<long int>> edgesExplicit =
+      uAfterExplicit.getEdges();
+    REQUIRE(edgesExplicit["edge_type"].size() == 5);
+    CHECK(edgesExplicit["edge_type"].back() == 5);
+  }
+
+  SECTION("PBC-crossing slip-spring shifts, partner swaps, and relocations "
+          "preserve exact unwrapped bond vectors")
+  {
+    // Two chains crossing x = 0 / 10 periodic boundary:
+    //   Chain A: 1 (9.2) -- 2 (9.8) -- 3 (0.4) -- 4 (1.0) at y = 1.0
+    //   Chain B: 5 (9.2) -- 6 (9.8) -- 7 (0.4) -- 8 (1.0) at y = 2.0
+    // Slip-spring initially between atom 2 (9.8, 1, 1) and atom 7 (0.4, 2, 1):
+    // true minimum-image vector A->B is (+0.6, +1.0, 0.0), length^2 = 1.36.
+    pe::Universe u(10.0, 10.0, 10.0);
+    u.addAtoms({ 1, 2, 3, 4, 5, 6, 7, 8 },
+               { 1, 1, 1, 1, 1, 1, 1, 1 },
+               { 9.2, 9.8, 0.4, 1.0, 9.2, 9.8, 0.4, 1.0 },
+               { 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 2.0 },
+               { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 },
+               { 0, 0, 0, 0, 0, 0, 0, 0 },
+               { 0, 0, 0, 0, 0, 0, 0, 0 },
+               { 0, 0, 0, 0, 0, 0, 0, 0 });
+    u.addBonds({ 1, 2, 3, 5, 6, 7 }, { 2, 3, 4, 6, 7, 8 });
+    u.addBonds(1, { 2 }, { 7 }, { 9 });
+
+    // Compare tracked-offset PBC (default false) vs minimum-image PBC (true)
+    // across both 2-end and 1-end shifts and relocations with identical RNG
+    // seeds
+    for (const bool oneAtATime : { false, true }) {
+      pcd::DPDSimulator simTracked(u, 2, 9, false, "pbc_mc_seed", false);
+      pcd::DPDSimulator simMic(u, 2, 9, false, "pbc_mc_seed", true);
+      CHECK_FALSE(simTracked.assumesBoxLargeEnough());
+      CHECK(simMic.assumesBoxLargeEnough());
+
+      simTracked.configSlipspringLowCutoff(0.3);
+      simTracked.configSlipspringHighCutoff(2.5);
+      simTracked.configShiftOneAtATime(oneAtATime);
+      simMic.configSlipspringLowCutoff(0.3);
+      simMic.configSlipspringHighCutoff(2.5);
+      simMic.configShiftOneAtATime(oneAtATime);
+
+      REQUIRE(simTracked.getBondLengths().isApprox(simMic.getBondLengths()));
+
+      for (int step = 0; step < 40; ++step) {
+        const int sTracked = simTracked.shiftSlipSprings(1.5);
+        const int sMic = simMic.shiftSlipSprings(1.5);
+        CHECK(sTracked == sMic);
+        REQUIRE_NOTHROW(simTracked.validateState());
+        REQUIRE(
+          simTracked.getBondLengths().isApprox(simMic.getBondLengths(), 1e-10));
+        CHECK(simTracked.getBondLengths().maxCoeff() < 5.0);
+
+        const int rTracked = simTracked.relocateSlipSprings(1.5);
+        const int rMic = simMic.relocateSlipSprings(1.5);
+        CHECK(rTracked == rMic);
+        REQUIRE_NOTHROW(simTracked.validateState());
+        REQUIRE(
+          simTracked.getBondLengths().isApprox(simMic.getBondLengths(), 1e-10));
+      }
+    }
+
+    // Intra-chain PBC-crossing slip-spring where 2-end shift can swap A <-> B
+    // or step newPartnerA onto oldPartnerB: chain 1 (9.2) - 2 (9.8) - 3 (0.4) -
+    // 4 (1.0)
+    pe::Universe uSwap(10.0, 10.0, 10.0);
+    uSwap.addAtoms({ 1, 2, 3, 4 },
+                   { 1, 1, 1, 1 },
+                   { 9.2, 9.8, 0.4, 1.0 },
+                   { 1.0, 1.0, 1.0, 1.0 },
+                   { 1.0, 1.0, 1.0, 1.0 },
+                   { 0, 0, 0, 0 },
+                   { 0, 0, 0, 0 },
+                   { 0, 0, 0, 0 });
+    uSwap.addBonds({ 1, 2, 3 }, { 2, 3, 4 });
+    uSwap.addBonds(1, { 2 }, { 3 }, { 9 });
+
+    pcd::DPDSimulator simSwap(uSwap, 2, 9, false, "swap_pbc_seed", false);
+    simSwap.configSlipspringLowCutoff(0.3);
+    simSwap.configSlipspringHighCutoff(2.0);
+    simSwap.configShiftOneAtATime(false);
+    for (int step = 0; step < 30; ++step) {
+      REQUIRE_NOTHROW(simSwap.shiftSlipSprings(2.0));
+      REQUIRE_NOTHROW(simSwap.validateState());
+      CHECK(simSwap.computeBondLength(3) < 2.5);
+    }
+  }
+
+  SECTION("Collapse with no eligible relocation pairs reverts safely and "
+          "input validation catches invalid parameters")
+  {
+    // Two beads far apart (distance 3.0) with highCutoff = 2.0:
+    // collapse cannot find any candidate pair within (lowCutoff, highCutoff],
+    // so it must revert cleanly rather than leaving a self-loop.
+    pe::Universe uSparse(10.0, 10.0, 10.0);
+    uSparse.addAtoms({ 1, 2 },
+                     { 1, 1 },
+                     { 1.0, 4.0 },
+                     { 1.0, 1.0 },
+                     { 1.0, 1.0 },
+                     { 0, 0 },
+                     { 0, 0 },
+                     { 0, 0 });
+    uSparse.addBonds({ 1 }, { 2 });
+    uSparse.addBonds(1, { 1 }, { 2 }, { 9 });
+
+    pcd::DPDSimulator simSparse(uSparse, 2, 9, false, "sparse_collapse_seed");
+    simSparse.configSlipspringLowCutoff(0.5);
+    simSparse.configSlipspringHighCutoff(2.0);
+    simSparse.configShiftOneAtATime(true);
+    simSparse.configShiftPossibilityEmpty(false);
+
+    CHECK(simSparse.shiftSlipSprings(1.0) == 0);
+    REQUIRE_NOTHROW(simSparse.validateState());
+    CHECK(simSparse.computeBondLength(1) == Catch::Approx(3.0));
+
+    // Validation & edge cases
+    CHECK_THROWS_AS(simSparse.createSlipSprings(-1), std::invalid_argument);
+    CHECK_THROWS_AS(simSparse.createSlipSprings(1, -1), std::invalid_argument);
+    CHECK(simSparse.createSlipSprings(0) == 0);
+    CHECK_THROWS_AS(simSparse.configSlipspringLowCutoff(-0.1),
+                    std::invalid_argument);
+    CHECK_THROWS_AS(simSparse.configSigma(-1.0), std::invalid_argument);
+    CHECK_THROWS_AS(simSparse.configGamma(-1.0), std::invalid_argument);
+
+    simSparse.configSigma(3.0);
+    simSparse.configGamma(2.25);
+    CHECK(simSparse.getTargetKbT() == Catch::Approx(2.0));
+
+    simSparse.configAssumeBoxLargeEnough(true);
+    CHECK(simSparse.assumesBoxLargeEnough());
+    simSparse.configAssumeBoxLargeEnough(false);
+    CHECK_FALSE(simSparse.assumesBoxLargeEnough());
+
+    CHECK(pcd::DPDSimulator::computeTemperature(Eigen::VectorXd(0)) ==
+          Catch::Approx(0.0));
+  }
+}

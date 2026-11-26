@@ -593,24 +593,22 @@ plt.show()
 #
 # - **Monodisperse :math:`A_f + B_2 / B_1` & single crosslinker type**:
 #   All recursive formulas assume a single crosslinker functionality :math:`f`
-#   and monodisperse precursor reactivity (one :math:`B_2` / :math:`B_1` pool).
-#   In addition, :func:`~pylimer_tools.calc.structure_analysis.compute_stoichiometric_imbalance`
-#   assumes bifunctional strands (:math:`g = 2`), so when :math:`B_1` chains are
-#   present, :math:`r = f N_{A_f} / (2 N_{B_2} + N_{B_1})` and
-#   ``functionality_per_type={1: 2, 2: f, 4: 1}`` should be passed explicitly.
+#   and monodisperse precursor reactivity (one :math:`B_2` / :math:`B_1` pool),
+#   with each chain species (:math:`B_2`, :math:`B_1`, :math:`B_0`) represented
+#   by distinct atom type(s) (inferred from crosslinker attachments or passed via
+#   ``functionality_per_type={1: 2, 2: f, 4: 1}``).
 # - **Tree-like (no-loop) Bethe-lattice approximation**:
 #   MMT ignores spatial proximity and intramolecular loops. In melts near
 #   :math:`p_c` or in diluted precursors, primary and secondary loops waste
 #   crosslinker arms, shift :math:`p_c^{\text{eff}}` upward, and depress
 #   :math:`G_{\text{ph}}` below MMT.
-# - **Entanglement trapping & :math:`b_2 < 1` prefactors**:
+# - **Entanglement trapping & :math:`b_2 < 1` dilution prefactors**:
+#   While :func:`~pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition`
+#   and :func:`~pylimer_tools.calc.miller_macosko_theory.compute_junction_modulus`
+#   use the exact crosslinker density :math:`[A_f]_0 = \frac{2 r}{f (2 - b_2)}\,\nu`
+#   (for reactive strand density :math:`\nu = [B_2]_0 + [B_1]_0`),
 #   :func:`~pylimer_tools.calc.miller_macosko_theory.compute_trapping_factor`
 #   evaluates :math:`(1 - \beta)^4` without the :math:`w_{B_2}^2` dilution
-#   prefactor of :cite:t:`patel_elastic_1992`, and
-#   :func:`~pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition`
-#   uses :math:`(2 r b_2 / f)\,\nu` instead of :math:`[A_f]_0` when :math:`b_2 < 1`;
-#   for :math:`b_2 < 1`, prefer
-#   :func:`~pylimer_tools.calc.miller_macosko_theory.compute_junction_modulus`
-#   together with :math:`w_{B_2}^2 (1 - \beta)^4 G_e(1)`.
+#   prefactor of :cite:t:`patel_elastic_1992`.
 
 print(format_benchmark_footnote(data))

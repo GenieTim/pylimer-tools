@@ -828,16 +828,20 @@ class DPDSimulator:
         
                   :param file: The file path to the restart file to read
         """
-    def __init__(self, universe: Universe, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, slipspring_bond_type: typing.SupportsInt | typing.SupportsIndex = 9, is_2d: bool = False, seed: str = '') -> None:
+    def __init__(self, universe: Universe, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, slipspring_bond_type: typing.SupportsInt | typing.SupportsIndex = 9, is_2d: bool = False, seed: str = '', assume_box_large_enough: bool = False) -> None:
         """
         Get an instance of this class
         """
-    def assume_box_large_enough(self) -> None:
+    def assume_box_large_enough(self, assume: bool = True) -> None:
         """
-                  Configure whether to run PBC on the bonds or not.
+                  Configure whether to assume minimum-image PBC is sufficient for all bonds.
         
-                  If your bonds could get larger than half the box length, this must be kept false (default).
-                  Otherwise, you can set it to true and therewith get some securities.
+                  If your bonds could exceed half the box length, keep this ``False`` (default) so per-bond periodic box offsets are tracked.
+                  Set to ``True`` to apply minimum-image PBC on every bond evaluation.
+        """
+    def assumes_box_large_enough(self) -> bool:
+        """
+                  Return ``True`` if minimum-image PBC is assumed sufficient for bonds, ``False`` if per-bond periodic box offsets are tracked.
         """
     def config_a(self, A: typing.SupportsFloat | typing.SupportsIndex = 25.0) -> None:
         """
@@ -850,6 +854,13 @@ class DPDSimulator:
                   Side-effect: if true, the relocations may also happen *to* a slip-spring next to a crosslink.
         
                   :param allow_relocation_in_network (bool): Whether to allow relocation in the network or not.
+        """
+    def config_assume_box_large_enough(self, assume: bool = True) -> None:
+        """
+                  Configure whether to assume minimum-image PBC is sufficient for all bonds.
+        
+                  If your bonds could exceed half the box length, keep this ``False`` (default) so per-bond periodic box offsets are tracked.
+                  Set to ``True`` to apply minimum-image PBC on every bond evaluation.
         """
     def config_auto_correlator_output(self, values: collections.abc.Sequence[OutputConfiguration], num_corr_in: typing.SupportsInt | typing.SupportsIndex = 32, p: typing.SupportsInt | typing.SupportsIndex = 16, m: typing.SupportsInt | typing.SupportsIndex = 2) -> None:
         """
@@ -881,6 +892,10 @@ class DPDSimulator:
     def config_box_deformation(self, target_box: Box) -> None:
         """
                   Configure where to (incrementally) deform the box to during the next simulation run.
+        """
+    def config_gamma(self, gamma: typing.SupportsFloat | typing.SupportsIndex = 4.5) -> None:
+        """
+                  Configure the DPD dissipative friction parameter `\\gamma` independently of `\\sigma`.
         """
     def config_lambda(self, l: typing.SupportsFloat | typing.SupportsIndex = 0.65) -> None:
         """
@@ -927,7 +942,7 @@ class DPDSimulator:
         """
     def config_sigma(self, sigma: typing.SupportsFloat | typing.SupportsIndex = 3.0) -> None:
         """
-                  Configure the force-field (pair-style) parameter `\\sigma`.
+                  Configure the force-field (pair-style) parameter `\\sigma` (and set `\\gamma = 0.5 \\sigma^2`).
         """
     def config_slipspring_high_cutoff(self, cutoff: typing.SupportsFloat | typing.SupportsIndex = 2.0) -> None:
         """
@@ -947,9 +962,13 @@ class DPDSimulator:
         
                   :param values: a list of OutputConfiguration structs
         """
-    def create_slip_springs(self, num: typing.SupportsInt | typing.SupportsIndex, bond_type: typing.SupportsInt | typing.SupportsIndex = 9) -> int:
+    def create_slip_springs(self, num: typing.SupportsInt | typing.SupportsIndex, bond_type: typing.SupportsInt | typing.SupportsIndex = 0) -> int:
         """
-                  Randomly add the specified number of slip-springs to neighbours within the specified cut-offs.
+                  Randomly add up to the specified number of slip-springs to eligible neighbours within the configured cut-offs.
+        
+                  :param num: Maximum number of slip-springs to create
+                  :param bond_type: Bond type for created slip-springs (``0`` inherits ``slipspring_bond_type``)
+                  :return: Number of slip-springs actually created
         """
     def get_bond_lengths(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         """
@@ -968,6 +987,10 @@ class DPDSimulator:
                   Get the current timestep number.
         
                   :return: The current timestep index
+        """
+    def get_dpd_gamma(self) -> float:
+        """
+                  Get the configured DPD dissipative friction coefficient `\\gamma`.
         """
     def get_nr_of_atoms(self) -> int:
         """
@@ -1015,6 +1038,14 @@ class DPDSimulator:
         
                   :return: Number of MC steps
         """
+    def get_num_relocations(self) -> int:
+        """
+                  Get the number of accepted slip-spring relocation moves in the most recent MC sequence.
+        """
+    def get_num_shifts(self) -> int:
+        """
+                  Get the number of accepted slip-spring shift moves in the most recent MC sequence.
+        """
     def get_shift_one_at_a_time(self) -> bool:
         """
                   Get whether slip-springs are shifted one at a time.
@@ -1026,6 +1057,10 @@ class DPDSimulator:
                   Get whether shifting to empty positions is allowed.
         
                   :return: True if shifting to empty positions is allowed
+        """
+    def get_sigma(self) -> float:
+        """
+                  Get the configured DPD random force noise amplitude `\\sigma`.
         """
     def get_slip_spring_bond_type(self) -> int:
         """
@@ -1045,6 +1080,12 @@ class DPDSimulator:
         
                   :return: 3x3 stress tensor matrix
         """
+    def get_target_kbt(self) -> float:
+        """
+                  Get the target thermal energy :math:`k_B T = \\sigma^2 / (2 \\gamma)` configured on the DPD thermostat.
+        
+                  :return: Target thermal energy :math:`k_B T`
+        """
     def get_temperature(self) -> float:
         """
                   Get the current system temperature.
@@ -1063,6 +1104,12 @@ class DPDSimulator:
         
              :param with_slipsprings: Whether to include slip-springs in the returned universe (default: True)
         """
+    def get_velocities(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+        """
+                  Get the current particle velocities.
+        
+                  :return: Vector of particle velocities (vx1,vy1,vz1,vx2,vy2,vz2,...)
+        """
     def get_volume(self) -> float:
         """
                   Get the current system volume.
@@ -1074,8 +1121,22 @@ class DPDSimulator:
                   After re-configuring the force-field parameters,
                   this method should be called to update the current stress tensor etc.
         """
+    def relocate_slip_springs(self, kbt: typing.SupportsFloat | typing.SupportsIndex = 1.0) -> int:
+        """
+                  Perform one sweep of Monte Carlo slip-spring chain-end relocation moves.
+        
+                  :param kbt: Thermal energy scale :math:`k_B T` for Metropolis acceptance (must be ``>= 0``)
+                  :return: Number of accepted relocation moves
+        """
     def run_simulation(self, n_steps: typing.SupportsInt | typing.SupportsIndex, dt: typing.SupportsFloat | typing.SupportsIndex = 0.06, with_MC: bool = False) -> None:
         ...
+    def shift_slip_springs(self, kbt: typing.SupportsFloat | typing.SupportsIndex = 1.0) -> int:
+        """
+                  Perform one sweep of Monte Carlo slip-spring shift moves along polymer chains.
+        
+                  :param kbt: Thermal energy scale :math:`k_B T` for Metropolis acceptance (must be ``>= 0``)
+                  :return: Number of accepted shift moves
+        """
     def start_measuring_msd_for_atoms(self, atom_ids: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> None:
         """
                   Set a new origin for measuing the mean square displacement for a specified set of atoms
@@ -1092,15 +1153,6 @@ class DPDSimulator:
                   
                   Checks internal data structure consistency and throws exceptions if issues are found.
         """
-    @typing.overload
-    def write_restart_file(self, file: str) -> None:
-        """
-                  Explicitly force the writing of a restart file, now!
-        
-                  :param file: The file path and name of the restart file to be written.
-                               Can end in .xml, .json or anything else (-> binary)
-        """
-    @typing.overload
     def write_restart_file(self, file: str) -> None:
         """
                   Explicitly force the writing of a restart file, now!
@@ -2676,7 +2728,7 @@ class MEHPSimulator:
         ...
     def break_too_long_strands(self, breaking_length: typing.SupportsFloat | typing.SupportsIndex) -> int:
         ...
-    def config_assume_box_large_enough(self, assume: bool = False) -> None:
+    def config_assume_box_large_enough(self, assume: bool = True) -> None:
         ...
     def config_assume_network_is_complete(self, assume: bool = False) -> None:
         ...

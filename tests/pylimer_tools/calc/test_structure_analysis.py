@@ -19,10 +19,12 @@ from pylimer_tools.calc.structure_analysis import (
     compute_crosslinker_conversion,
     compute_effective_crosslinker_functionalities,
     compute_effective_crosslinker_functionality,
+    compute_extent_of_reaction,
     compute_fraction_of_bifunctional_reactive_sites,
     compute_mean_end_to_end_distances,
     compute_mean_end_to_end_vectors,
     compute_stoichiometric_imbalance,
+    determine_chain_functionality_per_type,
     measure_weight_fraction_of_backbone,
     measure_weight_fraction_of_dangling_chains,
     measure_weight_fraction_of_soluble_material,
@@ -182,6 +184,202 @@ class TestStructureAnalysisWithUniverse(UniverseUsingTestCase):
                 [self.testUniverse, self.testUniverse, self.saturatedTestUniverse],
                 crosslinker_type=2,
             )
+
+    def test_determine_chain_functionality_per_type(self):
+        """Test chain functionality inference for B2, B1, B0, primary loops, and unreacted networks."""
+        self.assertEqual(
+            {}, determine_chain_functionality_per_type(self.emptyUniverse, 2)
+        )
+
+        # Network with A4 crosslinkers (2), multi-bead B2 (1), multi-bead B1 (3), multi-bead B0 (4)
+        net = Universe(10, 10, 10)
+        # xlinks: 1, 2; B2: 10-11-12 (primary loop on 1), 13-14-15 (between 1 & 2)
+        # B1: 20-21-22 (attached to 2); B0: 30-31-32 (free solvent)
+        ids = [1, 2, 10, 11, 12, 13, 14, 15, 20, 21, 22, 30, 31, 32]
+        types = [2, 2, 1, 1, 1, 1, 1, 1, 3, 3, 3, 4, 4, 4]
+        n = len(ids)
+        net.add_atoms(
+            ids,
+            types,
+            [float(i) for i in range(n)],
+            [0.0] * n,
+            [0.0] * n,
+            [0] * n,
+            [0] * n,
+            [0] * n,
+        )
+        net.add_bonds(
+            [10, 11, 13, 14, 20, 21, 30, 31, 1, 1, 1, 2, 2],
+            [11, 12, 14, 15, 21, 22, 31, 32, 10, 12, 13, 15, 20],
+        )
+        inferred = determine_chain_functionality_per_type(net, crosslinker_type=2)
+        self.assertEqual(inferred, {1: 2, 2: 3, 3: 1, 4: 0})
+
+        # Primary-loop-only B2 network: single xlink (1) with a 3-bead primary loop (10-11-12)
+        loop_net = Universe(10, 10, 10)
+        loop_net.add_atoms(
+            [1, 10, 11, 12],
+            [2, 1, 1, 1],
+            [0.0, 1.0, 2.0, 3.0],
+            [0.0] * 4,
+            [0.0] * 4,
+            [0] * 4,
+            [0] * 4,
+            [0] * 4,
+        )
+        loop_net.add_bonds([10, 11, 1, 1], [11, 12, 10, 12])
+        self.assertEqual(
+            determine_chain_functionality_per_type(loop_net, crosslinker_type=2),
+            {1: 2, 2: 2},
+        )
+
+        # Unreacted network (0 crosslinker bonds): non-crosslinker types default to 2,
+        # and conversion / extent of reaction must be 0.0 (not 1.0 or ValueError)
+        unreacted = Universe(10, 10, 10)
+        unreacted.add_atoms(
+            [1, 10, 11, 12],
+            [2, 1, 1, 1],
+            [0.0, 1.0, 2.0, 3.0],
+            [0.0] * 4,
+            [0.0] * 4,
+            [0] * 4,
+            [0] * 4,
+            [0] * 4,
+        )
+        unreacted.add_bonds([10, 11], [11, 12])
+        self.assertEqual(
+            determine_chain_functionality_per_type(unreacted, crosslinker_type=2),
+            {1: 2, 2: 0},
+        )
+        self.assertAlmostEqual(
+            0.0, compute_extent_of_reaction(unreacted, crosslinker_type=2)
+        )
+        self.assertAlmostEqual(
+            0.0, compute_crosslinker_conversion(unreacted, crosslinker_type=2)
+        )
+
+        # Direct crosslinker-crosslinker bond (1-2) with unreacted B2 chain (10-11-12):
+        # unreacted type-1 chain must still default to 2 (not 0)
+        direct_xlink = Universe(10, 10, 10)
+        direct_xlink.add_atoms(
+            [1, 2, 10, 11, 12],
+            [2, 2, 1, 1, 1],
+            [0.0, 0.5, 1.0, 2.0, 3.0],
+            [0.0] * 5,
+            [0.0] * 5,
+            [0] * 5,
+            [0] * 5,
+            [0] * 5,
+        )
+        direct_xlink.add_bonds([1, 10, 11], [2, 11, 12])
+        self.assertEqual(
+            determine_chain_functionality_per_type(direct_xlink, crosslinker_type=2),
+            {1: 2, 2: 1},
+        )
+
+    def test_stoichiometric_imbalance_and_extent_of_reaction_with_b1_and_b0(self):
+        """Test r, p, and b2 when monofunctional (B1) and solvent (B0) chains are present."""
+        # 2 crosslinkers (type 2, target f=4 => 8 A sites)
+        # 1 B2 chain (type 1, 3 beads => 2 B sites)
+        # 2 B1 chains (type 3, 3 beads each => 2 B sites)
+        # 2 B0 solvent chains (type 4, 3 beads each => 0 B sites)
+        # Total B sites = 2 + 2 + 0 = 4
+        # With f=4: r = 8 / 4 = 2.0; max_formable_bonds = min(4, 8) = 4
+        # Formed bonds: B2 bonded to xlink 1 & xlink 2 (2 bonds),
+        #               both B1 bonded to xlink 1 (2 bonds) => 4 bonds total
+        # Crosslinker max degree observed: xlink 1 has 3 bonds, xlink 2 has 1 bond => inferred f = 3
+        net = Universe(10, 10, 10)
+        ids = (
+            [1, 2] + [10, 11, 12] + [20, 21, 22, 23, 24, 25] + [30, 31, 32, 33, 34, 35]
+        )
+        types = [2, 2] + [1] * 3 + [3] * 6 + [4] * 6
+        n = len(ids)
+        net.add_atoms(
+            ids,
+            types,
+            [float(i) for i in range(n)],
+            [0.0] * n,
+            [0.0] * n,
+            [0] * n,
+            [0] * n,
+            [0] * n,
+        )
+        bonds_from = [10, 11, 20, 21, 23, 24, 30, 31, 33, 34, 1, 2, 1, 1]
+        bonds_to = [11, 12, 21, 22, 24, 25, 31, 32, 34, 35, 10, 12, 20, 23]
+        net.add_bonds(bonds_from, bonds_to)
+
+        explicit_func = {1: 2, 2: 4, 3: 1, 4: 0}
+
+        # With explicit functionality_per_type
+        self.assertAlmostEqual(
+            2.0,
+            compute_stoichiometric_imbalance(
+                net, crosslinker_type=2, functionality_per_type=explicit_func
+            ),
+        )
+        self.assertAlmostEqual(
+            1.0,
+            compute_extent_of_reaction(
+                net, crosslinker_type=2, functionality_per_type=explicit_func
+            ),
+        )
+        self.assertAlmostEqual(
+            0.5,
+            compute_fraction_of_bifunctional_reactive_sites(
+                net, crosslinker_type=2, functionality_per_type=explicit_func
+            ),
+        )
+
+        # Without explicit functionality_per_type (inferred f=3 => 2*3=6 A sites, 4 B sites)
+        self.assertAlmostEqual(
+            6.0 / 4.0,
+            compute_stoichiometric_imbalance(net, crosslinker_type=2),
+        )
+        self.assertAlmostEqual(
+            1.0,
+            compute_extent_of_reaction(net, crosslinker_type=2),
+        )
+        self.assertAlmostEqual(
+            0.5,
+            compute_fraction_of_bifunctional_reactive_sites(net, crosslinker_type=2),
+        )
+
+        # Partial functionality_per_type={2: 4} still infers B1=1 and B0=0
+        self.assertAlmostEqual(
+            2.0,
+            compute_stoichiometric_imbalance(
+                net, crosslinker_type=2, functionality_per_type={2: 4}
+            ),
+        )
+        self.assertAlmostEqual(
+            1.0,
+            compute_extent_of_reaction(
+                net, crosslinker_type=2, functionality_per_type={2: 4}
+            ),
+        )
+
+        # ignore_types on compute_extent_of_reaction (including ignoring bonded B1 type 3)
+        self.assertAlmostEqual(
+            1.0,
+            compute_extent_of_reaction(
+                net, crosslinker_type=2, functionality_per_type={2: 4}, ignore_types=[4]
+            ),
+        )
+        self.assertAlmostEqual(
+            1.0,
+            compute_extent_of_reaction(
+                net, crosslinker_type=2, functionality_per_type={2: 4}, ignore_types=[3]
+            ),
+        )
+
+        # Omitting crosslinker_type from functionality_per_type warns but preserves chain entries
+        with self.assertWarns(UserWarning):
+            r_warn = compute_stoichiometric_imbalance(
+                net,
+                crosslinker_type=2,
+                functionality_per_type={1: 2, 3: 1, 4: 0},
+            )
+        self.assertAlmostEqual(6.0 / 4.0, r_warn)
 
 
 if __name__ == "__main__":

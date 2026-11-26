@@ -20,17 +20,35 @@ from __future__ import annotations
 
 import math
 import warnings
-from typing import Callable, List, Tuple, Union
+from typing import Any, Callable, List, Tuple, Union
 
 import pint
 
 from pylimer_tools.calc.structure_analysis import (
+    _resolve_chain_functionality_per_type,
     compute_crosslinker_conversion,
     compute_fraction_of_bifunctional_reactive_sites,
     compute_stoichiometric_imbalance,
+    count_strands_by_functionality,
+    determine_chain_functionality_per_type,
 )
 from pylimer_tools.io.unit_styles import UnitStyle
 from pylimer_tools_cpp import Universe
+
+_KB_SI_J_PER_K: float = 1.380649e-23
+
+
+def _compute_effective_junction_factor(f: int, alpha: float) -> float:
+    """Compute MMT junction prefactor sum_{m=3}^f ((m - 2) / 2) * P(X_{m,f})."""
+    gamma_mmt_sum = 0.0
+    for m in range(3, f + 1):
+        gamma_mmt_sum += (
+            (m - 2) / 2
+        ) * compute_probability_that_crosslink_is_effective(f, m, alpha)
+        assert math.isfinite(gamma_mmt_sum), (
+            "Non-finite gamma_mmt_sum computed for f = {}.".format(m)
+        )
+    return gamma_mmt_sum
 
 
 def predict_shear_modulus(**kwargs) -> pint.Quantity:
@@ -275,8 +293,10 @@ def compute_weight_fraction_of_dangling_chains(
                 * compute_probability_that_bifunctional_monomer_is_dangling(beta)
             )
         elif functionality_per_type[atom_type] == 1:
-            # TODO: revise this, check if correct
             w_dangling += weight_fraction * (1.0 - beta)
+        elif functionality_per_type[atom_type] == 0:
+            # Solvent chains cannot be dangling
+            w_dangling += 0.0
         else:
             raise NotImplementedError(
                 "Currently, only monomeric, bifunctional, and junction functionalities are supported, {} given.".format(
@@ -460,21 +480,22 @@ def compute_miller_macosko_probabilities(
 
     :param r: The stoichiometric imbalance
     :param p: The extent of reaction in terms of the crosslinkers
-    :param f: The functionality of the the crosslinker
-    :param b2: The fraction of bifunctional chains; defaults to 1.0 for no monofunctional chains.
+    :param f: The functionality of the crosslinker
+    :param b2: The fraction of reactive B sites belonging to bifunctional chains;
+            defaults to 1.0 for no monofunctional chains (`0.0` for pure :math:`B_1`).
             Can be computed e.g. as :math:`b_2 = \\frac{2 \\cdot [B_2]}{[B_1] + 2 \\cdot [B_2]}`
     :return: alpha: :math:`P(F_A)`
     :return: beta: :math:`P(F_B)`
     """
+    if b2 < 0.0 or b2 > 1.0 or not math.isfinite(b2):
+        raise ValueError("b2 must be in [0, 1], got b2 = {}".format(b2))
     if r == 0 or p == 0 or f == 0:
         return 1.0, 1.0
-    if b2 > 1 or b2 <= 0:
-        raise ValueError("b2 must be in (0, 1), got b2 = {}".format(b2))
 
-    # first, check a few things required by the formulae
-    # since we want alpha, beta \in [0,1], given they are supposed to be
-    # probabilities
-    _validate_r_and_p(r, p, f)
+    # Validate parameters and clamp tiny floating-point overshoot at p == p_max
+    p = _validate_r_and_p(r, p, f)
+    if b2 == 0.0:
+        return 1.0, 1.0
 
     if not (1 / (f - 1) < b2 * (p**2) * r < 1):
         warnings.warn(
@@ -493,33 +514,40 @@ def compute_miller_macosko_probabilities(
             raise NotImplementedError(
                 "A functionality of {} is not supported.".format(f)
             )
+        if b2 * (p**2) * r <= 1.0 / (f - 1):
+            alpha = 1.0
+        else:
+            try:
+                from scipy import optimize
+            except ImportError:
+                raise ImportError(
+                    "scipy is required for crosslinker functionality > 4. "
+                    "Please install scipy or use f <= 4."
+                )
 
-        try:
-            from scipy import optimize
-        except ImportError:
-            raise ImportError(
-                "scipy is required for crosslinker functionality > 4. "
-                "Please install scipy or use f <= 4."
+            def fun_to_root_for_alpha(alpha_val: float) -> float:
+                return (
+                    r * b2 * p**2 * alpha_val ** (f - 1)
+                    - alpha_val
+                    - r * b2 * (p**2)
+                    + 1
+                )
+
+            def fun_to_root_for_alpha_prime(alpha_val: float) -> float:
+                return -1 + alpha_val ** (f - 2) * (-1 + f) * (p**2) * r * b2
+
+            def fun_to_root_for_alpha_prime2(alpha_val: float) -> float:
+                return alpha_val ** (f - 3) * (-2 + f) * (-1 + f) * (p**2) * r * b2
+
+            alpha_sol = optimize.root_scalar(
+                fun_to_root_for_alpha,
+                bracket=(0, 1),
+                method="halley",
+                fprime=fun_to_root_for_alpha_prime,
+                fprime2=fun_to_root_for_alpha_prime2,
+                x0=0.5,
             )
-
-        def fun_to_root_for_alpha(alpha):
-            return r * b2 * p**2 * alpha ** (f - 1) - alpha - r * b2 * (p**2) + 1
-
-        def fun_to_root_for_alpha_prime(alpha):
-            return -1 + alpha ** (f - 2) * (-1 + f) * (p**2) * r * b2
-
-        def fun_to_root_for_alpha_prime2(alpha):
-            return alpha ** (f - 3) * (-2 + f) * (-1 + f) * (p**2) * r * b2
-
-        alpha_sol = optimize.root_scalar(
-            fun_to_root_for_alpha,
-            bracket=(0, 1),
-            method="halley",
-            fprime=fun_to_root_for_alpha_prime,
-            fprime2=fun_to_root_for_alpha_prime2,
-            x0=0.5,
-        )
-        alpha = alpha_sol.root
+            alpha = alpha_sol.root
     beta = r * p * alpha ** (f - 1) + 1 - r * p
     if alpha > 1 or alpha < 0:
         warnings.warn(
@@ -551,7 +579,7 @@ def compute_modulus_decomposition(
     temperature: Union[pint.Quantity, None] = None,
     functionality_per_type: Union[dict, None] = None,
     g_e_1: Union[pint.Quantity, None] = None,
-    b2: float = 1.0,
+    b2: Union[float, None] = None,
 ) -> Tuple[pint.Quantity, pint.Quantity, pint.Quantity, pint.Quantity]:
     """
     Compute four different estimates of the plateau modulus, using MMT, ANM and PNM.
@@ -563,20 +591,21 @@ def compute_modulus_decomposition(
     :param r: The stoichiometric imbalance. Optional if network is specified
     :param p: The extent of reaction. Optional if network is specified
     :param f: The functionality of the the crosslinker. Optional if network is specified
-    :param nu: The strand number density (nr of strands per volume) (ideally with units).
-        Optional if network is specified
+    :param nu: The strand number density (nr of reactive strands :math:`[B_2]_0 + [B_1]_0` per volume)
+        (ideally with units). Optional if network is specified
     :param temperature: The temperature to compute the modulus at. Default: 298.15 K
         Optional, can be passed to improve performance
     :param functionality_per_type: a dictionary with key: type, and value: functionality of this atom type.
         Optional, can be passed to improve performance
     :param g_e_1: The melt entanglement modulus
     :param b2: The mole fraction of reactive sites in B2 among all reactive sites
-        in a mixture of B1 and B2
+        in a mixture of B1 and B2. Defaults to 1.0 if ``network`` is not specified,
+        otherwise inferred from ``network``.
     :return: G_MMT_phantom: The phantom contribution to the MMT modulus;
         see also :func:`pylimer_tools.calc.miller_macosko_theory.compute_junction_modulus`
     :return: G_MMT_entanglement: The entanglement contribution to the MMT modulus
-    :return: g_anm: The ANM estimate of the modulus
-    :return: g_pnm: The PNM estimate of the modulus
+    :return: g_anm: The ideal ANM upper-bound estimate (:math:`\\nu k_B T`)
+    :return: g_pnm: The ideal PNM upper-bound estimate (:math:`(1 - 2/f) \\nu k_B T`)
     """
     if ureg is None:
         if unit_style is None:
@@ -585,18 +614,22 @@ def compute_modulus_decomposition(
             )
         ureg = unit_style.get_underlying_unit_registry()
 
+    if b2 is None and network is None:
+        b2 = 1.0
+
     param = _compute_validate_parameters(
         {**locals()},
-        ["f", "nu", "p_f_a_out", "p_f_b_out", "p", "r"],
+        ["f", "nu", "p_f_a_out", "p_f_b_out", "p", "r", "b2"],
     )
 
-    f, nu, alpha, beta, p, r = (
+    f, nu, alpha, beta, p, r, b2 = (
         param["f"],
         param["nu"],
         param["p_f_a_out"],
         param["p_f_b_out"],
         param["p"],
         param["r"],
+        param["b2"],
     )
     assert (
         f is not None
@@ -605,6 +638,7 @@ def compute_modulus_decomposition(
         and beta is not None
         and p is not None
         and r is not None
+        and b2 is not None
     )
 
     if temperature is None:
@@ -633,21 +667,17 @@ def compute_modulus_decomposition(
         raise ValueError("nu must have dimensionality of number density (1/volume).")
 
     # Boltzmann constant
-    kb = 1.380649e-23 * ureg.joule / ureg.kelvin
+    kb = _KB_SI_J_PER_K * ureg.joule / ureg.kelvin
     # affine
     g_anm = nu * kb * temperature
     # phantom
     g_pnm = (1 - 2 / f) * nu * kb * temperature if f != 0 else 0.0
     # MMT:
-    gamma_mmt_sum = 0.0
-    for m in range(3, f + 1):
-        gamma_mmt_sum += (
-            (m - 2) / 2
-        ) * compute_probability_that_crosslink_is_effective(f, m, alpha)
-        assert math.isfinite(gamma_mmt_sum), (
-            "Non-finite gamma_mmt_sum computed for f = {}.".format(m)
-        )
-    gamma_mmt = (2 * r * b2 / f) * gamma_mmt_sum if f != 0 else 0.0
+    # Since nu = [B_2]_0 + [B_1]_0 and b2 = 2[B_2]_0 / (2[B_2]_0 + [B_1]_0),
+    # total reactive B-site density is [B]_0 = 2 / (2 - b2) * nu,
+    # hence [A_f]_0 = (r / f) * [B]_0 = (2 * r / (f * (2 - b2))) * nu.
+    gamma_mmt_sum = _compute_effective_junction_factor(f, alpha)
+    gamma_mmt = (2 * r / (f * (2 - b2))) * gamma_mmt_sum if f != 0 else 0.0
     g_mmt_phantom = gamma_mmt * nu * kb * temperature
     # fraction of elastically effective strands.
     g_mmt_entanglement = g_e_1 * compute_trapping_factor(beta=beta)
@@ -673,11 +703,12 @@ def compute_extracted_modulus(
     :param r: The stoichiometric imbalance
     :param f: The functionality of the crosslinkers
     :param g_e_1: The melt entanglement modulus :math:`G_e(1) = k_B T \\epsilon_e`
+    :param w_sol: The soluble fraction (to be removed)
     :param xlink_concentration_0: [A_f]_0, in 1/volume units
     :param ureg: The unit registry to use
-    :param alpha: :math:`P(F_a^{out})`, optional
     :param temperature: The temperatures; defaults to room temperature
-    :param w_sol: The soluble fraction (to be removed)
+    :param b2: The mole fraction of reactive sites in B2 among all reactive sites
+        in a mixture of B1 and B2
     """
     if temperature is None:
         if ureg is None:
@@ -764,10 +795,13 @@ def compute_junction_modulus(
     :param xlink_concentration_0: [A_f]_0, in 1/volume units
     :param ureg: The unit registry to use
     :param f: The functionality of the crosslinkers
-    :param alpha: :math:`P(F_a^{out})`, optional
     :param temperature: The temperatures; defaults to room temperature (25 °C)
+    :param b2: The mole fraction of reactive sites in B2 among all reactive sites
+        in a mixture of B1 and B2
     :return: The junction modulus contribution
     """
+    if b2 is None:
+        b2 = 1.0
     param = _compute_validate_parameters(
         {**locals()},
         ["p_f_a_out"],
@@ -778,14 +812,9 @@ def compute_junction_modulus(
     if temperature is None:
         assert ureg is not None, "Unit registry must be initialized."
         temperature = (273.15 + 25) * ureg.kelvin
-    assert alpha is not None
-    gamma_mmt_sum = 0.0
-    for m in range(3, f + 1):
-        gamma_mmt_sum += (
-            (m - 2) / 2
-        ) * compute_probability_that_crosslink_is_effective(f, m, alpha)
+    gamma_mmt_sum = _compute_effective_junction_factor(f, alpha)
 
-    kb = 1.380649e-23 * ureg.joule / ureg.kelvin
+    kb = _KB_SI_J_PER_K * ureg.joule / ureg.kelvin
     return kb * temperature * xlink_concentration_0 * gamma_mmt_sum
 
 
@@ -904,7 +933,7 @@ def compute_probability_that_bifunctional_monomer_is_dangling(
     return math.comb(2, 1) * (p_f_b_out) * (1.0 - p_f_b_out)
 
 
-def predict_gelation_point(r: float, f: int, b2: float = 1) -> float:
+def predict_gelation_point(r: float, f: int, b2: float = 1.0) -> float:
     """
     Compute the gelation point :math:`p_{gel}` as theoretically predicted
     (gelation point = critical extent of reaction for gelation)
@@ -916,16 +945,16 @@ def predict_gelation_point(r: float, f: int, b2: float = 1) -> float:
     :param f: functionality of the crosslinkers
     :param b2: The mole fraction of reactive sites in B2 among all reactive sites
         in a mixture of B1 and B2
-    :return: p_gel: critical extent of reaction for gelation
+    :return: p_gel: critical extent of reaction for gelation (``math.inf`` if gelation is impossible)
     """
-    # if (r is None):
-    #   r = calculateEffectiveCrosslinkerFunctionality(network, crosslinker_type, f)
+    if r <= 0 or f <= 1 or b2 <= 0:
+        return math.inf
     return math.sqrt(1 / (r * (f - 1) * b2))
 
 
-def predict_maximum_p(r: float, f: int, b2: float = 1) -> Union[float, None]:
+def predict_maximum_p(r: float, f: int, b2: float = 1.0) -> Union[float, None]:
     """
-    Compute the maximum crosslinker conversion possible given a stoichiometric inbalance.
+    Compute the maximum crosslinker conversion possible given a stoichiometric imbalance.
 
     :param r: The stoichiometric imbalance of reactants (see: :func:`~pylimer_tools.calc.structure_analysis.compute_stoichiometric_imbalance`)
     :param f: functionality of the crosslinkers
@@ -934,12 +963,9 @@ def predict_maximum_p(r: float, f: int, b2: float = 1) -> Union[float, None]:
         is not necessary.
     :return: p_max: The maximum crosslinker conversion possible
     """
-    n_xlinks = r * 2 / f
-    if n_xlinks == 0:
+    if r == 0 or f == 0:
         return None
-    max_possible_bonds = min(2, f * n_xlinks)
-    p_max = max_possible_bonds / (n_xlinks * f)
-    return p_max
+    return min(1.0, 1.0 / r)
 
 
 def predict_p_from_w_sol(
@@ -1035,18 +1061,20 @@ def predict_p_from_w_sol(
     return float(res.root)
 
 
-def _validate_r_and_p(r: float, p: float, f: int) -> None:
+def _validate_r_and_p(r: float, p: float, f: int) -> float:
     """
     Validate the parameters used in Miller-Macosko theory calculations.
 
     This function checks if the stoichiometric imbalance, crosslinker conversion,
     and crosslinker functionality are within valid ranges. It also verifies that
     the crosslinker conversion does not exceed the maximum possible value given
-    the stoichiometric imbalance and functionality.
+    the stoichiometric imbalance and functionality (allowing 1e-12 floating-point
+    rounding tolerance and returning the clamped value).
 
     :param r: The stoichiometric imbalance (ratio of reactive groups)
     :param p: The crosslinker conversion (extent of reaction)
     :param f: The functionality of the crosslinker (number of reactive groups)
+    :return: Validated (and tolerance-clamped) conversion ``p``
     :raises ValueError: If any parameter is outside its valid range or if p exceeds
                        the maximum possible conversion
     """
@@ -1062,14 +1090,22 @@ def _validate_r_and_p(r: float, p: float, f: int) -> None:
         raise ValueError(
             "The crosslinker functionality `f` must be >= 2, got {}".format(f)
         )
-    # assume:
     p_max = predict_maximum_p(r=r, f=f)
-    if p_max is None or p > p_max:
+    if p_max is None:
         raise ValueError(
-            "For a system with r = {} and f = {}, p (in terms of crosslinkers) must be < {}, {} given.".format(
+            "For a system with r = {} and f = {}, maximum conversion could not be determined.".format(
+                r, f
+            )
+        )
+    if p > p_max:
+        if math.isclose(p, p_max, rel_tol=1e-12, abs_tol=1e-12):
+            return p_max
+        raise ValueError(
+            "For a system with r = {} and f = {}, p (in terms of crosslinkers) must be <= {}, {} given.".format(
                 r, f, p_max, p
             )
         )
+    return p
 
 
 class _ParamValidatorAssembler:
@@ -1104,12 +1140,93 @@ This list is used by the _compute_validate_parameters function to automatically
 compute missing parameters and validate existing ones
 when performing Miller-Macosko theory calculations.
 """
+
+
+def _infer_crosslinker_type(p: dict[str, Any]) -> int:
+    """Infer crosslinker atom type from explicit functionality_per_type or network."""
+    func_per_type = p.get("functionality_per_type")
+    if isinstance(func_per_type, dict) and func_per_type:
+        non_none = {k: v for k, v in func_per_type.items() if v is not None}
+        if non_none:
+            return max(non_none, key=lambda k: non_none[k])
+    bead_func = p["network"].determine_functionality_per_type()
+    if not bead_func:
+        raise ValueError("Cannot determine crosslinker_type for an empty network.")
+    return max(bead_func, key=lambda k: bead_func[k])
+
+
+def _get_cached_strand_counts(p: dict[str, Any]) -> dict[int, int]:
+    """Compute and cache strand functionality counts once per MMT evaluation."""
+    cached = p.get("_strand_counts")
+    if isinstance(cached, dict):
+        return cached
+    counts = count_strands_by_functionality(
+        network=p["network"],
+        crosslinker_type=p["crosslinker_type"],
+        functionality_per_type=p["functionality_per_type"],
+    )
+    p["_strand_counts"] = counts
+    return counts
+
+
+def _compute_functionality_per_type(p: dict[str, Any]) -> dict[int, int]:
+    """Infer complete functionality_per_type map from network and optional f."""
+    inferred = determine_chain_functionality_per_type(
+        p["network"], crosslinker_type=p["crosslinker_type"]
+    )
+    if p.get("f") is not None:
+        inferred[p["crosslinker_type"]] = int(p["f"])
+    return inferred
+
+
+def _compute_r_from_cached(p: dict[str, Any]) -> float:
+    """Compute stoichiometric imbalance sharing cached strand counts."""
+    network: Universe = p["network"]
+    if network.get_nr_of_atoms() == 0:
+        return 0.0
+    crosslinker_type: int = p["crosslinker_type"]
+    atom_counts = network.count_atom_types()
+    if crosslinker_type not in atom_counts:
+        return 0.0
+    strand_counts = _get_cached_strand_counts(p)
+    other_formable = sum(func * cnt for func, cnt in strand_counts.items() if func > 0)
+    if other_formable == 0:
+        return math.inf
+    crosslinker_formable = (
+        atom_counts[crosslinker_type] * p["functionality_per_type"][crosslinker_type]
+    )
+    return crosslinker_formable / other_formable
+
+
+def _compute_b2_from_cached(p: dict[str, Any]) -> float:
+    """Compute b2 sharing cached strand counts."""
+    if p["network"].get_nr_of_atoms() == 0:
+        return 1.0
+    strand_counts = _get_cached_strand_counts(p)
+    n_mono = strand_counts.get(1, 0)
+    n_bi = strand_counts.get(2, 0)
+    total_sites = n_mono + 2 * n_bi
+    if total_sites == 0:
+        return 1.0
+    return (2 * n_bi) / total_sites
+
+
+def _compute_reactive_strand_number_density(p: dict[str, Any]) -> pint.Quantity:
+    """Compute reactive strand number density ([B_2]_0 + [B_1]_0) / V, excluding solvent (B_0)."""
+    network: Universe = p["network"]
+    strand_counts = _get_cached_strand_counts(p)
+    n_reactive_strands = sum(cnt for func, cnt in strand_counts.items() if func > 0)
+    return n_reactive_strands / (
+        network.get_volume() * p["unit_style"].get_base_unit_of("volume")
+    )
+
+
 _validators_assembler = [
     _ParamValidatorAssembler(
         "functionality_per_type",
-        lambda p: p["network"].determine_functionality_per_type(),
+        _compute_functionality_per_type,
         lambda x: isinstance(x, dict),
-        ["network"],
+        ["network", "crosslinker_type"],
     ),
     _ParamValidatorAssembler(
         "weight_fractions",
@@ -1119,9 +1236,9 @@ _validators_assembler = [
     ),
     _ParamValidatorAssembler(
         "crosslinker_type",
-        lambda p: max(p["functionality_per_type"], key=p["functionality_per_type"].get),
+        _infer_crosslinker_type,
         lambda x: isinstance(x, int) and x >= 0,
-        ["functionality_per_type"],
+        ["network"],
     ),
     _ParamValidatorAssembler(
         "f",
@@ -1131,42 +1248,32 @@ _validators_assembler = [
     ),
     _ParamValidatorAssembler(
         "r",
-        lambda p: compute_stoichiometric_imbalance(
-            network=p["network"],
-            crosslinker_type=p["crosslinker_type"],
-            functionality_per_type=p["functionality_per_type"],
-        ),
+        _compute_r_from_cached,
         lambda r: r > 0 and math.isfinite(r),
-        ["network", "crosslinker_type"],
+        ["network", "crosslinker_type", "functionality_per_type"],
     ),
     _ParamValidatorAssembler(
         "p",
         lambda p: compute_crosslinker_conversion(
             network=p["network"],
             crosslinker_type=p["crosslinker_type"],
+            f=p.get("f"),
             functionality_per_type=p["functionality_per_type"],
         ),
         lambda p: 0 <= p <= 1,
-        ["network", "crosslinker_type"],
+        ["network", "crosslinker_type", "functionality_per_type"],
     ),
     _ParamValidatorAssembler(
         "nu",
-        lambda p: (
-            len(p["network"].get_molecules(p["crosslinker_type"]))
-            / (p["network"].get_volume() * p["unit_style"].get_base_unit_of("volume"))
-        ),
+        _compute_reactive_strand_number_density,
         lambda nu: nu.magnitude > 0 and math.isfinite(nu.magnitude),
-        ["network", "crosslinker_type", "unit_style"],
+        ["network", "crosslinker_type", "unit_style", "functionality_per_type"],
     ),
     _ParamValidatorAssembler(
         "b2",
-        lambda p: compute_fraction_of_bifunctional_reactive_sites(
-            network=p["network"],
-            crosslinker_type=p["crosslinker_type"],
-            functionality_per_type=p["functionality_per_type"],
-        ),
+        _compute_b2_from_cached,
         lambda b2: 0 <= b2 <= 1,
-        ["network", "crosslinker_type"],
+        ["network", "crosslinker_type", "functionality_per_type"],
     ),
     _ParamValidatorAssembler(
         "p_f_a_out",
@@ -1195,16 +1302,15 @@ _validator_per_name = {v.param_name: v for v in _validators_assembler}
 
 
 def _compute_validate_parameters(
-    given_parameters: dict, required_parameters: List[str]
-) -> dict:
+    given_parameters: dict[str, Any], required_parameters: List[str]
+) -> dict[str, Any]:
     """
-    Slightly overengineered function
-    to compute missing parameters e.g. from the network,
-    and validate parameters.
+    Compute missing parameters (e.g. from ``network``) and validate parameters.
     """
+    given_parameters = dict(given_parameters)
 
     def _param_is_ready(param: str) -> bool:
-        return param in given_parameters and not given_parameters[param] is None
+        return param in given_parameters and given_parameters[param] is not None
 
     def _is_complete(dependencies: List[str]) -> bool:
         return all(_param_is_ready(param) for param in dependencies)
@@ -1222,23 +1328,71 @@ def _compute_validate_parameters(
                 )
             )
 
-    # first, validate existing parameters
+    # first, validate existing required parameters
     present = [d for d in required_parameters if _param_is_ready(d)]
     for p in present:
         _validate(p)
 
-    # first, determine all parameters to compute
-    to_compute = set([d for d in required_parameters if not _param_is_ready(d)])
-    # add dependencies
+    # If crosslinker_type is missing, infer it from explicit functionality_per_type or network
+    if not _param_is_ready("crosslinker_type"):
+        if (
+            _param_is_ready("functionality_per_type")
+            and given_parameters["functionality_per_type"]
+        ):
+            given_parameters["crosslinker_type"] = _infer_crosslinker_type(
+                given_parameters
+            )
+            _validate("crosslinker_type")
+        elif _param_is_ready("network"):
+            _validate("network")
+            if given_parameters["network"].get_nr_of_atoms() > 0:
+                given_parameters["crosslinker_type"] = _infer_crosslinker_type(
+                    given_parameters
+                )
+                _validate("crosslinker_type")
+
+    # If network and a (possibly partial) functionality_per_type were both provided,
+    # complete missing atom types using chain functionality inference.
+    if (
+        _param_is_ready("network")
+        and _param_is_ready("crosslinker_type")
+        and _param_is_ready("functionality_per_type")
+    ):
+        _validate("network")
+        _validate("crosslinker_type")
+        _validate("functionality_per_type")
+        resolved_func = _resolve_chain_functionality_per_type(
+            given_parameters["network"],
+            given_parameters["crosslinker_type"],
+            given_parameters["functionality_per_type"],
+        )
+        if (
+            _param_is_ready("f")
+            and given_parameters["crosslinker_type"]
+            not in given_parameters["functionality_per_type"]
+        ):
+            _validate("f")
+            resolved_func[given_parameters["crosslinker_type"]] = int(
+                given_parameters["f"]
+            )
+        given_parameters["functionality_per_type"] = resolved_func
+
+    # Determine all parameters to compute and validate ready transitive dependencies
+    to_compute = set(d for d in required_parameters if not _param_is_ready(d))
+    validated_ready = set(present)
     found_last_iteration = True
     while found_last_iteration:
         found_last_iteration = False
         for p in list(to_compute):
             dependencies = _validator_per_name[p].dependencies
             for dep in dependencies:
-                if dep not in to_compute and not _param_is_ready(dep):
-                    to_compute.add(dep)
-                    found_last_iteration = True
+                if not _param_is_ready(dep):
+                    if dep not in to_compute:
+                        to_compute.add(dep)
+                        found_last_iteration = True
+                elif dep in _validator_per_name and dep not in validated_ready:
+                    _validate(dep)
+                    validated_ready.add(dep)
 
     found_last_iteration = False
     while not _is_complete(required_parameters):
