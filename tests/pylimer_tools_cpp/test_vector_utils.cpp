@@ -3,8 +3,10 @@
 #include "../../src/pylimer_tools_cpp/utils/ExtraEigenTypes.h"
 #include "../../src/pylimer_tools_cpp/utils/StringUtils.h"
 #include "../../src/pylimer_tools_cpp/utils/VectorUtils.h"
+#include <catch2/benchmark/catch_benchmark_all.hpp>
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 #include <filesystem>
 #include <iostream>
 #include <random>
@@ -515,6 +517,16 @@ TEST_CASE("Segment-wise norm is calculated",
 
   CHECK_THROWS(pu::segmentwise_norm(vec1, 0));
   CHECK_THROWS(pu::segmentwise_norm(vec1, 5));
+
+  const Eigen::VectorXd emptyVec;
+  CHECK(pu::segmentwise_norm(emptyVec, 3).empty());
+  CHECK(pu::segmentwise_norm_max(emptyVec, 3) == 0.0);
+  CHECK(pu::segmentwise_norm_mean(emptyVec, 3) == 0.0);
+  CHECK_THAT(pu::segmentwise_norm_mean(vec1, 1),
+             Catch::Matchers::WithinRel(3.5, 1e-12));
+  CHECK_THAT(
+    pu::segmentwise_norm_mean(vec1, 6),
+    Catch::Matchers::WithinRel(std::sqrt(vec1.array().square().sum()), 1e-12));
 }
 
 TEST_CASE("Segment-wise norm maximum is calculated",
@@ -529,6 +541,16 @@ TEST_CASE("Segment-wise norm maximum is calculated",
 
   CHECK_THROWS(pu::segmentwise_norm(vec1, 0));
   CHECK_THROWS(pu::segmentwise_norm(vec1, 5));
+
+  const Eigen::VectorXd emptyVec;
+  CHECK(pu::segmentwise_norm(emptyVec, 3).empty());
+  CHECK(pu::segmentwise_norm_max(emptyVec, 3) == 0.0);
+  CHECK(pu::segmentwise_norm_mean(emptyVec, 3) == 0.0);
+  CHECK_THAT(pu::segmentwise_norm_mean(vec1, 1),
+             Catch::Matchers::WithinRel(3.5, 1e-12));
+  CHECK_THAT(
+    pu::segmentwise_norm_mean(vec1, 6),
+    Catch::Matchers::WithinRel(std::sqrt(vec1.array().square().sum()), 1e-12));
 }
 
 TEST_CASE("Finite component check is performed",
@@ -549,4 +571,32 @@ TEST_CASE("Finite component check is performed",
   Eigen::VectorXd vec4 =
     vec1.array() * std::numeric_limits<double>::signaling_NaN();
   CHECK_FALSE(pu::all_components_finite(vec4));
+}
+
+TEST_CASE("VectorUtils Eigen operations benchmark",
+          "[!benchmark][VectorUtils][EigenBenchmark]")
+{
+  const Eigen::Index nSegments = 100000;
+  const Eigen::VectorXd vec =
+    Eigen::VectorXd::LinSpaced(3 * nSegments, -10.0, 10.0);
+
+  BENCHMARK("segmentwise_norm (N=100k x 3)")
+  {
+    return pu::segmentwise_norm(vec, 3);
+  };
+
+  BENCHMARK("segmentwise_norm_max (N=100k x 3)")
+  {
+    return pu::segmentwise_norm_max(vec, 3);
+  };
+
+  BENCHMARK("segmentwise_norm_mean (N=100k x 3)")
+  {
+    return pu::segmentwise_norm_mean(vec, 3);
+  };
+
+  BENCHMARK("all_components_finite (N=300k)")
+  {
+    return pu::all_components_finite(vec);
+  };
 }

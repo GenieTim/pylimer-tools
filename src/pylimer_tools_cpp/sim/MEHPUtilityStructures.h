@@ -95,6 +95,8 @@ inline const std::string ExitReasonNames[] = {
   X(SIMPLICIAL_LDLT, "SimplicialLDLT")                                         \
   X(SPARSE_LU, "SparseLU")                                                     \
   X(SPARSE_QR, "SparseQR")                                                     \
+  X(ACCELERATE_LLT, "AccelerateLLT")                                           \
+  X(ACCELERATE_LDLT, "AccelerateLDLT")                                         \
   /* iterative methods */                                                      \
   X(CONJUGATE_GRADIENT, "ConjugateGradient")                                   \
   X(CONJUGATE_GRADIENT_DIAGONALIZED,                                           \

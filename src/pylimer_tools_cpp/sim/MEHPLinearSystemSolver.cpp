@@ -1,3 +1,7 @@
+#ifdef __APPLE__
+// Avoid header symbol conflict between Eigen's lapacke.h and Apple Accelerate.h
+#undef EIGEN_USE_LAPACKE
+#endif
 #include "MEHPLinearSystemSolver.h"
 #ifdef USE_METAL
 #include "MetalForceBalanceSolver.h"
@@ -11,6 +15,9 @@
 #include <Eigen/SparseCore>
 #include <Eigen/SparseLU>
 #include <Eigen/SparseQR>
+#ifdef __APPLE__
+#include <Eigen/AccelerateSupport>
+#endif
 #include <algorithm>
 #include <cassert>
 #include <cmath>
@@ -35,12 +42,10 @@ namespace {
                               const size_t nrOfLinks,
                               const bool is2D)
   {
-    if (!is2D) {
+    if (!is2D || nrOfLinks == 0) {
       return;
     }
-    for (size_t linkIdx = 0; linkIdx < nrOfLinks; ++linkIdx) {
-      u[3 * static_cast<Eigen::Index>(linkIdx) + 2] = 0.0;
-    }
+    u.reshaped(3, static_cast<Eigen::Index>(nrOfLinks)).row(2).setZero();
   }
 
   [[nodiscard]] double computeResidualNorm(
@@ -140,13 +145,10 @@ namespace {
     const Eigen::VectorXd& vec,
     const Eigen::Index nLinks)
   {
-    Eigen::MatrixX3d mat(nLinks, 3);
-    for (Eigen::Index i = 0; i < nLinks; ++i) {
-      mat(i, 0) = vec[3 * i];
-      mat(i, 1) = vec[3 * i + 1];
-      mat(i, 2) = vec[3 * i + 2];
+    if (nLinks == 0) {
+      return Eigen::MatrixX3d(0, 3);
     }
-    return mat;
+    return vec.reshaped(3, nLinks).transpose();
   }
 
   [[nodiscard]] Eigen::VectorXd packMatrixX3ToCoordinates(
@@ -155,16 +157,13 @@ namespace {
     const Eigen::Index nLinks,
     const bool is2D)
   {
-    if (is2D) {
-      for (Eigen::Index i = 0; i < nLinks; ++i) {
-        xMat(i, 2) = origCoords[3 * i + 2];
-      }
-    }
     Eigen::VectorXd flat(3 * nLinks);
-    for (Eigen::Index i = 0; i < nLinks; ++i) {
-      flat[3 * i] = xMat(i, 0);
-      flat[3 * i + 1] = xMat(i, 1);
-      flat[3 * i + 2] = xMat(i, 2);
+    if (nLinks == 0) {
+      return flat;
+    }
+    flat.reshaped(3, nLinks) = xMat.transpose();
+    if (is2D) {
+      flat.reshaped(3, nLinks).row(2) = origCoords.reshaped(3, nLinks).row(2);
     }
     return flat;
   }
@@ -297,10 +296,8 @@ namespace {
     const int numCols = is2D ? 2 : 3;
     int maxColIterations = 0;
     for (int col = 0; col < numCols; ++col) {
-      Eigen::VectorXd initCol(nLinks);
-      for (Eigen::Index i = 0; i < nLinks; ++i) {
-        initCol[i] = initialSolution[3 * i + static_cast<Eigen::Index>(col)];
-      }
+      const Eigen::VectorXd initCol =
+        initialSolution.reshaped(3, nLinks).row(col).transpose();
       int colIterations = 0;
       sol.col(col) = solveColumn(rhs.col(col), initCol, colIterations);
       maxColIterations = std::max(maxColIterations, colIterations);
@@ -362,7 +359,13 @@ namespace {
 
     if (!fallbackNeeded) {
       for (int col = 0; col < numCols; ++col) {
-        sol.col(col) = cgSolver.solve(rhs.col(col));
+        const bool useGuess =
+          sol.col(col).allFinite() && !sol.col(col).isZero();
+        if (useGuess) {
+          sol.col(col) = cgSolver.solveWithGuess(rhs.col(col), sol.col(col));
+        } else {
+          sol.col(col) = cgSolver.solve(rhs.col(col));
+        }
         if (cgFallbackMaxIterations > 0 &&
             (cgSolver.info() != Eigen::Success ||
              (cgSolver.iterations() >= cgMaxIters &&
@@ -909,6 +912,40 @@ LinearSystemMEHPSolver::solve(MEHPNetwork& net,
                                              effectiveSolverChoice,
                                              result.exitReason);
         break;
+      }
+      case SLESolver::ACCELERATE_LLT: {
+#ifdef __APPLE__
+        Eigen::AccelerateLLT<Eigen::SparseMatrix<double>> solver;
+        finalCoordinates = solveDirectScalar(solver,
+                                             sysMatrix,
+                                             constants,
+                                             net.coordinates,
+                                             nLinks,
+                                             is2D,
+                                             effectiveSolverChoice,
+                                             result.exitReason);
+        break;
+#else
+        throw std::invalid_argument(
+          "AccelerateLLT solver is only available on Apple platforms.");
+#endif
+      }
+      case SLESolver::ACCELERATE_LDLT: {
+#ifdef __APPLE__
+        Eigen::AccelerateLDLT<Eigen::SparseMatrix<double>> solver;
+        finalCoordinates = solveDirectScalar(solver,
+                                             sysMatrix,
+                                             constants,
+                                             net.coordinates,
+                                             nLinks,
+                                             is2D,
+                                             effectiveSolverChoice,
+                                             result.exitReason);
+        break;
+#else
+        throw std::invalid_argument(
+          "AccelerateLDLT solver is only available on Apple platforms.");
+#endif
       }
       case SLESolver::METAL_CG: {
 #ifdef USE_METAL

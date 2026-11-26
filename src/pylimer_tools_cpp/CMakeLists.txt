@@ -156,6 +156,12 @@ if (USE_CUDA)
     message(STATUS "CUDA acceleration enabled")
 endif()
 
+if (APPLE)
+    find_library(ACCELERATE_FRAMEWORK Accelerate REQUIRED)
+    target_link_libraries(pylimer_tools PUBLIC ${ACCELERATE_FRAMEWORK})
+    message(STATUS "Accelerate framework linked on Apple")
+endif()
+
 option(USE_METAL "Enable Metal acceleration on Apple Silicon" ON)
 
 if (APPLE AND USE_METAL)

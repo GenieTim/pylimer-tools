@@ -2722,6 +2722,10 @@ TEST_CASE("All MEHPSimulator solvers solve simple melt systems",
          pcm::SLESolver::SIMPLICIAL_LDLT,
          pcm::SLESolver::SPARSE_LU,
          pcm::SLESolver::SPARSE_QR,
+#ifdef __APPLE__
+         pcm::SLESolver::ACCELERATE_LLT,
+         pcm::SLESolver::ACCELERATE_LDLT,
+#endif
          pcm::SLESolver::GRADIENT_DESCENT,
          pcm::SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT,
          pcm::SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG,

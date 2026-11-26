@@ -223,14 +223,15 @@ segmentwise_norm(const Eigen::VectorXd& vecs, const size_t segmentSize = 3)
                        std::to_string(vecSize) +
                        " is not a multiple of the segment size, " +
                        std::to_string(segmentSize) + ".");
-  std::vector<double> results;
-  results.reserve(vecSize / segmentSize);
-  for (size_t i = 0; i < vecSize / segmentSize; i++) {
-    results.push_back(vecs
-                        .segment(static_cast<Eigen::Index>(segmentSize * i),
-                                 static_cast<Eigen::Index>(segmentSize))
-                        .norm());
+  if (vecSize == 0) {
+    return {};
   }
+  const Eigen::Index segIdx = static_cast<Eigen::Index>(segmentSize);
+  const Eigen::Index nSegments =
+    static_cast<Eigen::Index>(vecSize / segmentSize);
+  std::vector<double> results(static_cast<size_t>(nSegments));
+  Eigen::VectorXd::Map(results.data(), nSegments) =
+    vecs.reshaped(segIdx, nSegments).colwise().norm();
   return results;
 }
 
@@ -259,16 +260,13 @@ segmentwise_norm_max(const Eigen::VectorXd& vecs, const size_t segmentSize = 3)
                        std::to_string(vecSize) +
                        " is not a multiple of the segment size, " +
                        std::to_string(segmentSize) + ".");
-  double result = 0.; //-DBL_MAX;
-
-  for (size_t i = 0; i < vecSize / segmentSize; i++) {
-    result = std::max(vecs
-                        .segment(static_cast<Eigen::Index>(segmentSize * i),
-                                 static_cast<Eigen::Index>(segmentSize))
-                        .norm(),
-                      result);
+  if (vecSize == 0) {
+    return 0.;
   }
-  return result;
+  const Eigen::Index segIdx = static_cast<Eigen::Index>(segmentSize);
+  const Eigen::Index nSegments =
+    static_cast<Eigen::Index>(vecSize / segmentSize);
+  return vecs.reshaped(segIdx, nSegments).colwise().norm().maxCoeff();
 }
 
 /**
@@ -295,17 +293,13 @@ segmentwise_norm_mean(const Eigen::VectorXd& vecs, const size_t segmentSize = 3)
                        std::to_string(vecSize) +
                        " is not a multiple of the segment size, " +
                        std::to_string(segmentSize) + ".");
-  double result = 0.; //-DBL_MAX;
-  const double denominator = 1. / static_cast<double>(vecSize / segmentSize);
-
-  for (size_t i = 0; i < vecSize / segmentSize; i++) {
-    const double norm = vecs
-                          .segment(static_cast<Eigen::Index>(segmentSize * i),
-                                   static_cast<Eigen::Index>(segmentSize))
-                          .norm();
-    result += (norm * denominator);
+  if (vecSize == 0) {
+    return 0.;
   }
-  return result;
+  const Eigen::Index segIdx = static_cast<Eigen::Index>(segmentSize);
+  const Eigen::Index nSegments =
+    static_cast<Eigen::Index>(vecSize / segmentSize);
+  return vecs.reshaped(segIdx, nSegments).colwise().norm().mean();
 }
 
 /**
@@ -329,12 +323,7 @@ static inline typename std::enable_if<
   bool>::type
 all_components_finite(const IN& vec)
 {
-  for (typename IN::Index i = 0; i < vec.size(); ++i) {
-    if (!std::isfinite(vec[i])) {
-      return false;
-    }
-  }
-  return true;
+  return vec.allFinite();
 }
 
 // For std::vector types
