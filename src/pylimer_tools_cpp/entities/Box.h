@@ -41,9 +41,10 @@ protected:
   template<typename Derived>
   inline void minImageDistance(Eigen::MatrixBase<Derived>& coords) const
   {
-    coords -=
-      (this->L.replicate(coords.size() / 3, 1) *
-       (coords.array() * this->oneOverL.replicate(coords.size() / 3, 1)).rint())
+    auto reshapedCoords = coords.reshaped(3, coords.size() / 3);
+    reshapedCoords -=
+      ((reshapedCoords.array().colwise() * this->oneOverL).rint().colwise() *
+       this->L)
         .matrix();
   }
 

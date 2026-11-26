@@ -3535,9 +3535,9 @@ MEHPNetwork::evaluateSpringVectors(const Eigen::VectorXd& u,
     this->box.handlePBC(vectors);
   }
   if (is2D) {
-    for (Eigen::Index i = 2; i < vectors.size(); i += 3) {
-      vectors[i] = 0.0;
-    }
+    vectors.reshaped(3, static_cast<Eigen::Index>(this->nrOfSprings))
+      .row(2)
+      .setZero();
   }
   return vectors;
 }
@@ -3576,12 +3576,13 @@ MEHPNetwork::evaluateSpringLengths(const Eigen::VectorXd& u,
                                    const bool is2D) const
 {
   const Eigen::VectorXd springVecs = this->evaluateSpringVectors(u, is2D);
-  Eigen::VectorXd lengths(static_cast<Eigen::Index>(this->nrOfSprings));
-  for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(this->nrOfSprings);
-       ++i) {
-    lengths[i] = springVecs.segment<3>(3 * i).norm();
+  if (this->nrOfSprings == 0) {
+    return Eigen::VectorXd::Zero(0);
   }
-  return lengths;
+  return springVecs.reshaped(3, static_cast<Eigen::Index>(this->nrOfSprings))
+    .colwise()
+    .norm()
+    .transpose();
 }
 
 Eigen::Vector3d
@@ -4401,17 +4402,24 @@ MEHPNetwork::getGammaFactors(const Eigen::VectorXd& u,
     return Eigen::VectorXd::Zero(0);
   }
   const Eigen::VectorXd springVectors = this->evaluateSpringVectors(u, is2D);
-  Eigen::VectorXd gammaFactors(static_cast<Eigen::Index>(this->nrOfSprings));
+  const Eigen::Index nSprings = static_cast<Eigen::Index>(this->nrOfSprings);
   const double commonDenominator = 1.0 / b02;
 
-  for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(this->nrOfSprings);
-       ++i) {
-    const double invContour = 1.0 / this->springContourLength[i];
-    gammaFactors[i] = springVectors.segment<3>(3 * i).squaredNorm() *
-                      commonDenominator * invContour;
-    RUNTIME_EXP_IFN(std::isfinite(gammaFactors[i]),
-                    "Non-finite gamma factor for spring " + std::to_string(i) +
-                      ".");
+  Eigen::VectorXd gammaFactors =
+    (springVectors.reshaped(3, nSprings)
+       .colwise()
+       .squaredNorm()
+       .transpose()
+       .array() *
+     commonDenominator / this->springContourLength.array())
+      .matrix();
+
+  if (!gammaFactors.allFinite()) {
+    for (Eigen::Index i = 0; i < nSprings; ++i) {
+      RUNTIME_EXP_IFN(std::isfinite(gammaFactors[i]),
+                      "Non-finite gamma factor for spring " +
+                        std::to_string(i) + ".");
+    }
   }
   return gammaFactors;
 }
@@ -4435,17 +4443,16 @@ MEHPNetwork::getGammaFactorsInDir(const Eigen::VectorXd& u,
   }
 
   const Eigen::VectorXd springVectors = this->evaluateSpringVectors(u, is2D);
-  Eigen::VectorXd gammaFactors =
-    Eigen::VectorXd::Zero(static_cast<Eigen::Index>(this->nrOfSprings));
+  const Eigen::Index nSprings = static_cast<Eigen::Index>(this->nrOfSprings);
   const double commonDenominator = 1.0 / b02;
 
-  for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(this->nrOfSprings);
-       ++i) {
-    const double comp = springVectors[3 * i + static_cast<Eigen::Index>(dir)];
-    gammaFactors[i] =
-      (comp * comp) * commonDenominator / this->springContourLength[i];
-  }
-  return gammaFactors;
+  return (springVectors.reshaped(3, nSprings)
+            .row(static_cast<Eigen::Index>(dir))
+            .transpose()
+            .array()
+            .square() *
+          commonDenominator / this->springContourLength.array())
+    .matrix();
 }
 
 double

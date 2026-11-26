@@ -684,6 +684,20 @@ namespace {
       return entries_.front().coords;
     }
 
+    void putIfFits(const size_t strandIdx, Eigen::VectorXd&& coords)
+    {
+      if (indexMap_.find(strandIdx) != indexMap_.end()) {
+        return;
+      }
+      const size_t nBeads = static_cast<size_t>(coords.size() / 3);
+      if (cachedBeads_ + nBeads > maxBeads_) {
+        return;
+      }
+      cachedBeads_ += nBeads;
+      entries_.push_front(Entry{ strandIdx, std::move(coords) });
+      indexMap_[strandIdx] = entries_.begin();
+    }
+
   private:
     struct Entry
     {
@@ -950,6 +964,7 @@ randomlyFindEntanglementsOnDemand(
 
   std::vector<StrandBoundingBox> bboxes(nStrands);
   std::vector<size_t> strandInternalOffset(nStrands + 1, 0);
+  StrandCache cache(250000);
 
   for (size_t s = 0; s < nStrands; ++s) {
     const int nBeads = crosslinkerUniverse.beadsInStrand[s];
@@ -1013,6 +1028,7 @@ randomlyFindEntanglementsOnDemand(
     bboxes[s].center = unwrappedCenter;
     box.handlePBC(bboxes[s].center);
     bboxes[s].radius = bboxes[s].halfExtents.norm();
+    cache.putIfFits(s, std::move(coords));
   }
 
   const size_t totalInternalBeads = strandInternalOffset[nStrands];
@@ -1064,8 +1080,6 @@ randomlyFindEntanglementsOnDemand(
     size_t globalIdx;
   };
   std::vector<BatchCandidate> batchCandidates;
-
-  StrandCache cache(250000);
 
   std::vector<Eigen::Vector3d> sampledPos1;
   std::vector<Eigen::Vector3d> sampledPos2;

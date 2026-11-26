@@ -714,15 +714,13 @@ DPDSimulator::computeForces(
 
   // we use our own parallelization -> disable the one by Eigen
   Eigen::setNbThreads(1);
-#pragma omp parallel for reduction(+ : stressTensor, pressure)                 \
-  schedule(static, 16) if (this->bondPartnersA.size() > 500)
-  for (Eigen::Index i = 0; i < this->bondPartnersA.size(); ++i) {
-    // attractive force -> reduces pressure in the system
-    pressure -= this->k * bondDistances.segment(3 * i, 3).squaredNorm();
-    stressTensor -= this->k * bondDistances.segment(3 * i, 3) *
-                    bondDistances.segment(3 * i, 3).transpose();
-    assert(std::isfinite(bondDistances.segment(3 * i, 3).squaredNorm()));
-  }
+  // attractive force -> reduces pressure in the system
+  assert(bondDistances.allFinite());
+  pressure -= this->k * bondDistances.squaredNorm();
+  const auto bondDistancesMat =
+    bondDistances.reshaped(3, this->bondPartnersA.size());
+  stressTensor.noalias() -=
+    this->k * (bondDistancesMat * bondDistancesMat.transpose());
 
   timer.section(DPDPerformanceSections::PAIR_FORCE);
 

@@ -278,12 +278,29 @@ HookeanForceEvaluator::evaluateNetworkEnergyAndGradient(
   double* const grad) const
 {
   validateNetworkAndSpringVectors(net, springVectors, grad);
-  if (grad != nullptr) {
-    std::fill(grad, grad + (3 * net.nrOfLinks), 0.0);
+  const Eigen::Index nSprings = static_cast<Eigen::Index>(net.nrOfSprings);
+  if (nSprings == 0) {
+    if (grad != nullptr) {
+      std::fill(grad, grad + (3 * net.nrOfLinks), 0.0);
+    }
+    return 0.0;
   }
+  if (grad == nullptr) {
+    const auto springMat = springVectors.reshaped(3, nSprings);
+    if (is2D) {
+      return 0.5 * this->kappa *
+             (springMat.topRows<2>().colwise().squaredNorm().array() /
+              net.springContourLength.transpose().array())
+               .sum();
+    }
+    return 0.5 * this->kappa *
+           (springMat.colwise().squaredNorm().array() /
+            net.springContourLength.transpose().array())
+             .sum();
+  }
+  std::fill(grad, grad + (3 * net.nrOfLinks), 0.0);
   double totalEnergy = 0.0;
-  for (Eigen::Index s = 0; s < static_cast<Eigen::Index>(net.nrOfSprings);
-       ++s) {
+  for (Eigen::Index s = 0; s < nSprings; ++s) {
     const double dx = springVectors[3 * s];
     const double dy = springVectors[3 * s + 1];
     const double dz = is2D ? 0.0 : springVectors[3 * s + 2];

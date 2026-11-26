@@ -1559,21 +1559,20 @@ Universe::identifyActiveAtoms(const int crossLinkerType) const
 
   const std::vector<Molecule> chains =
     this->getChainsWithCrosslinker(crossLinkerType);
-  size_t strandIdx = 0;
-  for (size_t c = 0; c < chains.size(); ++c) {
-    const Molecule& chain = chains[c];
-    if (strandIdx < peelResult.strandIsIgnored.size()) {
-      const bool strandActive = !peelResult.strandIsIgnored[strandIdx];
-      const std::vector<long int> atomIds =
-        chain.getPropertyValues<long int>("id");
-      for (const long int atomId : atomIds) {
-        const size_t v = static_cast<size_t>(this->getIdxByAtomId(atomId));
-        if (vertexTypes[v] != crossLinkerType && vertexDegrees[v] <= 2) {
-          isActive[v] = strandActive;
-        }
+  const size_t nStrands =
+    std::min(chains.size(), peelResult.strandIsIgnored.size());
+  for (size_t strandIdx = 0; strandIdx < nStrands; ++strandIdx) {
+    if (peelResult.strandIsIgnored[strandIdx]) {
+      continue;
+    }
+    const std::vector<long int> atomIds =
+      chains[strandIdx].getPropertyValues<long int>("id");
+    for (const long int atomId : atomIds) {
+      const size_t v = static_cast<size_t>(this->getIdxByAtomId(atomId));
+      if (vertexTypes[v] != crossLinkerType && vertexDegrees[v] <= 2) {
+        isActive[v] = true;
       }
     }
-    strandIdx++;
   }
 
   return isActive;
