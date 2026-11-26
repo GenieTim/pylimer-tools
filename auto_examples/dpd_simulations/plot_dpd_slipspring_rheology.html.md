@@ -157,7 +157,7 @@ print(
 ```
 
 ```none
-Demo melt (N_atoms=1125, SS=225): G_GK(0)=16.403, NMA modes=1125, static MEHP plateau=0.5170
+Demo melt (N_atoms=1125, SS=225): G_GK(0)=14.678, NMA modes=1125, static MEHP plateau=0.5521
 ```
 
 <!-- GENERATED FROM PYTHON SOURCE LINES 147-152 -->
@@ -281,7 +281,7 @@ Melt + SS (MC=False, frozen)      — 1.6224                 — 0.6589 +/- 0.06
     Network (no SS, phantom) 1.0014 1.6235 0.0104 +/- 0.0025 0.0253 +/- 0.0245
   Network + SS (reloc=False) 0.9917 1.6252 0.5225 +/- 0.0256 0.3876 +/- 0.0351
    Network + SS (reloc=True)      — 1.6149 0.5443 +/- 0.0285 0.2536 +/- 0.0500
-Measured on: Apple M3 Pro (12 cores), 36 GB RAM, Mac15,7, macOS 27.2.1 (arm64), Python 3.13.18 (cached 2026-11-25).
+Measured on: Apple M3 Pro (12 cores), 36 GB RAM, Mac15,7, macOS 27.2.1 (arm64), Python 3.13.18 (cached 2026-11-26).
 ```
 
 <!-- GENERATED FROM PYTHON SOURCE LINES 250-263 -->
@@ -596,7 +596,7 @@ plt.tight_layout(rect=(0.0, 0.03, 1.0, 1.0))
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 2.017 seconds)
+**Total running time of the script:** (0 minutes 1.893 seconds)
 
 <a id="sphx-glr-download-auto-examples-dpd-simulations-plot-dpd-slipspring-rheology-py"></a>
 

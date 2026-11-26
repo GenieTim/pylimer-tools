@@ -669,10 +669,10 @@ a-PS*      | 2.58(  5) | 1.67( 11) | 1.27( 22) | 1.02( 43) | 0.91( 86) | 0.84(17
   PDMS*    Mc = 2 Mk : GAUSSIAN(N= 2)=1.741+/-0.116 | KUHN(N= 2)=1.783+/-0.123 | KG_LJ(N= 4)=1.654+/-0.144
   PDMS*    Mc = 40 Mk: GAUSSIAN(N=47)=0.293+/-0.013 | KUHN(N=40)=0.296+/-0.012 | KG_LJ(N=77)=0.286+/-0.008
 
-Measured on: Apple M3 Pro (12 cores), 36 GB RAM, Mac15,7, macOS 27.2.1 (arm64), Python 3.13.18 (cached 2026-11-25).
+Measured on: Apple M3 Pro (12 cores), 36 GB RAM, Mac15,7, macOS 27.2.1 (arm64), Python 3.13.18 (cached 2026-11-26).
 ```
 
-**Total running time of the script:** (0 minutes 3.377 seconds)
+**Total running time of the script:** (0 minutes 2.974 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-multichemistry-and-coarse-graining-py"></a>
 

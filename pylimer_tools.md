@@ -48,6 +48,8 @@
     * [`compute_mean_end_to_end_vectors()`](pylimer_tools.calc.md#pylimer_tools.calc.structure_analysis.compute_mean_end_to_end_vectors)
     * [`compute_stoichiometric_imbalance()`](pylimer_tools.calc.md#pylimer_tools.calc.structure_analysis.compute_stoichiometric_imbalance)
     * [`compute_weight_fractions()`](pylimer_tools.calc.md#pylimer_tools.calc.structure_analysis.compute_weight_fractions)
+    * [`count_strands_by_functionality()`](pylimer_tools.calc.md#pylimer_tools.calc.structure_analysis.count_strands_by_functionality)
+    * [`determine_chain_functionality_per_type()`](pylimer_tools.calc.md#pylimer_tools.calc.structure_analysis.determine_chain_functionality_per_type)
     * [`measure_lower_bound_weight_fraction_of_soluble_material()`](pylimer_tools.calc.md#pylimer_tools.calc.structure_analysis.measure_lower_bound_weight_fraction_of_soluble_material)
     * [`measure_weight_fraction_of_backbone()`](pylimer_tools.calc.md#pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_backbone)
     * [`measure_weight_fraction_of_dangling_chains()`](pylimer_tools.calc.md#pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_dangling_chains)

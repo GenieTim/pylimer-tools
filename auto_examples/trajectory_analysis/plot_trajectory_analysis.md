@@ -60,7 +60,7 @@ by using the “lazy” iterator over the sequence
 This allows you to process large trajectories without loading everything
 into memory at once.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 49-111 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 49-104 -->
 ```Python
 # Compute radius of gyration over time
 rgs = []
@@ -79,23 +79,16 @@ for universe in sequence:
     timesteps.append(universe.get_timestep())
 
 # Plot 1: Mean Square Displacement (primary single-panel figure)
+# compute_msd_for_atoms returns an unordered mapping from lag time tau to MSD;
+# sort by lag time before plotting.
+sorted_taus = sorted(msd.keys())
+sorted_msd = [msd[tau] for tau in sorted_taus]
+
 fig, ax = plt.subplots(figsize=(7, 4.5))
 ax.plot(
-    list(msd.keys()),
-    list(msd.values()),
+    sorted_taus,
+    sorted_msd,
     label="Mean Square Displacement",
-)
-ax.axhline(
-    np.mean(list(msd.values())),
-    color="black",
-    linestyle="--",
-    label="Mean",
-)
-ax.plot(
-    list(msd.keys()),
-    [np.mean(list(msd.values())[: i + 1]) for i in range(len(msd))],
-    label="Cumulative Mean",
-    color="red",
 )
 ax.set_xlabel(r"$\tau$")
 ax.set_ylabel("MSD")
@@ -124,7 +117,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 112-138 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 105-131 -->
 
 Please beware that the MSD is computed in an $N^2$ manner, which can be slow for large systems,
 many origins and long trajectories.
@@ -152,7 +145,7 @@ msd_result = tidynamics.msd(
  )
 ```
 
-**Total running time of the script:** (4 minutes 24.539 seconds)
+**Total running time of the script:** (2 minutes 12.713 seconds)
 
 <a id="sphx-glr-download-auto-examples-trajectory-analysis-plot-trajectory-analysis-py"></a>
 

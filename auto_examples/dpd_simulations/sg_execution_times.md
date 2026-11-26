@@ -2,7 +2,7 @@
 
 # Computation times
 
-**00:08.173** total execution time for 3 files **from auto_examples/dpd_simulations**:
+**00:08.365** total execution time for 3 files **from auto_examples/dpd_simulations**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -19,6 +19,6 @@ $(document).ready( function () {
 
 | Example                                                                                                                                                                                                                             | Time      |   Mem (MB) |
 |-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [DPD Simulations](plot_dpd_simulation.md#sphx-glr-auto-examples-dpd-simulations-plot-dpd-simulation-py) (`plot_dpd_simulation.py`)                                                                             | 00:04.939 |          0 |
-| [Multi-Scale Rheology: DPD Slip-Spring Melt vs. Crosslinked Network](plot_dpd_slipspring_rheology.md#sphx-glr-auto-examples-dpd-simulations-plot-dpd-slipspring-rheology-py) (`plot_dpd_slipspring_rheology.py`)        | 00:02.017 |          0 |
-| [In-Situ DPD Dynamic Crosslinking vs. Instantaneous MC Network Synthesis](plot_dpd_dynamic_curing_vs_mc.md#sphx-glr-auto-examples-dpd-simulations-plot-dpd-dynamic-curing-vs-mc-py) (`plot_dpd_dynamic_curing_vs_mc.py`) | 00:01.217 |          0 |
+| [DPD Simulations](plot_dpd_simulation.md#sphx-glr-auto-examples-dpd-simulations-plot-dpd-simulation-py) (`plot_dpd_simulation.py`)                                                                             | 00:05.358 |          0 |
+| [Multi-Scale Rheology: DPD Slip-Spring Melt vs. Crosslinked Network](plot_dpd_slipspring_rheology.md#sphx-glr-auto-examples-dpd-simulations-plot-dpd-slipspring-rheology-py) (`plot_dpd_slipspring_rheology.py`)        | 00:01.893 |          0 |
+| [In-Situ DPD Dynamic Crosslinking vs. Instantaneous MC Network Synthesis](plot_dpd_dynamic_curing_vs_mc.md#sphx-glr-auto-examples-dpd-simulations-plot-dpd-dynamic-curing-vs-mc-py) (`plot_dpd_dynamic_curing_vs_mc.py`) | 00:01.114 |          0 |

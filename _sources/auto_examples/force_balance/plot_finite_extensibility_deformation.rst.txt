@@ -782,7 +782,7 @@ regime where 100% of rigid Padé realizations exceed :math:`x = 0.999` and blow 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 2.232 seconds)
+   **Total running time of the script:** (0 minutes 1.838 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_finite_extensibility_deformation.py:

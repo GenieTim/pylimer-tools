@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**06:37.235** total execution time for 53 files **from all galleries**:
+**04:50.338** total execution time for 53 files **from all galleries**:
 
 .. container::
 
@@ -33,161 +33,161 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_trajectory_analysis_plot_trajectory_analysis.py` (``../examples/trajectory_analysis/plot_trajectory_analysis.py``)
-     - 04:24.539
+     - 02:12.713
      - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_monte_carlo_configuration.py` (``../examples/network_generator/plot_monte_carlo_configuration.py``)
-     - 00:37.305
+     - 00:47.145
      - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_vulcanized_network.py` (``../examples/network_generator/plot_vulcanized_network.py``)
-     - 00:22.000
+     - 00:24.547
      - 0.0
    * - :ref:`sphx_glr_auto_examples_normal_mode_analysis_plot_normal_mode_analysis.py` (``../examples/normal_mode_analysis/plot_normal_mode_analysis.py``)
-     - 00:13.397
+     - 00:23.914
      - 0.0
    * - :ref:`sphx_glr_auto_examples_normal_mode_analysis_plot_kpm_vs_exact_pdms.py` (``../examples/normal_mode_analysis/plot_kpm_vs_exact_pdms.py``)
-     - 00:10.929
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_normal_mode_analysis_plot_kpm_limitations_and_hybrid.py` (``../examples/normal_mode_analysis/plot_kpm_limitations_and_hybrid.py``)
-     - 00:05.450
+     - 00:15.995
      - 0.0
    * - :ref:`sphx_glr_auto_examples_dpd_simulations_plot_dpd_simulation.py` (``../examples/dpd_simulations/plot_dpd_simulation.py``)
-     - 00:04.939
+     - 00:05.358
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_normal_mode_analysis_plot_kpm_limitations_and_hybrid.py` (``../examples/normal_mode_analysis/plot_kpm_limitations_and_hybrid.py``)
+     - 00:04.948
      - 0.0
    * - :ref:`sphx_glr_auto_examples_readers_writers_plot_memory_efficient_dump_file_reading.py` (``../examples/readers_writers/plot_memory_efficient_dump_file_reading.py``)
-     - 00:03.701
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_force_balance_plot_multichemistry_and_coarse_graining.py` (``../examples/force_balance/plot_multichemistry_and_coarse_graining.py``)
-     - 00:03.377
+     - 00:03.521
      - 0.0
    * - :ref:`sphx_glr_auto_examples_rouse_simulations_plot_rouse_topologies_and_resistance.py` (``../examples/rouse_simulations/plot_rouse_topologies_and_resistance.py``)
-     - 00:03.217
+     - 00:03.224
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_force_balance_plot_multichemistry_and_coarse_graining.py` (``../examples/force_balance/plot_multichemistry_and_coarse_graining.py``)
+     - 00:02.974
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_representative_volume_pdms.py` (``../examples/force_balance/plot_representative_volume_pdms.py``)
-     - 00:03.131
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_force_balance_plot_finite_extensibility_deformation.py` (``../examples/force_balance/plot_finite_extensibility_deformation.py``)
-     - 00:02.232
+     - 00:02.841
      - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_mc_cutoff_and_pbc_artifacts.py` (``../examples/network_generator/plot_mc_cutoff_and_pbc_artifacts.py``)
-     - 00:02.198
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_structure_analysis_plot_resistance_vs_mehp_stress.py` (``../examples/structure_analysis/plot_resistance_vs_mehp_stress.py``)
-     - 00:02.034
+     - 00:02.037
      - 0.0
    * - :ref:`sphx_glr_auto_examples_dpd_simulations_plot_dpd_slipspring_rheology.py` (``../examples/dpd_simulations/plot_dpd_slipspring_rheology.py``)
-     - 00:02.017
+     - 00:01.893
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_structure_analysis_plot_resistance_vs_mehp_stress.py` (``../examples/structure_analysis/plot_resistance_vs_mehp_stress.py``)
+     - 00:01.877
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_force_balance_plot_finite_extensibility_deformation.py` (``../examples/force_balance/plot_finite_extensibility_deformation.py``)
+     - 00:01.838
      - 0.0
    * - :ref:`sphx_glr_auto_examples_rouse_simulations_plot_rouse_brownian_simulation.py` (``../examples/rouse_simulations/plot_rouse_brownian_simulation.py``)
-     - 00:01.816
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_force_balance_plot_entanglement_sampling_comparison.py` (``../examples/force_balance/plot_entanglement_sampling_comparison.py``)
-     - 00:01.728
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_force_balance_plot_mmt_vs_mehp_gelation_and_loops.py` (``../examples/force_balance/plot_mmt_vs_mehp_gelation_and_loops.py``)
-     - 00:01.674
+     - 00:01.737
      - 0.0
    * - :ref:`sphx_glr_auto_examples_structure_analysis_plot_resistance_distance_analysis.py` (``../examples/structure_analysis/plot_resistance_distance_analysis.py``)
-     - 00:01.665
+     - 00:01.613
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_force_balance_plot_entanglement_sampling_comparison.py` (``../examples/force_balance/plot_entanglement_sampling_comparison.py``)
+     - 00:01.540
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_force_balance_plot_mmt_vs_mehp_gelation_and_loops.py` (``../examples/force_balance/plot_mmt_vs_mehp_gelation_and_loops.py``)
+     - 00:01.502
      - 0.0
    * - :ref:`sphx_glr_auto_examples_dpd_simulations_plot_dpd_dynamic_curing_vs_mc.py` (``../examples/dpd_simulations/plot_dpd_dynamic_curing_vs_mc.py``)
-     - 00:01.217
+     - 00:01.114
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_sampling_cutoff_effect.py` (``../examples/force_balance/plot_sampling_cutoff_effect.py``)
-     - 00:00.939
+     - 00:00.857
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_inactive_removal_and_sampling.py` (``../examples/force_balance/plot_inactive_removal_and_sampling.py``)
-     - 00:00.863
+     - 00:00.792
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_balance.py` (``../examples/force_balance/plot_force_balance.py``)
-     - 00:00.534
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_balance_2.py` (``../examples/force_balance/plot_force_balance_2.py``)
-     - 00:00.486
+     - 00:00.473
      - 0.0
    * - :ref:`sphx_glr_auto_examples_readers_writers_plot_unit_conversion.py` (``../examples/readers_writers/plot_unit_conversion.py``)
-     - 00:00.484
+     - 00:00.428
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_balance_2.py` (``../examples/force_balance/plot_force_balance_2.py``)
+     - 00:00.423
      - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_custom_crosslinking_callback.py` (``../examples/network_generator/plot_custom_crosslinking_callback.py``)
-     - 00:00.429
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_network_generator_plot_polydisperse_system.py` (``../examples/network_generator/plot_polydisperse_system.py``)
-     - 00:00.399
+     - 00:00.400
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_slipping_vs_fixed_links.py` (``../examples/force_balance/plot_slipping_vs_fixed_links.py``)
-     - 00:00.395
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_force_balance_plot_polydispersity_study.py` (``../examples/force_balance/plot_polydispersity_study.py``)
-     - 00:00.392
+     - 00:00.371
      - 0.0
    * - :ref:`sphx_glr_auto_examples_readers_writers_plot_data_file_reader.py` (``../examples/readers_writers/plot_data_file_reader.py``)
-     - 00:00.391
+     - 00:00.366
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_network_generator_plot_polydisperse_system.py` (``../examples/network_generator/plot_polydisperse_system.py``)
+     - 00:00.357
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_force_balance_plot_polydispersity_study.py` (``../examples/force_balance/plot_polydispersity_study.py``)
+     - 00:00.357
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_relaxation.py` (``../examples/force_balance/plot_force_relaxation.py``)
-     - 00:00.376
+     - 00:00.335
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_entanglement_link_vs_spring.py` (``../examples/force_balance/plot_entanglement_link_vs_spring.py``)
-     - 00:00.356
+     - 00:00.332
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_fb_deformation_exp.py` (``../examples/force_balance/plot_fb_deformation_exp.py``)
-     - 00:00.278
+     - 00:00.242
      - 0.0
    * - :ref:`sphx_glr_auto_examples_readers_writers_plot_convert_trajectory_to_frame.py` (``../examples/readers_writers/plot_convert_trajectory_to_frame.py``)
-     - 00:00.228
+     - 00:00.236
      - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_tetra_peg_network.py` (``../examples/network_generator/plot_tetra_peg_network.py``)
-     - 00:00.166
+     - 00:00.194
      - 0.0
    * - :ref:`sphx_glr_auto_examples_structure_analysis_plot_topological_leaf_pruning_vs_pbc.py` (``../examples/structure_analysis/plot_topological_leaf_pruning_vs_pbc.py``)
-     - 00:00.161
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_readers_writers_plot_data_file_writer.py` (``../examples/readers_writers/plot_data_file_writer.py``)
-     - 00:00.155
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_readers_writers_plot_convert_for_bond_swapping.py` (``../examples/readers_writers/plot_convert_for_bond_swapping.py``)
      - 00:00.151
      - 0.0
-   * - :ref:`sphx_glr_auto_examples_network_generator_plot_multi_component_system.py` (``../examples/network_generator/plot_multi_component_system.py``)
-     - 00:00.136
+   * - :ref:`sphx_glr_auto_examples_readers_writers_plot_convert_for_bond_swapping.py` (``../examples/readers_writers/plot_convert_for_bond_swapping.py``)
+     - 00:00.149
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_readers_writers_plot_data_file_writer.py` (``../examples/readers_writers/plot_data_file_writer.py``)
+     - 00:00.145
      - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_add_angles.py` (``../examples/network_generator/plot_add_angles.py``)
-     - 00:00.136
+     - 00:00.132
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_network_generator_plot_multi_component_system.py` (``../examples/network_generator/plot_multi_component_system.py``)
+     - 00:00.129
      - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_simple_crosslinked_network.py` (``../examples/network_generator/plot_simple_crosslinked_network.py``)
-     - 00:00.127
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_structure_analysis_plot_end_to_end_distribution.py` (``../examples/structure_analysis/plot_end_to_end_distribution.py``)
-     - 00:00.123
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_readers_writers_plot_correlated_averages_reader.py` (``../examples/readers_writers/plot_correlated_averages_reader.py``)
-     - 00:00.119
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_structure_analysis_plot_loop_analysis.py` (``../examples/structure_analysis/plot_loop_analysis.py``)
-     - 00:00.117
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_readers_writers_plot_log_thermo_file_reader.py` (``../examples/readers_writers/plot_log_thermo_file_reader.py``)
      - 00:00.116
      - 0.0
+   * - :ref:`sphx_glr_auto_examples_readers_writers_plot_correlated_averages_reader.py` (``../examples/readers_writers/plot_correlated_averages_reader.py``)
+     - 00:00.113
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_structure_analysis_plot_loop_analysis.py` (``../examples/structure_analysis/plot_loop_analysis.py``)
+     - 00:00.111
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_structure_analysis_plot_end_to_end_distribution.py` (``../examples/structure_analysis/plot_end_to_end_distribution.py``)
+     - 00:00.110
+     - 0.0
    * - :ref:`sphx_glr_auto_examples_readers_writers_plot_time_averaged_data_reader.py` (``../examples/readers_writers/plot_time_averaged_data_reader.py``)
-     - 00:00.115
+     - 00:00.108
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_readers_writers_plot_log_thermo_file_reader.py` (``../examples/readers_writers/plot_log_thermo_file_reader.py``)
+     - 00:00.107
      - 0.0
    * - :ref:`sphx_glr_auto_examples_readers_writers_plot_dump_file_reader.py` (``../examples/readers_writers/plot_dump_file_reader.py``)
-     - 00:00.102
+     - 00:00.093
      - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_save_network.py` (``../examples/network_generator/plot_save_network.py``)
-     - 00:00.091
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_readers_writers_plot_histogram_reader.py` (``../examples/readers_writers/plot_histogram_reader.py``)
-     - 00:00.070
+     - 00:00.084
      - 0.0
    * - :ref:`sphx_glr_auto_examples_structure_analysis_plot_structure_analysis.py` (``../examples/structure_analysis/plot_structure_analysis.py``)
-     - 00:00.066
+     - 00:00.069
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_readers_writers_plot_histogram_reader.py` (``../examples/readers_writers/plot_histogram_reader.py``)
+     - 00:00.068
      - 0.0
    * - :ref:`sphx_glr_auto_examples_structure_analysis_plot_decompose_structure.py` (``../examples/structure_analysis/plot_decompose_structure.py``)
-     - 00:00.065
+     - 00:00.062
      - 0.0
    * - :ref:`sphx_glr_auto_examples_readers_writers_plot_pylimer_tools_output_reader.py` (``../examples/readers_writers/plot_pylimer_tools_output_reader.py``)
-     - 00:00.057
+     - 00:00.053
      - 0.0
    * - :ref:`sphx_glr_auto_examples_readers_writers_plot_performance_caching.py` (``../examples/readers_writers/plot_performance_caching.py``)
-     - 00:00.044
+     - 00:00.042
      - 0.0

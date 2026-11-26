@@ -11,12 +11,15 @@ DPDSimulator
    .. autosummary::
 
       ~DPDSimulator.assume_box_large_enough
+      ~DPDSimulator.assumes_box_large_enough
       ~DPDSimulator.config_a
       ~DPDSimulator.config_allow_relocation_in_network
+      ~DPDSimulator.config_assume_box_large_enough
       ~DPDSimulator.config_auto_correlator_output
       ~DPDSimulator.config_average_output
       ~DPDSimulator.config_bond_formation
       ~DPDSimulator.config_box_deformation
+      ~DPDSimulator.config_gamma
       ~DPDSimulator.config_lambda
       ~DPDSimulator.config_num_steps_dpd
       ~DPDSimulator.config_num_steps_mc
@@ -32,6 +35,7 @@ DPDSimulator
       ~DPDSimulator.get_bond_lengths
       ~DPDSimulator.get_coordinates
       ~DPDSimulator.get_current_timestep
+      ~DPDSimulator.get_dpd_gamma
       ~DPDSimulator.get_nr_of_atoms
       ~DPDSimulator.get_nr_of_bonds
       ~DPDSimulator.get_nr_of_bonds_to_form
@@ -40,18 +44,25 @@ DPDSimulator
       ~DPDSimulator.get_nr_of_slip_springs
       ~DPDSimulator.get_nr_of_steps_dpd
       ~DPDSimulator.get_nr_of_steps_mc
+      ~DPDSimulator.get_num_relocations
+      ~DPDSimulator.get_num_shifts
       ~DPDSimulator.get_shift_one_at_a_time
       ~DPDSimulator.get_shift_possibility_empty
+      ~DPDSimulator.get_sigma
       ~DPDSimulator.get_slip_spring_bond_type
       ~DPDSimulator.get_spring_constant
       ~DPDSimulator.get_stress_tensor
+      ~DPDSimulator.get_target_kbt
       ~DPDSimulator.get_temperature
       ~DPDSimulator.get_timestep
       ~DPDSimulator.get_universe
+      ~DPDSimulator.get_velocities
       ~DPDSimulator.get_volume
       ~DPDSimulator.read_restart_file
       ~DPDSimulator.refresh_current_state
+      ~DPDSimulator.relocate_slip_springs
       ~DPDSimulator.run_simulation
+      ~DPDSimulator.shift_slip_springs
       ~DPDSimulator.start_measuring_msd_for_atoms
       ~DPDSimulator.validate_neighbour_list
       ~DPDSimulator.validate_state
@@ -60,12 +71,15 @@ DPDSimulator
    .. rubric:: Methods Documentation
 
    .. automethod:: assume_box_large_enough
+   .. automethod:: assumes_box_large_enough
    .. automethod:: config_a
    .. automethod:: config_allow_relocation_in_network
+   .. automethod:: config_assume_box_large_enough
    .. automethod:: config_auto_correlator_output
    .. automethod:: config_average_output
    .. automethod:: config_bond_formation
    .. automethod:: config_box_deformation
+   .. automethod:: config_gamma
    .. automethod:: config_lambda
    .. automethod:: config_num_steps_dpd
    .. automethod:: config_num_steps_mc
@@ -81,6 +95,7 @@ DPDSimulator
    .. automethod:: get_bond_lengths
    .. automethod:: get_coordinates
    .. automethod:: get_current_timestep
+   .. automethod:: get_dpd_gamma
    .. automethod:: get_nr_of_atoms
    .. automethod:: get_nr_of_bonds
    .. automethod:: get_nr_of_bonds_to_form
@@ -89,18 +104,25 @@ DPDSimulator
    .. automethod:: get_nr_of_slip_springs
    .. automethod:: get_nr_of_steps_dpd
    .. automethod:: get_nr_of_steps_mc
+   .. automethod:: get_num_relocations
+   .. automethod:: get_num_shifts
    .. automethod:: get_shift_one_at_a_time
    .. automethod:: get_shift_possibility_empty
+   .. automethod:: get_sigma
    .. automethod:: get_slip_spring_bond_type
    .. automethod:: get_spring_constant
    .. automethod:: get_stress_tensor
+   .. automethod:: get_target_kbt
    .. automethod:: get_temperature
    .. automethod:: get_timestep
    .. automethod:: get_universe
+   .. automethod:: get_velocities
    .. automethod:: get_volume
    .. automethod:: read_restart_file
    .. automethod:: refresh_current_state
+   .. automethod:: relocate_slip_springs
    .. automethod:: run_simulation
+   .. automethod:: shift_slip_springs
    .. automethod:: start_measuring_msd_for_atoms
    .. automethod:: validate_neighbour_list
    .. automethod:: validate_state

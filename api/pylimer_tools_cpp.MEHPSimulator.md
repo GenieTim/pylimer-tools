@@ -153,7 +153,7 @@ Overloaded function.
 
 #### break_too_long_strands(self: [pylimer_tools_cpp.MEHPSimulator](#pylimer_tools_cpp.MEHPSimulator), breaking_length: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [int](https://docs.python.org/3/builtins/functions.html#int)
 
-#### config_assume_box_large_enough(self: [pylimer_tools_cpp.MEHPSimulator](#pylimer_tools_cpp.MEHPSimulator), assume: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### config_assume_box_large_enough(self: [pylimer_tools_cpp.MEHPSimulator](#pylimer_tools_cpp.MEHPSimulator), assume: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 #### config_assume_network_is_complete(self: [pylimer_tools_cpp.MEHPSimulator](#pylimer_tools_cpp.MEHPSimulator), assume: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [None](https://docs.python.org/3/builtins/constants.html#None)
 

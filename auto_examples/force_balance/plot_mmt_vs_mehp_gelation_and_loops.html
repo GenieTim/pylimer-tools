@@ -1035,32 +1035,30 @@ or experimental networks, keep the following built-in scope limits in mind:</p>
 <ul class="simple">
 <li><p><strong>Monodisperse :math:`A_f + B_2 / B_1` &amp; single crosslinker type</strong>:
 All recursive formulas assume a single crosslinker functionality <span class="math notranslate nohighlight">\(f\)</span>
-and monodisperse precursor reactivity (one <span class="math notranslate nohighlight">\(B_2\)</span> / <span class="math notranslate nohighlight">\(B_1\)</span> pool).
-In addition, <a class="reference internal" href="../../pylimer_tools.calc.html#pylimer_tools.calc.structure_analysis.compute_stoichiometric_imbalance" title="pylimer_tools.calc.structure_analysis.compute_stoichiometric_imbalance"><code class="xref py py-func docutils literal notranslate"><span class="pre">compute_stoichiometric_imbalance()</span></code></a>
-assumes bifunctional strands (<span class="math notranslate nohighlight">\(g = 2\)</span>), so when <span class="math notranslate nohighlight">\(B_1\)</span> chains are
-present, <span class="math notranslate nohighlight">\(r = f N_{A_f} / (2 N_{B_2} + N_{B_1})\)</span> and
-<code class="docutils literal notranslate"><span class="pre">functionality_per_type={1:</span> <span class="pre">2,</span> <span class="pre">2:</span> <span class="pre">f,</span> <span class="pre">4:</span> <span class="pre">1}</span></code> should be passed explicitly.</p></li>
+and monodisperse precursor reactivity (one <span class="math notranslate nohighlight">\(B_2\)</span> / <span class="math notranslate nohighlight">\(B_1\)</span> pool),
+with each chain species (<span class="math notranslate nohighlight">\(B_2\)</span>, <span class="math notranslate nohighlight">\(B_1\)</span>, <span class="math notranslate nohighlight">\(B_0\)</span>) represented
+by distinct atom type(s) (inferred from crosslinker attachments or passed via
+<code class="docutils literal notranslate"><span class="pre">functionality_per_type={1:</span> <span class="pre">2,</span> <span class="pre">2:</span> <span class="pre">f,</span> <span class="pre">4:</span> <span class="pre">1}</span></code>).</p></li>
 <li><p><strong>Tree-like (no-loop) Bethe-lattice approximation</strong>:
 MMT ignores spatial proximity and intramolecular loops. In melts near
 <span class="math notranslate nohighlight">\(p_c\)</span> or in diluted precursors, primary and secondary loops waste
 crosslinker arms, shift <span class="math notranslate nohighlight">\(p_c^{\text{eff}}\)</span> upward, and depress
 <span class="math notranslate nohighlight">\(G_{\text{ph}}\)</span> below MMT.</p></li>
-<li><p><strong>Entanglement trapping &amp; :math:`b_2 &lt; 1` prefactors</strong>:
+<li><p><strong>Entanglement trapping &amp; :math:`b_2 &lt; 1` dilution prefactors</strong>:
+While <a class="reference internal" href="../../pylimer_tools.calc.html#pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition" title="pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition"><code class="xref py py-func docutils literal notranslate"><span class="pre">compute_modulus_decomposition()</span></code></a>
+and <a class="reference internal" href="../../pylimer_tools.calc.html#pylimer_tools.calc.miller_macosko_theory.compute_junction_modulus" title="pylimer_tools.calc.miller_macosko_theory.compute_junction_modulus"><code class="xref py py-func docutils literal notranslate"><span class="pre">compute_junction_modulus()</span></code></a>
+use the exact crosslinker density <span class="math notranslate nohighlight">\([A_f]_0 = \frac{2 r}{f (2 - b_2)}\,\nu\)</span>
+(for reactive strand density <span class="math notranslate nohighlight">\(\nu = [B_2]_0 + [B_1]_0\)</span>),
 <a class="reference internal" href="../../pylimer_tools.calc.html#pylimer_tools.calc.miller_macosko_theory.compute_trapping_factor" title="pylimer_tools.calc.miller_macosko_theory.compute_trapping_factor"><code class="xref py py-func docutils literal notranslate"><span class="pre">compute_trapping_factor()</span></code></a>
 evaluates <span class="math notranslate nohighlight">\((1 - \beta)^4\)</span> without the <span class="math notranslate nohighlight">\(w_{B_2}^2\)</span> dilution
-prefactor of <span class="bibtex-citation" id="id16">Patel <em>et al.</em> [<a class="reference internal" href="../../acknowledgements.html#id14" title="Suman K. Patel, Shawn Malone, Claude Cohen, Jeffrey R. Gillmor, and Ralph H. Colby. Elastic modulus and equilibrium swelling of poly(dimethylsiloxane) networks. Macromolecules, 25(20):5241–5251, September 1992. doi:10.1021/ma00046a021.">PMC+92</a>]</span>, and
-<a class="reference internal" href="../../pylimer_tools.calc.html#pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition" title="pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition"><code class="xref py py-func docutils literal notranslate"><span class="pre">compute_modulus_decomposition()</span></code></a>
-uses <span class="math notranslate nohighlight">\((2 r b_2 / f)\,\nu\)</span> instead of <span class="math notranslate nohighlight">\([A_f]_0\)</span> when <span class="math notranslate nohighlight">\(b_2 &lt; 1\)</span>;
-for <span class="math notranslate nohighlight">\(b_2 &lt; 1\)</span>, prefer
-<a class="reference internal" href="../../pylimer_tools.calc.html#pylimer_tools.calc.miller_macosko_theory.compute_junction_modulus" title="pylimer_tools.calc.miller_macosko_theory.compute_junction_modulus"><code class="xref py py-func docutils literal notranslate"><span class="pre">compute_junction_modulus()</span></code></a>
-together with <span class="math notranslate nohighlight">\(w_{B_2}^2 (1 - \beta)^4 G_e(1)\)</span>.</p></li>
+prefactor of <span class="bibtex-citation" id="id16">Patel <em>et al.</em> [<a class="reference internal" href="../../acknowledgements.html#id14" title="Suman K. Patel, Shawn Malone, Claude Cohen, Jeffrey R. Gillmor, and Ralph H. Colby. Elastic modulus and equilibrium swelling of poly(dimethylsiloxane) networks. Macromolecules, 25(20):5241–5251, September 1992. doi:10.1021/ma00046a021.">PMC+92</a>]</span>.</p></li>
 </ul>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span class="nb">print</span><span class="p">(</span><span class="n">format_benchmark_footnote</span><span class="p">(</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="dict"><span class="n">data</span></a><span class="p">)</span><span class="p">)</span><span class="w">
 </span></pre></div></div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Measured on: Apple M3 Pro (12 cores), 36 GB RAM, Mac15,7, macOS 27.2.1 (arm64), Python 3.13.18 (cached 2026-11-25).
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Measured on: Apple M3 Pro (12 cores), 36 GB RAM, Mac15,7, macOS 27.2.1 (arm64), Python 3.13.18 (cached 2026-11-26).
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.674 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.502 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-force-balance-plot-mmt-vs-mehp-gelation-and-loops-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/ba22ffafe0b11200d9c5e8fbdf92ec65/plot_mmt_vs_mehp_gelation_and_loops.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_mmt_vs_mehp_gelation_and_loops.ipynb</span></code></a></p>

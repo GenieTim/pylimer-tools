@@ -138,7 +138,7 @@ print(format_benchmark_footnote(data))
 Loading cached example data from dpd_dynamic_curing_vs_mc_cache.npz...
 System: 100 f=4 crosslinkers + 200 strands (N=20), L=11.10, rho=3.0, 6 seeds
 Equilibrated DPD melt: <b^2> = 1.643 +/- 0.034 (ideal 3kT/k = 1.500), C_inf_eff = 1.066 +/- 0.082
-Measured on: Apple M3 Pro (12 cores), 36 GB RAM, Mac15,7, macOS 27.2.1 (arm64), Python 3.13.18 (cached 2026-11-25).
+Measured on: Apple M3 Pro (12 cores), 36 GB RAM, Mac15,7, macOS 27.2.1 (arm64), Python 3.13.18 (cached 2026-11-26).
 ```
 
 <!-- GENERATED FROM PYTHON SOURCE LINES 123-136 -->
@@ -703,7 +703,7 @@ print(summary_df.to_string(index=False))
 0.94    89.2          2.33         5.17      0.76     0.91      6.06     4.68    0.0615   0.0348     0.2451    0.1774
 ```
 
-**Total running time of the script:** (0 minutes 1.217 seconds)
+**Total running time of the script:** (0 minutes 1.114 seconds)
 
 <a id="sphx-glr-download-auto-examples-dpd-simulations-plot-dpd-dynamic-curing-vs-mc-py"></a>
 

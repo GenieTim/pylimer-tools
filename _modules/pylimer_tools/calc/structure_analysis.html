@@ -422,10 +422,10 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
-
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools_cpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">MoleculeType</span>
 
@@ -433,13 +433,195 @@
     <span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools_cpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">Molecule</span><span class="p">,</span> <span class="n">Universe</span>
 
 
+<div class="viewcode-block" id="determine_chain_functionality_per_type">
+<a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.structure_analysis.determine_chain_functionality_per_type">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">determine_chain_functionality_per_type</span><span class="p">(</span>
+    <span class="n">network</span><span class="p">:</span> <span class="n">Universe</span><span class="p">,</span>
+    <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Determine the reactive chain functionality for each atom type in the network.</span>
+
+<span class="sd">    Unlike :meth:`pylimer_tools_cpp.Universe.determine_functionality_per_type`, which</span>
+<span class="sd">    returns the maximum vertex degree per atom type (and therefore reports ``2`` for</span>
+<span class="sd">    internal beads of multi-bead monofunctional and solvent chains), this function</span>
+<span class="sd">    infers non-crosslinker chain functionalities from the maximum number of bonds</span>
+<span class="sd">    to crosslinker atoms observed across chains of each atom type:</span>
+
+<span class="sd">    - ``crosslinker_type``: maximum vertex degree of crosslinker atoms (:math:`f`)</span>
+<span class="sd">    - bifunctional (:math:`B_2`) chain types: ``2`` (up to 2 crosslinker bonds per chain)</span>
+<span class="sd">    - monofunctional (:math:`B_1`) chain types: ``1`` (at most 1 crosslinker bond per chain)</span>
+<span class="sd">    - solvent (:math:`B_0`) chain types: ``0`` (no crosslinker bonds)</span>
+
+<span class="sd">    If no bonds between crosslinkers and non-crosslinker chains exist anywhere in the</span>
+<span class="sd">    network (completely unreacted system), non-crosslinker atom types default to ``2``.</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        - Each chain species (:math:`B_2`, :math:`B_1`, :math:`B_0`) is assumed to have</span>
+<span class="sd">          distinct atom type(s) representing the chain's reactive functionality (rather</span>
+<span class="sd">          than sharing interior backbone atom types across species or using distinct</span>
+<span class="sd">          per-bead end-cap types).</span>
+<span class="sd">        - Because functionalities are inferred from *observed* attachments in ``network``,</span>
+<span class="sd">          partially reacted / low-conversion networks in which no chain or crosslinker of a</span>
+<span class="sd">          given type has yet formed its maximum number of bonds will underestimate that</span>
+<span class="sd">          type's target functionality; pass ``functionality_per_type`` explicitly in those</span>
+<span class="sd">          cases.</span>
+
+<span class="sd">    :param network: The polymer network to analyze</span>
+<span class="sd">    :param crosslinker_type: The atom type of crosslinker beads</span>
+<span class="sd">    :return: Dictionary mapping atom type to its chain/crosslinker functionality</span>
+<span class="sd">    :rtype: dict[int, int]</span>
+<span class="sd">    """</span>
+    <span class="n">bead_func</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">determine_functionality_per_type</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">network</span><span class="o">.</span><span class="n">get_nr_of_atoms</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">bead_func</span>
+
+    <span class="n">chains</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">get_chains_with_crosslinker</span><span class="p">(</span><span class="n">crosslinker_type</span><span class="o">=</span><span class="n">crosslinker_type</span><span class="p">)</span>
+    <span class="n">max_xlink_bonds_per_type</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">total_xlink_bonds</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">chains</span><span class="p">:</span>
+        <span class="n">xlink_atoms</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">get_atoms_by_type</span><span class="p">(</span><span class="n">crosslinker_type</span><span class="p">)</span>
+        <span class="n">n_xlink_bonds</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+            <span class="mi">1</span>
+            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">xlink_atoms</span>
+            <span class="k">for</span> <span class="n">nbr</span> <span class="ow">in</span> <span class="n">chain</span><span class="o">.</span><span class="n">get_atoms_connected_to</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">nbr</span><span class="o">.</span><span class="n">get_type</span><span class="p">()</span> <span class="o">!=</span> <span class="n">crosslinker_type</span>
+        <span class="p">)</span>
+        <span class="n">total_xlink_bonds</span> <span class="o">+=</span> <span class="n">n_xlink_bonds</span>
+        <span class="k">for</span> <span class="n">atype</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">get_atom_types</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">atype</span> <span class="o">!=</span> <span class="n">crosslinker_type</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="n">atype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">max_xlink_bonds_per_type</span>
+                    <span class="ow">or</span> <span class="n">n_xlink_bonds</span> <span class="o">&gt;</span> <span class="n">max_xlink_bonds_per_type</span><span class="p">[</span><span class="n">atype</span><span class="p">]</span>
+                <span class="p">):</span>
+                    <span class="n">max_xlink_bonds_per_type</span><span class="p">[</span><span class="n">atype</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_xlink_bonds</span>
+
+    <span class="n">result</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">atype</span><span class="p">,</span> <span class="n">deg</span> <span class="ow">in</span> <span class="n">bead_func</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">atype</span> <span class="o">==</span> <span class="n">crosslinker_type</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">atype</span><span class="p">]</span> <span class="o">=</span> <span class="n">deg</span>
+        <span class="k">elif</span> <span class="n">total_xlink_bonds</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">atype</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">atype</span><span class="p">]</span> <span class="o">=</span> <span class="n">max_xlink_bonds_per_type</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">atype</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">result</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_resolve_chain_functionality_per_type</span><span class="p">(</span>
+    <span class="n">network</span><span class="p">:</span> <span class="n">Universe</span><span class="p">,</span>
+    <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">functionality_per_type</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">warn_missing_crosslinker</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Resolve a complete chain functionality map for all atom types in ``network``.</span>
+
+<span class="sd">    Explicit entries in ``functionality_per_type`` take precedence; any missing</span>
+<span class="sd">    atom types are inferred via :func:`determine_chain_functionality_per_type`.</span>
+<span class="sd">    When ``functionality_per_type`` already covers every atom type present in</span>
+<span class="sd">    ``network``, chain decomposition is skipped entirely.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">functionality_per_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">warn_missing_crosslinker</span> <span class="ow">and</span> <span class="p">(</span>
+            <span class="n">crosslinker_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">functionality_per_type</span>
+            <span class="ow">or</span> <span class="n">functionality_per_type</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span>
+        <span class="p">):</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Crosslinker type </span><span class="si">{</span><span class="n">crosslinker_type</span><span class="si">}</span><span class="s2"> not found in passed "</span>
+                <span class="s2">"functionality_per_type; inferring its functionality from the network."</span>
+            <span class="p">)</span>
+        <span class="n">atom_types_in_net</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">count_atom_types</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span>
+            <span class="n">t</span> <span class="ow">in</span> <span class="n">functionality_per_type</span> <span class="ow">and</span> <span class="n">functionality_per_type</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">atom_types_in_net</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">atype</span><span class="p">):</span> <span class="nb">int</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">atype</span><span class="p">,</span> <span class="n">func</span> <span class="ow">in</span> <span class="n">functionality_per_type</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">func</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="p">}</span>
+
+    <span class="n">inferred</span> <span class="o">=</span> <span class="n">determine_chain_functionality_per_type</span><span class="p">(</span>
+        <span class="n">network</span><span class="p">,</span> <span class="n">crosslinker_type</span><span class="o">=</span><span class="n">crosslinker_type</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">functionality_per_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">inferred</span>
+    <span class="n">resolved</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">inferred</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">atype</span><span class="p">,</span> <span class="n">func</span> <span class="ow">in</span> <span class="n">functionality_per_type</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">func</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">resolved</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">atype</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">resolved</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_strand_functionality</span><span class="p">(</span>
+    <span class="n">strand</span><span class="p">:</span> <span class="n">Molecule</span><span class="p">,</span>
+    <span class="n">functionality_per_type</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+    <span class="n">ignore_types_set</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Determine the number of reactive sites (functionality) of a single strand.</span>
+
+<span class="sd">    Strands composed solely of ignored atom types contribute 0.</span>
+<span class="sd">    """</span>
+    <span class="n">atom_types</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">strand</span><span class="o">.</span><span class="n">get_atom_types</span><span class="p">())</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">atom_types</span> <span class="ow">or</span> <span class="n">atom_types</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">ignore_types_set</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span>
+    <span class="n">relevant_types</span> <span class="o">=</span> <span class="n">atom_types</span> <span class="o">-</span> <span class="n">ignore_types_set</span>
+    <span class="n">funcs</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="nb">int</span><span class="p">(</span><span class="n">functionality_per_type</span><span class="p">[</span><span class="n">t</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">relevant_types</span>
+        <span class="k">if</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">functionality_per_type</span> <span class="ow">and</span> <span class="n">functionality_per_type</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">funcs</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">2</span>
+    <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="n">funcs</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="count_strands_by_functionality">
+<a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.structure_analysis.count_strands_by_functionality">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">count_strands_by_functionality</span><span class="p">(</span>
+    <span class="n">network</span><span class="p">:</span> <span class="n">Universe</span><span class="p">,</span>
+    <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="n">functionality_per_type</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">ignore_types</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Count precursor strands (after splitting at ``crosslinker_type``) grouped by</span>
+<span class="sd">    their reactive functionality (e.g. ``0`` for solvent, ``1`` for :math:`B_1`,</span>
+<span class="sd">    ``2`` for :math:`B_2`).</span>
+
+<span class="sd">    :param network: The polymer network to analyze</span>
+<span class="sd">    :param crosslinker_type: The atom type of crosslinker beads</span>
+<span class="sd">    :param functionality_per_type: Optional mapping from atom type to functionality</span>
+<span class="sd">    :param ignore_types: Optional sequence of atom types to treat as non-reactive (functionality 0)</span>
+<span class="sd">    :return: Dictionary mapping strand functionality to number of strands</span>
+<span class="sd">    :rtype: dict[int, int]</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">network</span><span class="o">.</span><span class="n">get_nr_of_atoms</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{}</span>
+    <span class="n">chain_func_per_type</span> <span class="o">=</span> <span class="n">_resolve_chain_functionality_per_type</span><span class="p">(</span>
+        <span class="n">network</span><span class="p">,</span> <span class="n">crosslinker_type</span><span class="p">,</span> <span class="n">functionality_per_type</span>
+    <span class="p">)</span>
+    <span class="n">ignore_types_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">ignore_types</span><span class="p">)</span> <span class="k">if</span> <span class="n">ignore_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">ignore_types_set</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">crosslinker_type</span><span class="p">)</span>
+    <span class="n">counts_by_func</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">strand</span> <span class="ow">in</span> <span class="n">network</span><span class="o">.</span><span class="n">get_molecules</span><span class="p">(</span><span class="n">crosslinker_type</span><span class="p">):</span>
+        <span class="n">func</span> <span class="o">=</span> <span class="n">_get_strand_functionality</span><span class="p">(</span><span class="n">strand</span><span class="p">,</span> <span class="n">chain_func_per_type</span><span class="p">,</span> <span class="n">ignore_types_set</span><span class="p">)</span>
+        <span class="n">counts_by_func</span><span class="p">[</span><span class="n">func</span><span class="p">]</span> <span class="o">=</span> <span class="n">counts_by_func</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">counts_by_func</span></div>
+
+
+
 <div class="viewcode-block" id="compute_stoichiometric_imbalance">
 <a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.structure_analysis.compute_stoichiometric_imbalance">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_stoichiometric_imbalance</span><span class="p">(</span>
     <span class="n">network</span><span class="p">:</span> <span class="n">Universe</span><span class="p">,</span>
     <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
-    <span class="n">functionality_per_type</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">ignore_types</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">functionality_per_type</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">ignore_types</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">effective</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
@@ -451,15 +633,17 @@
 <span class="sd">    .. note::</span>
 <span class="sd">        - if your system has a non-integer number of possible bonds (e.g. one site non-bonded),</span>
 <span class="sd">          this will not be rounded/respected in any way.</span>
-<span class="sd">        - Currently, only g = 2 chains are respected yet, and only one type of crosslinker is supported.</span>
-<span class="sd">        - If you have e.g. solvent chains in the network, use `ignore_types` to not count them.</span>
+<span class="sd">        - Only one type of crosslinker is supported.</span>
+<span class="sd">        - Monofunctional (:math:`B_1`) and solvent (:math:`B_0`) chains are accounted for</span>
+<span class="sd">          using ``functionality_per_type`` or inferred from crosslinker attachments;</span>
+<span class="sd">          you can also use ``ignore_types`` to explicitly exclude atom types.</span>
 
 <span class="sd">    :param network: The polymer network to do the computation for</span>
 <span class="sd">    :param crosslinker_type: The type of the junctions/crosslinkers to select them in the network</span>
 <span class="sd">    :param functionality_per_type: A dictionary with key: type, and value: functionality of this atom type.</span>
-<span class="sd">        If `None`: will use max functionality per type.</span>
-<span class="sd">    :param ignore_types: A list of integers, the types to ignore for the imbalance (e.g. solvent atom types)</span>
-<span class="sd">    :param effective: Whether to use the effective functionality (if functionality_per_type is not passed)</span>
+<span class="sd">        If `None`: will infer chain functionalities from the network.</span>
+<span class="sd">    :param ignore_types: A sequence of integers, the types to ignore for the imbalance (e.g. solvent atom types)</span>
+<span class="sd">    :param effective: Whether to use the effective functionality (if crosslinker functionality is not passed)</span>
 <span class="sd">        or the maximum functionality of the crosslinkers.</span>
 <span class="sd">    :return: The stoichiometric imbalance. If the network is empty, or no crosslinkers are present 0. is returned.</span>
 <span class="sd">    :rtype: float</span>
@@ -468,51 +652,43 @@
         <span class="k">return</span> <span class="mf">0.0</span>
 
     <span class="n">counts</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">count_atom_types</span><span class="p">()</span>
+    <span class="n">crosslinker_explicit</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">functionality_per_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="ow">and</span> <span class="n">crosslinker_type</span> <span class="ow">in</span> <span class="n">functionality_per_type</span>
+        <span class="ow">and</span> <span class="n">functionality_per_type</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">functionality_per_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span>
-        <span class="n">crosslinker_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">functionality_per_type</span>
-        <span class="ow">or</span> <span class="n">functionality_per_type</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span>
-    <span class="p">):</span>
-        <span class="n">functionality_per_type</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s2">"Crosslink's atom type not found in functionality_per_type, "</span>
-            <span class="o">+</span> <span class="s2">"will ignore passed argument `functionality_per_type`."</span>
-        <span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">functionality_per_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">functionality_per_type</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">network</span><span class="o">.</span><span class="n">determine_effective_functionality_per_type</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">effective</span>
-            <span class="k">else</span> <span class="n">network</span><span class="o">.</span><span class="n">determine_functionality_per_type</span><span class="p">()</span>
-        <span class="p">)</span>
+    <span class="n">chain_func_per_type</span> <span class="o">=</span> <span class="n">_resolve_chain_functionality_per_type</span><span class="p">(</span>
+        <span class="n">network</span><span class="p">,</span>
+        <span class="n">crosslinker_type</span><span class="p">,</span>
+        <span class="n">functionality_per_type</span><span class="p">,</span>
+        <span class="n">warn_missing_crosslinker</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">crosslinker_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">counts</span><span class="p">:</span>
         <span class="k">return</span> <span class="mf">0.0</span>
 
-    <span class="c1"># TODO: use the data from the functionality_per_type to determine the</span>
-    <span class="c1"># functionality per strand, maybe?</span>
-    <span class="n">strands</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">get_molecules</span><span class="p">(</span><span class="n">crosslinker_type</span><span class="p">)</span>
-    <span class="n">ignore_types_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">ignore_types</span><span class="p">)</span> <span class="k">if</span> <span class="n">ignore_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">set</span><span class="p">()</span>
-    <span class="n">ignore_types_set</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">crosslinker_type</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">ignore_types_set</span><span class="p">:</span>
-        <span class="n">num_relevant_strands</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">strands</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">num_relevant_strands</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
-            <span class="mi">1</span>
-            <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">strands</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">get_type</span><span class="p">()</span> <span class="ow">in</span> <span class="n">ignore_types_set</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">get_atoms</span><span class="p">())</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">crosslinker_explicit</span> <span class="ow">and</span> <span class="n">effective</span><span class="p">:</span>
+        <span class="n">crosslinker_func</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">network</span><span class="o">.</span><span class="n">determine_effective_functionality_per_type</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="n">crosslinker_type</span><span class="p">,</span> <span class="mf">0.0</span>
+            <span class="p">)</span>
         <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">crosslinker_func</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">chain_func_per_type</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">])</span>
 
-    <span class="n">crosslinker_formable_bonds</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="n">counts</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">]</span> <span class="o">*</span> <span class="n">functionality_per_type</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">]</span>
+    <span class="n">strand_counts</span> <span class="o">=</span> <span class="n">count_strands_by_functionality</span><span class="p">(</span>
+        <span class="n">network</span><span class="p">,</span> <span class="n">crosslinker_type</span><span class="p">,</span> <span class="n">chain_func_per_type</span><span class="p">,</span> <span class="n">ignore_types</span>
     <span class="p">)</span>
-    <span class="n">other_formable_bonds</span> <span class="o">=</span> <span class="n">num_relevant_strands</span> <span class="o">*</span> <span class="mi">2</span>
+    <span class="n">crosslinker_formable_bonds</span> <span class="o">=</span> <span class="n">counts</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">]</span> <span class="o">*</span> <span class="n">crosslinker_func</span>
+    <span class="n">other_formable_bonds</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+        <span class="n">func</span> <span class="o">*</span> <span class="n">cnt</span> <span class="k">for</span> <span class="n">func</span><span class="p">,</span> <span class="n">cnt</span> <span class="ow">in</span> <span class="n">strand_counts</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">func</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">other_formable_bonds</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span>
 
-    <span class="c1"># division by 2 is implicit</span>
-    <span class="k">return</span> <span class="n">crosslinker_formable_bonds</span> <span class="o">/</span> <span class="p">(</span><span class="n">other_formable_bonds</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">crosslinker_formable_bonds</span> <span class="o">/</span> <span class="n">other_formable_bonds</span></div>
 
 
 
@@ -521,7 +697,8 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_extent_of_reaction</span><span class="p">(</span>
     <span class="n">network</span><span class="p">:</span> <span class="n">Universe</span><span class="p">,</span>
     <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
-    <span class="n">functionality_per_type</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">functionality_per_type</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">ignore_types</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute the extent of polymerization reaction</span>
@@ -530,57 +707,73 @@
 <span class="sd">    .. note::</span>
 <span class="sd">        - if your system has a non-integer number of possible bonds (e.g. one site non-bonded),</span>
 <span class="sd">          this will not be rounded/respected in any way</span>
-<span class="sd">        - if the system contains solvent or other molecules that should not be binding to</span>
-<span class="sd">          crosslinkers, make sure to remove them before calling this function</span>
+<span class="sd">        - Monofunctional (:math:`B_1`) and solvent (:math:`B_0`) chains are accounted for</span>
+<span class="sd">          using ``functionality_per_type`` or inferred from crosslinker attachments;</span>
+<span class="sd">          you can also use ``ignore_types`` to explicitly exclude atom types.</span>
 <span class="sd">        - if you have multiple crosslinker types, be sure to replace them by one type only</span>
 
 <span class="sd">    :param network: The polymer network to do the computation for</span>
 <span class="sd">    :param crosslinker_type: The atom type of crosslinker beads</span>
 <span class="sd">    :param functionality_per_type: A dictionary with key: type, and value: functionality of this atom type.</span>
-<span class="sd">        If None: will use max functionality per type.</span>
+<span class="sd">        If None: will infer chain functionalities from the network.</span>
+<span class="sd">    :param ignore_types: A sequence of integers, the types to ignore (e.g. solvent atom types)</span>
 <span class="sd">    :return: The extent of reaction</span>
 <span class="sd">    :rtype: float</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="n">network</span><span class="o">.</span><span class="n">get_nr_of_atoms</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="mf">1.0</span>
 
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">get_atoms_by_type</span><span class="p">(</span><span class="n">crosslinker_type</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="mi">0</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="n">functionality_per_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
-        <span class="n">crosslinker_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">functionality_per_type</span>
-    <span class="p">):</span>
-        <span class="n">functionality_per_type</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s2">"Crosslinker type </span><span class="si">{}</span><span class="s2"> not found in passed functionality_per_type, "</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">crosslinker_type</span>
-            <span class="p">)</span>
-            <span class="o">+</span> <span class="s2">"will ignore passed argument `functionality_per_type`."</span>
-        <span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">functionality_per_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">functionality_per_type</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">determine_functionality_per_type</span><span class="p">()</span>
-
-    <span class="n">num_strands</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">get_molecules</span><span class="p">(</span><span class="n">crosslinker_type</span><span class="p">))</span>
     <span class="n">crosslinks</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">get_atoms_by_type</span><span class="p">(</span><span class="n">crosslinker_type</span><span class="p">)</span>
     <span class="n">num_crosslinkers</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">crosslinks</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">num_crosslinkers</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
 
-    <span class="c1"># assuming strand has functionality 2</span>
-    <span class="n">max_formable_bonds</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
-        <span class="n">num_strands</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">num_crosslinkers</span> <span class="o">*</span> <span class="n">functionality_per_type</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">]</span>
+    <span class="n">crosslinker_explicit</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">functionality_per_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="ow">and</span> <span class="n">crosslinker_type</span> <span class="ow">in</span> <span class="n">functionality_per_type</span>
+        <span class="ow">and</span> <span class="n">functionality_per_type</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
     <span class="p">)</span>
+    <span class="n">chain_func_per_type</span> <span class="o">=</span> <span class="n">_resolve_chain_functionality_per_type</span><span class="p">(</span>
+        <span class="n">network</span><span class="p">,</span>
+        <span class="n">crosslinker_type</span><span class="p">,</span>
+        <span class="n">functionality_per_type</span><span class="p">,</span>
+        <span class="n">warn_missing_crosslinker</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">ignore_types_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">ignore_types</span><span class="p">)</span> <span class="k">if</span> <span class="n">ignore_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">ignore_types_set</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">crosslinker_type</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">max_formable_bonds</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="mi">1</span>
+    <span class="n">strand_counts</span> <span class="o">=</span> <span class="n">count_strands_by_functionality</span><span class="p">(</span>
+        <span class="n">network</span><span class="p">,</span> <span class="n">crosslinker_type</span><span class="p">,</span> <span class="n">chain_func_per_type</span><span class="p">,</span> <span class="n">ignore_types</span>
+    <span class="p">)</span>
+    <span class="n">other_formable_bonds</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+        <span class="n">func</span> <span class="o">*</span> <span class="n">cnt</span> <span class="k">for</span> <span class="n">func</span><span class="p">,</span> <span class="n">cnt</span> <span class="ow">in</span> <span class="n">strand_counts</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">func</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="p">)</span>
 
     <span class="n">actually_formed_bonds</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">crosslink</span> <span class="ow">in</span> <span class="n">crosslinks</span><span class="p">:</span>
         <span class="n">connected_to</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">get_atoms_connected_to</span><span class="p">(</span><span class="n">atom</span><span class="o">=</span><span class="n">crosslink</span><span class="p">)</span>
-        <span class="n">actually_formed_bonds</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">connected_to</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">get_type</span><span class="p">()</span> <span class="o">!=</span> <span class="n">crosslinker_type</span><span class="p">]</span>
+        <span class="n">actually_formed_bonds</span> <span class="o">+=</span> <span class="nb">sum</span><span class="p">(</span>
+            <span class="mi">1</span>
+            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">connected_to</span>
+            <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">get_type</span><span class="p">()</span> <span class="o">!=</span> <span class="n">crosslinker_type</span> <span class="ow">and</span> <span class="n">a</span><span class="o">.</span><span class="n">get_type</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ignore_types_set</span>
         <span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">actually_formed_bonds</span> <span class="o">/</span> <span class="p">(</span><span class="n">max_formable_bonds</span><span class="p">)</span></div>
+    <span class="n">crosslinker_formable_bonds</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">num_crosslinkers</span> <span class="o">*</span> <span class="n">chain_func_per_type</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">max_formable_bonds</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">other_formable_bonds</span><span class="p">,</span> <span class="n">crosslinker_formable_bonds</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">max_formable_bonds</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="ow">not</span> <span class="n">crosslinker_explicit</span>
+            <span class="ow">and</span> <span class="n">chain_func_per_type</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
+            <span class="ow">and</span> <span class="n">other_formable_bonds</span> <span class="o">&gt;</span> <span class="mi">0</span>
+            <span class="ow">and</span> <span class="n">actually_formed_bonds</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="mf">0.0</span>
+        <span class="k">return</span> <span class="mf">1.0</span>
+
+    <span class="k">return</span> <span class="n">actually_formed_bonds</span> <span class="o">/</span> <span class="n">max_formable_bonds</span></div>
 
 
 
@@ -589,13 +782,13 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_fraction_of_bifunctional_reactive_sites</span><span class="p">(</span>
     <span class="n">network</span><span class="p">:</span> <span class="n">Universe</span><span class="p">,</span>
     <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
-    <span class="n">functionality_per_type</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">functionality_per_type</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute the mole fraction of reactive sites in B2</span>
 <span class="sd">    among all reactive sites in a mixture of B1 and B2.</span>
-<span class="sd">    Uses the network to detect what might be monofunctional chains,</span>
-<span class="sd">    and then counts them and the bifunctional ones.</span>
+<span class="sd">    Uses the network to detect monofunctional and solvent chains,</span>
+<span class="sd">    and then counts the monofunctional and bifunctional ones.</span>
 
 <span class="sd">    :param network: The polymer network to do the computation for</span>
 <span class="sd">    :param crosslinker_type: The atom type of crosslinker beads</span>
@@ -603,61 +796,15 @@
 <span class="sd">    :return: The mole fraction of reactive sites in B2 among all reactive sites in a mixture of B1 and B2</span>
 <span class="sd">    :rtype: float</span>
 <span class="sd">    """</span>
-    <span class="n">functionality_per_type_given</span> <span class="o">=</span> <span class="n">functionality_per_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-    <span class="k">if</span> <span class="n">functionality_per_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">functionality_per_type</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">determine_functionality_per_type</span><span class="p">()</span>
-
-    <span class="n">monofunctional_types</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">functionality_per_type</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">f</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">monofunctional_types</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">functionality_per_type_given</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Assume the whole monofunctional chain has the same atom type</span>
-<span class="sd">        """</span>
-        <span class="n">chains_with_crosslinks</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">get_chains_with_crosslinker</span><span class="p">(</span>
-            <span class="n">crosslinker_type</span><span class="o">=</span><span class="n">crosslinker_type</span>
-        <span class="p">)</span>
-        <span class="n">all_atom_types</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">count_atom_types</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
-        <span class="n">atom_type_has_only_monofunctional</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">atype</span><span class="p">:</span> <span class="kc">True</span>
-            <span class="k">for</span> <span class="n">atype</span> <span class="ow">in</span> <span class="n">all_atom_types</span>
-            <span class="k">if</span> <span class="n">atype</span> <span class="o">!=</span> <span class="n">crosslinker_type</span> <span class="ow">and</span> <span class="n">functionality_per_type</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">atype</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span>
-        <span class="p">}</span>
-        <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">chains_with_crosslinks</span><span class="p">:</span>
-            <span class="n">n_xlinks</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">get_atoms_by_type</span><span class="p">(</span><span class="n">crosslinker_type</span><span class="p">))</span>
-            <span class="n">atom_types_in_chain</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">get_atom_types</span><span class="p">())</span>
-            <span class="k">if</span> <span class="n">n_xlinks</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">atype</span> <span class="ow">in</span> <span class="n">atom_types_in_chain</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">atype</span> <span class="ow">in</span> <span class="n">atom_type_has_only_monofunctional</span><span class="p">:</span>
-                        <span class="n">atom_type_has_only_monofunctional</span><span class="p">[</span><span class="n">atype</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
-
-        <span class="c1"># the atom_type_has_only_monofunctional is now a dictionary that indicates</span>
-        <span class="c1"># the atom types belonging to a monofunctional chain</span>
-        <span class="n">monofunctional_types</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">t</span> <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">atom_type_has_only_monofunctional</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">i</span>
-        <span class="p">]</span>
-
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">monofunctional_types</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">network</span><span class="o">.</span><span class="n">get_nr_of_atoms</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="mf">1.0</span>
 
-    <span class="c1"># then, count the number of chains where one end is of the monofunctional</span>
-    <span class="c1"># type</span>
-    <span class="n">chains_with_crosslinks</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">get_chains_with_crosslinker</span><span class="p">(</span>
-        <span class="n">crosslinker_type</span><span class="o">=</span><span class="n">crosslinker_type</span>
+    <span class="n">strand_counts</span> <span class="o">=</span> <span class="n">count_strands_by_functionality</span><span class="p">(</span>
+        <span class="n">network</span><span class="p">,</span> <span class="n">crosslinker_type</span><span class="p">,</span> <span class="n">functionality_per_type</span>
     <span class="p">)</span>
+    <span class="n">n_monofunctional_chains</span> <span class="o">=</span> <span class="n">strand_counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">n_bifunctional_chains</span> <span class="o">=</span> <span class="n">strand_counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
-    <span class="n">n_monofunctional_chains</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
-        <span class="mi">1</span>
-        <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">chains_with_crosslinks</span>
-        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span>
-            <span class="n">a</span><span class="o">.</span><span class="n">get_type</span><span class="p">()</span> <span class="ow">in</span> <span class="n">monofunctional_types</span>
-            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">chain</span><span class="o">.</span><span class="n">get_strand_ends</span><span class="p">(</span>
-                <span class="n">crosslinker_type</span><span class="o">=</span><span class="n">crosslinker_type</span><span class="p">,</span> <span class="n">close_loop</span><span class="o">=</span><span class="kc">True</span>
-            <span class="p">)</span>
-        <span class="p">)</span>
-        <span class="ow">and</span> <span class="n">chain</span><span class="o">.</span><span class="n">get_nr_of_atoms</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">1</span>
-    <span class="p">)</span>
-    <span class="n">n_bifunctional_chains</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="nb">len</span><span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">get_molecules</span><span class="p">(</span><span class="n">crosslinker_type</span><span class="p">))</span> <span class="o">-</span> <span class="n">n_monofunctional_chains</span>
-    <span class="p">)</span>
     <span class="n">total_reactive_sites</span> <span class="o">=</span> <span class="n">n_monofunctional_chains</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">n_bifunctional_chains</span>
     <span class="k">if</span> <span class="n">total_reactive_sites</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="mf">1.0</span>
@@ -793,8 +940,8 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_crosslinker_conversion</span><span class="p">(</span>
     <span class="n">network</span><span class="p">:</span> <span class="n">Universe</span><span class="p">,</span>
     <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
-    <span class="n">f</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">functionality_per_type</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">f</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">functionality_per_type</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute the extent of reaction of the crosslinkers</span>
@@ -808,11 +955,22 @@
 <span class="sd">    :rtype: float</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="n">f</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">inferred_from_network</span> <span class="o">=</span> <span class="n">functionality_per_type</span> <span class="ow">is</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">functionality_per_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">functionality_per_type</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">determine_functionality_per_type</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">crosslinker_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">functionality_per_type</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">crosslinker_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">functionality_per_type</span>
+            <span class="ow">or</span> <span class="n">functionality_per_type</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span>
+        <span class="p">):</span>
             <span class="k">return</span> <span class="mf">0.0</span>
         <span class="n">f</span> <span class="o">=</span> <span class="n">functionality_per_type</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">]</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">inferred_from_network</span>
+            <span class="ow">and</span> <span class="n">f</span> <span class="o">==</span> <span class="mi">0</span>
+            <span class="ow">and</span> <span class="n">compute_effective_crosslinker_functionality</span><span class="p">(</span><span class="n">network</span><span class="p">,</span> <span class="n">crosslinker_type</span><span class="p">)</span>
+            <span class="o">==</span> <span class="mf">0.0</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="mf">0.0</span>
 
     <span class="k">if</span> <span class="n">f</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">f</span> <span class="o">&lt;=</span> <span class="mf">0.0</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">math</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Crosslinker functionality = </span><span class="si">{}</span><span class="s2"> is not reasonable."</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>

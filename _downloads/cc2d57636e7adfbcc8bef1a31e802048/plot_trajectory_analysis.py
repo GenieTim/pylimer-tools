@@ -64,23 +64,16 @@ for universe in sequence:
     timesteps.append(universe.get_timestep())
 
 # Plot 1: Mean Square Displacement (primary single-panel figure)
+# compute_msd_for_atoms returns an unordered mapping from lag time tau to MSD;
+# sort by lag time before plotting.
+sorted_taus = sorted(msd.keys())
+sorted_msd = [msd[tau] for tau in sorted_taus]
+
 fig, ax = plt.subplots(figsize=(7, 4.5))
 ax.plot(
-    list(msd.keys()),
-    list(msd.values()),
+    sorted_taus,
+    sorted_msd,
     label="Mean Square Displacement",
-)
-ax.axhline(
-    np.mean(list(msd.values())),
-    color="black",
-    linestyle="--",
-    label="Mean",
-)
-ax.plot(
-    list(msd.keys()),
-    [np.mean(list(msd.values())[: i + 1]) for i in range(len(msd))],
-    label="Cumulative Mean",
-    color="red",
 )
 ax.set_xlabel(r"$\tau$")
 ax.set_ylabel("MSD")

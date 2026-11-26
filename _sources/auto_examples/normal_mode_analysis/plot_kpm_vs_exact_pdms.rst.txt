@@ -201,10 +201,10 @@ KPM moduli.
     Demo PDMS box (L=12 nm, N_atoms=3819, N_ent=84):
     Method   | Time [s] |  Speedup | Mean Rel. Err. G' [%] | Max Rel. Err. G' [%]
     -----------------------------------------------------------------------------
-    Exact    |    7.003 |     1.0x |                  0.00 |                 0.00
-    KPM      |    0.146 |    47.9x |                  2.69 |                 9.99
-    SLQ      |    0.048 |   144.7x |                  0.68 |                 4.79
-    Hybrid   |    0.140 |    50.0x |                  0.64 |                 1.80
+    Exact    |   12.383 |     1.0x |                  0.00 |                 0.00
+    KPM      |    0.149 |    83.4x |                  2.69 |                 9.99
+    SLQ      |    0.048 |   256.3x |                  0.68 |                 4.79
+    Hybrid   |    0.142 |    87.2x |                  0.64 |                 1.80
     Loading cached example data from kpm_vs_exact_pdms_cache.npz...
 
 
@@ -409,13 +409,13 @@ target 95% confidence interval.
     Runtime comparison per network (single-threaded worker, mean over repeats):
      L [nm] |  N_atoms |  N_ent |  Exact [s] |   KPM [s] |   SLQ [s] | Hybrid [s]
     -------------------------------------------------------------------------
-         10 |     2211 |     50 |      1.94s |    0.091s |    0.153s |     0.230s
-         12 |     3819 |     86 |     13.09s |    0.097s |    0.195s |     0.452s
-         14 |     6130 |    130 |     13.44s |    0.096s |    0.284s |     0.868s
-         16 |     9146 |    213 |     42.71s |    0.094s |    0.333s |     1.126s
-         20 |    17788 |    383 |    259.44s |    0.100s |    0.580s |     2.704s
-         28 |    48843 |   1095 |    skipped |    0.154s |    2.333s |    11.314s
-         36 |   103816 |   2324 |    skipped |    0.547s |    6.324s |    26.636s
+         10 |     2211 |     50 |      1.91s |    0.080s |    0.144s |     0.222s
+         12 |     3819 |     86 |     12.89s |    0.079s |    0.185s |     0.456s
+         14 |     6130 |    130 |     12.32s |    0.088s |    0.277s |     0.813s
+         16 |     9146 |    213 |     38.20s |    0.098s |    0.357s |     1.094s
+         20 |    17788 |    383 |    216.64s |    0.088s |    0.548s |     2.643s
+         28 |    48843 |   1095 |    skipped |    0.132s |    1.603s |     8.556s
+         36 |   103816 |   2324 |    skipped |    0.586s |    4.355s |    23.939s
 
 
 
@@ -441,7 +441,7 @@ Benchmark Hardware
 
  .. code-block:: none
 
-    Measured on: Apple M3 Pro (12 cores), 36 GB RAM, Mac15,7, macOS 27.2.1 (arm64), Python 3.13.18 (cached 2026-11-17).
+    Measured on: Apple M3 Pro (12 cores), 36 GB RAM, Mac15,7, macOS 27.2.1 (arm64), Python 3.13.18 (cached 2026-11-26).
 
 
 
@@ -449,7 +449,7 @@ Benchmark Hardware
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 10.929 seconds)
+   **Total running time of the script:** (0 minutes 15.995 seconds)
 
 
 .. _sphx_glr_download_auto_examples_normal_mode_analysis_plot_kpm_vs_exact_pdms.py:

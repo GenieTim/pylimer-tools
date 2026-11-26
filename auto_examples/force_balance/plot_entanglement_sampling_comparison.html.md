@@ -210,10 +210,10 @@ print(format_benchmark_footnote(data))
 ```
 
 ```none
-Measured on: Apple M3 Pro (12 cores), 36 GB RAM, Mac15,7, macOS 27.2.1 (arm64), Python 3.13.18 (cached 2026-11-24).
+Measured on: Apple M3 Pro (12 cores), 36 GB RAM, Mac15,7, macOS 27.2.1 (arm64), Python 3.13.18 (cached 2026-11-26).
 ```
 
-**Total running time of the script:** (0 minutes 1.728 seconds)
+**Total running time of the script:** (0 minutes 1.540 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-entanglement-sampling-comparison-py"></a>
 

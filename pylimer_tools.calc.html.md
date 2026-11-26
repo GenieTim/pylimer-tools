@@ -194,11 +194,12 @@ Compute MMT’s modulus, assuming the solvent is removed
   * **r** – The stoichiometric imbalance
   * **f** – The functionality of the crosslinkers
   * **g_e_1** – The melt entanglement modulus $G_e(1) = k_B T \epsilon_e$
+  * **w_sol** – The soluble fraction (to be removed)
   * **xlink_concentration_0** – [A_f]_0, in 1/volume units
   * **ureg** – The unit registry to use
-  * **alpha** – $P(F_a^{out})$, optional
   * **temperature** – The temperatures; defaults to room temperature
-  * **w_sol** – The soluble fraction (to be removed)
+  * **b2** – The mole fraction of reactive sites in B2 among all reactive sites
+    in a mixture of B1 and B2
 
 ### pylimer_tools.calc.miller_macosko_theory.compute_junction_modulus(p: [float](https://docs.python.org/3/builtins/functions.html#float), r: [float](https://docs.python.org/3/builtins/functions.html#float), xlink_concentration_0: [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity), ureg: [UnitRegistry](https://pint.readthedocs.io/en/stable/api/base.html#pint.UnitRegistry), f: [int](https://docs.python.org/3/builtins/functions.html#int), temperature: [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, b2: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None) → [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity)
 
@@ -211,8 +212,9 @@ $G_{junctions} = k_B T [A_f]_0 \sum_{m=3}^{f} \frac{m-2}{2} P(X_{m,f})$.
   * **xlink_concentration_0** – [A_f]_0, in 1/volume units
   * **ureg** – The unit registry to use
   * **f** – The functionality of the crosslinkers
-  * **alpha** – $P(F_a^{out})$, optional
   * **temperature** – The temperatures; defaults to room temperature (25 °C)
+  * **b2** – The mole fraction of reactive sites in B2 among all reactive sites
+    in a mixture of B1 and B2
 * **Returns:**
   The junction modulus contribution
 
@@ -236,15 +238,16 @@ you would need to implement these formulas yourselves.
 * **Parameters:**
   * **r** – The stoichiometric imbalance
   * **p** – The extent of reaction in terms of the crosslinkers
-  * **f** – The functionality of the the crosslinker
-  * **b2** – The fraction of bifunctional chains; defaults to 1.0 for no monofunctional chains.
+  * **f** – The functionality of the crosslinker
+  * **b2** – The fraction of reactive B sites belonging to bifunctional chains;
+    defaults to 1.0 for no monofunctional chains (0.0 for pure $B_1$).
     Can be computed e.g. as $b_2 = \frac{2 \cdot [B_2]}{[B_1] + 2 \cdot [B_2]}$
 * **Returns:**
   alpha: $P(F_A)$
 * **Returns:**
   beta: $P(F_B)$
 
-### pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition(network: [Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, ureg: [UnitRegistry](https://pint.readthedocs.io/en/stable/api/base.html#pint.UnitRegistry) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, unit_style: [None](https://docs.python.org/3/builtins/constants.html#None) | [UnitStyle](pylimer_tools.io.html.md#pylimer_tools.io.unit_styles.UnitStyle) = None, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, r: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, p: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, f: [int](https://docs.python.org/3/builtins/functions.html#int) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, nu: [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, temperature: [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, functionality_per_type: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, g_e_1: [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, b2: [float](https://docs.python.org/3/builtins/functions.html#float) = 1.0) → [Tuple](https://docs.python.org/3/library/typing.html#typing.Tuple)[[Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity), [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity), [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity), [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity)]
+### pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition(network: [Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, ureg: [UnitRegistry](https://pint.readthedocs.io/en/stable/api/base.html#pint.UnitRegistry) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, unit_style: [None](https://docs.python.org/3/builtins/constants.html#None) | [UnitStyle](pylimer_tools.io.html.md#pylimer_tools.io.unit_styles.UnitStyle) = None, crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, r: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, p: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, f: [int](https://docs.python.org/3/builtins/functions.html#int) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, nu: [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, temperature: [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, functionality_per_type: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, g_e_1: [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, b2: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None) → [Tuple](https://docs.python.org/3/library/typing.html#typing.Tuple)[[Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity), [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity), [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity), [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity)]
 
 Compute four different estimates of the plateau modulus, using MMT, ANM and PNM.
 
@@ -256,24 +259,25 @@ Compute four different estimates of the plateau modulus, using MMT, ANM and PNM.
   * **r** – The stoichiometric imbalance. Optional if network is specified
   * **p** – The extent of reaction. Optional if network is specified
   * **f** – The functionality of the the crosslinker. Optional if network is specified
-  * **nu** – The strand number density (nr of strands per volume) (ideally with units).
-    Optional if network is specified
+  * **nu** – The strand number density (nr of reactive strands $[B_2]_0 + [B_1]_0$ per volume)
+    (ideally with units). Optional if network is specified
   * **temperature** – The temperature to compute the modulus at. Default: 298.15 K
     Optional, can be passed to improve performance
   * **functionality_per_type** – a dictionary with key: type, and value: functionality of this atom type.
     Optional, can be passed to improve performance
   * **g_e_1** – The melt entanglement modulus
   * **b2** – The mole fraction of reactive sites in B2 among all reactive sites
-    in a mixture of B1 and B2
+    in a mixture of B1 and B2. Defaults to 1.0 if `network` is not specified,
+    otherwise inferred from `network`.
 * **Returns:**
   G_MMT_phantom: The phantom contribution to the MMT modulus;
   see also [`pylimer_tools.calc.miller_macosko_theory.compute_junction_modulus()`](#pylimer_tools.calc.miller_macosko_theory.compute_junction_modulus)
 * **Returns:**
   G_MMT_entanglement: The entanglement contribution to the MMT modulus
 * **Returns:**
-  g_anm: The ANM estimate of the modulus
+  g_anm: The ideal ANM upper-bound estimate ($\nu k_B T$)
 * **Returns:**
-  g_pnm: The PNM estimate of the modulus
+  g_pnm: The ideal PNM upper-bound estimate ($(1 - 2/f) \nu k_B T$)
 
 ### pylimer_tools.calc.miller_macosko_theory.compute_probability_that_bifunctional_monomer_is_dangling(p_f_b_out: [float](https://docs.python.org/3/builtins/functions.html#float)) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
@@ -429,7 +433,7 @@ $$
   * **w_g** – The weight fraction of ordinary chains
   * **g** – The functionality of the ordinary chains
 
-### pylimer_tools.calc.miller_macosko_theory.predict_gelation_point(r: [float](https://docs.python.org/3/builtins/functions.html#float), f: [int](https://docs.python.org/3/builtins/functions.html#int), b2: [float](https://docs.python.org/3/builtins/functions.html#float) = 1) → [float](https://docs.python.org/3/builtins/functions.html#float)
+### pylimer_tools.calc.miller_macosko_theory.predict_gelation_point(r: [float](https://docs.python.org/3/builtins/functions.html#float), f: [int](https://docs.python.org/3/builtins/functions.html#int), b2: [float](https://docs.python.org/3/builtins/functions.html#float) = 1.0) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Compute the gelation point $p_{gel}$ as theoretically predicted
 (gelation point = critical extent of reaction for gelation)
@@ -443,11 +447,11 @@ Source:
   * **b2** – The mole fraction of reactive sites in B2 among all reactive sites
     in a mixture of B1 and B2
 * **Returns:**
-  p_gel: critical extent of reaction for gelation
+  p_gel: critical extent of reaction for gelation (`math.inf` if gelation is impossible)
 
-### pylimer_tools.calc.miller_macosko_theory.predict_maximum_p(r: [float](https://docs.python.org/3/builtins/functions.html#float), f: [int](https://docs.python.org/3/builtins/functions.html#int), b2: [float](https://docs.python.org/3/builtins/functions.html#float) = 1) → [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None)
+### pylimer_tools.calc.miller_macosko_theory.predict_maximum_p(r: [float](https://docs.python.org/3/builtins/functions.html#float), f: [int](https://docs.python.org/3/builtins/functions.html#int), b2: [float](https://docs.python.org/3/builtins/functions.html#float) = 1.0) → [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None)
 
-Compute the maximum crosslinker conversion possible given a stoichiometric inbalance.
+Compute the maximum crosslinker conversion possible given a stoichiometric imbalance.
 
 * **Parameters:**
   * **r** – The stoichiometric imbalance of reactants (see: [`compute_stoichiometric_imbalance()`](#pylimer_tools.calc.structure_analysis.compute_stoichiometric_imbalance))
@@ -576,7 +580,7 @@ Makes some assumptions, e.g. the same density for both types of strands.
 
 This module provides functions to compute various quantities related to polymer networks from their structure.
 
-### pylimer_tools.calc.structure_analysis.compute_crosslinker_conversion(network: [Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe), crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2, f: [int](https://docs.python.org/3/builtins/functions.html#int) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, functionality_per_type: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict) | [None](https://docs.python.org/3/builtins/constants.html#None) = None) → [float](https://docs.python.org/3/builtins/functions.html#float)
+### pylimer_tools.calc.structure_analysis.compute_crosslinker_conversion(network: [Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe), crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2, f: [int](https://docs.python.org/3/builtins/functions.html#int) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, functionality_per_type: Mapping[[int](https://docs.python.org/3/builtins/functions.html#int), [int](https://docs.python.org/3/builtins/functions.html#int) | [None](https://docs.python.org/3/builtins/constants.html#None)] | [None](https://docs.python.org/3/builtins/constants.html#None) = None) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Compute the extent of reaction of the crosslinkers
 (actual functionality divided by target functionality)
@@ -627,7 +631,7 @@ Compute the end to end vectors between each pair of (indirectly) connected cross
 * **Return type:**
   [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)
 
-### pylimer_tools.calc.structure_analysis.compute_extent_of_reaction(network: [Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe), crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2, functionality_per_type: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict) | [None](https://docs.python.org/3/builtins/constants.html#None) = None) → [float](https://docs.python.org/3/builtins/functions.html#float)
+### pylimer_tools.calc.structure_analysis.compute_extent_of_reaction(network: [Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe), crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2, functionality_per_type: Mapping[[int](https://docs.python.org/3/builtins/functions.html#int), [int](https://docs.python.org/3/builtins/functions.html#int) | [None](https://docs.python.org/3/builtins/constants.html#None)] | [None](https://docs.python.org/3/builtins/constants.html#None) = None, ignore_types: Sequence[[int](https://docs.python.org/3/builtins/functions.html#int)] | [None](https://docs.python.org/3/builtins/constants.html#None) = None) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Compute the extent of polymerization reaction
 (nr. of formed bonds in reaction / max. nr. of bonds formable)
@@ -635,26 +639,28 @@ Compute the extent of polymerization reaction
 #### NOTE
 - if your system has a non-integer number of possible bonds (e.g. one site non-bonded),
   this will not be rounded/respected in any way
-- if the system contains solvent or other molecules that should not be binding to
-  crosslinkers, make sure to remove them before calling this function
+- Monofunctional ($B_1$) and solvent ($B_0$) chains are accounted for
+  using `functionality_per_type` or inferred from crosslinker attachments;
+  you can also use `ignore_types` to explicitly exclude atom types.
 - if you have multiple crosslinker types, be sure to replace them by one type only
 
 * **Parameters:**
   * **network** – The polymer network to do the computation for
   * **crosslinker_type** – The atom type of crosslinker beads
   * **functionality_per_type** – A dictionary with key: type, and value: functionality of this atom type.
-    If None: will use max functionality per type.
+    If None: will infer chain functionalities from the network.
+  * **ignore_types** – A sequence of integers, the types to ignore (e.g. solvent atom types)
 * **Returns:**
   The extent of reaction
 * **Return type:**
   [float](https://docs.python.org/3/builtins/functions.html#float)
 
-### pylimer_tools.calc.structure_analysis.compute_fraction_of_bifunctional_reactive_sites(network: [Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe), crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2, functionality_per_type: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict) | [None](https://docs.python.org/3/builtins/constants.html#None) = None) → [float](https://docs.python.org/3/builtins/functions.html#float)
+### pylimer_tools.calc.structure_analysis.compute_fraction_of_bifunctional_reactive_sites(network: [Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe), crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2, functionality_per_type: Mapping[[int](https://docs.python.org/3/builtins/functions.html#int), [int](https://docs.python.org/3/builtins/functions.html#int) | [None](https://docs.python.org/3/builtins/constants.html#None)] | [None](https://docs.python.org/3/builtins/constants.html#None) = None) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Compute the mole fraction of reactive sites in B2
 among all reactive sites in a mixture of B1 and B2.
-Uses the network to detect what might be monofunctional chains,
-and then counts them and the bifunctional ones.
+Uses the network to detect monofunctional and solvent chains,
+and then counts the monofunctional and bifunctional ones.
 
 * **Parameters:**
   * **network** – The polymer network to do the computation for
@@ -689,7 +695,7 @@ Compute the mean end to end vectors between each pair of (indirectly) connected 
 * **Return type:**
   [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)
 
-### pylimer_tools.calc.structure_analysis.compute_stoichiometric_imbalance(network: [Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe), crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2, functionality_per_type: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, ignore_types: [list](https://docs.python.org/3/builtins/stdtypes.html#list) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, effective: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [float](https://docs.python.org/3/builtins/functions.html#float)
+### pylimer_tools.calc.structure_analysis.compute_stoichiometric_imbalance(network: [Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe), crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2, functionality_per_type: Mapping[[int](https://docs.python.org/3/builtins/functions.html#int), [int](https://docs.python.org/3/builtins/functions.html#int) | [None](https://docs.python.org/3/builtins/constants.html#None)] | [None](https://docs.python.org/3/builtins/constants.html#None) = None, ignore_types: Sequence[[int](https://docs.python.org/3/builtins/functions.html#int)] | [None](https://docs.python.org/3/builtins/constants.html#None) = None, effective: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Compute the stoichiometric imbalance
 ( nr. of bonds formable of crosslinker / (nr. of bonds formable of precursor chains) )
@@ -699,16 +705,18 @@ r > 1 means an excess of crosslinkers, whereas r = 0 implies that there are not 
 #### NOTE
 - if your system has a non-integer number of possible bonds (e.g. one site non-bonded),
   this will not be rounded/respected in any way.
-- Currently, only g = 2 chains are respected yet, and only one type of crosslinker is supported.
-- If you have e.g. solvent chains in the network, use ignore_types to not count them.
+- Only one type of crosslinker is supported.
+- Monofunctional ($B_1$) and solvent ($B_0$) chains are accounted for
+  using `functionality_per_type` or inferred from crosslinker attachments;
+  you can also use `ignore_types` to explicitly exclude atom types.
 
 * **Parameters:**
   * **network** – The polymer network to do the computation for
   * **crosslinker_type** – The type of the junctions/crosslinkers to select them in the network
   * **functionality_per_type** – A dictionary with key: type, and value: functionality of this atom type.
-    If None: will use max functionality per type.
-  * **ignore_types** – A list of integers, the types to ignore for the imbalance (e.g. solvent atom types)
-  * **effective** – Whether to use the effective functionality (if functionality_per_type is not passed)
+    If None: will infer chain functionalities from the network.
+  * **ignore_types** – A sequence of integers, the types to ignore for the imbalance (e.g. solvent atom types)
+  * **effective** – Whether to use the effective functionality (if crosslinker functionality is not passed)
     or the maximum functionality of the crosslinkers.
 * **Returns:**
   The stoichiometric imbalance. If the network is empty, or no crosslinkers are present 0. is returned.
@@ -727,6 +735,59 @@ Kept for compatibility reasons; just call
   Using the type i as a key, this dict contains the weight fractions ($\frac{W_i}{W_{tot}}$)
 * **Return type:**
   [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)
+
+### pylimer_tools.calc.structure_analysis.count_strands_by_functionality(network: [Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe), crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2, functionality_per_type: Mapping[[int](https://docs.python.org/3/builtins/functions.html#int), [int](https://docs.python.org/3/builtins/functions.html#int) | [None](https://docs.python.org/3/builtins/constants.html#None)] | [None](https://docs.python.org/3/builtins/constants.html#None) = None, ignore_types: Sequence[[int](https://docs.python.org/3/builtins/functions.html#int)] | [None](https://docs.python.org/3/builtins/constants.html#None) = None) → [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[int](https://docs.python.org/3/builtins/functions.html#int), [int](https://docs.python.org/3/builtins/functions.html#int)]
+
+Count precursor strands (after splitting at `crosslinker_type`) grouped by
+their reactive functionality (e.g. `0` for solvent, `1` for $B_1$,
+`2` for $B_2$).
+
+* **Parameters:**
+  * **network** – The polymer network to analyze
+  * **crosslinker_type** – The atom type of crosslinker beads
+  * **functionality_per_type** – Optional mapping from atom type to functionality
+  * **ignore_types** – Optional sequence of atom types to treat as non-reactive (functionality 0)
+* **Returns:**
+  Dictionary mapping strand functionality to number of strands
+* **Return type:**
+  [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[int](https://docs.python.org/3/builtins/functions.html#int), [int](https://docs.python.org/3/builtins/functions.html#int)]
+
+### pylimer_tools.calc.structure_analysis.determine_chain_functionality_per_type(network: [Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe), crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2) → [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[int](https://docs.python.org/3/builtins/functions.html#int), [int](https://docs.python.org/3/builtins/functions.html#int)]
+
+Determine the reactive chain functionality for each atom type in the network.
+
+Unlike [`pylimer_tools_cpp.Universe.determine_functionality_per_type()`](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe.determine_functionality_per_type), which
+returns the maximum vertex degree per atom type (and therefore reports `2` for
+internal beads of multi-bead monofunctional and solvent chains), this function
+infers non-crosslinker chain functionalities from the maximum number of bonds
+to crosslinker atoms observed across chains of each atom type:
+
+- `crosslinker_type`: maximum vertex degree of crosslinker atoms ($f$)
+- bifunctional ($B_2$) chain types: `2` (up to 2 crosslinker bonds per chain)
+- monofunctional ($B_1$) chain types: `1` (at most 1 crosslinker bond per chain)
+- solvent ($B_0$) chain types: `0` (no crosslinker bonds)
+
+If no bonds between crosslinkers and non-crosslinker chains exist anywhere in the
+network (completely unreacted system), non-crosslinker atom types default to `2`.
+
+#### NOTE
+- Each chain species ($B_2$, $B_1$, $B_0$) is assumed to have
+  distinct atom type(s) representing the chain’s reactive functionality (rather
+  than sharing interior backbone atom types across species or using distinct
+  per-bead end-cap types).
+- Because functionalities are inferred from *observed* attachments in `network`,
+  partially reacted / low-conversion networks in which no chain or crosslinker of a
+  given type has yet formed its maximum number of bonds will underestimate that
+  type’s target functionality; pass `functionality_per_type` explicitly in those
+  cases.
+
+* **Parameters:**
+  * **network** – The polymer network to analyze
+  * **crosslinker_type** – The atom type of crosslinker beads
+* **Returns:**
+  Dictionary mapping atom type to its chain/crosslinker functionality
+* **Return type:**
+  [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[int](https://docs.python.org/3/builtins/functions.html#int), [int](https://docs.python.org/3/builtins/functions.html#int)]
 
 ### pylimer_tools.calc.structure_analysis.measure_lower_bound_weight_fraction_of_soluble_material(network: [Universe](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe), crosslinker_type: [int](https://docs.python.org/3/builtins/functions.html#int) = 2, rel_tol: [float](https://docs.python.org/3/builtins/functions.html#float) = 0.75, abs_tol: [float](https://docs.python.org/3/builtins/functions.html#float) | [None](https://docs.python.org/3/builtins/constants.html#None) = None) → [float](https://docs.python.org/3/builtins/functions.html#float)
 

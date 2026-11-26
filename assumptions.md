@@ -23,15 +23,15 @@ If the box is too small, it can lead to artifacts in the simulation results, suc
 Particularly the latter can happen in the Force Balance, Maximum Entropy Homogenization Procedure (MEHP), where springs represent entire polymer chains.
 In those cases, it is the periodic boundary conditions that prevent chains from collapsing.
 If the conventional implementations of PBC are used (such as the one provided in LAMMPS), an exemplaric chain that spans the whole box would collapse, rather than staying elastically effective.
-To avoid these issues, pylimer-tools provides a configuration option to assume that the simulation box is large enough to handle periodic boundary conditions correctly. This is particularly important when using the DPDSimulator or other simulation classes that rely on accurate PBC handling.
+To avoid these issues, pylimer-tools defaults to *not* assuming that the simulation box is large enough for minimum-image PBC (assume_box_large_enough = False). Instead, it tracks periodic box offsets per bond or strand so that bonds or chains longer than half the box length are handled without collapsing or flipping direction.
 
-When initializing your simulation, make sure to set the assume_box_large_enough configuration option to False if you are not confident that your simulation box is sufficiently large.
-This will enable the correct handling of periodic boundaries and hopefully prevent any artifacts related to PBC.
-Note, however, that it assumes that the initial configuration of the structure has bonds that are all shorter than half the box length, since those are used to determine the initial offsets imposed by the PBC.
+When initializing your simulation, leave assume_box_large_enough at its default (False) if you are not confident that all bonds will remain shorter than half the box length.
+Note, however, that this default mode still assumes that the initial configuration of the structure has bonds that are all shorter than half the box length, since those are used to determine the initial offsets imposed by the PBC.
 
-Relevant methods:
-- [`pylimer_tools_cpp.DPDSimulator.assume_box_large_enough()`](api/pylimer_tools_cpp.DPDSimulator.md#pylimer_tools_cpp.DPDSimulator.assume_box_large_enough)
-- [`pylimer_tools_cpp.MEHPSimulator.config_assume_box_large_enough()`](api/pylimer_tools_cpp.MEHPSimulator.md#pylimer_tools_cpp.MEHPSimulator.config_assume_box_large_enough)
+Only enable the large-box assumption if you are confident that your simulation box is sufficiently large for minimum-image PBC:
+
+- Both [`DPDSimulator`](api/pylimer_tools_cpp.DPDSimulator.md#pylimer_tools_cpp.DPDSimulator) and [`MEHPSimulator`](api/pylimer_tools_cpp.MEHPSimulator.md#pylimer_tools_cpp.MEHPSimulator) accept an `assume_box_large_enough` keyword argument (default `False`) in their constructors.
+- [`pylimer_tools_cpp.DPDSimulator.config_assume_box_large_enough()`](api/pylimer_tools_cpp.DPDSimulator.md#pylimer_tools_cpp.DPDSimulator.config_assume_box_large_enough) (also aliased as [`assume_box_large_enough()`](api/pylimer_tools_cpp.DPDSimulator.md#pylimer_tools_cpp.DPDSimulator.assume_box_large_enough)) and [`pylimer_tools_cpp.MEHPSimulator.config_assume_box_large_enough()`](api/pylimer_tools_cpp.MEHPSimulator.md#pylimer_tools_cpp.MEHPSimulator.config_assume_box_large_enough) accept a boolean flag (default `True` when called explicitly; pass `False` to re-enable tracked periodic box offsets).
 
 #### NOTE
 Purely topological utilities such as [`pylimer_tools_cpp.Universe.peel_topological_leaves()`](api/pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe.peel_topological_leaves),

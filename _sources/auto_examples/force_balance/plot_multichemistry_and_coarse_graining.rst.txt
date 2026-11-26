@@ -750,7 +750,7 @@ Numerical Summary & Provenance
       PDMS*    Mc = 2 Mk : GAUSSIAN(N= 2)=1.741+/-0.116 | KUHN(N= 2)=1.783+/-0.123 | KG_LJ(N= 4)=1.654+/-0.144
       PDMS*    Mc = 40 Mk: GAUSSIAN(N=47)=0.293+/-0.013 | KUHN(N=40)=0.296+/-0.012 | KG_LJ(N=77)=0.286+/-0.008
 
-    Measured on: Apple M3 Pro (12 cores), 36 GB RAM, Mac15,7, macOS 27.2.1 (arm64), Python 3.13.18 (cached 2026-11-25).
+    Measured on: Apple M3 Pro (12 cores), 36 GB RAM, Mac15,7, macOS 27.2.1 (arm64), Python 3.13.18 (cached 2026-11-26).
 
 
 
@@ -758,7 +758,7 @@ Numerical Summary & Provenance
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 3.377 seconds)
+   **Total running time of the script:** (0 minutes 2.974 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_multichemistry_and_coarse_graining.py:

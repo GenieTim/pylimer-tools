@@ -296,13 +296,13 @@ six frequency decades.
     Mean N_atoms=6110, N_ent=7.1, zero_modes=28.5, w_active=0.069, w_dangling=0.363, w_soluble=0.568
     Method               | Time [s] | Err G'(1e-5) [%] | Mean Err G'(<=1e-3) [%] | Err G''(1e-5) [%] | Max Err G'' [%]
     ----------------------------------------------------------------------------------------------------------------
-    Exact                |    3.012 |             0.00 |                    0.00 |              0.00 |            0.00
-    KPM (M=256)          |    0.077 |            97.31 |                   83.89 |             74.40 |           74.40
-    KPM (M=1024)         |    0.044 |            94.32 |                   66.09 |             55.29 |           55.29
-    KPM (M=4096)         |    0.220 |            97.81 |                   80.68 |             64.32 |           64.32
-    SLQ (200 steps)      |    0.141 |            86.02 |                   40.98 |             32.74 |           32.74
-    Hybrid (50 modes)    |    0.255 |             0.00 |                    0.03 |              0.10 |            0.46
-    Hybrid (100 modes)   |    0.311 |             0.00 |                    0.00 |              0.02 |            0.37
+    Exact                |   10.416 |             0.00 |                    0.00 |              0.00 |            0.00
+    KPM (M=256)          |    0.162 |            97.31 |                   83.89 |             74.40 |           74.40
+    KPM (M=1024)         |    0.066 |            94.32 |                   66.09 |             55.29 |           55.29
+    KPM (M=4096)         |    0.313 |            97.81 |                   80.68 |             64.32 |           64.32
+    SLQ (200 steps)      |    0.231 |            86.02 |                   40.98 |             32.74 |           32.74
+    Hybrid (50 modes)    |    0.671 |             0.00 |                    0.03 |              0.10 |            0.46
+    Hybrid (100 modes)   |    0.885 |             0.00 |                    0.00 |              0.02 |            0.37
 
 
 
@@ -352,13 +352,13 @@ Again, KPM fails catastrophically in the terminal/dangling relaxation tail, whil
     Mean N_atoms=6121, N_ent=4.1, zero_modes=6.0, w_active=0.081, w_dangling=0.739, w_soluble=0.180
     Method               | Time [s] | Err G'(1e-5) [%] | Mean Err G'(<=1e-3) [%] | Err G''(1e-5) [%] | Max Err G'' [%]
     ----------------------------------------------------------------------------------------------------------------
-    Exact                |   10.109 |             0.00 |                    0.00 |              0.00 |            0.00
-    KPM (M=256)          |    0.024 |            98.02 |                   90.57 |             82.49 |           82.49
-    KPM (M=1024)         |    0.051 |            95.98 |                   80.92 |             70.19 |           70.19
-    KPM (M=4096)         |    0.251 |            98.48 |                   89.06 |             75.95 |           75.95
-    SLQ (200 steps)      |    0.156 |            74.35 |                   33.32 |             25.80 |           25.80
-    Hybrid (50 modes)    |    0.245 |             0.01 |                    0.08 |              0.16 |            0.85
-    Hybrid (100 modes)   |    0.401 |             0.00 |                    0.00 |              0.05 |            0.88
+    Exact                |   29.547 |             0.00 |                    0.00 |              0.00 |            0.00
+    KPM (M=256)          |    0.072 |            98.02 |                   90.57 |             82.49 |           82.49
+    KPM (M=1024)         |    0.062 |            95.98 |                   80.92 |             70.19 |           70.19
+    KPM (M=4096)         |    0.297 |            98.48 |                   89.06 |             75.95 |           75.95
+    SLQ (200 steps)      |    0.207 |            74.35 |                   33.32 |             25.80 |           25.80
+    Hybrid (50 modes)    |    0.369 |             0.01 |                    0.08 |              0.16 |            0.85
+    Hybrid (100 modes)   |    0.812 |             0.00 |                    0.00 |              0.05 |            0.88
 
 
 
@@ -774,7 +774,7 @@ Benchmark Hardware
 
  .. code-block:: none
 
-    Measured on: Apple M3 Pro (12 cores), 36 GB RAM, Mac15,7, macOS 27.2.1 (arm64), Python 3.13.18 (cached 2026-11-25).
+    Measured on: Apple M3 Pro (12 cores), 36 GB RAM, Mac15,7, macOS 27.2.1 (arm64), Python 3.13.18 (cached 2026-11-26).
 
 
 
@@ -782,7 +782,7 @@ Benchmark Hardware
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 5.450 seconds)
+   **Total running time of the script:** (0 minutes 4.948 seconds)
 
 
 .. _sphx_glr_download_auto_examples_normal_mode_analysis_plot_kpm_limitations_and_hybrid.py:

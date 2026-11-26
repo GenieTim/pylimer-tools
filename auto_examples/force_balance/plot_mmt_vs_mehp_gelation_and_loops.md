@@ -620,7 +620,7 @@ fig4.tight_layout()
 plt.show()
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 589-615 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 589-613 -->
 
 ## 5. Summary of MMT Scope & Limitations in `pylimer-tools`
 
@@ -629,36 +629,34 @@ or experimental networks, keep the following built-in scope limits in mind:
 
 - **Monodisperse :math:\`A_f + B_2 / B_1\` & single crosslinker type**:
   All recursive formulas assume a single crosslinker functionality $f$
-  and monodisperse precursor reactivity (one $B_2$ / $B_1$ pool).
-  In addition, [`compute_stoichiometric_imbalance()`](../../pylimer_tools.calc.md#pylimer_tools.calc.structure_analysis.compute_stoichiometric_imbalance)
-  assumes bifunctional strands ($g = 2$), so when $B_1$ chains are
-  present, $r = f N_{A_f} / (2 N_{B_2} + N_{B_1})$ and
-  `functionality_per_type={1: 2, 2: f, 4: 1}` should be passed explicitly.
+  and monodisperse precursor reactivity (one $B_2$ / $B_1$ pool),
+  with each chain species ($B_2$, $B_1$, $B_0$) represented
+  by distinct atom type(s) (inferred from crosslinker attachments or passed via
+  `functionality_per_type={1: 2, 2: f, 4: 1}`).
 - **Tree-like (no-loop) Bethe-lattice approximation**:
   MMT ignores spatial proximity and intramolecular loops. In melts near
   $p_c$ or in diluted precursors, primary and secondary loops waste
   crosslinker arms, shift $p_c^{\text{eff}}$ upward, and depress
   $G_{\text{ph}}$ below MMT.
-- **Entanglement trapping & :math:\`b_2 < 1\` prefactors**:
+- **Entanglement trapping & :math:\`b_2 < 1\` dilution prefactors**:
+  While [`compute_modulus_decomposition()`](../../pylimer_tools.calc.md#pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition)
+  and [`compute_junction_modulus()`](../../pylimer_tools.calc.md#pylimer_tools.calc.miller_macosko_theory.compute_junction_modulus)
+  use the exact crosslinker density $[A_f]_0 = \frac{2 r}{f (2 - b_2)}\,\nu$
+  (for reactive strand density $\nu = [B_2]_0 + [B_1]_0$),
   [`compute_trapping_factor()`](../../pylimer_tools.calc.md#pylimer_tools.calc.miller_macosko_theory.compute_trapping_factor)
   evaluates $(1 - \beta)^4$ without the $w_{B_2}^2$ dilution
-  prefactor of Patel *et al.* [[PMC+92](../../acknowledgements.md#id14)], and
-  [`compute_modulus_decomposition()`](../../pylimer_tools.calc.md#pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition)
-  uses $(2 r b_2 / f)\,\nu$ instead of $[A_f]_0$ when $b_2 < 1$;
-  for $b_2 < 1$, prefer
-  [`compute_junction_modulus()`](../../pylimer_tools.calc.md#pylimer_tools.calc.miller_macosko_theory.compute_junction_modulus)
-  together with $w_{B_2}^2 (1 - \beta)^4 G_e(1)$.
+  prefactor of Patel *et al.* [[PMC+92](../../acknowledgements.md#id14)].
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 615-617 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 613-615 -->
 ```Python
 print(format_benchmark_footnote(data))
 ```
 
 ```none
-Measured on: Apple M3 Pro (12 cores), 36 GB RAM, Mac15,7, macOS 27.2.1 (arm64), Python 3.13.18 (cached 2026-11-25).
+Measured on: Apple M3 Pro (12 cores), 36 GB RAM, Mac15,7, macOS 27.2.1 (arm64), Python 3.13.18 (cached 2026-11-26).
 ```
 
-**Total running time of the script:** (0 minutes 1.674 seconds)
+**Total running time of the script:** (0 minutes 1.502 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-mmt-vs-mehp-gelation-and-loops-py"></a>
 

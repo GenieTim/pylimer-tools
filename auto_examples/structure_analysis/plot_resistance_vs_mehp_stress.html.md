@@ -757,10 +757,10 @@ Bimodal + Defects (p=0.92, N=15/90):
   stiffness       : rho(gamma_eq)=-0.490 (r=-0.441) | rho(dgamma)=-0.008 (r=-0.119) | rho(||F||)=+0.245 (r=+0.275)
   mean_centrality : rho(gamma_eq)=+0.022 (r=+0.043) | rho(dgamma)=+0.000 (r=+0.026) | rho(||F||)=+0.357 (r=+0.375)
 
-Measured on: Apple M3 Pro (12 cores), 36 GB RAM, Mac15,7, macOS 27.2.1 (arm64), Python 3.13.18 (cached 2026-11-25).
+Measured on: Apple M3 Pro (12 cores), 36 GB RAM, Mac15,7, macOS 27.2.1 (arm64), Python 3.13.18 (cached 2026-11-26).
 ```
 
-**Total running time of the script:** (0 minutes 2.034 seconds)
+**Total running time of the script:** (0 minutes 1.877 seconds)
 
 <a id="sphx-glr-download-auto-examples-structure-analysis-plot-resistance-vs-mehp-stress-py"></a>
 
