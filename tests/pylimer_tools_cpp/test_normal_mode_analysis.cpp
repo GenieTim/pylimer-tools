@@ -309,7 +309,7 @@ TEST_CASE("NormalModeAnalyzer solvers give consistent eigenvalues",
     nma.solveExact(pc::NormalModeSolver::DENSE_LAPACK, false, false)
       .getEigenvalues();
 
-  for (auto solver : pc::allNormalModeSolvers) {
+  for (const pc::NormalModeSolver solver : pc::allNormalModeSolvers) {
     DYNAMIC_SECTION("Solver: "
                     << pc::NormalModeSolverNames[static_cast<int>(solver)]
                     << " (without decomposition)")

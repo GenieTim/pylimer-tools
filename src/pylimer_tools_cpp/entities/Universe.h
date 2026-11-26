@@ -159,9 +159,27 @@ public:
   [[nodiscard]] std::vector<Universe> getClusters() const;
   [[nodiscard]] StrandAffiliationInfo getStrandAffiliation(
     int crosslinkerType) const;
-  [[nodiscard]] std::vector<Molecule> getMolecules(
+  /**
+   * @brief Decompose this universe into molecules by omitting a given atom
+   * type.
+   *
+   * @note Returns a reference to an internal cache that is invalidated by any
+   * mutating operation on this Universe (e.g. adding/removing atoms or bonds,
+   * changing box or masses). Copy by value if the result must outlive
+   * subsequent mutations.
+   */
+  [[nodiscard]] const std::vector<Molecule>& getMolecules(
     int atomTypeToOmit = -1) const;
-  [[nodiscard]] std::vector<Molecule> getChainsWithCrosslinker(
+  /**
+   * @brief Decompose this universe into strands including their terminal
+   * crosslinkers.
+   *
+   * @note Returns a reference to an internal cache that is invalidated by any
+   * mutating operation on this Universe (e.g. adding/removing atoms or bonds,
+   * changing box or masses). Copy by value if the result must outlive
+   * subsequent mutations.
+   */
+  [[nodiscard]] const std::vector<Molecule>& getChainsWithCrosslinker(
     int crossLinkerType) const;
   [[nodiscard]] pylimer_tools::sim::mehp::CrosslinkerUniverse
   toCrosslinkerUniverse(int crosslinkerType = 2) const;

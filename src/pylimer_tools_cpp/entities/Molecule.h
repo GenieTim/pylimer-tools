@@ -59,7 +59,7 @@ public:
   [[nodiscard]] int getNrOfAtoms() const;
   [[nodiscard]] int getNrOfBonds() const;
   [[nodiscard]] const Box& getBox() const;
-  [[nodiscard]] std::string getKey() const;
+  [[nodiscard]] const std::string& getKey() const;
   [[nodiscard]] std::vector<int> getAtomTypes() const
   {
     return this->getPropertyValues<int>("type");
@@ -79,11 +79,11 @@ public:
     int crossLinkerType = 2) const;
   [[nodiscard]] double computeEndToEndDistanceWithDerivedImageFlags(
     int crossLinkerType = 2) const;
-  [[nodiscard]] double computeRadiusOfGyration();
+  [[nodiscard]] double computeRadiusOfGyration() const;
   [[nodiscard]] double computeRadiusOfGyrationWithDerivedImageFlags() const;
-  [[nodiscard]] double computeTotalMass();
+  [[nodiscard]] double computeTotalMass() const;
   [[nodiscard]] std::vector<double> computeBondLengths() const;
-  [[nodiscard]] double computeTotalLength();
+  [[nodiscard]] double computeTotalLength() const;
 
   /**
    * @brief Get the sum of all bond vectors, similar to

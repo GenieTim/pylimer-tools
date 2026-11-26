@@ -72,6 +72,50 @@ TEST_CASE("FileParsers can be used", "[utils][DumpFileParser][DataFileParser]")
     CHECK(parser.getValuesForAt<double>(0, "BOX BOUNDS", 1).size() == 3);
     CHECK(parser.getValuesForAt<double>(0, "BOX BOUNDS", 1)[0] ==
           4.8545999999999999e+01);
+
+    // test CRLF line endings and inline comments on group headers
+    const std::string crlfDumpPath =
+      suspectedPath + "/tmp_crlf_comments_dump.lammpstrj";
+    {
+      std::ofstream out(crlfDumpPath, std::ios::binary | std::ios::trunc);
+      out << "  # leading comment\r\n"
+          << "ITEM: TIMESTEP # first step\r\n"
+          << "10\r\n"
+          << "ITEM: NUMBER OF ATOMS\r\n"
+          << "1\r\n"
+          << "ITEM: BOX BOUNDS pp pp pp\r\n"
+          << "0.0 5.0\r\n"
+          << "0.0 6.0\r\n"
+          << "0.0 7.0\r\n"
+          << "ITEM: ATOMS id type xs ys zs\r\n"
+          << "1 2 0.5 0.5 0.5\r\n"
+          << "  ITEM: TIMESTEP # second step\r\n"
+          << "20\r\n"
+          << "ITEM: NUMBER OF ATOMS\r\n"
+          << "1\r\n"
+          << "ITEM: BOX BOUNDS pp pp pp\r\n"
+          << "0.0 5.0\r\n"
+          << "0.0 6.0\r\n"
+          << "0.0 7.0\r\n"
+          << "ITEM: ATOMS id type xs ys zs\r\n"
+          << "1 2 0.2 0.5 0.8\r\n";
+    }
+    {
+      pu::DumpFileParser crlfParser(crlfDumpPath);
+      REQUIRE(crlfParser.getLength() == 2);
+      const std::vector<long int> crlfSteps = crlfParser.readTimeSteps();
+      REQUIRE(crlfSteps == std::vector<long int>{ 10, 20 });
+      CHECK(crlfParser.getValuesForAt<long int>(1, "TIMESTEP", 0) ==
+            std::vector<long int>{ 20 });
+      const std::vector<std::vector<pe::Atom>> crlfAtoms =
+        crlfParser.readAtoms();
+      REQUIRE(crlfAtoms.size() == 2);
+      CHECK(crlfAtoms[1][0].getX() == Catch::Approx(1.0));
+      CHECK(crlfAtoms[1][0].getY() == Catch::Approx(3.0));
+      CHECK(crlfAtoms[1][0].getZ() == Catch::Approx(5.6));
+      crlfParser.finish();
+    }
+    std::filesystem::remove(crlfDumpPath);
   }
 
   SECTION("Reading from data files works")
@@ -152,7 +196,8 @@ TEST_CASE("Writers can be used", "[utils][DataFileWriter][DataFileParser]")
     pe::Universe universe = universeSeq.atIndex(0);
 
     // add angles
-    auto angles = universe.detectAngles();
+    std::map<std::string, std::vector<long int>> angles =
+      universe.detectAngles();
     std::vector<int> angleTypes;
     angleTypes.reserve(angles["angle_from"].size());
     for (size_t i = 0; i < angles["angle_from"].size(); i++) {
@@ -165,7 +210,8 @@ TEST_CASE("Writers can be used", "[utils][DataFileWriter][DataFileParser]")
     CHECK(universe.getNrOfAngles() > 0);
 
     // add dihedrals
-    auto detectedAngles = universe.detectDihedralAngles();
+    std::map<std::string, std::vector<long int>> detectedAngles =
+      universe.detectDihedralAngles();
     CHECK(detectedAngles["dihedral_angle_from"].size() > 0);
     std::vector<int> dihedralAngleTypes;
     dihedralAngleTypes.reserve(detectedAngles["dihedral_angle_from"].size());
@@ -203,19 +249,24 @@ TEST_CASE("Writers can be used", "[utils][DataFileWriter][DataFileParser]")
     CHECK(universe.getNrOfDihedralAngles() ==
           readUniverse.getNrOfDihedralAngles());
 
-    auto newBonds = readUniverse.getBonds();
-    auto oldBonds = universe.getBonds();
+    std::map<std::string, std::vector<long int>> newBonds =
+      readUniverse.getBonds();
+    std::map<std::string, std::vector<long int>> oldBonds = universe.getBonds();
 
-    for (size_t i = 0; i < newBonds.size(); i++) {
+    REQUIRE(newBonds["bond_from"].size() == oldBonds["bond_from"].size());
+    for (size_t i = 0; i < newBonds["bond_from"].size(); i++) {
       CHECK(newBonds["bond_type"][i] == oldBonds["bond_type"][i]);
-      CHECK(newBonds["bond_from"][i] == oldBonds["bond_from"][i]);
-      CHECK(newBonds["bond_to"][i] == oldBonds["bond_to"][i]);
+      CHECK(std::minmax(newBonds["bond_from"][i], newBonds["bond_to"][i]) ==
+            std::minmax(oldBonds["bond_from"][i], oldBonds["bond_to"][i]));
     }
 
-    auto newAngles = readUniverse.getAngles();
-    auto oldAngles = universe.getAngles();
+    std::map<std::string, std::vector<long int>> newAngles =
+      readUniverse.getAngles();
+    std::map<std::string, std::vector<long int>> oldAngles =
+      universe.getAngles();
 
-    for (size_t i = 0; i < newAngles.size(); i++) {
+    REQUIRE(newAngles["angle_from"].size() == oldAngles["angle_from"].size());
+    for (size_t i = 0; i < newAngles["angle_from"].size(); i++) {
       CHECK(newAngles["angle_type"][i] == oldAngles["angle_type"][i]);
       CHECK(newAngles["angle_from"][i] == oldAngles["angle_from"][i]);
       CHECK(newAngles["angle_via"][i] == oldAngles["angle_via"][i]);
@@ -311,13 +362,13 @@ TEST_CASE("All atom types are supported",
             // Integer properties
             int intVal = intDist(gen);
             universe.setPropertyValue(atomId - 1, property.c_str(), intVal);
-            CHECK_THAT(universe.getAtom(atomId).getExtraData()[property],
+            CHECK_THAT(universe.getAtom(atomId).getExtraData().at(property),
                        Catch::Matchers::WithinAbs(intVal, 1e-9));
           } else {
             // Double properties
             int doubleVal = realDist(gen);
             universe.setPropertyValue(atomId - 1, property.c_str(), doubleVal);
-            CHECK_THAT(universe.getAtom(atomId).getExtraData()[property],
+            CHECK_THAT(universe.getAtom(atomId).getExtraData().at(property),
                        Catch::Matchers::WithinRel(doubleVal, 1e-9));
           }
         }

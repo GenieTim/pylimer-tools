@@ -55,7 +55,7 @@ namespace entities {
       const Eigen::Ref<const Eigen::VectorXd>& newCoordinates);
 
     bool checkIfCoordinatesAreCurrent(
-      const Eigen::Ref<const Eigen::VectorXd>& newCoordinates);
+      const Eigen::Ref<const Eigen::VectorXd>& newCoordinates) const;
 
     void validateWhyNotIncluded(
       const Eigen::Ref<const Eigen::Vector3d>& sourceCoords,
@@ -111,7 +111,7 @@ namespace entities {
     Eigen::Vector3d getCentralCoordinatesOfBucket(int bucketIndex) const;
 
     std::vector<bucket_idx_t> getCombinedBucketIndicesForCoordinates(
-      const Eigen::Vector3d& coordinates,
+      const Eigen::Ref<const Eigen::Vector3d>& coordinates,
       double newCutoff,
       bool sort = false) const;
 
@@ -126,7 +126,9 @@ namespace entities {
          scalingFactor,
          actualCutoff,
          box,
-         neighbourBuckets,
+         defaultCutoffStride,
+         flatBuckets,
+         bucketOffsets,
          neighbourBucketNeighboursDefaultCutoff,
          neighbourBucketSizes);
     }
@@ -162,7 +164,7 @@ namespace entities {
     bucket_idx_t getBucketIndexForTriplet(Eigen::Array3li ind) const;
 
     Eigen::Array3li getBucketTripletForCoordinates(
-      const Eigen::Vector3d& coordinates) const;
+      const Eigen::Ref<const Eigen::Vector3d>& coordinates) const;
 
   private:
     // the width of the buckets in each dimension (double)
@@ -179,10 +181,12 @@ namespace entities {
 
     pylimer_tools::entities::Box box;
 
-    std::vector<std::vector<coordinate_idx_t>> neighbourBuckets;
-    std::vector<std::vector<bucket_idx_t>>
-      neighbourBucketNeighboursDefaultCutoff;
+    size_t defaultCutoffStride = 0;
+    std::vector<coordinate_idx_t> flatBuckets;
+    std::vector<size_t> bucketOffsets;
+    std::vector<bucket_idx_t> neighbourBucketNeighboursDefaultCutoff;
     Eigen::VectorXi neighbourBucketSizes;
+    std::vector<bucket_idx_t> atomBucketsScratch;
   };
 };
 };

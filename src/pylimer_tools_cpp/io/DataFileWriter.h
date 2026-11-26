@@ -58,7 +58,7 @@ namespace utils {
     {
       this->atomStyle = newAtomStyle;
     }
-    void setCustomAtomFormat(const std::string atomFormat)
+    void setCustomAtomFormat(const std::string& atomFormat)
     {
       this->customAtomFormat = atomFormat;
       this->customAtomFormatAdditionalProperties.clear();
@@ -92,11 +92,11 @@ namespace utils {
     {
       this->reindexAtoms = reindex;
     }
-    void writeToFile(const std::string filePath)
+    void writeToFile(const std::string& filePath)
     {
       std::ofstream file;
-      auto t = std::time(nullptr);
-      auto tm = std::localtime(&t);
+      const std::time_t t = std::time(nullptr);
+      const std::tm* tm = std::localtime(&t);
       std::vector<int> allAtomTypes = this->universe.getAtomTypes();
       int nrOfAtomTypes =
         pylimer_tools::utils::max_element<int>(allAtomTypes, 1);
@@ -176,7 +176,7 @@ namespace utils {
       // write masses
       file << "Masses\n\n";
       std::map<int, double> masses = this->universe.getMasses();
-      for (const auto& massPair : masses) {
+      for (const std::pair<const int, double>& massPair : masses) {
         file << "\t" << massPair.first << " " << massPair.second << "\n";
       }
       file << "\n";
@@ -569,7 +569,7 @@ namespace utils {
 
       // then, we can output all others
       int nMoleculesOutput = 0;
-      const std::vector<pylimer_tools::entities::Molecule> chains =
+      const std::vector<pylimer_tools::entities::Molecule>& chains =
         this->universe.getChainsWithCrosslinker(this->crossLinkerType);
       for (const pylimer_tools::entities::Molecule& chain : chains) {
         // image flag reset attempt might not be the best yet?

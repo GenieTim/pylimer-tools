@@ -61,6 +61,9 @@ TEST_CASE("String utility functions work", "[utils][StringUtil]")
   REQUIRE_FALSE(pu::startsWith("test", "es"));
   std::string testCommentString = "#  test  ";
   REQUIRE(pu::trimLineOmitComment("  test  ") == "test  ");
+  REQUIRE(pu::trimLineOmitComment("  ITEM: TIMESTEP # comment\r\n") ==
+          "ITEM: TIMESTEP ");
+  REQUIRE(pu::trimLineOmitComment("  ITEM: TIMESTEP\r\n") == "ITEM: TIMESTEP");
   REQUIRE(pu::trimLineOmitComment(testCommentString) == "");
   REQUIRE(pu::trimLineOmitComment(testCommentString.c_str()) == "");
   const std::string vecStr = std::to_string(Eigen::Vector3d(1.0, 2.0, 3.0));

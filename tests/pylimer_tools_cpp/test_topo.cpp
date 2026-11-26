@@ -278,7 +278,7 @@ TEST_CASE("On-Demand Entanglement Detector samples valid entanglements on "
     // Conversion to AtomPairEntanglements
     pt::AtomPairEntanglements atomPairs = es1.toAtomPairEntanglements(cu);
     CHECK(atomPairs.pairsOfAtoms.size() == es1.size());
-    for (const auto& pair : atomPairs.pairsOfAtoms) {
+    for (const std::pair<size_t, size_t>& pair : atomPairs.pairsOfAtoms) {
       CHECK(pair.first != pair.second);
       CHECK(atomPairs.pairOfAtom[pair.first - 1] >= 0);
       CHECK(atomPairs.pairOfAtom[pair.second - 1] >= 0);
@@ -592,7 +592,8 @@ TEST_CASE("Entanglement Detector respects distance cut-off",
             CHECK(entanglements.pairsOfAtoms.size() <=
                   0.11 * universe.getNrOfAtoms());
 
-            for (auto& pair : entanglements.pairsOfAtoms) {
+            for (const std::pair<size_t, size_t>& pair :
+                 entanglements.pairsOfAtoms) {
               pe::Atom a1 = universe.getAtom(pair.first);
               pe::Atom a2 = universe.getAtom(pair.second);
               CHECK(a1.distanceTo(a2, universe.getBox()) <= upperCutoff);

@@ -26,6 +26,79 @@ namespace {
                                           static_cast<double>(nrOfOrigins));
     return std::max<size_t>(1, static_cast<size_t>(std::max(0.0, rawStepSize)));
   }
+
+  std::unordered_map<long int, double> averageVectorMap(
+    const std::unordered_map<long int, std::vector<double>>& results)
+  {
+    std::unordered_map<long int, double> actualMeans;
+    actualMeans.reserve(results.size());
+    for (const std::pair<const long int, std::vector<double>>& resultPair :
+         results) {
+      const std::vector<double>& values = resultPair.second;
+      if (values.empty()) {
+        continue;
+      }
+      actualMeans[resultPair.first] =
+        Eigen::Map<const Eigen::VectorXd, Eigen::Unaligned>(
+          values.data(), static_cast<Eigen::Index>(values.size()))
+          .mean();
+    }
+    return actualMeans;
+  }
+
+  std::unordered_map<long int, double> computePairwiseMsdMeans(
+    const std::vector<Eigen::VectorXd>& coordinates,
+    const std::vector<long int>& timeSteps,
+    const size_t startingIndex,
+    const size_t totalLength,
+    const size_t numAtoms,
+    const int nrOfOrigins,
+    const int maxTau,
+    const std::string& filePathForWarning = "")
+  {
+    if (totalLength <= startingIndex || numAtoms == 0) {
+      return {};
+    }
+    std::unordered_map<long int, std::vector<double>> results;
+    results.reserve(totalLength - startingIndex);
+
+    const size_t stepSize =
+      computeStepSize(totalLength - startingIndex, nrOfOrigins);
+    const double invNumAtoms = 1.0 / static_cast<double>(numAtoms);
+    for (size_t parentUniverseIdx = startingIndex;
+         parentUniverseIdx < totalLength;
+         parentUniverseIdx += stepSize) {
+      for (size_t universeIdx = parentUniverseIdx + 1;
+           universeIdx < totalLength;
+           ++universeIdx) {
+        const long int deltaT =
+          timeSteps[universeIdx] - timeSteps[parentUniverseIdx];
+        if (deltaT < 0 && !filePathForWarning.empty()) {
+          std::cerr << "Encountered a negative delta time-step for universes "
+                    << universeIdx << " (" << timeSteps[universeIdx] << ")"
+                    << " and " << parentUniverseIdx << " ("
+                    << timeSteps[parentUniverseIdx] << ") in file "
+                    << filePathForWarning << std::endl;
+        }
+
+        // Skip if deltaT exceeds maxTau for better statistics
+        if (deltaT > maxTau && maxTau >= 0) {
+          continue;
+        }
+
+        const double localMean =
+          (coordinates[universeIdx - startingIndex] -
+           coordinates[parentUniverseIdx - startingIndex])
+            .squaredNorm() *
+          invNumAtoms;
+        results[deltaT].push_back(localMean);
+      }
+      std::cout << "Universe " << parentUniverseIdx
+                << " as basis has been handled." << std::endl;
+    }
+
+    return averageVectorMap(results);
+  }
 } // namespace
 // TODO: connectivity (& graphs) could be stored only once if they stay the
 // same over a sequence.
@@ -173,10 +246,13 @@ UniverseSequence::readDumpFileAtIndex(size_t universeIndex)
       std::to_string(positionsZ.size()) + "). Is the file defect?");
   };
   if (isScaled) {
+    const double lx = newUniverse.getBox().getLx();
+    const double ly = newUniverse.getBox().getLy();
+    const double lz = newUniverse.getBox().getLz();
     for (size_t i = 0; i < positionsZ.size(); ++i) {
-      positionsX[i] *= newUniverse.getBox().getLx();
-      positionsY[i] *= newUniverse.getBox().getLx();
-      positionsZ[i] *= newUniverse.getBox().getLx();
+      positionsX[i] *= lx;
+      positionsY[i] *= ly;
+      positionsZ[i] *= lz;
     }
   }
 
@@ -636,21 +712,7 @@ UniverseSequence::computeDistanceAutocorrelationFromToAtoms(
               << " as basis has been handled." << std::endl;
   }
 
-  // actually compute the mean
-  std::unordered_map<long int, double> actual_means;
-  actual_means.reserve(results.size());
-  for (const auto& result_pair : results) {
-    std::vector<double> sds = result_pair.second;
-    if (sds.size() == 0) {
-      continue;
-    }
-    actual_means[result_pair.first] =
-      (Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
-         sds.data(), static_cast<Eigen::Index>(sds.size())))
-        .mean();
-  }
-
-  return actual_means;
+  return averageVectorMap(results);
 }
 
 // computations
@@ -709,10 +771,10 @@ UniverseSequence::computeMsdForAtomProperties(
       pylimer_tools::utils::ReadableDumpFileSections::ATOM |
       pylimer_tools::utils::ReadableDumpFileSections::EXTRA_ATOM |
       pylimer_tools::utils::ReadableDumpFileSections::BOX);
-  std::vector<long int> timeSteps = sections.timesteps;
-  std::vector<Box> boxes = sections.boxes;
-  std::vector<std::vector<Atom>> atoms = sections.atoms;
-  std::vector<std::unordered_map<std::string, std::vector<double>>>
+  const std::vector<long int>& timeSteps = sections.timesteps;
+  const std::vector<Box>& boxes = sections.boxes;
+  const std::vector<std::vector<Atom>>& atoms = sections.atoms;
+  const std::vector<std::unordered_map<std::string, std::vector<double>>>&
     extraAtomData = sections.extraAtomsData;
 
   RUNTIME_EXP_IFN(timeSteps.size() == boxes.size(),
@@ -761,81 +823,30 @@ UniverseSequence::computeMsdForAtomProperties(
     }
     Eigen::VectorXd localCoordinates =
       Eigen::VectorXd::Zero(static_cast<Eigen::Index>(3 * atomIds.size()));
-    RUNTIME_EXP_IFN(extraAtomData[i].at(x).size() == atoms[i].size(),
-                    "Wrong size");
-    RUNTIME_EXP_IFN(extraAtomData[i].at(y).size() == atoms[i].size(),
-                    "Wrong size");
-    RUNTIME_EXP_IFN(extraAtomData[i].at(z).size() == atoms[i].size(),
-                    "Wrong size");
+    const std::vector<double>& propX = extraAtomData[i].at(x);
+    const std::vector<double>& propY = extraAtomData[i].at(y);
+    const std::vector<double>& propZ = extraAtomData[i].at(z);
+    RUNTIME_EXP_IFN(propX.size() == atoms[i].size(), "Wrong size");
+    RUNTIME_EXP_IFN(propY.size() == atoms[i].size(), "Wrong size");
+    RUNTIME_EXP_IFN(propZ.size() == atoms[i].size(), "Wrong size");
     for (size_t j = 0; j < atomIds.size(); ++j) {
-      size_t row = atomIdToAtomIndex.at(atomIds[j]);
-      Eigen::Vector3d coords;
-      coords << extraAtomData[i].at(x)[row], extraAtomData[i].at(y)[row],
-        extraAtomData[i].at(z)[row];
-      localCoordinates.segment(static_cast<Eigen::Index>(3 * j), 3) = coords;
+      const size_t row = atomIdToAtomIndex.at(atomIds[j]);
+      localCoordinates.segment<3>(static_cast<Eigen::Index>(3 * j)) =
+        Eigen::Vector3d(propX[row], propY[row], propZ[row]);
     }
-    coordinates.push_back(localCoordinates);
+    coordinates.push_back(std::move(localCoordinates));
   }
 
   std::cout << "Assembled coordinates" << std::endl;
 
-  std::unordered_map<long int, std::vector<double>> results;
-  results.reserve(this->getLength() - startingIndex);
-  // next, we actually start computations
-  // this is a highly inefficient algorithm, but no idea how to do better
-  // (except for omitting some data, skipping the graph, or other minor
-  // optimizations)
-  const size_t stepSize =
-    computeStepSize(this->getLength() - startingIndex, nrOfOrigins);
-  const double invNumAtoms = 1.0 / static_cast<double>(atomIds.size());
-  for (size_t parent_universe_idx = startingIndex;
-       parent_universe_idx < this->getLength();
-       parent_universe_idx += stepSize) {
-
-    for (size_t universe_idx = parent_universe_idx + 1;
-         universe_idx < this->getLength();
-         ++universe_idx) {
-      long int delta_t =
-        (timeSteps[universe_idx] - timeSteps[parent_universe_idx]);
-      if (delta_t < 0) {
-        std::cerr << "Encountered a negative delta time-step for universes "
-                  << universe_idx << " (" << timeSteps[universe_idx] << ")"
-                  << " and " << parent_universe_idx << " ("
-                  << timeSteps[parent_universe_idx] << ") in file "
-                  << this->dumpFileParser.getFilePath() << std::endl;
-      }
-
-      // Skip if delta_t exceeds max_tau for better statistics
-      if (delta_t > max_tau && max_tau >= 0) {
-        continue;
-      }
-
-      const double localMean =
-        (coordinates[universe_idx - startingIndex] -
-         coordinates[parent_universe_idx - startingIndex])
-          .squaredNorm() *
-        invNumAtoms;
-      results[delta_t].push_back(localMean);
-    }
-    std::cout << "Universe " << parent_universe_idx
-              << " as basis has been handled." << std::endl;
-  }
-
-  // actually compute the mean
-  std::unordered_map<long int, double> actual_means;
-  actual_means.reserve(results.size());
-  for (const auto& result_pair : results) {
-    const std::vector<double>& sds = result_pair.second;
-    if (sds.empty()) {
-      continue;
-    }
-    actual_means[result_pair.first] =
-      Eigen::Map<const Eigen::VectorXd, Eigen::Unaligned>(
-        sds.data(), static_cast<Eigen::Index>(sds.size()))
-        .mean();
-  }
-
-  return actual_means;
+  return computePairwiseMsdMeans(coordinates,
+                                 timeSteps,
+                                 startingIndex,
+                                 this->getLength(),
+                                 atomIds.size(),
+                                 nrOfOrigins,
+                                 max_tau,
+                                 this->dumpFileParser.getFilePath());
 }
 
 /**
@@ -863,9 +874,9 @@ UniverseSequence::computeMsdForAtomsFromDumpFile(
       pylimer_tools::utils::ReadableDumpFileSections::TIMESTEP |
       pylimer_tools::utils::ReadableDumpFileSections::ATOM |
       pylimer_tools::utils::ReadableDumpFileSections::BOX);
-  std::vector<long int> timeSteps = sections.timesteps;
-  std::vector<Box> boxes = sections.boxes;
-  std::vector<std::vector<Atom>> atoms = sections.atoms;
+  const std::vector<long int>& timeSteps = sections.timesteps;
+  const std::vector<Box>& boxes = sections.boxes;
+  const std::vector<std::vector<Atom>>& atoms = sections.atoms;
 
   RUNTIME_EXP_IFN(timeSteps.size() == boxes.size(),
                   "Dump file seems inconsistent: read " +
@@ -909,73 +920,24 @@ UniverseSequence::computeMsdForAtomsFromDumpFile(
     Eigen::VectorXd localCoordinates =
       Eigen::VectorXd::Zero(static_cast<Eigen::Index>(3 * atomIds.size()));
     for (size_t j = 0; j < atomIds.size(); ++j) {
-      Atom atom = atoms[i][atomIdToAtomIndex.at(atomIds[j])];
+      const Atom& atom = atoms[i][atomIdToAtomIndex.at(atomIds[j])];
       Eigen::Vector3d coords;
       atom.getUnwrappedCoordinates<Eigen::Vector3d>(coords, boxes[i]);
-      localCoordinates.segment(static_cast<Eigen::Index>(3 * j), 3) = coords;
+      localCoordinates.segment<3>(static_cast<Eigen::Index>(3 * j)) = coords;
     }
-    coordinates.push_back(localCoordinates);
+    coordinates.push_back(std::move(localCoordinates));
   }
 
   std::cout << "Assembled coordinates" << std::endl;
 
-  std::unordered_map<long int, std::vector<double>> results;
-  results.reserve(this->getLength() - startingIndex);
-  // next, we actually start computations
-  // this is a highly inefficient algorithm, but no idea how to do better
-  // (except for omitting some data, skipping the graph, or other minor
-  // optimizations)
-  const size_t stepSize =
-    computeStepSize(this->getLength() - startingIndex, nrOfOrigins);
-  const double invNumAtoms = 1.0 / static_cast<double>(atomIds.size());
-  for (size_t parent_universe_idx = startingIndex;
-       parent_universe_idx < this->getLength();
-       parent_universe_idx += stepSize) {
-
-    for (size_t universe_idx = parent_universe_idx + 1;
-         universe_idx < this->getLength();
-         ++universe_idx) {
-      long int delta_t =
-        (timeSteps[universe_idx] - timeSteps[parent_universe_idx]);
-      if (delta_t < 0) {
-        std::cerr << "Encountered a negative delta time-step for universes "
-                  << universe_idx << " (" << timeSteps[universe_idx] << ")"
-                  << " and " << parent_universe_idx << " ("
-                  << timeSteps[parent_universe_idx] << ") in file "
-                  << this->dumpFileParser.getFilePath() << std::endl;
-      }
-
-      // Skip if delta_t exceeds max_tau for better statistics
-      if (delta_t > max_tau && max_tau >= 0) {
-        continue;
-      }
-
-      const double localMean =
-        (coordinates[universe_idx - startingIndex] -
-         coordinates[parent_universe_idx - startingIndex])
-          .squaredNorm() *
-        invNumAtoms;
-      results[delta_t].push_back(localMean);
-    }
-    std::cout << "Universe " << parent_universe_idx
-              << " as basis has been handled." << std::endl;
-  }
-
-  // actually compute the mean
-  std::unordered_map<long int, double> actual_means;
-  actual_means.reserve(results.size());
-  for (const auto& result_pair : results) {
-    const std::vector<double>& sds = result_pair.second;
-    if (sds.empty()) {
-      continue;
-    }
-    actual_means[result_pair.first] =
-      Eigen::Map<const Eigen::VectorXd, Eigen::Unaligned>(
-        sds.data(), static_cast<Eigen::Index>(sds.size()))
-        .mean();
-  }
-
-  return actual_means;
+  return computePairwiseMsdMeans(coordinates,
+                                 timeSteps,
+                                 startingIndex,
+                                 this->getLength(),
+                                 atomIds.size(),
+                                 nrOfOrigins,
+                                 max_tau,
+                                 this->dumpFileParser.getFilePath());
 }
 
 /**
@@ -993,92 +955,62 @@ UniverseSequence::computeMsdForAtomsFromDataFiles(
   bool reduceMemory,
   int max_tau)
 {
-  igraph_vector_int_t vertex_ids;
-  igraph_vector_int_init(&vertex_ids,
-                         static_cast<igraph_int_t>(atomIds.size()));
-  pylimer_tools::entities::Universe initialUniverse = this->atIndex(0);
-  for (long int atomId : atomIds) {
-    igraph_vector_int_push_back(&vertex_ids,
-                                initialUniverse.getIdxByAtomId(atomId));
+  if (this->getLength() == 0 || atomIds.empty()) {
+    return {};
   }
-  pylimer_tools::entities::Box box = initialUniverse.getBox();
-  std::unordered_map<long int, std::vector<double>> results;
-  results.reserve(this->getLength());
+
+  igraph_vector_int_t vertexIds;
+  igraph_vector_int_init(&vertexIds, static_cast<igraph_int_t>(atomIds.size()));
+  const pylimer_tools::entities::Universe initialUniverse = this->atIndex(0);
+  const pylimer_tools::entities::Box box = initialUniverse.getBox();
   std::vector<Eigen::VectorXd> coordinates;
   coordinates.reserve(this->getLength());
   std::vector<long int> timeSteps;
   timeSteps.reserve(this->getLength());
 
-  // initial loop to reserve everything
-  for (size_t universe_idx = 0; universe_idx < this->getLength();
-       ++universe_idx) {
-    pylimer_tools::entities::Universe current_universe =
-      this->atIndex(universe_idx);
-    Eigen::VectorXd current_coordinates =
-      current_universe.getUnwrappedVertexCoordinates(vertex_ids, box);
-    coordinates.push_back(current_coordinates);
-    timeSteps.push_back(current_universe.getTimestep());
-    long int delta_t =
-      (current_universe.getTimestep() - initialUniverse.getTimestep());
-    std::vector<double> resultsVec;
-    resultsVec.reserve(atomIds.size() * this->getLength() *
-                       (this->getLength() - universe_idx));
-    results[delta_t] = resultsVec;
-    RUNTIME_EXP_IFN(current_universe.getBox() == initialUniverse.getBox(),
-                    "Boxes must be the same for all universes.");
-
-    if (reduceMemory) {
-      this->forgetAtIndex(universe_idx);
-    }
-  }
-
-  // next, we actually start computations
-  // this is a highly inefficient algorithm, but no idea how to do better
-  // (except for omitting some data, skipping the graph, or other minor
-  // optimizations)
-  const size_t stepSize = computeStepSize(this->getLength(), nrOfOrigins);
-  const double invNumAtoms = 1.0 / static_cast<double>(atomIds.size());
-  for (size_t parent_universe_idx = 0; parent_universe_idx < this->getLength();
-       parent_universe_idx += stepSize) {
-
-    for (size_t universe_idx = parent_universe_idx + 1;
-         universe_idx < this->getLength();
-         ++universe_idx) {
-
-      long int delta_t =
-        (timeSteps[universe_idx] - timeSteps[parent_universe_idx]);
-
-      // Skip if delta_t exceeds max_tau for better statistics
-      if (delta_t > max_tau && max_tau >= 0) {
-        continue;
+  try {
+    for (size_t universeIdx = 0; universeIdx < this->getLength();
+         ++universeIdx) {
+      const pylimer_tools::entities::Universe currentUniverse =
+        this->atIndex(universeIdx);
+      RUNTIME_EXP_IFN(currentUniverse.getBox() == box,
+                      "Boxes must be the same for all universes.");
+      for (size_t i = 0; i < atomIds.size(); ++i) {
+        igraph_vector_int_set(&vertexIds,
+                              static_cast<igraph_int_t>(i),
+                              currentUniverse.getIdxByAtomId(atomIds[i]));
       }
+      coordinates.push_back(
+        currentUniverse.getUnwrappedVertexCoordinates(vertexIds, box));
+      timeSteps.push_back(currentUniverse.getTimestep());
 
-      const double localMean =
-        (coordinates[parent_universe_idx] - coordinates[universe_idx])
-          .squaredNorm() *
-        invNumAtoms;
-      results[delta_t].push_back(localMean);
+      if (reduceMemory) {
+        this->forgetAtIndex(universeIdx);
+      }
     }
-    std::cout << "Universe " << parent_universe_idx
-              << " as basis has been handled." << std::endl;
+  } catch (...) {
+    igraph_vector_int_destroy(&vertexIds);
+    throw;
+  }
+  igraph_vector_int_destroy(&vertexIds);
+
+  // LAMMPS data files do not store explicit timesteps (all default to 0);
+  // fall back to sequential frame indices when all timesteps are identical.
+  if (std::adjacent_find(timeSteps.begin(),
+                         timeSteps.end(),
+                         std::not_equal_to<long int>()) == timeSteps.end()) {
+    for (size_t i = 0; i < timeSteps.size(); ++i) {
+      timeSteps[i] = static_cast<long int>(i);
+    }
   }
 
-  igraph_vector_int_destroy(&vertex_ids);
-  // actually compute the mean
-  std::unordered_map<long int, double> actual_means;
-  actual_means.reserve(this->getLength());
-  for (const auto& result_pair : results) {
-    const std::vector<double>& sds = result_pair.second;
-    if (sds.empty()) {
-      continue;
-    }
-    actual_means[result_pair.first] =
-      Eigen::Map<const Eigen::VectorXd, Eigen::Unaligned>(
-        sds.data(), static_cast<Eigen::Index>(sds.size()))
-        .mean();
-  }
-
-  return actual_means;
+  return computePairwiseMsdMeans(coordinates,
+                                 timeSteps,
+                                 0,
+                                 this->getLength(),
+                                 atomIds.size(),
+                                 nrOfOrigins,
+                                 max_tau);
 }
 
 // resets

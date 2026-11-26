@@ -37,7 +37,7 @@ Molecule::Molecule(const Box& parentBox,
 void
 Molecule::initializeFromGraph(const igraph_t* inGraph)
 {
-  auto mutator = this->getMutableGraph();
+  GraphMutator mutator = this->getMutableGraph();
   igraph_destroy(mutator);
   igraph_copy(mutator, inGraph);
   this->size = static_cast<int>(igraph_vcount(mutator));
@@ -48,26 +48,27 @@ Molecule::initializeFromGraph(const igraph_t* inGraph)
   }
   igraph_vector_t allIds;
   igraph_vector_init(&allIds, this->size);
-  VANV(mutator, "id", &allIds);
   if (igraph_cattribute_VANV(mutator, "id", igraph_vss_all(), &allIds)) {
+    igraph_vector_destroy(&allIds);
     throw std::runtime_error(
       "Molecule's graph's attribute id is not accessible.");
-  };
-  std::vector<int> ids;
+  }
+  std::vector<long int> ids;
   pylimer_tools::utils::igraphVectorTToStdVector(&allIds, ids);
+  igraph_vector_destroy(&allIds);
   if (ids.empty() && this->size > 0) {
     throw std::runtime_error(
       "Molecule's graph's attribute id was not queried.");
   }
+  this->atomIdToVertexIdx.clear();
   this->atomIdToVertexIdx.reserve(ids.size());
   for (size_t i = 0; i < ids.size(); ++i) {
-    this->atomIdToVertexIdx[ids[i]] = static_cast<int>(i);
+    this->atomIdToVertexIdx[ids[i]] = static_cast<long int>(i);
   }
   // TODO: possibly use the lined up atoms instead? Check performance.
   std::sort(ids.begin(), ids.end());
   this->key =
     pylimer_tools::utils::join(ids.begin(), ids.end(), std::string("-"));
-  igraph_vector_destroy(&allIds);
   // detect whether the graph has more than the standard attributes
   this->atomsHaveCustomAttributes = this->checkIfAtomsHaveCustomAttributes();
 };
@@ -77,10 +78,15 @@ Molecule::~Molecule() = default;
 
 // copy constructor
 Molecule::Molecule(const Molecule& src)
-  : Molecule(src.parent,
-             &src.getGraph(),
-             src.typeOfThisMolecule,
-             src.massPerType) {};
+  : AtomGraphParent(src)
+  , parent(src.parent)
+  , typeOfThisMolecule(src.typeOfThisMolecule)
+  , size(src.size)
+  , key(src.key)
+  , massPerType(src.massPerType)
+  , atomIdToVertexIdx(src.atomIdToVertexIdx)
+{
+}
 
 // move constructor
 Molecule::Molecule(Molecule&& other) noexcept
@@ -145,9 +151,9 @@ Molecule::computeBondLengths() const
 }
 
 double
-Molecule::computeTotalLength()
+Molecule::computeTotalLength() const
 {
-  std::vector<double> bondLens = this->computeBondLengths();
+  const std::vector<double> bondLens = this->computeBondLengths();
   return std::accumulate(bondLens.begin(), bondLens.end(), 0.0);
 }
 
@@ -224,15 +230,16 @@ Molecule::computeEndToEndVectorWithDerivedImageFlags(
  * @return double the total weight
  */
 double
-Molecule::computeTotalMass()
+Molecule::computeTotalMass() const
 {
-  std::vector<int> presentTypes = this->getPropertyValues<int>("type");
-  double totalWeight = std::accumulate(
+  const std::vector<int> presentTypes = this->getPropertyValues<int>("type");
+  const double totalWeight = std::accumulate(
     presentTypes.begin(),
     presentTypes.end(),
     0.0,
     [&massPerType = this->massPerType](const double val, const int type) {
-      return val + massPerType[type];
+      const std::map<int, double>::const_iterator it = massPerType.find(type);
+      return val + (it != massPerType.end() ? it->second : 0.0);
     });
   return totalWeight;
 }
@@ -311,7 +318,7 @@ Molecule::getBox() const
 }
 
 double
-Molecule::computeRadiusOfGyration()
+Molecule::computeRadiusOfGyration() const
 {
   double meanX = 0.0, meanY = 0.0, meanZ = 0.0;
   // would be faster to just query the attributes.
@@ -412,7 +419,7 @@ Molecule::computeRadiusOfGyrationWithDerivedImageFlags() const
   return Rg2;
 };
 
-std::string
+const std::string&
 Molecule::getKey() const
 {
   return this->key;

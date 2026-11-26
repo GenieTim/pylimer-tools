@@ -68,7 +68,7 @@ namespace utils {
     {
       std::unordered_map<T, int> result;
       result.reserve(this->counts.size());
-      for (const auto& pair : this->counts) {
+      for (const std::pair<const T, IntDefaultZero>& pair : this->counts) {
         if (pair.second.i > 0) {
           result[pair.first] = pair.second.i;
         }

@@ -2151,7 +2151,7 @@ MCUniverseGenerator::linkStrandsToStrandsToConversion(
                        std::to_string(targetStrandConversion) + ".");
 
   // Count initial free ends
-  auto freeStrandEnds = this->findFreeStrandEnds();
+  std::vector<size_t> freeStrandEnds = this->findFreeStrandEnds();
   std::ranges::shuffle(freeStrandEnds, this->rng);
   size_t initialFreeEndCount = freeStrandEnds.size();
 
@@ -2213,7 +2213,7 @@ MCUniverseGenerator::linkStrandsToStrandsToConversion(
     }
 
 #ifndef NDEBUG
-    for (const auto& freeEnd : freeStrandEnds) {
+    for (const size_t freeEnd : freeStrandEnds) {
       assert(freeEnd < this->simplifiedUniverse.strandFrom.size());
     }
 #endif

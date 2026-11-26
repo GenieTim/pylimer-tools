@@ -393,7 +393,7 @@ public:
     INVALIDINDEX_EXP_IFN(vertexId < this->getNrOfVertices(),
                          "Index " + std::to_string(vertexId) +
                            " is out of bounds");
-    auto mutator = this->getMutableGraph();
+    GraphMutator mutator = this->getMutableGraph();
     if (igraph_cattribute_VAN_set(mutator, propertyName, vertexId, value)) {
       throw std::runtime_error("Failed to set property value");
     }

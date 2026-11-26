@@ -280,7 +280,7 @@ Universe::addAtoms(
     }
   }
   // actually add the vertices
-  auto mutator = this->getMutableGraph();
+  GraphMutator mutator = this->getMutableGraph();
   REQUIRE_IGRAPH_SUCCESS(
     igraph_add_vertices(mutator, static_cast<igraph_int_t>(NNewAtoms), 0));
   this->atomIdToVertexIdx.reserve(this->NAtoms + NNewAtoms);
@@ -366,7 +366,7 @@ Universe::replaceAtom(const long int id, const Atom& replacement)
                                 "as the one of the atom to be replaced.");
   }
   // this->atomIdToVertexIdx[replacement.getId()] = vertexIdx;
-  auto mutator = this->getMutableGraph();
+  GraphMutator mutator = this->getMutableGraph();
   igraph_cattribute_VAN_set(mutator, "x", vertexIdx, replacement.getX());
   igraph_cattribute_VAN_set(mutator, "y", vertexIdx, replacement.getY());
   igraph_cattribute_VAN_set(mutator, "z", vertexIdx, replacement.getZ());
@@ -407,7 +407,7 @@ Universe::resampleVelocities(const double mean,
   std::normal_distribution<double> dist(mean, variance);
 
   this->atomsHaveCustomAttributes = true;
-  auto mutator = this->getMutableGraph();
+  GraphMutator mutator = this->getMutableGraph();
   for (igraph_integer_t i = 0; i < static_cast<igraph_integer_t>(this->NAtoms);
        ++i) {
     igraph_cattribute_VAN_set(mutator, "vx", i, dist(e2));
@@ -427,7 +427,7 @@ Universe::removeAtoms(const std::vector<long int>& ids)
     igraph_vector_int_set(
       &vertexIds, static_cast<igraph_int_t>(i), this->getIdxByAtomId(ids[i]));
   }
-  auto mutator = this->getMutableGraph();
+  GraphMutator mutator = this->getMutableGraph();
   igraph_delete_vertices(mutator, igraph_vss_vector(&vertexIds));
   igraph_vector_int_destroy(&vertexIds);
 
@@ -458,7 +458,7 @@ Universe::removeBonds(const std::vector<long int>& atomIdsFrom,
 {
   INVALIDARG_EXP_IFN(atomIdsFrom.size() == atomIdsTo.size(),
                      "Vertex ids from and to must have the same length.");
-  auto mutator = this->getMutableGraph();
+  GraphMutator mutator = this->getMutableGraph();
   for (size_t i = 0; i < atomIdsFrom.size(); ++i) {
     std::vector<igraph_integer_t> edgeIds = this->getEdgeIdsFromTo(
       this->getIdxByAtomId(atomIdsFrom[i]), this->getIdxByAtomId(atomIdsTo[i]));
@@ -499,7 +499,7 @@ Universe::removeBondsOfType(const int bondType)
   igraph_vector_destroy(&typesVec);
 
   // actually remove the bonds
-  auto mutator = this->getMutableGraph();
+  GraphMutator mutator = this->getMutableGraph();
   if (igraph_vector_int_size(&edges_to_remove) > 0) {
     igraph_delete_edges(mutator, igraph_ess_vector(&edges_to_remove));
   }
@@ -587,7 +587,7 @@ Universe::addBonds(const size_t NNewBonds,
   igraph_vector_int_resize(&newEdges,
                            static_cast<igraph_int_t>(2 * actualNrOfBondsAdded));
   // add the new edges
-  auto mutator = this->getMutableGraph();
+  GraphMutator mutator = this->getMutableGraph();
   REQUIRE_IGRAPH_SUCCESS(igraph_add_edges(mutator, &newEdges, 0));
   igraph_vector_int_destroy(&newEdges);
   if (actualNrOfBondsAdded > 0) {
@@ -722,7 +722,9 @@ Universe::removeAllDihedralAngles()
 void
 Universe::inferCoordinates(const int crosslinkerType)
 {
-  std::vector<Molecule> molecules = this->getMolecules(crosslinkerType);
+  // Copy by value intentionally: replaceAtom() mutates the graph and clears
+  // cachedMolecules_.
+  const std::vector<Molecule> molecules = this->getMolecules(crosslinkerType);
   for (const Molecule& molecule : molecules) {
     std::vector<Atom> linedUpAtoms =
       molecule.getAtomsLinedUp(crosslinkerType, true, false);
@@ -746,7 +748,7 @@ Universe::simplify()
   // let's take the mean.
   REQUIRE_IGRAPH_SUCCESS(igraph_attribute_combination_add(
     &comb, NULL, IGRAPH_ATTRIBUTE_COMBINE_MEAN, NULL));
-  auto mutator = this->getMutableGraph();
+  GraphMutator mutator = this->getMutableGraph();
   igraph_simplify(mutator, /*multiple=*/1, /*loops=*/1, &comb);
   igraph_attribute_combination_destroy(&comb);
   this->NBonds = static_cast<size_t>(igraph_ecount(mutator));
@@ -1019,20 +1021,21 @@ Universe::getStrandAffiliation(const int crosslinkerType) const
  * clusters
  *
  * @param atomTypeToOmit The atom type to remove to get more clusters
- * @return std::vector<Molecule>
+ * @return const std::vector<Molecule>&
  */
-std::vector<Molecule>
+const std::vector<Molecule>&
 Universe::getMolecules(const int atomTypeToOmit) const
 {
-  auto it = this->cachedMolecules_.find(atomTypeToOmit);
+  const std::unordered_map<int, std::vector<Molecule>>::const_iterator it =
+    this->cachedMolecules_.find(atomTypeToOmit);
   if (it != this->cachedMolecules_.end()) {
     return it->second;
   }
 
-  std::vector<Molecule> molecules;
   if (this->getNrOfAtoms() == 0) {
-    return molecules;
+    return this->cachedMolecules_[atomTypeToOmit];
   }
+  std::vector<Molecule> molecules;
   // make a copy to remove crossLinkers from
   igraph_t graphWithoutCrosslinkers;
   REQUIRE_IGRAPH_SUCCESS(
@@ -1077,8 +1080,10 @@ Universe::getMolecules(const int atomTypeToOmit) const
   }
   igraph_graph_list_destroy(&components);
   igraph_destroy(&graphWithoutCrosslinkers);
-  this->cachedMolecules_[atomTypeToOmit] = molecules;
-  return molecules;
+  std::vector<Molecule>& cachedMolecules =
+    this->cachedMolecules_[atomTypeToOmit];
+  cachedMolecules = std::move(molecules);
+  return cachedMolecules;
 }
 
 /**
@@ -1117,20 +1122,21 @@ Universe::getVerticesByIndices(
  * get more clusters
  *
  * @param crossLinkerType the type of the atoms to omit and re-add
- * @return std::vector<Molecule>
+ * @return const std::vector<Molecule>&
  */
-std::vector<Molecule>
+const std::vector<Molecule>&
 Universe::getChainsWithCrosslinker(const int crossLinkerType) const
 {
-  auto it = this->cachedChainsWithCrosslinker_.find(crossLinkerType);
+  std::unordered_map<int, std::vector<Molecule>>::const_iterator it =
+    this->cachedChainsWithCrosslinker_.find(crossLinkerType);
   if (it != this->cachedChainsWithCrosslinker_.end()) {
     return it->second;
   }
 
-  std::vector<Molecule> molecules;
   if (this->getNrOfAtoms() == 0) {
-    return molecules;
+    return this->cachedChainsWithCrosslinker_[crossLinkerType];
   }
+  std::vector<Molecule> molecules;
   std::vector<bool> vertexIsJunction =
     pylimer_tools::utils::initializeWithValue(this->getNrOfAtoms(), false);
   // make a copy to remove junctions from
@@ -1239,7 +1245,7 @@ Universe::getChainsWithCrosslinker(const int crossLinkerType) const
 
       std::unordered_map<long int, long int> newAtomsMap;
       // actually add the atoms...
-      for (auto atomToAddOriginalIdx : atomsToAdd) {
+      for (const long int atomToAddOriginalIdx : atomsToAdd) {
         REQUIRE_IGRAPH_SUCCESS(igraph_add_vertices(chain, 1, nullptr));
         long int newCrosslinkerVertexIdx = igraph_vcount(chain) - 1;
         newAtomsMap.insert_or_assign(atomToAddOriginalIdx,
@@ -1261,7 +1267,7 @@ Universe::getChainsWithCrosslinker(const int crossLinkerType) const
           vertexAndEdgeProperties.first);
       }
       // ...and bonds
-      for (auto bond : bondsToAdd) {
+      for (const std::vector<long int>& bond : bondsToAdd) {
         REQUIRE_IGRAPH_SUCCESS(
           igraph_add_edge(chain, bond[1], newAtomsMap.at(bond[2])));
         // also copy the bond attributes
@@ -1300,13 +1306,6 @@ Universe::getChainsWithCrosslinker(const int crossLinkerType) const
     std::vector<igraph_integer_t> edgeIds =
       this->getIncidentEdgeIds(junctionIdx);
     assert(connections.size() == edgeIds.size());
-    igraph_attribute_combination_t comb;
-    igraph_attribute_combination_init(&comb);
-    // how to combine two edges and their attributes
-    // currently, only the type attribute exists.
-    // let's take the mean.
-    REQUIRE_IGRAPH_SUCCESS(igraph_attribute_combination_add(
-      &comb, nullptr, IGRAPH_ATTRIBUTE_COMBINE_MEAN, nullptr));
     bool hasPrimary = false;
     for (size_t i = 0; i < connections.size(); ++i) {
       long int connectedVertexIdx = connections[i];
@@ -1385,15 +1384,15 @@ Universe::getChainsWithCrosslinker(const int crossLinkerType) const
         igraph_destroy(&chain);
       }
     }
-
-    igraph_attribute_combination_destroy(&comb);
   }
 
   igraph_graph_list_destroy(&components);
   igraph_destroy(&graphWithoutJunctions);
 
-  this->cachedChainsWithCrosslinker_[crossLinkerType] = molecules;
-  return molecules;
+  std::vector<Molecule>& cachedMolecules =
+    this->cachedChainsWithCrosslinker_[crossLinkerType];
+  cachedMolecules = std::move(molecules);
+  return cachedMolecules;
 };
 
 pylimer_tools::sim::mehp::CrosslinkerUniverse
@@ -1444,7 +1443,7 @@ Universe::toCrosslinkerUniverse(const int crossLinkerType) const
     }
   }
 
-  const std::vector<Molecule> chains =
+  const std::vector<Molecule>& chains =
     this->getChainsWithCrosslinker(crossLinkerType);
   for (size_t c = 0; c < chains.size(); ++c) {
     const Molecule& chain = chains[c];
@@ -1557,7 +1556,7 @@ Universe::identifyActiveAtoms(const int crossLinkerType) const
     }
   }
 
-  const std::vector<Molecule> chains =
+  const std::vector<Molecule>& chains =
     this->getChainsWithCrosslinker(crossLinkerType);
   const size_t nStrands =
     std::min(chains.size(), peelResult.strandIsIgnored.size());
@@ -2224,7 +2223,7 @@ Universe::determineEffectiveFunctionalityPerType() const
   igraph_vector_int_destroy(&degrees);
 
   std::map<int, int> typeCounts = this->countAtomTypes();
-  for (const auto typePair : typeCounts) {
+  for (const std::pair<const int, int>& typePair : typeCounts) {
     result[typePair.first] /= typePair.second;
   }
 
@@ -2274,7 +2273,7 @@ Universe::computeWeightFractions() const
   }
 
   //  loop to turn partial masses into weight fractions
-  for (const auto& partialMassPair : partialMasses) {
+  for (const std::pair<const int, double>& partialMassPair : partialMasses) {
     partialMasses[partialMassPair.first] = partialMassPair.second / totalMass;
   }
 
@@ -2873,7 +2872,7 @@ Universe::contractVerticesAlongBondType(const int bondType) const
       break;
     }
 
-    auto mutator = result.getMutableGraph();
+    GraphMutator mutator = result.getMutableGraph();
 
     // Batch add all new edges at once
     if (!edgesToAdd.empty()) {
@@ -2884,7 +2883,8 @@ Universe::contractVerticesAlongBondType(const int bondType) const
       REQUIRE_IGRAPH_SUCCESS(igraph_add_edges(mutator, &newEdgesVec, nullptr));
 
       // Copy edge properties for all new edges
-      for (const auto& copyPair : edgePropertyCopyPairs) {
+      for (const std::pair<igraph_integer_t, igraph_integer_t>& copyPair :
+           edgePropertyCopyPairs) {
         igraph_integer_t newEdgeIdx = edgeCountBefore + copyPair.second;
         pylimer_tools::utils::copyEdgeProperties(
           mutator, copyPair.first, mutator, newEdgeIdx, edgeProperties);
@@ -3110,9 +3110,9 @@ Universe::interpolateEdges(const int crossLinkerType,
                                                         -1);
   size_t currentMaxIdx = 0;
   std::vector<std::pair<size_t, size_t>> results;
-  std::vector<Molecule> chainsToInterpolate =
+  const std::vector<Molecule>& chainsToInterpolate =
     this->getChainsWithCrosslinker(crossLinkerType);
-  for (const auto& chain : chainsToInterpolate) {
+  for (const Molecule& chain : chainsToInterpolate) {
     std::vector<Atom> ends = chain.getChainEnds(crossLinkerType, true);
     RUNTIME_EXP_IFN(ends.size() == 2, "Chain must have exactly two ends");
     const size_t end0 =
@@ -3292,18 +3292,17 @@ Universe::computeTemperature(const int dimensions, const double kb) const
 double
 Universe::getMeanStrandLength(const int crossLinkerType) const
 {
-  std::vector<Molecule> molecules = this->getMolecules(crossLinkerType);
+  const std::vector<Molecule>& molecules = this->getMolecules(crossLinkerType);
+  if (molecules.empty()) {
+    return 0.0;
+  }
 
-  double multiplier = 1.0 / static_cast<double>(molecules.size());
-  double meanStrandLength = std::accumulate(
-    molecules.begin(),
-    molecules.end(),
-    0.0,
-    [multiplier](const double val, const Molecule molecule) {
-      return val + static_cast<double>(molecule.getLength()) * multiplier;
-    });
+  double sumStrandLength = 0.0;
+  for (const Molecule& molecule : molecules) {
+    sumStrandLength += static_cast<double>(molecule.getLength());
+  }
 
-  return meanStrandLength;
+  return sumStrandLength / static_cast<double>(molecules.size());
 }
 
 /**
@@ -3319,13 +3318,8 @@ std::vector<double>
 Universe::computeEndToEndDistances(const int crossLinkerType,
                                    bool implyImageFlags) const
 {
-  if (this->cachedChainsWithCrosslinker_.find(crossLinkerType) ==
-      this->cachedChainsWithCrosslinker_.end()) {
-    this->cachedChainsWithCrosslinker_[crossLinkerType] =
-      this->getChainsWithCrosslinker(crossLinkerType);
-  }
   const std::vector<Molecule>& molecules =
-    this->cachedChainsWithCrosslinker_[crossLinkerType];
+    this->getChainsWithCrosslinker(crossLinkerType);
 
   std::vector<double> distances;
   distances.reserve(molecules.size());
@@ -3502,13 +3496,8 @@ Universe::computeEndToEndStats(
   const pylimer_tools::utils::StrandCategory category,
   const bool implyImageFlags) const
 {
-  if (this->cachedChainsWithCrosslinker_.find(crossLinkerType) ==
-      this->cachedChainsWithCrosslinker_.end()) {
-    this->cachedChainsWithCrosslinker_[crossLinkerType] =
-      this->getChainsWithCrosslinker(crossLinkerType);
-  }
   const std::vector<Molecule>& molecules =
-    this->cachedChainsWithCrosslinker_[crossLinkerType];
+    this->getChainsWithCrosslinker(crossLinkerType);
 
   pylimer_tools::utils::EndToEndStats stats;
   double sumR = 0.0;
@@ -3551,13 +3540,13 @@ Universe::computeWeightAverageMolecularWeight(const int crossLinkerType) const
 {
   double weightAverage = 0.0;
 
-  std::vector<Molecule> molecules = this->getMolecules(crossLinkerType);
+  const std::vector<Molecule>& molecules = this->getMolecules(crossLinkerType);
   std::map<int, double> massPerTypeToUse(this->massPerType);
   massPerTypeToUse[crossLinkerType] = 0.0;
-  double totalMass = this->computeTotalMassWithMasses(massPerTypeToUse);
-  double massDivisor = 1.0 / totalMass;
-  for (Molecule molecule : molecules) {
-    double moleculeMass = molecule.computeTotalMass();
+  const double totalMass = this->computeTotalMassWithMasses(massPerTypeToUse);
+  const double massDivisor = 1.0 / totalMass;
+  for (const Molecule& molecule : molecules) {
+    const double moleculeMass = molecule.computeTotalMass();
     weightAverage += moleculeMass * moleculeMass * massDivisor;
   }
 
@@ -3575,10 +3564,10 @@ Universe::computeWeightAverageMolecularWeight(const int crossLinkerType) const
 double
 Universe::computeNumberAverageMolecularWeight(const int crossLinkerType) const
 {
-  std::vector<Molecule> molecules = this->getMolecules(crossLinkerType);
+  const std::vector<Molecule>& molecules = this->getMolecules(crossLinkerType);
   std::map<int, double> massPerTypeToUse(this->massPerType);
   massPerTypeToUse[crossLinkerType] = 0.0;
-  double totalMass = this->computeTotalMassWithMasses(massPerTypeToUse);
+  const double totalMass = this->computeTotalMassWithMasses(massPerTypeToUse);
 
   return totalMass / static_cast<double>(molecules.size());
 };
@@ -3718,7 +3707,7 @@ Universe::setBox(const Box& passedBox, const bool rescaleAtomCoordinates)
                           offsetZ);
     }
 
-    auto mutator = this->getMutableGraph();
+    GraphMutator mutator = this->getMutableGraph();
     REQUIRE_IGRAPH_SUCCESS(
       igraph_cattribute_VAN_setv(mutator, "x", &xValueVec));
     REQUIRE_IGRAPH_SUCCESS(

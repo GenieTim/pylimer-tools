@@ -319,335 +319,229 @@ DataFileParser::readMass(const std::string& line)
   this->masses[key] = tokenizer.get<double>(1);
 }
 
-DataFileParser::AtomFieldDescriptor
-DataFileParser::getAtomStyleDescriptor(AtomStyle style) const
+const DataFileParser::AtomFieldDescriptor&
+DataFileParser::getAtomStyleDescriptor(const AtomStyle style)
 {
   using FT = AtomFieldDescriptor::FieldType;
 
   switch (style) {
     case AtomStyle::ANGLE:
     case AtomStyle::BOND:
-    case AtomStyle::MOLECULAR:
-      return { { FT::ATOM_ID,
-                 FT::MOLECULE_ID,
-                 FT::ATOM_TYPE,
-                 FT::X,
-                 FT::Y,
-                 FT::Z,
-                 FT::NX,
-                 FT::NY,
-                 FT::NZ } };
+    case AtomStyle::MOLECULAR: {
+      static const AtomFieldDescriptor desc = {
+        FT::ATOM_ID, FT::MOLECULE_ID, FT::ATOM_TYPE, FT::X, FT::Y,
+        FT::Z,       FT::NX,          FT::NY,        FT::NZ
+      };
+      return desc;
+    }
 
-    case AtomStyle::ATOMIC:
-      return { { FT::ATOM_ID,
-                 FT::ATOM_TYPE,
-                 FT::X,
-                 FT::Y,
-                 FT::Z,
-                 FT::NX,
-                 FT::NY,
-                 FT::NZ } };
+    case AtomStyle::ATOMIC: {
+      static const AtomFieldDescriptor desc = {
+        FT::ATOM_ID, FT::ATOM_TYPE, FT::X, FT::Y, FT::Z, FT::NX, FT::NY, FT::NZ
+      };
+      return desc;
+    }
 
-    case AtomStyle::BODY:
-      return { { FT::ATOM_ID,
-                 FT::ATOM_TYPE,
-                 FT::BODYFLAG,
-                 FT::MASS,
-                 FT::X,
-                 FT::Y,
-                 FT::Z,
-                 FT::NX,
-                 FT::NY,
-                 FT::NZ } };
+    case AtomStyle::BODY: {
+      static const AtomFieldDescriptor desc = {
+        FT::ATOM_ID, FT::ATOM_TYPE, FT::BODYFLAG, FT::MASS, FT::X,
+        FT::Y,       FT::Z,         FT::NX,       FT::NY,   FT::NZ
+      };
+      return desc;
+    }
 
-    case AtomStyle::BPM_SPHERE:
-      return { { FT::ATOM_ID,
-                 FT::MOLECULE_ID,
-                 FT::ATOM_TYPE,
-                 FT::DIAMETER,
-                 FT::DENSITY,
-                 FT::X,
-                 FT::Y,
-                 FT::Z,
-                 FT::NX,
-                 FT::NY,
-                 FT::NZ } };
+    case AtomStyle::BPM_SPHERE: {
+      static const AtomFieldDescriptor desc = {
+        FT::ATOM_ID, FT::MOLECULE_ID, FT::ATOM_TYPE, FT::DIAMETER,
+        FT::DENSITY, FT::X,           FT::Y,         FT::Z,
+        FT::NX,      FT::NY,          FT::NZ
+      };
+      return desc;
+    }
 
-    case AtomStyle::CHARGE:
-      return { { FT::ATOM_ID,
-                 FT::ATOM_TYPE,
-                 FT::ATOM_CHARGE,
-                 FT::X,
-                 FT::Y,
-                 FT::Z,
-                 FT::NX,
-                 FT::NY,
-                 FT::NZ } };
+    case AtomStyle::CHARGE: {
+      static const AtomFieldDescriptor desc = {
+        FT::ATOM_ID, FT::ATOM_TYPE, FT::ATOM_CHARGE, FT::X, FT::Y,
+        FT::Z,       FT::NX,        FT::NY,          FT::NZ
+      };
+      return desc;
+    }
 
-    case AtomStyle::DIELECTRIC:
-      return { { FT::ATOM_ID,
-                 FT::ATOM_TYPE,
-                 FT::ATOM_CHARGE,
-                 FT::X,
-                 FT::Y,
-                 FT::Z,
-                 FT::MUX,
-                 FT::MUY,
-                 FT::MUZ,
-                 FT::AREA,
-                 FT::ED,
-                 FT::EM,
-                 FT::EPSILON,
-                 FT::CURVATURE,
-                 FT::NX,
-                 FT::NY,
-                 FT::NZ } };
+    case AtomStyle::DIELECTRIC: {
+      static const AtomFieldDescriptor desc = {
+        FT::ATOM_ID, FT::ATOM_TYPE, FT::ATOM_CHARGE, FT::X,    FT::Y,  FT::Z,
+        FT::MUX,     FT::MUY,       FT::MUZ,         FT::AREA, FT::ED, FT::EM,
+        FT::EPSILON, FT::CURVATURE, FT::NX,          FT::NY,   FT::NZ
+      };
+      return desc;
+    }
 
-    case AtomStyle::DIPOLE:
-      return { { FT::ATOM_ID,
-                 FT::ATOM_TYPE,
-                 FT::ATOM_CHARGE,
-                 FT::X,
-                 FT::Y,
-                 FT::Z,
-                 FT::MUX,
-                 FT::MUY,
-                 FT::MUZ,
-                 FT::NX,
-                 FT::NY,
-                 FT::NZ } };
+    case AtomStyle::DIPOLE: {
+      static const AtomFieldDescriptor desc = {
+        FT::ATOM_ID, FT::ATOM_TYPE, FT::ATOM_CHARGE, FT::X,  FT::Y,  FT::Z,
+        FT::MUX,     FT::MUY,       FT::MUZ,         FT::NX, FT::NY, FT::NZ
+      };
+      return desc;
+    }
 
-    case AtomStyle::DPD:
-      return { { FT::ATOM_ID,
-                 FT::ATOM_TYPE,
-                 FT::THETA,
-                 FT::X,
-                 FT::Y,
-                 FT::Z,
-                 FT::NX,
-                 FT::NY,
-                 FT::NZ } };
+    case AtomStyle::DPD: {
+      static const AtomFieldDescriptor desc = {
+        FT::ATOM_ID, FT::ATOM_TYPE, FT::THETA, FT::X, FT::Y,
+        FT::Z,       FT::NX,        FT::NY,    FT::NZ
+      };
+      return desc;
+    }
 
-    case AtomStyle::EDPD:
-      return { { FT::ATOM_ID,
-                 FT::ATOM_TYPE,
-                 FT::EDPD_TEMP,
-                 FT::EDPD_CV,
-                 FT::X,
-                 FT::Y,
-                 FT::Z,
-                 FT::NX,
-                 FT::NY,
-                 FT::NZ } };
+    case AtomStyle::EDPD: {
+      static const AtomFieldDescriptor desc = {
+        FT::ATOM_ID, FT::ATOM_TYPE, FT::EDPD_TEMP, FT::EDPD_CV, FT::X,
+        FT::Y,       FT::Z,         FT::NX,        FT::NY,      FT::NZ
+      };
+      return desc;
+    }
 
-    case AtomStyle::ELECTRON:
-      return { { FT::ATOM_ID,
-                 FT::ATOM_TYPE,
-                 FT::ATOM_CHARGE,
-                 FT::ESPIN,
-                 FT::ERADIUS,
-                 FT::X,
-                 FT::Y,
-                 FT::Z,
-                 FT::NX,
-                 FT::NY,
-                 FT::NZ } };
+    case AtomStyle::ELECTRON: {
+      static const AtomFieldDescriptor desc = {
+        FT::ATOM_ID, FT::ATOM_TYPE, FT::ATOM_CHARGE, FT::ESPIN,
+        FT::ERADIUS, FT::X,         FT::Y,           FT::Z,
+        FT::NX,      FT::NY,        FT::NZ
+      };
+      return desc;
+    }
 
-    case AtomStyle::ELLIPSOID:
-      return { { FT::ATOM_ID,
-                 FT::ATOM_TYPE,
-                 FT::ELLIPSOIDFLAG,
-                 FT::DENSITY,
-                 FT::X,
-                 FT::Y,
-                 FT::Z,
-                 FT::NX,
-                 FT::NY,
-                 FT::NZ } };
+    case AtomStyle::ELLIPSOID: {
+      static const AtomFieldDescriptor desc = {
+        FT::ATOM_ID, FT::ATOM_TYPE, FT::ELLIPSOIDFLAG,
+        FT::DENSITY, FT::X,         FT::Y,
+        FT::Z,       FT::NX,        FT::NY,
+        FT::NZ
+      };
+      return desc;
+    }
 
-    case AtomStyle::LINE:
-      return { { FT::ATOM_ID,
-                 FT::MOLECULE_ID,
-                 FT::ATOM_TYPE,
-                 FT::LINEFLAG,
-                 FT::DENSITY,
-                 FT::X,
-                 FT::Y,
-                 FT::Z,
-                 FT::NX,
-                 FT::NY,
-                 FT::NZ } };
+    case AtomStyle::LINE: {
+      static const AtomFieldDescriptor desc = {
+        FT::ATOM_ID, FT::MOLECULE_ID, FT::ATOM_TYPE, FT::LINEFLAG,
+        FT::DENSITY, FT::X,           FT::Y,         FT::Z,
+        FT::NX,      FT::NY,          FT::NZ
+      };
+      return desc;
+    }
 
-    case AtomStyle::MDPD:
-      return { { FT::ATOM_ID,
-                 FT::ATOM_TYPE,
-                 FT::RHO,
-                 FT::X,
-                 FT::Y,
-                 FT::Z,
-                 FT::NX,
-                 FT::NY,
-                 FT::NZ } };
+    case AtomStyle::MDPD: {
+      static const AtomFieldDescriptor desc = {
+        FT::ATOM_ID, FT::ATOM_TYPE, FT::RHO, FT::X, FT::Y,
+        FT::Z,       FT::NX,        FT::NY,  FT::NZ
+      };
+      return desc;
+    }
 
-    case AtomStyle::PERI:
-      return { { FT::ATOM_ID,
-                 FT::ATOM_TYPE,
-                 FT::VOLUME,
-                 FT::DENSITY,
-                 FT::X,
-                 FT::Y,
-                 FT::Z,
-                 FT::NX,
-                 FT::NY,
-                 FT::NZ } };
+    case AtomStyle::PERI: {
+      static const AtomFieldDescriptor desc = {
+        FT::ATOM_ID, FT::ATOM_TYPE, FT::VOLUME, FT::DENSITY, FT::X,
+        FT::Y,       FT::Z,         FT::NX,     FT::NY,      FT::NZ
+      };
+      return desc;
+    }
 
-    case AtomStyle::RHEO:
-      return { { FT::ATOM_ID,
-                 FT::ATOM_TYPE,
-                 FT::STATUS,
-                 FT::RHO,
-                 FT::X,
-                 FT::Y,
-                 FT::Z,
-                 FT::NX,
-                 FT::NY,
-                 FT::NZ } };
+    case AtomStyle::RHEO: {
+      static const AtomFieldDescriptor desc = {
+        FT::ATOM_ID, FT::ATOM_TYPE, FT::STATUS, FT::RHO, FT::X,
+        FT::Y,       FT::Z,         FT::NX,     FT::NY,  FT::NZ
+      };
+      return desc;
+    }
 
-    case AtomStyle::RHEO_THERMAL:
-      return { { FT::ATOM_ID,
-                 FT::ATOM_TYPE,
-                 FT::STATUS,
-                 FT::RHO,
-                 FT::ENERGY,
-                 FT::X,
-                 FT::Y,
-                 FT::Z,
-                 FT::NX,
-                 FT::NY,
-                 FT::NZ } };
+    case AtomStyle::RHEO_THERMAL: {
+      static const AtomFieldDescriptor desc = {
+        FT::ATOM_ID, FT::ATOM_TYPE, FT::STATUS, FT::RHO, FT::ENERGY, FT::X,
+        FT::Y,       FT::Z,         FT::NX,     FT::NY,  FT::NZ
+      };
+      return desc;
+    }
 
-    case AtomStyle::SMD:
-      return { { FT::ATOM_ID,
-                 FT::ATOM_TYPE,
-                 FT::MOLECULE_ID,
-                 FT::VOLUME,
-                 FT::MASS,
-                 FT::KRADIUS,
-                 FT::CRADIUS,
-                 FT::X0,
-                 FT::Y0,
-                 FT::Z0,
-                 FT::X,
-                 FT::Y,
-                 FT::Z,
-                 FT::NX,
-                 FT::NY,
-                 FT::NZ } };
+    case AtomStyle::SMD: {
+      static const AtomFieldDescriptor desc = {
+        FT::ATOM_ID, FT::ATOM_TYPE, FT::MOLECULE_ID, FT::VOLUME,
+        FT::MASS,    FT::KRADIUS,   FT::CRADIUS,     FT::X0,
+        FT::Y0,      FT::Z0,        FT::X,           FT::Y,
+        FT::Z,       FT::NX,        FT::NY,          FT::NZ
+      };
+      return desc;
+    }
 
-    case AtomStyle::SPH:
-      return { { FT::ATOM_ID,
-                 FT::ATOM_TYPE,
-                 FT::RHO,
-                 FT::ESPH,
-                 FT::CV,
-                 FT::X,
-                 FT::Y,
-                 FT::Z,
-                 FT::NX,
-                 FT::NY,
-                 FT::NZ } };
+    case AtomStyle::SPH: {
+      static const AtomFieldDescriptor desc = {
+        FT::ATOM_ID, FT::ATOM_TYPE, FT::RHO, FT::ESPH, FT::CV, FT::X,
+        FT::Y,       FT::Z,         FT::NX,  FT::NY,   FT::NZ
+      };
+      return desc;
+    }
 
-    case AtomStyle::SPHERE:
-      return { { FT::ATOM_ID,
-                 FT::ATOM_TYPE,
-                 FT::DIAMETER,
-                 FT::DENSITY,
-                 FT::X,
-                 FT::Y,
-                 FT::Z,
-                 FT::NX,
-                 FT::NY,
-                 FT::NZ } };
+    case AtomStyle::SPHERE: {
+      static const AtomFieldDescriptor desc = {
+        FT::ATOM_ID, FT::ATOM_TYPE, FT::DIAMETER, FT::DENSITY, FT::X,
+        FT::Y,       FT::Z,         FT::NX,       FT::NY,      FT::NZ
+      };
+      return desc;
+    }
 
-    case AtomStyle::SPIN:
-      return { { FT::ATOM_ID,
-                 FT::ATOM_TYPE,
-                 FT::X,
-                 FT::Y,
-                 FT::Z,
-                 FT::SPX,
-                 FT::SPY,
-                 FT::SPZ,
-                 FT::SP,
-                 FT::NX,
-                 FT::NY,
-                 FT::NZ } };
+    case AtomStyle::SPIN: {
+      static const AtomFieldDescriptor desc = {
+        FT::ATOM_ID, FT::ATOM_TYPE, FT::X,  FT::Y,  FT::Z,  FT::SPX,
+        FT::SPY,     FT::SPZ,       FT::SP, FT::NX, FT::NY, FT::NZ
+      };
+      return desc;
+    }
 
-    case AtomStyle::TDPD:
-      return { { FT::ATOM_ID,
-                 FT::ATOM_TYPE,
-                 FT::X,
-                 FT::Y,
-                 FT::Z,
-                 FT::CC1,
-                 FT::CC2,
-                 FT::NX,
-                 FT::NY,
-                 FT::NZ } };
+    case AtomStyle::TDPD: {
+      static const AtomFieldDescriptor desc = {
+        FT::ATOM_ID, FT::ATOM_TYPE, FT::X,  FT::Y,  FT::Z,
+        FT::CC1,     FT::CC2,       FT::NX, FT::NY, FT::NZ
+      };
+      return desc;
+    }
 
-    case AtomStyle::TEMPLATE:
-      return { { FT::ATOM_ID,
-                 FT::ATOM_TYPE,
-                 FT::MOLECULE_ID,
-                 FT::TEMPLATE_INDEX,
-                 FT::TEMPLATE_ATOM,
-                 FT::X,
-                 FT::Y,
-                 FT::Z,
-                 FT::NX,
-                 FT::NY,
-                 FT::NZ } };
+    case AtomStyle::TEMPLATE: {
+      static const AtomFieldDescriptor desc = { FT::ATOM_ID,
+                                                FT::ATOM_TYPE,
+                                                FT::MOLECULE_ID,
+                                                FT::TEMPLATE_INDEX,
+                                                FT::TEMPLATE_ATOM,
+                                                FT::X,
+                                                FT::Y,
+                                                FT::Z,
+                                                FT::NX,
+                                                FT::NY,
+                                                FT::NZ };
+      return desc;
+    }
 
-    case AtomStyle::TRI:
-      return { { FT::ATOM_ID,
-                 FT::MOLECULE_ID,
-                 FT::ATOM_TYPE,
-                 FT::TRIANGLEFLAG,
-                 FT::DENSITY,
-                 FT::X,
-                 FT::Y,
-                 FT::Z,
-                 FT::NX,
-                 FT::NY,
-                 FT::NZ } };
+    case AtomStyle::TRI: {
+      static const AtomFieldDescriptor desc = {
+        FT::ATOM_ID, FT::MOLECULE_ID, FT::ATOM_TYPE, FT::TRIANGLEFLAG,
+        FT::DENSITY, FT::X,           FT::Y,         FT::Z,
+        FT::NX,      FT::NY,          FT::NZ
+      };
+      return desc;
+    }
 
-    case AtomStyle::WAVEPACKET:
-      return { { FT::ATOM_ID,
-                 FT::ATOM_TYPE,
-                 FT::ATOM_CHARGE,
-                 FT::ESPIN,
-                 FT::ERADIUS,
-                 FT::ETAG,
-                 FT::CS_RE,
-                 FT::CS_IM,
-                 FT::X,
-                 FT::Y,
-                 FT::Z,
-                 FT::NX,
-                 FT::NY,
-                 FT::NZ } };
+    case AtomStyle::WAVEPACKET: {
+      static const AtomFieldDescriptor desc = {
+        FT::ATOM_ID, FT::ATOM_TYPE, FT::ATOM_CHARGE, FT::ESPIN, FT::ERADIUS,
+        FT::ETAG,    FT::CS_RE,     FT::CS_IM,       FT::X,     FT::Y,
+        FT::Z,       FT::NX,        FT::NY,          FT::NZ
+      };
+      return desc;
+    }
 
-    case AtomStyle::FULL:
-      return { { FT::ATOM_ID,
-                 FT::MOLECULE_ID,
-                 FT::ATOM_TYPE,
-                 FT::ATOM_CHARGE,
-                 FT::X,
-                 FT::Y,
-                 FT::Z,
-                 FT::NX,
-                 FT::NY,
-                 FT::NZ } };
+    case AtomStyle::FULL: {
+      static const AtomFieldDescriptor desc = {
+        FT::ATOM_ID, FT::MOLECULE_ID, FT::ATOM_TYPE, FT::ATOM_CHARGE, FT::X,
+        FT::Y,       FT::Z,           FT::NX,        FT::NY,          FT::NZ
+      };
+      return desc;
+    }
 
     default:
       throw std::invalid_argument("Unsupported atom style for generic parsing");
@@ -912,10 +806,7 @@ DataFileParser::readAtomGeneric(const std::string& line,
   (processArg(args), ...);
 
   // Set default molecule ID for styles that don't have it
-  if (std::find(descriptor.fields.begin(),
-                descriptor.fields.end(),
-                AtomFieldDescriptor::FieldType::MOLECULE_ID) ==
-      descriptor.fields.end()) {
+  if (!descriptor.hasMoleculeId) {
     this->moleculeIds.push_back(0);
   }
 }
@@ -923,7 +814,8 @@ DataFileParser::readAtomGeneric(const std::string& line,
 void
 DataFileParser::readAtom(const std::string& line)
 {
-  auto descriptor = getAtomStyleDescriptor(AtomStyle::MOLECULAR);
+  const AtomFieldDescriptor& descriptor =
+    getAtomStyleDescriptor(AtomStyle::MOLECULAR);
   long int atomId;
   long int nx, ny, nz;
   int atomType, moleculeId;
@@ -936,7 +828,8 @@ DataFileParser::readAtom(const std::string& line)
 void
 DataFileParser::readAtomFull(const std::string& line)
 {
-  auto descriptor = getAtomStyleDescriptor(AtomStyle::FULL);
+  const AtomFieldDescriptor& descriptor =
+    getAtomStyleDescriptor(AtomStyle::FULL);
   long int atomId;
   long int nx, ny, nz;
   int atomType, moleculeId;
@@ -959,7 +852,8 @@ DataFileParser::readAtomFull(const std::string& line)
 void
 DataFileParser::readAtomCharge(const std::string& line)
 {
-  auto descriptor = getAtomStyleDescriptor(AtomStyle::CHARGE);
+  const AtomFieldDescriptor& descriptor =
+    getAtomStyleDescriptor(AtomStyle::CHARGE);
   long int atomId;
   long int nx, ny, nz;
   int atomType;
@@ -972,7 +866,8 @@ DataFileParser::readAtomCharge(const std::string& line)
 void
 DataFileParser::readAtomDipole(const std::string& line)
 {
-  auto descriptor = getAtomStyleDescriptor(AtomStyle::DIPOLE);
+  const AtomFieldDescriptor& descriptor =
+    getAtomStyleDescriptor(AtomStyle::DIPOLE);
   long int atomId;
   long int nx, ny, nz;
   int atomType;
@@ -997,7 +892,8 @@ DataFileParser::readAtomDipole(const std::string& line)
 void
 DataFileParser::readAtomDpd(const std::string& line)
 {
-  auto descriptor = getAtomStyleDescriptor(AtomStyle::DPD);
+  const AtomFieldDescriptor& descriptor =
+    getAtomStyleDescriptor(AtomStyle::DPD);
   long int atomId;
   long int nx, ny, nz;
   int atomType;
@@ -1010,7 +906,8 @@ DataFileParser::readAtomDpd(const std::string& line)
 void
 DataFileParser::readAtomMdpd(const std::string& line)
 {
-  auto descriptor = getAtomStyleDescriptor(AtomStyle::MDPD);
+  const AtomFieldDescriptor& descriptor =
+    getAtomStyleDescriptor(AtomStyle::MDPD);
   long int atomId;
   long int nx, ny, nz;
   int atomType;
@@ -1022,7 +919,8 @@ DataFileParser::readAtomMdpd(const std::string& line)
 void
 DataFileParser::readAtomSphere(const std::string& line)
 {
-  auto descriptor = getAtomStyleDescriptor(AtomStyle::SPHERE);
+  const AtomFieldDescriptor& descriptor =
+    getAtomStyleDescriptor(AtomStyle::SPHERE);
   long int atomId;
   long int nx, ny, nz;
   int atomType;
@@ -1035,7 +933,8 @@ DataFileParser::readAtomSphere(const std::string& line)
 void
 DataFileParser::readAtomAtomic(const std::string& line)
 {
-  auto descriptor = getAtomStyleDescriptor(AtomStyle::ATOMIC);
+  const AtomFieldDescriptor& descriptor =
+    getAtomStyleDescriptor(AtomStyle::ATOMIC);
   long int atomId;
   long int nx, ny, nz;
   int atomType;
@@ -1047,7 +946,8 @@ DataFileParser::readAtomAtomic(const std::string& line)
 void
 DataFileParser::readAtomBody(const std::string& line)
 {
-  auto descriptor = getAtomStyleDescriptor(AtomStyle::BODY);
+  const AtomFieldDescriptor& descriptor =
+    getAtomStyleDescriptor(AtomStyle::BODY);
   long int atomId;
   long int nx, ny, nz;
   int atomType, bodyflag;
@@ -1060,7 +960,8 @@ DataFileParser::readAtomBody(const std::string& line)
 void
 DataFileParser::readAtomBpmSphere(const std::string& line)
 {
-  auto descriptor = getAtomStyleDescriptor(AtomStyle::BPM_SPHERE);
+  const AtomFieldDescriptor& descriptor =
+    getAtomStyleDescriptor(AtomStyle::BPM_SPHERE);
   long int atomId;
   long int nx, ny, nz;
   int atomType, moleculeId;
@@ -1084,7 +985,8 @@ DataFileParser::readAtomBpmSphere(const std::string& line)
 void
 DataFileParser::readAtomDielectric(const std::string& line)
 {
-  auto descriptor = getAtomStyleDescriptor(AtomStyle::DIELECTRIC);
+  const AtomFieldDescriptor& descriptor =
+    getAtomStyleDescriptor(AtomStyle::DIELECTRIC);
   long int atomId;
   long int nx, ny, nz;
   int atomType;
@@ -1114,7 +1016,8 @@ DataFileParser::readAtomDielectric(const std::string& line)
 void
 DataFileParser::readAtomEdpd(const std::string& line)
 {
-  auto descriptor = getAtomStyleDescriptor(AtomStyle::EDPD);
+  const AtomFieldDescriptor& descriptor =
+    getAtomStyleDescriptor(AtomStyle::EDPD);
   long int atomId;
   long int nx, ny, nz;
   int atomType;
@@ -1137,7 +1040,8 @@ DataFileParser::readAtomEdpd(const std::string& line)
 void
 DataFileParser::readAtomElectron(const std::string& line)
 {
-  auto descriptor = getAtomStyleDescriptor(AtomStyle::ELECTRON);
+  const AtomFieldDescriptor& descriptor =
+    getAtomStyleDescriptor(AtomStyle::ELECTRON);
   long int atomId;
   long int nx, ny, nz;
   int atomType;
@@ -1161,7 +1065,8 @@ DataFileParser::readAtomElectron(const std::string& line)
 void
 DataFileParser::readAtomEllipsoid(const std::string& line)
 {
-  auto descriptor = getAtomStyleDescriptor(AtomStyle::ELLIPSOID);
+  const AtomFieldDescriptor& descriptor =
+    getAtomStyleDescriptor(AtomStyle::ELLIPSOID);
   long int atomId;
   long int nx, ny, nz;
   int atomType, ellipsoidflag;
@@ -1184,7 +1089,8 @@ DataFileParser::readAtomEllipsoid(const std::string& line)
 void
 DataFileParser::readAtomLine(const std::string& line)
 {
-  auto descriptor = getAtomStyleDescriptor(AtomStyle::LINE);
+  const AtomFieldDescriptor& descriptor =
+    getAtomStyleDescriptor(AtomStyle::LINE);
   long int atomId;
   long int nx, ny, nz;
   int atomType, moleculeId, lineflag;
@@ -1208,7 +1114,8 @@ DataFileParser::readAtomLine(const std::string& line)
 void
 DataFileParser::readAtomPeri(const std::string& line)
 {
-  auto descriptor = getAtomStyleDescriptor(AtomStyle::PERI);
+  const AtomFieldDescriptor& descriptor =
+    getAtomStyleDescriptor(AtomStyle::PERI);
   long int atomId;
   long int nx, ny, nz;
   int atomType;
@@ -1221,7 +1128,8 @@ DataFileParser::readAtomPeri(const std::string& line)
 void
 DataFileParser::readAtomRheo(const std::string& line)
 {
-  auto descriptor = getAtomStyleDescriptor(AtomStyle::RHEO);
+  const AtomFieldDescriptor& descriptor =
+    getAtomStyleDescriptor(AtomStyle::RHEO);
   long int atomId;
   long int nx, ny, nz;
   int atomType, status;
@@ -1234,7 +1142,8 @@ DataFileParser::readAtomRheo(const std::string& line)
 void
 DataFileParser::readAtomRheoThermal(const std::string& line)
 {
-  auto descriptor = getAtomStyleDescriptor(AtomStyle::RHEO_THERMAL);
+  const AtomFieldDescriptor& descriptor =
+    getAtomStyleDescriptor(AtomStyle::RHEO_THERMAL);
   long int atomId;
   long int nx, ny, nz;
   int atomType, status;
@@ -1258,7 +1167,8 @@ DataFileParser::readAtomRheoThermal(const std::string& line)
 void
 DataFileParser::readAtomSmd(const std::string& line)
 {
-  auto descriptor = getAtomStyleDescriptor(AtomStyle::SMD);
+  const AtomFieldDescriptor& descriptor =
+    getAtomStyleDescriptor(AtomStyle::SMD);
   long int atomId;
   long int nx, ny, nz;
   int atomType, moleculeId;
@@ -1287,7 +1197,8 @@ DataFileParser::readAtomSmd(const std::string& line)
 void
 DataFileParser::readAtomSph(const std::string& line)
 {
-  auto descriptor = getAtomStyleDescriptor(AtomStyle::SPH);
+  const AtomFieldDescriptor& descriptor =
+    getAtomStyleDescriptor(AtomStyle::SPH);
   long int atomId;
   long int nx, ny, nz;
   int atomType;
@@ -1300,7 +1211,8 @@ DataFileParser::readAtomSph(const std::string& line)
 void
 DataFileParser::readAtomSpin(const std::string& line)
 {
-  auto descriptor = getAtomStyleDescriptor(AtomStyle::SPIN);
+  const AtomFieldDescriptor& descriptor =
+    getAtomStyleDescriptor(AtomStyle::SPIN);
   long int atomId;
   long int nx, ny, nz;
   int atomType;
@@ -1313,7 +1225,8 @@ DataFileParser::readAtomSpin(const std::string& line)
 void
 DataFileParser::readAtomTemplate(const std::string& line)
 {
-  auto descriptor = getAtomStyleDescriptor(AtomStyle::TEMPLATE);
+  const AtomFieldDescriptor& descriptor =
+    getAtomStyleDescriptor(AtomStyle::TEMPLATE);
   long int atomId;
   long int nx, ny, nz;
   int atomType, moleculeId, templateIndex, templateAtom;
@@ -1337,7 +1250,8 @@ DataFileParser::readAtomTemplate(const std::string& line)
 void
 DataFileParser::readAtomTri(const std::string& line)
 {
-  auto descriptor = getAtomStyleDescriptor(AtomStyle::TRI);
+  const AtomFieldDescriptor& descriptor =
+    getAtomStyleDescriptor(AtomStyle::TRI);
   long int atomId;
   long int nx, ny, nz;
   int atomType, moleculeId, triangleflag;
@@ -1361,7 +1275,8 @@ DataFileParser::readAtomTri(const std::string& line)
 void
 DataFileParser::readAtomWavepacket(const std::string& line)
 {
-  auto descriptor = getAtomStyleDescriptor(AtomStyle::WAVEPACKET);
+  const AtomFieldDescriptor& descriptor =
+    getAtomStyleDescriptor(AtomStyle::WAVEPACKET);
   long int atomId;
   long int nx, ny, nz;
   int atomType, etag;

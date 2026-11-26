@@ -1,7 +1,5 @@
 #pragma once
 
-// #include <ranges>
-// #include <string_view>
 #include <Eigen/Dense>
 #include <chrono>
 #include <iomanip>
@@ -9,6 +7,7 @@
 #include <regex>
 #include <sstream>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace std {
@@ -37,13 +36,16 @@ template<typename Duration>
 std::string
 duration_to_string(Duration duration)
 {
-  auto hours = std::chrono::duration_cast<std::chrono::hours>(duration);
+  const std::chrono::hours hours =
+    std::chrono::duration_cast<std::chrono::hours>(duration);
   duration -= hours;
-  auto minutes = std::chrono::duration_cast<std::chrono::minutes>(duration);
+  const std::chrono::minutes minutes =
+    std::chrono::duration_cast<std::chrono::minutes>(duration);
   duration -= minutes;
-  auto seconds = std::chrono::duration_cast<std::chrono::seconds>(duration);
+  const std::chrono::seconds seconds =
+    std::chrono::duration_cast<std::chrono::seconds>(duration);
   duration -= seconds;
-  auto milliseconds =
+  const std::chrono::milliseconds milliseconds =
     std::chrono::duration_cast<std::chrono::milliseconds>(duration);
 
   std::ostringstream oss;
@@ -114,19 +116,20 @@ join(const A& begin, const A& end, const T& t)
   return result;
 }
 
+inline constexpr std::string_view WHITESPACE_VIEW = " \n\r\t\f\v";
 static const std::string WHITESPACE = " \n\r\t\f\v";
 
 static inline std::string
 ltrim(const std::string& s)
 {
-  const size_t start = s.find_first_not_of(WHITESPACE);
+  const size_t start = s.find_first_not_of(WHITESPACE_VIEW);
   return (start == std::string::npos) ? "" : s.substr(start);
 }
 
 static inline std::string
 rtrim(const std::string& s)
 {
-  const size_t end = s.find_last_not_of(WHITESPACE);
+  const size_t end = s.find_last_not_of(WHITESPACE_VIEW);
   return (end == std::string::npos) ? "" : s.substr(0, end + 1);
 }
 
@@ -139,7 +142,7 @@ trim(const std::string& s)
 static inline std::string
 rstrip(std::string haystack, const std::string& needle)
 {
-  const auto pos = haystack.find(needle);
+  const size_t pos = haystack.find(needle);
   if (pos != std::string::npos) {
     haystack.erase(pos);
   }
@@ -152,20 +155,34 @@ startsWith(const std::string& haystack, const std::string& needle)
   return haystack.compare(0, needle.size(), needle) == 0;
 }
 
-static inline std::string
-trimLineOmitComment(std::string line)
+static inline std::string_view
+trimLineOmitCommentView(std::string_view line)
 {
-  line = pylimer_tools::utils::ltrim(line);
-  // trim comments
-  line = pylimer_tools::utils::rstrip(line, "#");
+  const size_t start = line.find_first_not_of(WHITESPACE_VIEW);
+  if (start == std::string_view::npos) {
+    return std::string_view();
+  }
+  line.remove_prefix(start);
+  const size_t commentPos = line.find('#');
+  if (commentPos != std::string_view::npos) {
+    line = line.substr(0, commentPos);
+  }
+  while (!line.empty() && (line.back() == '\r' || line.back() == '\n')) {
+    line.remove_suffix(1);
+  }
   return line;
 }
 
 static inline std::string
-trimLineOmitComment(char* line)
+trimLineOmitComment(std::string_view line)
 {
-  const std::string tempString = std::string(line);
-  return pylimer_tools::utils::trimLineOmitComment(tempString);
+  return std::string(trimLineOmitCommentView(line));
+}
+
+static inline std::string
+trimLineOmitComment(const char* line)
+{
+  return std::string(trimLineOmitCommentView(std::string_view(line)));
 }
 
 static inline std::vector<std::string>
@@ -229,7 +246,7 @@ public:
     // }
 
     // or the "manual" one below
-    const std::string separators = " ,;\t\n";
+    const std::string separators = " ,;\t\r\n";
     const std::string& text = subject;
     size_t start = text.find_first_not_of(separators);
     do {
@@ -262,7 +279,7 @@ public:
 
     // or the "manual" one below
     this->results.reserve(maxNrToRead);
-    const std::string separators = " ,;\t\n";
+    const std::string separators = " ,;\t\r\n";
     const std::string& text = subject;
     size_t start = text.find_first_not_of(separators);
     size_t iteration = 0;

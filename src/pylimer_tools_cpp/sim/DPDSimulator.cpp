@@ -1562,13 +1562,15 @@ DPDSimulator::validateNeighbourlist(const double cutoff)
     this->numAtoms *
     (std::ceil((3.1 * cutoff) * (3.1 * cutoff) * (3.1 * cutoff)) /
      this->box.getVolume())));
+  std::vector<size_t> relevantNeighbors;
+  std::vector<size_t> relevantPairs;
 
   // actually loop the atoms
   for (size_t i = 0; i < static_cast<size_t>(this->numAtoms); ++i) {
     const Eigen::Index iEigen = static_cast<Eigen::Index>(i);
     const int numNeighbors = this->neighbourlist.getIndicesCloseToCoordinates(
       neighbors, this->coordinates.segment(3 * iEigen, 3), cutoff);
-    Eigen::ArrayXi neighbors2 =
+    const Eigen::ArrayXi neighbors2 =
       this->neighbourlist.getIndicesCloseToCoordinates(
         this->coordinates.segment(3 * iEigen, 3), cutoff);
     RUNTIME_EXP_IFN(
@@ -1576,8 +1578,8 @@ DPDSimulator::validateNeighbourlist(const double cutoff)
       "Neighbors should be equal no matter the method, but apparently, "
       "they are not.");
 
-    std::vector<size_t> relevantNeighbors;
-    std::vector<size_t> relevantPairs;
+    relevantNeighbors.clear();
+    relevantPairs.clear();
 
     // neighbour-list
     for (Eigen::Index neigh_idx = 0; neigh_idx < numNeighbors; ++neigh_idx) {

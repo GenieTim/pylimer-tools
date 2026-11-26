@@ -3,6 +3,7 @@
 #include "../../src/pylimer_tools_cpp/entities/Molecule.h"
 #include "../../src/pylimer_tools_cpp/entities/Universe.h"
 #include "../../src/pylimer_tools_cpp/entities/UniverseSequence.h"
+#include "../../src/pylimer_tools_cpp/io/DataFileWriter.h"
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
@@ -38,7 +39,7 @@ TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]")
     REQUIRE(universeSeq.atIndex(0).getNrOfBonds() == 5);
     REQUIRE(universeSeq.atIndex(0).getTimestep() == 70764);
     REQUIRE(universeSeq.atIndex(0).getMasses()[1] == 1.0);
-    auto universes = universeSeq.getAll();
+    std::vector<pe::Universe> universes = universeSeq.getAll();
     REQUIRE(universes.size() == 1);
   }
 
@@ -248,9 +249,47 @@ TEST_CASE("Universe sequence can compute things", "[UniverseSequence][entity]")
       { suspectedPath + "/structure/network_100_a_46.structure.out",
         suspectedPath + "/structure/network_100_a_46.structure.out" });
 
-    auto msdRes = universeSeq.computeMsdForAtoms({ 1 }, 1, true);
+    std::unordered_map<long int, double> msdRes =
+      universeSeq.computeMsdForAtoms({ 1 }, 1, true);
     CHECK(msdRes.size() == 1);
-    CHECK(msdRes[1] == 0.);
+    CHECK(msdRes.at(1) == 0.);
+
+    // Verify non-zero MSD on data files when only selected atom moves while
+    // vertex 0 moves differently
+    const std::string dataStep0 = suspectedPath + "/tmp_msd_step0.data";
+    const std::string dataStep1 = suspectedPath + "/tmp_msd_step1.data";
+    const std::string dataStep2 = suspectedPath + "/tmp_msd_step2.data";
+    auto writeTwoAtomData =
+      [](const std::string& path, const double xAtom1, const double xAtom2) {
+        pe::Universe u(20.0, 20.0, 20.0);
+        u.addAtoms({ 1, 2 },
+                   { 1, 1 },
+                   { xAtom1, xAtom2 },
+                   { 0., 0. },
+                   { 0., 0. },
+                   { 0, 0 },
+                   { 0, 0 },
+                   { 0, 0 });
+        u.setMassForType(1, 1.0);
+        pylimer_tools::utils::DataFileWriter writer(u);
+        writer.writeToFile(path);
+      };
+    writeTwoAtomData(dataStep0, 0.0, 1.0);
+    writeTwoAtomData(dataStep1, 9.0, 3.0);
+    writeTwoAtomData(dataStep2, 18.0, 5.0);
+
+    pe::UniverseSequence movingDataSeq;
+    movingDataSeq.initializeFromDataSequence(
+      { dataStep0, dataStep1, dataStep2 });
+    const std::unordered_map<long int, double> msdAtom2 =
+      movingDataSeq.computeMsdForAtoms({ 2 }, 3, true);
+    REQUIRE(msdAtom2.size() == 2);
+    CHECK(msdAtom2.at(1) == Catch::Approx(4.0));
+    CHECK(msdAtom2.at(2) == Catch::Approx(16.0));
+
+    std::filesystem::remove(dataStep0);
+    std::filesystem::remove(dataStep1);
+    std::filesystem::remove(dataStep2);
   }
 
   SECTION("From dump files")
@@ -259,13 +298,15 @@ TEST_CASE("Universe sequence can compute things", "[UniverseSequence][entity]")
       suspectedPath + "/lammps_data_file_small.out",
       suspectedPath + "/lammps_dump_small_3step.lammpstrj");
 
-    auto msdRes = universeSeq.computeMsdForAtoms({ 90000 }, 1, true);
+    std::unordered_map<long int, double> msdRes =
+      universeSeq.computeMsdForAtoms({ 90000 }, 1, true);
     CHECK(msdRes.size() == 2);
     CHECK(msdRes.at(1) == 0.);
     CHECK(msdRes.at(2) == 0.);
 
-    auto msdRes2 = universeSeq.computeMsdForAtomProperties(
-      { 90000 }, "xsu", "ysu", "zsu", 1, true);
+    std::unordered_map<long int, double> msdRes2 =
+      universeSeq.computeMsdForAtomProperties(
+        { 90000 }, "xsu", "ysu", "zsu", 1, true);
     CHECK(msdRes2.size() == 2);
     CHECK(msdRes2.at(1) == 0.);
     CHECK(msdRes2.at(2) == 0.);
@@ -290,26 +331,29 @@ TEST_CASE("Universe sequence can compute things", "[UniverseSequence][entity]")
       suspectedPath + "/lammps_dump_small_3step.lammpstrj");
 
     // Test with max_tau = 1 - should only compute tau = 1
-    auto msdResLimited = universeSeq.computeMsdForAtoms({ 90000 }, 1, true, 1);
+    std::unordered_map<long int, double> msdResLimited =
+      universeSeq.computeMsdForAtoms({ 90000 }, 1, true, 1);
     CHECK(msdResLimited.size() == 1);
     CHECK(msdResLimited.find(1) != msdResLimited.end());
     CHECK(msdResLimited.find(2) == msdResLimited.end());
 
     // Test with max_tau = -1 (unlimited) - should compute all possible tau
     // values
-    auto msdResUnlimited =
+    std::unordered_map<long int, double> msdResUnlimited =
       universeSeq.computeMsdForAtoms({ 90000 }, 1, true, -1);
     CHECK(msdResUnlimited.size() == 2);
     CHECK(msdResUnlimited.find(1) != msdResUnlimited.end());
     CHECK(msdResUnlimited.find(2) != msdResUnlimited.end());
 
     // Test with max_tau = 0 - should compute no tau values
-    auto msdResZero = universeSeq.computeMsdForAtoms({ 90000 }, 1, true, 0);
+    std::unordered_map<long int, double> msdResZero =
+      universeSeq.computeMsdForAtoms({ 90000 }, 1, true, 0);
     CHECK(msdResZero.size() == 0);
 
     // Test with computeMsdForAtomProperties as well
-    auto msdPropsLimited = universeSeq.computeMsdForAtomProperties(
-      { 90000 }, "xsu", "ysu", "zsu", 1, true, 1);
+    std::unordered_map<long int, double> msdPropsLimited =
+      universeSeq.computeMsdForAtomProperties(
+        { 90000 }, "xsu", "ysu", "zsu", 1, true, 1);
     CHECK(msdPropsLimited.size() == 1);
     CHECK(msdPropsLimited.find(1) != msdPropsLimited.end());
     CHECK(msdPropsLimited.find(2) == msdPropsLimited.end());

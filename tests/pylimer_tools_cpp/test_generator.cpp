@@ -132,7 +132,7 @@ TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]")
   universe.setMasses(weights);
   REQUIRE(universe.getVolume() == 10.0 * 10.0 * 10.0);
 
-  auto angles = universe.detectAngles();
+  std::map<std::string, std::vector<long int>> angles = universe.detectAngles();
   std::vector<int> angleTypes;
   angleTypes.reserve(angles["angle_from"].size());
   for (size_t i = 0; i < angles["angle_from"].size(); i++) {
@@ -168,13 +168,13 @@ TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]")
     REQUIRE(universe.getNrOfBonds() == universe2.getNrOfBonds());
     REQUIRE(universe.getAtom(3) == universe2.getAtom(3));
 
-    auto molecules = universe.getMolecules(2);
+    const std::vector<pe::Molecule>& molecules = universe.getMolecules(2);
     CHECK(molecules.size() == (4 / 2) * 100 + 100);
-    for (const auto& molecule : molecules) {
+    for (const pe::Molecule& molecule : molecules) {
       CHECK(molecule.getNrOfAtoms() == 16);
     }
 
-    auto bondLengths = universe.computeBondLengths();
+    std::vector<double> bondLengths = universe.computeBondLengths();
     for (const double bondLength : bondLengths) {
       CHECK(bondLength > 0.0);
       CHECK(bondLength < 3.5);
@@ -290,13 +290,14 @@ TEST_CASE("MCUniverseGenerator can generate without primary loops",
 
     // verify that no primary loops are present
     // method 1: detection of molecules
-    auto chains = universe.getChainsWithCrosslinker(2);
-    for (const auto& chain : chains) {
+    const std::vector<pe::Molecule>& chains =
+      universe.getChainsWithCrosslinker(2);
+    for (const pe::Molecule& chain : chains) {
       CHECK(chain.getType() != pe::MoleculeType::PRIMARY_LOOP);
     }
 
     // method 2: detection of loops
-    auto loops = universe.countLoopLengths(14);
+    std::unordered_map<int, int> loops = universe.countLoopLengths(14);
     CHECK(loops.size() == 0);
   }
 
@@ -311,13 +312,14 @@ TEST_CASE("MCUniverseGenerator can generate without primary loops",
 
     // verify that no primary loops are present
     // method 1: detection of molecules
-    auto chains = universe.getChainsWithCrosslinker(2);
-    for (const auto& chain : chains) {
+    const std::vector<pe::Molecule>& chains =
+      universe.getChainsWithCrosslinker(2);
+    for (const pe::Molecule& chain : chains) {
       CHECK(chain.getType() != pe::MoleculeType::PRIMARY_LOOP);
     }
 
     // method 2: detection of loops
-    auto loops = universe.countLoopLengths(14);
+    std::unordered_map<int, int> loops = universe.countLoopLengths(14);
     CHECK(loops.size() == 0);
   }
 }
@@ -350,7 +352,7 @@ TEST_CASE("Universe can crosslink up to w_sol",
     nFreeStrands += mol.getType() == pe::MoleculeType::FREE_CHAIN;
   }
 
-  auto clusters = universe.getClusters();
+  std::vector<pe::Universe> clusters = universe.getClusters();
   CHECK(clusters.size() < 20);
 
   pylimer_tools::sim::mehp::MEHPSimulator forceRelaxer =
@@ -1619,19 +1621,20 @@ TEST_CASE("addStarCrosslinkers generates star-like crosslinkers with "
     CHECK(universe.getNrOfBonds() == 50 * 6 * 10);
 
     // Check that we have exactly 50*6 molecules (6 per star)
-    auto molecules = universe.getMolecules(2);
+    const std::vector<pe::Molecule>& molecules = universe.getMolecules(2);
     CHECK(molecules.size() == 50 * 6);
 
     // Check that each molecule has the correct number of atoms
-    for (const auto& molecule : molecules) {
+    for (const pe::Molecule& molecule : molecules) {
       CHECK(molecule.getNrOfAtoms() == 10); // 10 atoms per strand
     }
 
     // then, check that we have a cross-link for each strand
-    auto chains = universe.getChainsWithCrosslinker(2);
+    const std::vector<pe::Molecule>& chains =
+      universe.getChainsWithCrosslinker(2);
     CHECK(chains.size() == 50 * 6);
 
-    for (const auto& chain : chains) {
+    for (const pe::Molecule& chain : chains) {
       CHECK(chain.getNrOfAtoms() == 11); // 10 atoms per strand + 1 crosslinker
     }
   }
@@ -1647,10 +1650,10 @@ TEST_CASE("addStarCrosslinkers generates star-like crosslinkers with "
     CHECK(universe.getAtomsOfType(3).size() == 25);          // crosslinkers
     CHECK(universe.getAtomsOfType(2).size() == 25 * 8 * 15); // strand atoms
 
-    auto molecules = universe.getMolecules(3);
+    const std::vector<pe::Molecule>& molecules = universe.getMolecules(3);
     CHECK(molecules.size() == 25 * 8);
 
-    for (const auto& molecule : molecules) {
+    for (const pe::Molecule& molecule : molecules) {
       CHECK(molecule.getNrOfAtoms() == 15); // 15 atoms per strand
     }
   }

@@ -1115,7 +1115,7 @@ TEST_CASE("MEHP Force Balance can break all springs",
   std::unordered_map<long int, int> fs =
     forceBalancer.getEffectiveFunctionalityOfAtoms();
   CHECK(fs.size() == forceBalancer.getNrOfNodes());
-  for (const auto& pair : fs) {
+  for (const std::pair<const long int, int>& pair : fs) {
     CHECK(pair.second == 0);
   }
 }

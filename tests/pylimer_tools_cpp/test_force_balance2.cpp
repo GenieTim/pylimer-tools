@@ -261,7 +261,7 @@ TEST_CASE("MEHP Force Balance2 runs", "[analysis][MEHPSimulator][long]")
     CHECK(forceBalancer.getGammaFactor(
             1., static_cast<int>(forceBalancer.getNrOfStrands())) ==
           Catch::Approx(1. / 3.).epsilon(0.001));
-    auto stressTensor = forceBalancer.getStressTensor();
+    Eigen::Matrix3d stressTensor = forceBalancer.getStressTensor();
     CHECK(forceBalancer.getPressure() ==
           Catch::Approx(
             (stressTensor(0, 0) + stressTensor(1, 1) + stressTensor(2, 2)) / 3.)
@@ -336,7 +336,7 @@ TEST_CASE(
 
   std::unordered_map<long int, int> effF =
     forceBalancer.getEffectiveFunctionalityOfAtoms();
-  for (const auto& pair : effF) {
+  for (const std::pair<const long int, int>& pair : effF) {
     CHECK(pair.second == 0);
   }
   Eigen::VectorXd gammaFactorsX = forceBalancer.getGammaFactorsInDir(0, 1.);
@@ -773,9 +773,10 @@ TEST_CASE("MEHPForceBalance2 gives approx. same results for entanglement links "
   pe::Universe universe = universeSeq.atIndex(0);
   std::cout << "Read file " << inputFile << std::endl;
 
-  auto entanglements =
-    pylimer_tools::topo::entanglement_detection::randomlyFindEntanglements(
-      universe, 250, 2.5, 0., 10, 3, "a533d");
+  pylimer_tools::topo::entanglement_detection::AtomPairEntanglements
+    entanglements =
+      pylimer_tools::topo::entanglement_detection::randomlyFindEntanglements(
+        universe, 250, 2.5, 0., 10, 3, "a533d");
 
   pcm::MEHPSimulator forceBalanceLinks = pcm::MEHPSimulator(
     universe, entanglements, 2, pcm::EntanglementMode::MERGED_LINKS);
@@ -866,9 +867,10 @@ TEST_CASE("MEHPForceBalance2 gives approx. same results for entanglement links "
   pe::Universe universe = universeSeq.atIndex(0);
   std::cout << "Read file " << inputFile << std::endl;
 
-  auto entanglements =
-    pylimer_tools::topo::entanglement_detection::randomlyFindEntanglements(
-      universe, 25, 2.5, 0., 5, 2, "*a533d");
+  pylimer_tools::topo::entanglement_detection::AtomPairEntanglements
+    entanglements =
+      pylimer_tools::topo::entanglement_detection::randomlyFindEntanglements(
+        universe, 25, 2.5, 0., 5, 2, "*a533d");
 
   pcm::MEHPSimulator forceBalanceLinks = pcm::MEHPSimulator(
     universe, entanglements, 2, pcm::EntanglementMode::MERGED_LINKS);
@@ -1243,8 +1245,9 @@ TEST_CASE("MEHPForceBalance2 Bugfix Validations 1A.1 1A.2 1A.4",
   }
 
   // 1A.2: findSpringsAndLinksClusteredToActive size
-  auto clustered = fb.getNetwork().findSpringsAndLinksClusteredToActive(
-    fb.getCurrentDisplacements());
+  std::pair<Eigen::ArrayXb, Eigen::ArrayXb> clustered =
+    fb.getNetwork().findSpringsAndLinksClusteredToActive(
+      fb.getCurrentDisplacements());
   CHECK(static_cast<size_t>(clustered.second.size()) ==
         fb.getNetwork().nrOfLinks);
 
@@ -1276,7 +1279,7 @@ TEST_CASE(
   std::cout << "Reading file " << inputFile << std::endl;
   universeSeq.initializeFromDataSequence({ { inputFile } });
   pe::Universe universe = universeSeq.atIndex(0);
-  auto masses = universe.getMasses();
+  std::map<int, double> masses = universe.getMasses();
   std::cout << "Read file " << inputFile << std::endl;
 
   // sample entanglements
@@ -1402,7 +1405,7 @@ TEST_CASE(
   std::cout << "Reading file " << inputFile << std::endl;
   universeSeq.initializeFromDataSequence({ { inputFile } });
   pe::Universe universe = universeSeq.atIndex(0);
-  auto masses = universe.getMasses();
+  std::map<int, double> masses = universe.getMasses();
   std::cout << "Read file " << inputFile << std::endl;
 
   pylimer_tools::topo::entanglement_detection::AtomPairEntanglements
@@ -1465,7 +1468,7 @@ TEST_CASE("MEHPForceBalance2 phantom with and without removal is the same",
   std::cout << "Reading file " << inputFile << std::endl;
   universeSeq.initializeFromDataSequence({ { inputFile } });
   pe::Universe universe = universeSeq.atIndex(0);
-  auto masses = universe.getMasses();
+  std::map<int, double> masses = universe.getMasses();
   std::cout << "Read file " << inputFile << std::endl;
 
   pcm::MEHPSimulator forceBalancerPhantom = pcm::MEHPSimulator(
@@ -1538,7 +1541,7 @@ TEST_CASE("Temporary force balance 2 test case",
   std::cout << "Reading file " << inputFile << std::endl;
   universeSeq.initializeFromDataSequence({ { inputFile } });
   pe::Universe universe = universeSeq.atIndex(0);
-  auto masses = universe.getMasses();
+  std::map<int, double> masses = universe.getMasses();
   std::cout << "Read file " << inputFile << std::endl;
 
   pcm::MEHPSimulator forceBalancerEntanglements =
@@ -2576,19 +2579,20 @@ TEST_CASE("All MEHP Force Balance 1 vs. 2 Comparisons with Entanglements and "
     universeSeq.initializeFromDataSequence({ { inputFile } });
     pe::Universe universe = universeSeq.atIndex(0);
 
-    auto entanglements =
-      pylimer_tools::topo::entanglement_detection::randomlyFindEntanglements(
-        universe,
-        static_cast<size_t>(0.005 *
-                            static_cast<double>(universe.getNrOfAtoms())),
-        2.5,
-        0.,
-        0,
-        2,
-        "t35ts33d",
-        2,
-        true,
-        true);
+    pylimer_tools::topo::entanglement_detection::AtomPairEntanglements
+      entanglements =
+        pylimer_tools::topo::entanglement_detection::randomlyFindEntanglements(
+          universe,
+          static_cast<size_t>(0.005 *
+                              static_cast<double>(universe.getNrOfAtoms())),
+          2.5,
+          0.,
+          0,
+          2,
+          "t35ts33d",
+          2,
+          true,
+          true);
 
     pcm::MEHPSimulator forceBalance2 = pcm::MEHPSimulator(
       universe, entanglements, 2, pcm::EntanglementMode::MERGED_LINKS);
@@ -3951,7 +3955,7 @@ TEST_CASE("MEHPForceBalance2 Metal End-to-End GPU Relaxation",
     }
     Eigen::VectorXd diag =
       Eigen::VectorXd::Zero(static_cast<Eigen::Index>(numNodes));
-    for (const auto& tr : trips) {
+    for (const Eigen::Triplet<double>& tr : trips) {
       diag[tr.row()] -= tr.value();
     }
     for (size_t i = 0; i < numNodes; ++i) {
@@ -3962,7 +3966,7 @@ TEST_CASE("MEHPForceBalance2 Metal End-to-End GPU Relaxation",
     scalarL.setFromTriplets(trips.begin(), trips.end());
     scalarL.makeCompressed();
 
-    auto bench = pcm::benchmarkCoopWidthsMetal(scalarL, 50);
+    pcm::CoopBenchmarkResult bench = pcm::benchmarkCoopWidthsMetal(scalarL, 50);
     std::cout << "Coop2 time: " << bench.timeCoop2_ms << " ms" << std::endl;
     std::cout << "Coop4 time: " << bench.timeCoop4_ms << " ms" << std::endl;
     std::cout << "Coop8 time: " << bench.timeCoop8_ms << " ms" << std::endl;
@@ -3996,7 +4000,7 @@ TEST_CASE("MEHPForceBalance2 Metal End-to-End GPU Relaxation",
       }
     }
     Eigen::VectorXd diag = Eigen::VectorXd::Zero(static_cast<Eigen::Index>(N));
-    for (const auto& tr : tripsScalar)
+    for (const Eigen::Triplet<double>& tr : tripsScalar)
       diag[tr.row()] -= tr.value();
     for (size_t i = 0; i < N; ++i)
       tripsScalar.emplace_back(i, i, diag[static_cast<Eigen::Index>(i)] + 1.0);
@@ -4008,7 +4012,7 @@ TEST_CASE("MEHPForceBalance2 Metal End-to-End GPU Relaxation",
 
     std::vector<Eigen::Triplet<double>> trips3N;
     trips3N.reserve(tripsScalar.size() * 3);
-    for (const auto& tr : tripsScalar) {
+    for (const Eigen::Triplet<double>& tr : tripsScalar) {
       for (int d = 0; d < 3; ++d) {
         trips3N.emplace_back(tr.row() * 3 + d, tr.col() * 3 + d, tr.value());
       }
@@ -4083,7 +4087,7 @@ TEST_CASE("MEHPForceBalance2 Metal Single-Precision Solvers & Robust CPU "
 
   Eigen::VectorXd diag =
     Eigen::VectorXd::Zero(static_cast<Eigen::Index>(numNodes));
-  for (const auto& tr : trips) {
+  for (const Eigen::Triplet<double>& tr : trips) {
     diag[tr.row()] -= tr.value();
   }
   for (size_t i = 0; i < numNodes; ++i) {
@@ -4182,7 +4186,7 @@ TEST_CASE(
 
   Eigen::VectorXd diag =
     Eigen::VectorXd::Zero(static_cast<Eigen::Index>(numNodes));
-  for (const auto& tr : trips) {
+  for (const Eigen::Triplet<double>& tr : trips) {
     diag[tr.row()] -= tr.value();
   }
   for (size_t i = 0; i < numNodes; ++i) {
@@ -4284,7 +4288,7 @@ TEST_CASE(
 
   Eigen::VectorXd diag =
     Eigen::VectorXd::Zero(static_cast<Eigen::Index>(numNodes));
-  for (const auto& tr : trips) {
+  for (const Eigen::Triplet<double>& tr : trips) {
     diag[tr.row()] -= tr.value();
   }
   for (size_t i = 0; i < numNodes; ++i) {
@@ -4304,7 +4308,7 @@ TEST_CASE(
   std::cout << "Hybrid vs Uniform SpMV Max Diff: " << diff << std::endl;
   CHECK(diff < 1e-4);
 
-  auto bench = pcm::benchmarkHybridSpMVMetal(scalarL, 50);
+  pcm::HybridBenchmarkResult bench = pcm::benchmarkHybridSpMVMetal(scalarL, 50);
   std::cout << "Polymer network beads: Low-degree (<4) = "
             << bench.numLowDegreeRows << " ("
             << (100.0 * bench.numLowDegreeRows / numNodes) << "%), "

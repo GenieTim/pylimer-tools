@@ -459,7 +459,7 @@ init_pylimer_bound_entities(py::module_& m)
             << ", x=" << a.getX() << ", y=" << a.getY() << ", z=" << a.getZ()
             << ", nx=" << a.getNX() << ", ny=" << a.getNY()
             << ", nz=" << a.getNZ();
-        auto extra = a.getExtraData();
+        const std::unordered_map<std::string, double>& extra = a.getExtraData();
         if (!extra.empty()) {
           oss << ", extra_properties=" << extra.size();
         }

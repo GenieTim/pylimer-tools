@@ -170,6 +170,15 @@ private:
       CC2 // Can be extended for more species as needed
     };
     std::vector<FieldType> fields;
+    bool hasMoleculeId = false;
+
+    AtomFieldDescriptor(std::initializer_list<FieldType> fieldList)
+      : fields(fieldList)
+      , hasMoleculeId(std::find(fields.begin(),
+                                fields.end(),
+                                FieldType::MOLECULE_ID) != fields.end())
+    {
+    }
   };
 
   void readNs(const std::string& line);
@@ -208,7 +217,7 @@ private:
                        const AtomFieldDescriptor& descriptor,
                        Args&... args);
 
-  AtomFieldDescriptor getAtomStyleDescriptor(AtomStyle style) const;
+  static const AtomFieldDescriptor& getAtomStyleDescriptor(AtomStyle style);
 
   // bonds, angles, etc.
   void readBonds(std::ifstream& file, std::string& line);

@@ -778,7 +778,7 @@ set_has_key(const T0& map, const T1& key)
  */
 template<typename T0, typename T1>
 static inline bool
-map_has_key(const T0 map, const T1 key)
+map_has_key(const T0& map, const T1& key)
 {
 #if __cplusplus >= 202002L
   // C++20 (and later) code
@@ -859,15 +859,6 @@ vector_approx_rel_equal(const IN& v1,
     }
   }
   return true;
-}
-
-template<typename IN>
-static inline void
-eraseIndices(std::vector<IN> from, std::vector<long int>& indices)
-{
-  for (const auto index : indices) {
-    from.erase(static_cast<size_t>(index));
-  }
 }
 
 #define MAKE_CONVERSION_FROM_STD_VEC_TO_IGRAPH(IGRAPH_VEC, ELEM_TYPE)          \

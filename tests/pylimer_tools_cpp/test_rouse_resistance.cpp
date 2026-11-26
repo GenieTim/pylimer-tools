@@ -23,7 +23,8 @@ TEST_CASE("ResistanceDistanceAnalysis linear chain properties",
           "[topo][ResistanceDistanceAnalysis]")
 {
   const size_t N = 6;
-  auto rda = pt::ResistanceDistanceAnalysis::createLinearChain(N);
+  pt::ResistanceDistanceAnalysis rda =
+    pt::ResistanceDistanceAnalysis::createLinearChain(N);
 
   CHECK(rda.getNrOfNodes() == N);
   CHECK(rda.getNrOfEdges() == N - 1);
@@ -127,7 +128,8 @@ TEST_CASE("ResistanceDistanceAnalysis ring graph properties",
           "[topo][ResistanceDistanceAnalysis]")
 {
   const size_t N = 8;
-  auto rda = pt::ResistanceDistanceAnalysis::createRing(N);
+  pt::ResistanceDistanceAnalysis rda =
+    pt::ResistanceDistanceAnalysis::createRing(N);
 
   CHECK(rda.getNrOfNodes() == N);
   CHECK(rda.getNrOfEdges() == N);
@@ -170,7 +172,8 @@ TEST_CASE("ResistanceDistanceAnalysis complete graph K_N",
           "[topo][ResistanceDistanceAnalysis]")
 {
   const size_t N = 5;
-  auto rda = pt::ResistanceDistanceAnalysis::createComplete(N);
+  pt::ResistanceDistanceAnalysis rda =
+    pt::ResistanceDistanceAnalysis::createComplete(N);
 
   CHECK(rda.getNrOfNodes() == N);
   CHECK(rda.getNrOfEdges() == (N * (N - 1)) / 2);
@@ -201,7 +204,8 @@ TEST_CASE("ResistanceDistanceAnalysis star graph properties",
           "[topo][ResistanceDistanceAnalysis]")
 {
   const size_t numArms = 4;
-  auto rda = pt::ResistanceDistanceAnalysis::createStar(numArms, 1);
+  pt::ResistanceDistanceAnalysis rda =
+    pt::ResistanceDistanceAnalysis::createStar(numArms, 1);
   const size_t N = 1 + numArms; // Center node 0 + 4 leaves
 
   CHECK(rda.getNrOfNodes() == N);
@@ -351,7 +355,8 @@ TEST_CASE("ResistanceDistanceAnalysis Moore-Penrose pseudo-inverse properties",
           "[topo][ResistanceDistanceAnalysis]")
 {
   const size_t N = 5;
-  auto rda = pt::ResistanceDistanceAnalysis::createLinearChain(N);
+  pt::ResistanceDistanceAnalysis rda =
+    pt::ResistanceDistanceAnalysis::createLinearChain(N);
   Eigen::MatrixXd Lplus = rda.computeMoorePenrosePseudoInverse();
   Eigen::MatrixXd L = Eigen::MatrixXd(rda.getLaplacian());
 
@@ -410,7 +415,8 @@ TEST_CASE("RouseBrownianSimulator deterministic relaxation",
   double T = 0.0; // Deterministic (no thermal noise)
   double dt = 0.05;
 
-  auto sim = ps::RouseBrownianSimulator::createLinearChain(N, gamma, k, T, dt);
+  ps::RouseBrownianSimulator sim =
+    ps::RouseBrownianSimulator::createLinearChain(N, gamma, k, T, dt);
   sim.initializeLinearPositions(1.0, 0); // Along x-axis: [0, 1, 2, ..., N-1]
 
   Eigen::Vector3d initialCM = sim.getCenterOfMass();
@@ -468,11 +474,11 @@ TEST_CASE("RouseBrownianSimulator deterministic relaxation",
   SECTION(
     "Direct LDLT, Direct LLT, and Conjugate Gradient yield identical steps")
   {
-    auto simLDLT =
+    ps::RouseBrownianSimulator simLDLT =
       ps::RouseBrownianSimulator::createLinearChain(N, gamma, k, T, dt);
-    auto simLLT =
+    ps::RouseBrownianSimulator simLLT =
       ps::RouseBrownianSimulator::createLinearChain(N, gamma, k, T, dt);
-    auto simCG =
+    ps::RouseBrownianSimulator simCG =
       ps::RouseBrownianSimulator::createLinearChain(N, gamma, k, T, dt);
 
     simLDLT.setSolverType(ps::RouseSolverType::DIRECT_LDLT);
@@ -501,13 +507,14 @@ TEST_CASE("RouseBrownianSimulator center-of-mass diffusion",
   double T = 1.0;
   double dt = 0.01;
 
-  auto sim = ps::RouseBrownianSimulator::createLinearChain(N, gamma, k, T, dt);
+  ps::RouseBrownianSimulator sim =
+    ps::RouseBrownianSimulator::createLinearChain(N, gamma, k, T, dt);
   sim.initializeLinearPositions(1.0, 0);
   sim.setSeed(12345);
 
   size_t totalSteps = 500;
   size_t sampleInterval = 10;
-  auto result = sim.run(totalSteps, sampleInterval, true);
+  ps::RouseSimulationResult result = sim.run(totalSteps, sampleInterval, true);
 
   REQUIRE(result.times.size() ==
           static_cast<Eigen::Index>(totalSteps / sampleInterval + 1));
@@ -555,7 +562,8 @@ TEST_CASE("RouseBrownianSimulator external force drift",
   double T = 0.0; // Deterministic
   double dt = 0.02;
 
-  auto sim = ps::RouseBrownianSimulator::createLinearChain(N, gamma, k, T, dt);
+  ps::RouseBrownianSimulator sim =
+    ps::RouseBrownianSimulator::createLinearChain(N, gamma, k, T, dt);
   sim.initializeLinearPositions(1.0, 0);
 
   // Apply a constant force along the x-axis on node 0: F = (10, 0, 0)
@@ -589,7 +597,8 @@ TEST_CASE("RouseBrownianSimulator coordinates and parameter manipulation",
           "[sim][RouseBrownianSimulator]")
 {
   const size_t N = 4;
-  auto sim = ps::RouseBrownianSimulator::createLinearChain(N);
+  ps::RouseBrownianSimulator sim =
+    ps::RouseBrownianSimulator::createLinearChain(N);
 
   SECTION("Flattened position conversion: interleaved vs non-interleaved")
   {

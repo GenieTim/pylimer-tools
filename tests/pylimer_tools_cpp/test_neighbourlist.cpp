@@ -256,3 +256,66 @@ TEST_CASE("EigenNeighbourList diagnostic validateWhyNotIncluded works",
   CHECK_NOTHROW(neighbourList.validateWhyNotIncluded(
     Eigen::Vector3d(1.0, 1.0, 1.0), Eigen::Vector3d(2.0, 2.0, 2.0), 1.5));
 }
+
+TEST_CASE("EigenNeighbourList handles small boxes and non-unit scaling factors "
+          "without duplicates or misses",
+          "[EigenNeighbourList][entity]")
+{
+  const pe::Box smallBox = pe::Box(0.0, 2.5, 0.0, 2.5, 0.0, 2.5);
+  const int numAtoms = 40;
+  Eigen::VectorXd coordinates = Eigen::VectorXd::Zero(3 * numAtoms);
+  for (int i = 0; i < numAtoms; ++i) {
+    coordinates[3 * i + 0] = std::fmod(0.37 * i, 2.5);
+    coordinates[3 * i + 1] = std::fmod(0.61 * i, 2.5);
+    coordinates[3 * i + 2] = std::fmod(0.83 * i, 2.5);
+  }
+
+  for (const double scalingFactor : { 1.0, 1.5, 3.0 }) {
+    DYNAMIC_SECTION("scalingFactor = " << scalingFactor)
+    {
+      const double cutoff = 1.1;
+      const pe::EigenNeighbourList constList(
+        coordinates, smallBox, cutoff, scalingFactor);
+      CHECK(constList.checkIfCoordinatesAreCurrent(coordinates));
+      CHECK(constList.getNumBinnedCoordinates() == numAtoms);
+
+      Eigen::VectorXd perturbed = coordinates;
+      perturbed[0] += 1.25;
+      CHECK_FALSE(constList.checkIfCoordinatesAreCurrent(perturbed));
+
+      Eigen::ArrayXi neighbours(4);
+      for (int i = 0; i < numAtoms; ++i) {
+        const Eigen::Vector3d query = coordinates.segment<3>(3 * i);
+        const int nFound = constList.getIndicesCloseToCoordinates(
+          neighbours, query, cutoff, true);
+
+        // Must never return duplicate atom indices on small periodic grids
+        std::vector<int> returned(neighbours.data(),
+                                  neighbours.data() + nFound);
+        std::sort(returned.begin(), returned.end());
+        CHECK(std::adjacent_find(returned.begin(), returned.end()) ==
+              returned.end());
+
+        // Must recall every true PBC neighbour within cutoff
+        for (int j = 0; j < numAtoms; ++j) {
+          Eigen::Vector3d diff = query - coordinates.segment<3>(3 * j);
+          smallBox.handlePBC(diff);
+          if (diff.norm() < cutoff) {
+            CHECK(std::binary_search(returned.begin(), returned.end(), j));
+          }
+        }
+      }
+    }
+  }
+
+  SECTION("Single-bucket and empty neighbour list preserve preallocated buffer")
+  {
+    const pe::EigenNeighbourList emptyList(
+      Eigen::VectorXd(0), pe::Box(1.0, 1.0, 1.0), 2.0, 1.0);
+    Eigen::ArrayXi preallocated(16);
+    const int count = emptyList.getIndicesCloseToCoordinates(
+      preallocated, Eigen::Vector3d::Zero(), 2.0, true);
+    CHECK(count == 0);
+    CHECK(preallocated.size() == 16);
+  }
+}

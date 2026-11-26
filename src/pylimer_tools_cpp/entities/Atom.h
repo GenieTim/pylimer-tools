@@ -161,12 +161,13 @@ public:
     return coords;
   }
 
-  [[nodiscard]] std::unordered_map<std::string, double> getExtraData() const
+  [[nodiscard]] const std::unordered_map<std::string, double>& getExtraData()
+    const
   {
     return this->extraData;
   }
 
-  [[nodiscard]] double getProperty(const std::string property) const
+  [[nodiscard]] double getProperty(const std::string& property) const
   {
     return this->extraData.at(property);
   }

@@ -396,7 +396,7 @@ class Box:
         """
         Provides support for pickling.
         """
-    def apply_pbc(self, distances: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"]) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+    def apply_pbc(self, distances: typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         """
               Apply periodic boundary conditions (PBC): adjust the specified distances to fit into this box.
               
@@ -484,7 +484,7 @@ class Box:
         
                     :return: The z-dimension length of the box
         """
-    def get_offset(self, distances: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"]) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+    def get_offset(self, distances: typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         """
              Compute the offset required to compensate for periodic boundary conditions.
         
@@ -503,7 +503,7 @@ class Box:
         
                     :return: The volume of the box
         """
-    def is_valid_offset(self, potential_offset: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], abs_precision: typing.SupportsFloat | typing.SupportsIndex = 1e-05) -> bool:
+    def is_valid_offset(self, potential_offset: typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"], abs_precision: typing.SupportsFloat | typing.SupportsIndex = 1e-05) -> bool:
         """
                   Check whether the passed offset is a valid one in this box.
                   
@@ -3500,7 +3500,7 @@ class NormalModeAnalyzer:
                  :param config: KPMConfig instance
                  :return: Vector of damped Chebyshev moments
         """
-    def density_of_states(self, lambda_grid: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], config: KPMConfig = ...) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+    def density_of_states(self, lambda_grid: typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"], config: KPMConfig = ...) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         """
                  Compute continuous density of states (DOS) on lambda_grid using KPM.
         
@@ -3573,14 +3573,14 @@ class NormalModeSpectrum:
         ...
     def __setstate__(self, arg0: tuple) -> None:
         ...
-    def loss_modulus(self, omega: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"]) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+    def loss_modulus(self, omega: typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         """
                  Evaluate the loss modulus :math:`G''(\\omega)` (without prefactor).
         
                  :param omega: Angular frequencies
                  :return: Loss modulus values
         """
-    def moduli(self, omega: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"]) -> tuple[typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"], typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]]:
+    def moduli(self, omega: typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]) -> tuple[typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"], typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]]:
         """
                  Evaluate both storage and loss moduli :math:`(G'(\\omega), G''(\\omega))`
                  in a single pass.
@@ -3588,14 +3588,14 @@ class NormalModeSpectrum:
                  :param omega: Angular frequencies
                  :return: Tuple of (storage_modulus, loss_modulus)
         """
-    def storage_modulus(self, omega: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"]) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+    def storage_modulus(self, omega: typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         """
                  Evaluate the storage modulus :math:`G'(\\omega)` (without prefactor).
         
                  :param omega: Angular frequencies
                  :return: Storage modulus values
         """
-    def stress_autocorrelation(self, t: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"]) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+    def stress_autocorrelation(self, t: typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         """
                  Evaluate stress autocorrelation :math:`G(t)`.
         

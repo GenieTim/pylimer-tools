@@ -8,6 +8,7 @@
 #include <fstream> // std::ifstream
 #include <map>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace pylimer_tools::utils {
@@ -33,7 +34,7 @@ DumpFileParser::DumpFileParser(const DumpFileParser& src)
   this->filePath = src.filePath;
   // cannot clone ifstream
   this->file.clear();
-  this->file.open(src.filePath);
+  this->file.open(src.filePath, std::ios::binary);
 };
 // 3. copy assignment operator
 DumpFileParser&
@@ -53,8 +54,8 @@ DumpFileParser::operator=(DumpFileParser src)
     this->file.close();
   }
   this->file.clear();
-  this->file.open(src.filePath);
-  src.file.open(this->filePath);
+  this->file.open(src.filePath, std::ios::binary);
+  src.file.open(this->filePath, std::ios::binary);
   std::swap(this->filePath, src.filePath);
   return *this;
 };
@@ -202,7 +203,8 @@ DumpFileParser::readNGroups(const size_t start, const int N)
   while (std::getline(this->file, line)) {
     linesRead += 1;
     // std::cout << "Read line: " << line << std::endl;
-    line = pylimer_tools::utils::trimLineOmitComment(line);
+    line = pylimer_tools::utils::rtrim(
+      pylimer_tools::utils::trimLineOmitComment(line));
     if (line.empty()) {
       continue;
     }
@@ -306,12 +308,14 @@ DumpFileParser::readDumpFileSections(ReadableDumpFileSections sectionsToRead)
   int numAtoms = 0;
   size_t sectionsRead = 0;
   while (std::getline(this->file, line)) {
-    if (pylimer_tools::utils::startsWith(line, "ITEM: TIMESTEP") &&
+    const std::string_view trimmedHeader =
+      pylimer_tools::utils::trimLineOmitCommentView(line);
+    if (trimmedHeader.starts_with("ITEM: TIMESTEP") &&
         (sectionsToRead & ReadableDumpFileSections::TIMESTEP)) {
       RUNTIME_EXP_IFN(std::getline(this->file, line),
                       "File ended before reading an indicated time-step.");
       resultingTimeSteps.push_back(std::stol(line));
-    } else if (pylimer_tools::utils::startsWith(line, "ITEM: BOX BOUNDS") &&
+    } else if (trimmedHeader.starts_with("ITEM: BOX BOUNDS") &&
                ((sectionsToRead & ReadableDumpFileSections::BOX) ||
                 (sectionsToRead & ReadableDumpFileSections::ATOM))) {
       double loX, hiX, loY, hiY, loZ, hiZ;
@@ -332,16 +336,24 @@ DumpFileParser::readDumpFileSections(ReadableDumpFileSections sectionsToRead)
                       "Could not read the expected two box coords");
       resultingBoxes.push_back(
         pylimer_tools::entities::Box(loX, hiX, loY, hiY, loZ, hiZ));
-    } else if (pylimer_tools::utils::startsWith(line,
-                                                "ITEM: NUMBER OF ATOMS") &&
+    } else if (trimmedHeader.starts_with("ITEM: NUMBER OF ATOMS") &&
                (sectionsToRead & ReadableDumpFileSections::ATOM)) {
       RUNTIME_EXP_IFN(std::getline(this->file, line),
                       "File ended before num atoms could be read");
       numAtoms = std::stoi(line);
-    } else if (pylimer_tools::utils::startsWith(line, "ITEM: ATOMS") &&
+    } else if (trimmedHeader.starts_with("ITEM: ATOMS") &&
                (sectionsToRead & ReadableDumpFileSections::ATOM)) {
-      atomFormat = pylimer_tools::utils::trimLineOmitComment(
-        line.substr(std::string("ITEM: ATOMS ").length()));
+      constexpr std::string_view atomsPrefix = "ITEM: ATOMS";
+      const std::string_view formatView =
+        trimmedHeader.substr(atomsPrefix.size());
+      const size_t firstChar =
+        formatView.find_first_not_of(pylimer_tools::utils::WHITESPACE_VIEW);
+      const size_t lastChar =
+        formatView.find_last_not_of(pylimer_tools::utils::WHITESPACE_VIEW);
+      atomFormat =
+        (firstChar == std::string_view::npos)
+          ? std::string()
+          : std::string(formatView.substr(firstChar, lastChar - firstChar + 1));
       double x = 0., y = 0, z = 0.;
       int nx = 0, ny = 0, nz = 0;
       bool isUnwrappedX = false, isUnwrappedY = false, isUnwrappedZ = false;
@@ -494,61 +506,132 @@ DumpFileParser::rewind()
   this->file.seekg(0, std::ios::beg);
 }
 
+namespace {
+  constexpr size_t DUMP_SCAN_BUFFER_SIZE = 256 * 1024;
+
+  inline std::string_view trimDumpKeyView(const std::string_view line)
+  {
+    std::string_view trimmed =
+      pylimer_tools::utils::trimLineOmitCommentView(line);
+    const size_t end =
+      trimmed.find_last_not_of(pylimer_tools::utils::WHITESPACE_VIEW);
+    return (end == std::string_view::npos) ? std::string_view()
+                                           : trimmed.substr(0, end + 1);
+  }
+
+  inline bool lineMatchesKey(const std::string_view line,
+                             const std::string& key)
+  {
+    const size_t keyLen = key.size();
+    const size_t lineLen = line.size();
+    if (lineLen < keyLen) {
+      return false;
+    }
+    if (lineLen == keyLen) {
+      return std::memcmp(line.data(), key.data(), keyLen) == 0;
+    }
+    const char first = line[0];
+    if (first != key[0] && first != ' ' && first != '\t' && first != '\r' &&
+        first != '\n' && first != '\f' && first != '\v') {
+      return false;
+    }
+    return trimDumpKeyView(line) == key;
+  }
+} // namespace
+
 void
 DumpFileParser::openFile()
 {
-  this->file.open(this->filePath);
+  this->file.open(this->filePath, std::ios::binary);
 
   if (!this->file.is_open()) {
     throw std::invalid_argument("File to read ('" + this->filePath +
                                 "'): failed to open.");
   }
 
-  std::string line;
-  // read everything until the first key
-  while (getline(this->file, line)) {
-    line = pylimer_tools::utils::trimLineOmitComment(line);
-    // skip empty lines: break when not empty
-    if (!line.empty()) {
+  this->groupPosMap.clear();
+
+  std::vector<char> buffer(DUMP_SCAN_BUFFER_SIZE);
+  std::string carry;
+  std::streamoff chunkStartOffset = 0;
+  bool foundFirstKey = false;
+  size_t groupsFound = 0;
+
+  while (this->file) {
+    this->file.read(buffer.data(),
+                    static_cast<std::streamsize>(DUMP_SCAN_BUFFER_SIZE));
+    const std::streamsize bytesRead = this->file.gcount();
+    if (bytesRead <= 0) {
       break;
+    }
+
+    const char* ptr = buffer.data();
+    const char* const end = buffer.data() + bytesRead;
+
+    while (ptr < end) {
+      const char* const newline = static_cast<const char*>(
+        std::memchr(ptr, '\n', static_cast<size_t>(end - ptr)));
+      if (newline == nullptr) {
+        carry.append(ptr, static_cast<size_t>(end - ptr));
+        break;
+      }
+
+      std::string_view lineView;
+      if (carry.empty()) {
+        lineView = std::string_view(ptr, static_cast<size_t>(newline - ptr));
+      } else {
+        carry.append(ptr, static_cast<size_t>(newline - ptr));
+        lineView = std::string_view(carry);
+      }
+
+      const std::streampos nextLinePos = static_cast<std::streampos>(
+        chunkStartOffset + (newline - buffer.data()) + 1);
+
+      if (!foundFirstKey) {
+        const std::string_view trimmed = trimDumpKeyView(lineView);
+        if (!trimmed.empty()) {
+          // new group key: key for a new timestep (group)
+          this->newGroupKey.assign(trimmed.data(), trimmed.size());
+          this->currentLine = this->newGroupKey;
+          // record position of index to jump back at some point
+          this->groupPosMap.emplace(0, nextLinePos);
+          foundFirstKey = true;
+        }
+      } else if (lineMatchesKey(lineView, this->newGroupKey)) {
+        // new timestep
+        groupsFound += 1;
+        this->groupPosMap.emplace(groupsFound, nextLinePos);
+      }
+
+      if (!carry.empty()) {
+        carry.clear();
+      }
+      ptr = newline + 1;
+    }
+
+    chunkStartOffset += bytesRead;
+  }
+
+  if (!carry.empty()) {
+    const std::streampos eofPos = static_cast<std::streampos>(chunkStartOffset);
+    if (!foundFirstKey) {
+      const std::string_view trimmed = trimDumpKeyView(carry);
+      if (!trimmed.empty()) {
+        this->newGroupKey.assign(trimmed.data(), trimmed.size());
+        this->currentLine = this->newGroupKey;
+        this->groupPosMap.emplace(0, eofPos);
+        foundFirstKey = true;
+      }
+    } else if (lineMatchesKey(carry, this->newGroupKey)) {
+      groupsFound += 1;
+      this->groupPosMap.emplace(groupsFound, eofPos);
     }
   }
 
-  // Assemble CSV data for all keys
-  this->newGroupKey = line; // new group key: key for a new timestep (group)
-  this->currentLine = line; // current line
-  this->groupPosMap.emplace(
-    0,
-    this->file.tellg()); // record position of index to jump back at some point
-
-  // read the whole file, skipping all lines that are not the new group key
-  // to record the positions
-  size_t groupsFound = 0;
-  size_t linesSinceLastIgnore = 0;
-  while (getline(this->file, line)) {
-    linesSinceLastIgnore += 1;
-    // performance improvement: not skipping.
-    // could be bad for certain files.
-    line = pylimer_tools::utils::trimLineOmitComment(line);
-    // skip empty lines
-    if (line.empty()) {
-      continue;
-    }
-
-    if (line == this->newGroupKey) {
-      // new timestep
-      groupsFound += 1;
-      this->groupPosMap.emplace(groupsFound, this->file.tellg());
-    }
-
-    // skip forward. Could be too far, in principle.
-    if (linesSinceLastIgnore > 2) {
-      // jump to next occurrence of the first character of the desired line
-      this->file.ignore(std::numeric_limits<std::streamsize>::max(),
-                        this->file.widen(this->newGroupKey[0]));
-      this->file.unget(); // put the character back
-      linesSinceLastIgnore = 0;
-    }
+  if (!foundFirstKey) {
+    this->newGroupKey.clear();
+    this->currentLine.clear();
+    this->groupPosMap.emplace(0, static_cast<std::streampos>(chunkStartOffset));
   }
 
   this->nrOfGroups = groupsFound + 1;

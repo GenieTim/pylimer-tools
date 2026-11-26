@@ -407,10 +407,10 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
 
     SECTION("Get bonds returns")
     {
-      auto edges = universe.getEdges();
+      std::map<std::string, std::vector<long int>> edges = universe.getEdges();
       CHECK(edges["edge_from"][0] == 1 - 1);
       CHECK(edges["edge_to"][0] == 2 - 1);
-      auto bonds = universe.getBonds();
+      std::map<std::string, std::vector<long int>> bonds = universe.getBonds();
       CHECK(bonds.at("bond_from")[0] == 1);
       CHECK(bonds.at("bond_to")[0] == 2);
       CHECK(bonds["bond_from"].size() == bonds["bond_to"].size());
@@ -444,7 +444,8 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
         CHECK(lengths[i] == Catch::Approx(vecs[i].norm()));
       }
 
-      auto chains = universe.getChainsWithCrosslinker(2);
+      const std::vector<pe::Molecule>& chains =
+        universe.getChainsWithCrosslinker(2);
       REQUIRE(chains.size() == 3);
       REQUIRE(chains[0].computeEndToEndDistance() == Catch::Approx(sqrt(10.0)));
       REQUIRE(
@@ -464,7 +465,8 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     SECTION("get angles returns")
     {
       REQUIRE(universe.getAngles()["angle_from"].size() == 0);
-      auto detectedAngles = universe.detectAngles();
+      std::map<std::string, std::vector<long int>> detectedAngles =
+        universe.detectAngles();
       REQUIRE(detectedAngles["angle_from"].size() == 8);
       std::vector<int> angleTypes;
       angleTypes.reserve(detectedAngles["angle_from"].size());
@@ -489,7 +491,8 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     SECTION("get dihedral angles returns")
     {
       REQUIRE(universe.getDihedralAngles()["dihedral_angle_from"].size() == 0);
-      auto detectedAngles = universe.detectDihedralAngles();
+      std::map<std::string, std::vector<long int>> detectedAngles =
+        universe.detectDihedralAngles();
       REQUIRE(detectedAngles["dihedral_angle_from"].size() == 8);
       std::vector<int> angleTypes;
       angleTypes.reserve(detectedAngles["dihedral_angle_from"].size());
@@ -523,7 +526,8 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     SECTION("get atoms with crossLinkers returns")
     {
       // get atoms with crossLinkers returns
-      auto chains = universe.getChainsWithCrosslinker(2);
+      const std::vector<pe::Molecule>& chains =
+        universe.getChainsWithCrosslinker(2);
       REQUIRE(chains.size() == 3);
       REQUIRE(chains[0].getAtoms()[0].getId() == 1);
       REQUIRE(chains[0].getAtoms()[0].getX() == 1.25);
@@ -531,7 +535,8 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       REQUIRE(chains[0].getKey() == "1-2-3-6-7");
       REQUIRE(chains[0].getAtomsOfType(2).size() == 2);
       //
-      auto functionalityPerType = universe.determineFunctionalityPerType();
+      std::map<int, int> functionalityPerType =
+        universe.determineFunctionalityPerType();
       REQUIRE(functionalityPerType[1] == 2);
       REQUIRE(functionalityPerType[2] == 3);
       REQUIRE(functionalityPerType.size() == 2);
@@ -548,7 +553,8 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       REQUIRE(pylimer_tools::utils::map_has_key(loops, 2));
       REQUIRE(loops.size() == 1);
 
-      auto allBonds = universe.getBonds();
+      std::map<std::string, std::vector<long int>> allBonds =
+        universe.getBonds();
       std::vector<long int> bondsOf1;
       std::vector<long int> bondsOf2;
       for (size_t i = 0; i < allBonds["bond_from"].size(); ++i) {
@@ -627,7 +633,8 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       REQUIRE(loops.size() == 2);
       REQUIRE(reducedUniverse.getPropertyValues<int>("id").size() == 3);
       REQUIRE(reducedUniverse.getAtomTypes().size() == 3);
-      for (const auto& myPair : loops) {
+      for (const std::pair<const int, std::vector<std::vector<pe::Atom>>>&
+             myPair : loops) {
         for (const std::vector<pe::Atom>& loop : myPair.second) {
           REQUIRE(loop.size() == static_cast<size_t>(myPair.first));
         }
@@ -698,7 +705,8 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       REQUIRE(reducedUniverse.getNrOfAtoms() == 3);
       REQUIRE(reducedUniverse.getAtomsOfType(2).size() == 3);
 
-      auto edges = reducedUniverse.getEdges();
+      std::map<std::string, std::vector<long int>> edges =
+        reducedUniverse.getEdges();
 
       REQUIRE(reducedUniverse.getNrOfBonds() == 2);
       REQUIRE(edges.at("edge_from").size() == 2);
@@ -708,7 +716,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       REQUIRE(edges.at("edge_from")[1] == 1);
       REQUIRE(edges.at("edge_to")[1] == 2);
 
-      auto atom = reducedUniverse.getAtom(4);
+      pe::Atom atom = reducedUniverse.getAtom(4);
       REQUIRE(atom.getX() == 1.01);
       REQUIRE(atom.getY() == 4.01);
       REQUIRE(atom.getZ() == 1.01);
@@ -728,13 +736,15 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       universe.setBoxLengths(10.0, 10.0, 10.0);
 
       // To understand where the following computations are coming from
-      auto chains = universe.getChainsWithCrosslinker(2);
+      const std::vector<pe::Molecule>& chains =
+        universe.getChainsWithCrosslinker(2);
       REQUIRE(chains.size() == 3);
       REQUIRE(chains[0].getKey() == "1-2-3-6-7");
       REQUIRE(chains[1].getKey() == "5-6-7");
       REQUIRE(chains[2].getKey() == "7-8");
 
-      auto endToEndDistances = universe.computeEndToEndDistances(2);
+      std::vector<double> endToEndDistances =
+        universe.computeEndToEndDistances(2);
       CHECK(endToEndDistances.size() == 3);
       CHECK(endToEndDistances[0] == chains[0].computeEndToEndDistance());
       CHECK(endToEndDistances[0] == Catch::Approx(sqrt(3.0 * 3.0 + 1.0 * 1.0)));
@@ -781,7 +791,10 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
           1);
     CHECK(universe.computeFunctionalityForAtom(1) == 1);
     CHECK(universe.getAtomsConnectedTo(universe.getIdxByAtomId(1)).size() == 1);
-    auto chains = universe.getChainsWithCrosslinker(2);
+    // Copy by value intentionally: setBoxLengths() below invalidates the
+    // cached Molecule vector.
+    const std::vector<pe::Molecule> chains =
+      universe.getChainsWithCrosslinker(2);
     CHECK(chains.size() == 3);
     CHECK(chains[0].getNrOfAtoms() == 3);
     CHECK(chains[0].getType() == pe::MoleculeType::FREE_CHAIN);
@@ -829,7 +842,8 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       );
       universe.addBonds(3, { { 7, 8, 9 } }, { { 8, 9, 7 } });
       CHECK(universe.getNrOfBonds() == 7);
-      auto newChains = universe.getChainsWithCrosslinker(2);
+      const std::vector<pe::Molecule>& newChains =
+        universe.getChainsWithCrosslinker(2);
       CHECK(newChains.size() == 4);
       CHECK(newChains[2].getType() == pe::MoleculeType::PRIMARY_LOOP);
       CHECK(newChains[2].getKey() == "7-8-9");
@@ -1411,7 +1425,8 @@ TEST_CASE("Parts can be removed and added to the universe",
   SECTION("Angles")
   {
     CHECK(universe.getNrOfAngles() == 0);
-    auto angles = universe.detectAngles();
+    std::map<std::string, std::vector<long int>> angles =
+      universe.detectAngles();
     REQUIRE(angles["angle_from"].size() == 2);
     std::vector<int> angleTypes = { 1, 1 };
     universe.addAngles(angles["angle_from"],
@@ -1426,7 +1441,8 @@ TEST_CASE("Parts can be removed and added to the universe",
   SECTION("Dihedrals")
   {
     CHECK(universe.getNrOfDihedralAngles() == 0);
-    auto dihedrals = universe.detectDihedralAngles();
+    std::map<std::string, std::vector<long int>> dihedrals =
+      universe.detectDihedralAngles();
     REQUIRE(dihedrals["dihedral_angle_from"].size() == 1);
     std::vector<int> dihedralAngleTypes = { 1 };
     universe.addDihedralAngles(dihedrals["dihedral_angle_from"],
@@ -1537,7 +1553,8 @@ TEST_CASE("Universe can contract vertices", "[Universe][entity]")
   CHECK(contractedUniverse.validate());
 
   // validate that all edges have now only type 5
-  auto edges = contractedUniverse.getEdges();
+  std::map<std::string, std::vector<long int>> edges =
+    contractedUniverse.getEdges();
   for (size_t i = 0; i < edges["edge_from"].size(); ++i) {
     CHECK(edges["edge_type"][i] == 5);
   }
