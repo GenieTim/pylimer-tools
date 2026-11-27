@@ -151,8 +151,8 @@ plt.show()
 ```
 
 ```none
-Final residual (should be close to 0): 0.00031259672590849906
-Shear Modulus from Equilibrium [MPa]:  0.2630752683719433
+Final residual (should be close to 0): 0.0003327304662465468
+Shear Modulus from Equilibrium [MPa]:  0.26103846472666725
 ```
 
 <!-- GENERATED FROM PYTHON SOURCE LINES 142-145 -->

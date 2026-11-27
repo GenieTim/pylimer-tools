@@ -2,7 +2,7 @@
 
 # Computation times
 
-**00:34.094** total execution time for 3 files **from auto_examples/normal_mode_analysis**:
+**00:30.919** total execution time for 3 files **from auto_examples/normal_mode_analysis**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -19,6 +19,6 @@ $(document).ready( function () {
 
 | Example                                                                                                                                                                                                                                                 | Time      |   Mem (MB) |
 |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [Normal Mode Analysis (NMA)](plot_normal_mode_analysis.md#sphx-glr-auto-examples-normal-mode-analysis-plot-normal-mode-analysis-py) (`plot_normal_mode_analysis.py`)                                                                     | 00:18.089 |          0 |
-| [KPM vs. Full Eigenvalue Normal Mode Analysis for PDMS Networks](plot_kpm_vs_exact_pdms.md#sphx-glr-auto-examples-normal-mode-analysis-plot-kpm-vs-exact-pdms-py) (`plot_kpm_vs_exact_pdms.py`)                                       | 00:12.304 |          0 |
-| [When KPM Fails in Normal Mode Analysis: Percolation, Dangling Modes & HybridConfig](plot_kpm_limitations_and_hybrid.md#sphx-glr-auto-examples-normal-mode-analysis-plot-kpm-limitations-and-hybrid-py) (`plot_kpm_limitations_and_hybrid.py`) | 00:03.702 |          0 |
+| [Normal Mode Analysis (NMA)](plot_normal_mode_analysis.md#sphx-glr-auto-examples-normal-mode-analysis-plot-normal-mode-analysis-py) (`plot_normal_mode_analysis.py`)                                                                     | 00:16.274 |          0 |
+| [KPM vs. Full Eigenvalue Normal Mode Analysis for PDMS Networks](plot_kpm_vs_exact_pdms.md#sphx-glr-auto-examples-normal-mode-analysis-plot-kpm-vs-exact-pdms-py) (`plot_kpm_vs_exact_pdms.py`)                                       | 00:10.987 |          0 |
+| [When KPM Fails in Normal Mode Analysis: Percolation, Dangling Modes & HybridConfig](plot_kpm_limitations_and_hybrid.md#sphx-glr-auto-examples-normal-mode-analysis-plot-kpm-limitations-and-hybrid-py) (`plot_kpm_limitations_and_hybrid.py`) | 00:03.657 |          0 |

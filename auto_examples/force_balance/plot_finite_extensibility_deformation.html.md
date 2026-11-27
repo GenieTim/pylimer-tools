@@ -693,7 +693,7 @@ fig.tight_layout(rect=(0.0, 0.04, 1.0, 0.95))
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 1.467 seconds)
+**Total running time of the script:** (0 minutes 1.424 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-finite-extensibility-deformation-py"></a>
 

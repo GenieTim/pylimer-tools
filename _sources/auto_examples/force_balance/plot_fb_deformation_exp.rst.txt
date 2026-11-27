@@ -174,8 +174,8 @@ It also shows, that deformation is an equivalent method to the :math:`\Gamma` fa
 
  .. code-block:: none
 
-    Final residual (should be close to 0): 0.00031259672590849906
-    Shear Modulus from Equilibrium [MPa]:  0.2630752683719433
+    Final residual (should be close to 0): 0.0003327304662465468
+    Shear Modulus from Equilibrium [MPa]:  0.26103846472666725
 
 
 

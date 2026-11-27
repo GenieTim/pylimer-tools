@@ -976,7 +976,7 @@ L/R_rms | G_False (MPa) | G_True (MPa) |   Ratio | r_s>L/2 (%) | Flipped (%)
 Measured on: Apple M3 Pro (12 cores), 36 GB RAM, Mac15,7, macOS 27.2.1 (arm64), Python 3.13.18 (cached 2026-11-26).
 ```
 
-**Total running time of the script:** (0 minutes 1.557 seconds)
+**Total running time of the script:** (0 minutes 1.512 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-mc-cutoff-and-pbc-artifacts-py"></a>
 

@@ -758,7 +758,7 @@ Numerical Summary & Provenance
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 2.453 seconds)
+   **Total running time of the script:** (0 minutes 2.356 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_multichemistry_and_coarse_graining.py:
