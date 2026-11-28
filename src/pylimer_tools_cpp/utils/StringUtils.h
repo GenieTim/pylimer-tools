@@ -345,6 +345,15 @@ MAKE_GET(long int, std::stol)
 MAKE_GET(unsigned int, std::stoul)
 MAKE_GET(unsigned long int, std::stoull)
 
+inline void
+skipWhitespace(const char*& p)
+{
+  while (*p == ' ' || *p == '\t' || *p == '\r' || *p == '\n' || *p == '\f' ||
+         *p == '\v') {
+    ++p;
+  }
+}
+
 inline bool
 isNumericTokenBoundary(const char c)
 {
@@ -385,10 +394,7 @@ parseNumericToken(const char*& p, T& out)
     out = static_cast<T>(val);
   } else {
     const char* scan = p;
-    while (*scan == ' ' || *scan == '\t' || *scan == '\r' || *scan == '\n' ||
-           *scan == '\f' || *scan == '\v') {
-      ++scan;
-    }
+    skipWhitespace(scan);
     if (*scan == '-') {
       return false;
     }

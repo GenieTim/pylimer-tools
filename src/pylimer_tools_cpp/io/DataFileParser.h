@@ -203,7 +203,7 @@ private:
                         AtomStyle atomStyle,
                         AtomStyle atomStyle2,
                         AtomStyle atomStyle3);
-  void readAtomHybrid(std::string_view line,
+  void readAtomHybrid(const std::string& line,
                       AtomStyle style1,
                       AtomStyle style2);
 
@@ -216,11 +216,11 @@ private:
                         const char* sectionName,
                         ParseFn&& parseLine);
   void readBonds(std::ifstream& file);
-  void readBond(std::string_view line);
+  void readBond(const std::string& line);
   void readAngles(std::ifstream& file);
-  void readAngle(std::string_view line);
+  void readAngle(const std::string& line);
   void readDihedralAngles(std::ifstream& file);
-  void readDihedralAngle(std::string_view line);
+  void readDihedralAngle(const std::string& line);
   // additional atom data
   void readVelocities(std::ifstream& file,
                       std::vector<long int>& pendingVelAtomIds,

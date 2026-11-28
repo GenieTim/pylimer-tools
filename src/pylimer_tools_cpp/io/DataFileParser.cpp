@@ -28,12 +28,15 @@ namespace {
            trimmedNoComment.ends_with("Labels");
   }
 
+  std::string_view cleanDataFileLine(const std::string_view rawLine)
+  {
+    return pylimer_tools::utils::trimWhitespaceView(
+      pylimer_tools::utils::trimLineOmitCommentView(rawLine));
+  }
+
   bool hasRemainingTokens(const char* cursor)
   {
-    while (*cursor == ' ' || *cursor == '\t' || *cursor == '\r' ||
-           *cursor == '\n' || *cursor == '\f' || *cursor == '\v') {
-      ++cursor;
-    }
+    pylimer_tools::utils::skipWhitespace(cursor);
     return *cursor != '\0' && *cursor != '#';
   }
 } // namespace
@@ -134,8 +137,7 @@ DataFileParser::read(const std::string& filePath,
 
   bool hasPendingSection = false;
   while (std::getline(file, rawLine)) {
-    const std::string_view cleaned = pylimer_tools::utils::trimWhitespaceView(
-      pylimer_tools::utils::trimLineOmitCommentView(rawLine));
+    const std::string_view cleaned = cleanDataFileLine(rawLine);
     if (cleaned.empty()) {
       continue;
     }
@@ -189,16 +191,12 @@ DataFileParser::read(const std::string& filePath,
   std::vector<double> pendingVz;
 
   while (hasPendingSection) {
-    const std::string_view sectionName =
-      pylimer_tools::utils::trimWhitespaceView(
-        pylimer_tools::utils::trimLineOmitCommentView(rawLine));
+    const std::string_view sectionName = cleanDataFileLine(rawLine);
     hasPendingSection = false;
 
     if (sectionName == "Masses") {
       while (std::getline(file, rawLine)) {
-        const std::string_view cleaned =
-          pylimer_tools::utils::trimWhitespaceView(
-            pylimer_tools::utils::trimLineOmitCommentView(rawLine));
+        const std::string_view cleaned = cleanDataFileLine(rawLine);
         if (cleaned.empty()) {
           continue;
         }
@@ -246,9 +244,7 @@ DataFileParser::read(const std::string& filePath,
 
     if (!hasPendingSection) {
       while (std::getline(file, rawLine)) {
-        const std::string_view cleaned =
-          pylimer_tools::utils::trimWhitespaceView(
-            pylimer_tools::utils::trimLineOmitCommentView(rawLine));
+        const std::string_view cleaned = cleanDataFileLine(rawLine);
         if (isDataFileSectionHeader(cleaned)) {
           hasPendingSection = true;
           break;
@@ -568,16 +564,14 @@ DataFileParser::readAtomsSection(std::ifstream& file,
     return;
   }
 
-  std::string line;
   if (atomStyle == AtomStyle::HYBRID) {
-    for (int i = 0; i < this->nAtoms; ++i) {
-      if (!nextNonEmptyDataLine(file, line)) {
-        throw std::runtime_error(
-          "Data file ended too early. Not enough atoms read. Read " +
-          std::to_string(i) + " of " + std::to_string(this->nAtoms) + ".");
-      }
-      this->readAtomHybrid(line, atomStyle2, atomStyle3);
-    }
+    this->readSectionLines(
+      file,
+      this->nAtoms,
+      "atoms",
+      [this, atomStyle2, atomStyle3](const std::string& l) {
+        this->readAtomHybrid(l, atomStyle2, atomStyle3);
+      });
     return;
   }
 
@@ -706,131 +700,126 @@ DataFileParser::readAtomsSection(std::ifstream& file,
   const int minRequiredFields = static_cast<int>(numFields) - 3;
   const int fullRequiredFields = static_cast<int>(numFields);
 
-  for (int i = 0; i < this->nAtoms; ++i) {
-    if (!nextNonEmptyDataLine(file, line)) {
-      throw std::runtime_error(
-        "Data file ended too early. Not enough atoms read. Read " +
-        std::to_string(i) + " of " + std::to_string(this->nAtoms) + ".");
-    }
+  this->readSectionLines(
+    file, this->nAtoms, "atoms", [&](const std::string& line) {
+      const char* cursor = line.c_str();
+      int resFound = 0;
 
-    const char* cursor = line.c_str();
-    int resFound = 0;
+      for (size_t f = 0; f < numFields; ++f) {
+        if (extraFieldVecs[f] != nullptr) {
+          double val = 0.0;
+          if (!pylimer_tools::utils::parseNumericToken(cursor, val)) {
+            break;
+          }
+          extraFieldVecs[f]->push_back(val);
+          ++resFound;
+          continue;
+        }
 
-    for (size_t f = 0; f < numFields; ++f) {
-      if (extraFieldVecs[f] != nullptr) {
-        double val = 0.0;
-        if (!pylimer_tools::utils::parseNumericToken(cursor, val)) {
+        bool ok = false;
+        switch (descriptor.fields[f]) {
+          case FT::ATOM_ID: {
+            long int val = 0;
+            ok = pylimer_tools::utils::parseNumericToken(cursor, val);
+            if (ok) {
+              this->atomIds.push_back(val);
+            }
+            break;
+          }
+          case FT::MOLECULE_ID: {
+            int val = 0;
+            ok = pylimer_tools::utils::parseNumericToken(cursor, val);
+            if (ok) {
+              this->moleculeIds.push_back(val);
+            }
+            break;
+          }
+          case FT::ATOM_TYPE: {
+            int val = 0;
+            ok = pylimer_tools::utils::parseNumericToken(cursor, val);
+            if (ok) {
+              this->atomTypes.push_back(val);
+            }
+            break;
+          }
+          case FT::X: {
+            double val = 0.0;
+            ok = pylimer_tools::utils::parseNumericToken(cursor, val);
+            if (ok) {
+              this->atomX.push_back(val);
+            }
+            break;
+          }
+          case FT::Y: {
+            double val = 0.0;
+            ok = pylimer_tools::utils::parseNumericToken(cursor, val);
+            if (ok) {
+              this->atomY.push_back(val);
+            }
+            break;
+          }
+          case FT::Z: {
+            double val = 0.0;
+            ok = pylimer_tools::utils::parseNumericToken(cursor, val);
+            if (ok) {
+              this->atomZ.push_back(val);
+            }
+            break;
+          }
+          case FT::NX: {
+            int val = 0;
+            ok = pylimer_tools::utils::parseNumericToken(cursor, val);
+            if (ok) {
+              this->atomNx.push_back(val);
+            }
+            break;
+          }
+          case FT::NY: {
+            int val = 0;
+            ok = pylimer_tools::utils::parseNumericToken(cursor, val);
+            if (ok) {
+              this->atomNy.push_back(val);
+            }
+            break;
+          }
+          case FT::NZ: {
+            int val = 0;
+            ok = pylimer_tools::utils::parseNumericToken(cursor, val);
+            if (ok) {
+              this->atomNz.push_back(val);
+            }
+            break;
+          }
+          default:
+            break;
+        }
+        if (!ok) {
           break;
         }
-        extraFieldVecs[f]->push_back(val);
         ++resFound;
-        continue;
       }
 
-      bool ok = false;
-      switch (descriptor.fields[f]) {
-        case FT::ATOM_ID: {
-          long int val = 0;
-          ok = pylimer_tools::utils::parseNumericToken(cursor, val);
-          if (ok) {
-            this->atomIds.push_back(val);
-          }
-          break;
-        }
-        case FT::MOLECULE_ID: {
-          int val = 0;
-          ok = pylimer_tools::utils::parseNumericToken(cursor, val);
-          if (ok) {
-            this->moleculeIds.push_back(val);
-          }
-          break;
-        }
-        case FT::ATOM_TYPE: {
-          int val = 0;
-          ok = pylimer_tools::utils::parseNumericToken(cursor, val);
-          if (ok) {
-            this->atomTypes.push_back(val);
-          }
-          break;
-        }
-        case FT::X: {
-          double val = 0.0;
-          ok = pylimer_tools::utils::parseNumericToken(cursor, val);
-          if (ok) {
-            this->atomX.push_back(val);
-          }
-          break;
-        }
-        case FT::Y: {
-          double val = 0.0;
-          ok = pylimer_tools::utils::parseNumericToken(cursor, val);
-          if (ok) {
-            this->atomY.push_back(val);
-          }
-          break;
-        }
-        case FT::Z: {
-          double val = 0.0;
-          ok = pylimer_tools::utils::parseNumericToken(cursor, val);
-          if (ok) {
-            this->atomZ.push_back(val);
-          }
-          break;
-        }
-        case FT::NX: {
-          int val = 0;
-          ok = pylimer_tools::utils::parseNumericToken(cursor, val);
-          if (ok) {
-            this->atomNx.push_back(val);
-          }
-          break;
-        }
-        case FT::NY: {
-          int val = 0;
-          ok = pylimer_tools::utils::parseNumericToken(cursor, val);
-          if (ok) {
-            this->atomNy.push_back(val);
-          }
-          break;
-        }
-        case FT::NZ: {
-          int val = 0;
-          ok = pylimer_tools::utils::parseNumericToken(cursor, val);
-          if (ok) {
-            this->atomNz.push_back(val);
-          }
-          break;
-        }
-        default:
-          break;
+      RUNTIME_EXP_IFN(
+        (resFound == minRequiredFields || resFound == fullRequiredFields) &&
+          !hasRemainingTokens(cursor),
+        "Invalid atom format in line '" + line + "': parsed " +
+          std::to_string(resFound) + " fields.");
+
+      if (resFound == minRequiredFields) {
+        this->atomNx.push_back(0);
+        this->atomNy.push_back(0);
+        this->atomNz.push_back(0);
       }
-      if (!ok) {
-        break;
+
+      // Set default molecule ID for styles that don't have it
+      if (!descriptor.hasMoleculeId) {
+        this->moleculeIds.push_back(0);
       }
-      ++resFound;
-    }
-
-    RUNTIME_EXP_IFN(
-      (resFound == minRequiredFields || resFound == fullRequiredFields) &&
-        !hasRemainingTokens(cursor),
-      "Invalid atom format in line '" + line + "': parsed " +
-        std::to_string(resFound) + " fields.");
-
-    if (resFound == minRequiredFields) {
-      this->atomNx.push_back(0);
-      this->atomNy.push_back(0);
-      this->atomNz.push_back(0);
-    }
-
-    // Set default molecule ID for styles that don't have it
-    if (!descriptor.hasMoleculeId) {
-      this->moleculeIds.push_back(0);
-    }
-  }
+    });
 }
 
 void
-DataFileParser::readAtomHybrid(const std::string_view line,
+DataFileParser::readAtomHybrid(const std::string& line,
                                const AtomStyle style1,
                                const AtomStyle style2)
 {
@@ -842,8 +831,7 @@ DataFileParser::readAtomHybrid(const std::string_view line,
       "This combination is not implemented for hybrid atom style");
   }
 
-  const std::string lineStr(line);
-  const char* cursor = lineStr.c_str();
+  const char* cursor = line.c_str();
   long int atomId = 0;
   int atomType = 0;
   int moleculeId = 0;
@@ -858,8 +846,7 @@ DataFileParser::readAtomHybrid(const std::string_view line,
     pylimer_tools::utils::parseNumericToken(cursor, moleculeId) &&
     pylimer_tools::utils::parseNumericToken(cursor, edpdTemp) &&
     pylimer_tools::utils::parseNumericToken(cursor, edpd);
-  RUNTIME_EXP_IFN(baseOk,
-                  "Did not find enough data in line '" + lineStr + "'.");
+  RUNTIME_EXP_IFN(baseOk, "Did not find enough data in line '" + line + "'.");
 
   int nx = 0, ny = 0, nz = 0;
   if (hasRemainingTokens(cursor)) {
@@ -869,7 +856,7 @@ DataFileParser::readAtomHybrid(const std::string_view line,
                        !hasRemainingTokens(cursor);
     RUNTIME_EXP_IFN(imgOk,
                     "Invalid trailing image flags in hybrid atom line '" +
-                      lineStr + "'.");
+                      line + "'.");
   }
 
   this->atomIds.push_back(atomId);
@@ -923,10 +910,9 @@ DataFileParser::readBonds(std::ifstream& file)
 }
 
 void
-DataFileParser::readBond(const std::string_view line)
+DataFileParser::readBond(const std::string& line)
 {
-  const std::string lineStr(line);
-  const char* cursor = lineStr.c_str();
+  const char* cursor = line.c_str();
   long int bondId = 0, newBondFrom = 0, newBondTo = 0;
   int bondType = 0;
   const bool ok =
@@ -934,7 +920,7 @@ DataFileParser::readBond(const std::string_view line)
     pylimer_tools::utils::parseNumericToken(cursor, bondType) &&
     pylimer_tools::utils::parseNumericToken(cursor, newBondFrom) &&
     pylimer_tools::utils::parseNumericToken(cursor, newBondTo);
-  RUNTIME_EXP_IFN(ok, "Invalid bond line '" + lineStr + "'.");
+  RUNTIME_EXP_IFN(ok, "Invalid bond line '" + line + "'.");
   this->bondIds.push_back(bondId);
   this->bondTypes.push_back(bondType);
   this->bondFrom.push_back(newBondFrom);
@@ -951,10 +937,9 @@ DataFileParser::readAngles(std::ifstream& file)
 }
 
 void
-DataFileParser::readAngle(const std::string_view line)
+DataFileParser::readAngle(const std::string& line)
 {
-  const std::string lineStr(line);
-  const char* cursor = lineStr.c_str();
+  const char* cursor = line.c_str();
   long int newAngleId = 0, newAngleFrom = 0, newAngleVia = 0, newAngleTo = 0;
   int newAngleType = 0;
   const bool ok =
@@ -963,7 +948,7 @@ DataFileParser::readAngle(const std::string_view line)
     pylimer_tools::utils::parseNumericToken(cursor, newAngleFrom) &&
     pylimer_tools::utils::parseNumericToken(cursor, newAngleVia) &&
     pylimer_tools::utils::parseNumericToken(cursor, newAngleTo);
-  RUNTIME_EXP_IFN(ok, "Invalid angle line '" + lineStr + "'.");
+  RUNTIME_EXP_IFN(ok, "Invalid angle line '" + line + "'.");
 
   this->angleIds.push_back(newAngleId);
   this->angleTypes.push_back(newAngleType);
@@ -983,10 +968,9 @@ DataFileParser::readDihedralAngles(std::ifstream& file)
 }
 
 void
-DataFileParser::readDihedralAngle(const std::string_view line)
+DataFileParser::readDihedralAngle(const std::string& line)
 {
-  const std::string lineStr(line);
-  const char* cursor = lineStr.c_str();
+  const char* cursor = line.c_str();
   long int newAngleId = 0, newAngleFrom = 0, newAngleVia1 = 0, newAngleVia2 = 0,
            newAngleTo = 0;
   int newAngleType = 0;
@@ -997,7 +981,7 @@ DataFileParser::readDihedralAngle(const std::string_view line)
     pylimer_tools::utils::parseNumericToken(cursor, newAngleVia1) &&
     pylimer_tools::utils::parseNumericToken(cursor, newAngleVia2) &&
     pylimer_tools::utils::parseNumericToken(cursor, newAngleTo);
-  RUNTIME_EXP_IFN(ok, "Invalid dihedral angle line '" + lineStr + "'.");
+  RUNTIME_EXP_IFN(ok, "Invalid dihedral angle line '" + line + "'.");
 
   this->dihedralAngleIds.push_back(newAngleId);
   this->dihedralAngleTypes.push_back(newAngleType);
@@ -1021,38 +1005,35 @@ DataFileParser::readVelocities(std::ifstream& file,
   const size_t nAtomsSz = static_cast<size_t>(this->nAtoms);
   const bool atomsAlreadyRead = (this->atomIds.size() == nAtomsSz);
 
+  const auto parseVelocityLine = [](const std::string& line,
+                                    long int& atomId,
+                                    double& vx,
+                                    double& vy,
+                                    double& vz) {
+    const char* cursor = line.c_str();
+    const bool ok = pylimer_tools::utils::parseNumericToken(cursor, atomId) &&
+                    pylimer_tools::utils::parseNumericToken(cursor, vx) &&
+                    pylimer_tools::utils::parseNumericToken(cursor, vy) &&
+                    pylimer_tools::utils::parseNumericToken(cursor, vz);
+    RUNTIME_EXP_IFN(ok, "Invalid velocity line '" + line + "'.");
+  };
+
   if (!atomsAlreadyRead) {
     pendingVelAtomIds.reserve(nAtomsSz);
     pendingVx.reserve(nAtomsSz);
     pendingVy.reserve(nAtomsSz);
     pendingVz.reserve(nAtomsSz);
 
-    std::string line;
-    for (size_t i = 0; i < nAtomsSz; ++i) {
-      if (!nextNonEmptyDataLine(file, line)) {
-        if (i == 0) {
-          throw std::runtime_error("Data file ended too early. Not able to "
-                                   "read any advertised velocities.");
-        }
-        throw std::runtime_error("Data file ended too early. Not enough "
-                                 "velocities read. Read " +
-                                 std::to_string(i) + " of " +
-                                 std::to_string(this->nAtoms) +
-                                 " expected velocities.");
-      }
-      const char* cursor = line.c_str();
-      long int atomId = 0;
-      double vx = 0.0, vy = 0.0, vz = 0.0;
-      const bool ok = pylimer_tools::utils::parseNumericToken(cursor, atomId) &&
-                      pylimer_tools::utils::parseNumericToken(cursor, vx) &&
-                      pylimer_tools::utils::parseNumericToken(cursor, vy) &&
-                      pylimer_tools::utils::parseNumericToken(cursor, vz);
-      RUNTIME_EXP_IFN(ok, "Invalid velocity line '" + line + "'.");
-      pendingVelAtomIds.push_back(atomId);
-      pendingVx.push_back(vx);
-      pendingVy.push_back(vy);
-      pendingVz.push_back(vz);
-    }
+    this->readSectionLines(
+      file, this->nAtoms, "velocities", [&](const std::string& line) {
+        long int atomId = 0;
+        double vx = 0.0, vy = 0.0, vz = 0.0;
+        parseVelocityLine(line, atomId, vx, vy, vz);
+        pendingVelAtomIds.push_back(atomId);
+        pendingVx.push_back(vx);
+        pendingVy.push_back(vy);
+        pendingVz.push_back(vz);
+      });
     return;
   }
 
@@ -1062,56 +1043,42 @@ DataFileParser::readVelocities(std::ifstream& file,
   std::unordered_map<long int, size_t> atomIdToIdx;
   std::vector<uint8_t> seen;
   bool inOrder = true;
+  size_t i = 0;
 
-  std::string line;
-  for (size_t i = 0; i < nAtomsSz; ++i) {
-    if (!nextNonEmptyDataLine(file, line)) {
-      if (i == 0) {
-        throw std::runtime_error("Data file ended too early. Not able to read "
-                                 "any advertised velocities.");
-      }
-      throw std::runtime_error("Data file ended too early. Not enough "
-                               "velocities read. Read " +
-                               std::to_string(i) + " of " +
-                               std::to_string(this->nAtoms) +
-                               " expected velocities.");
-    }
-    const char* cursor = line.c_str();
-    long int atomId = 0;
-    double vx = 0.0, vy = 0.0, vz = 0.0;
-    const bool ok = pylimer_tools::utils::parseNumericToken(cursor, atomId) &&
-                    pylimer_tools::utils::parseNumericToken(cursor, vx) &&
-                    pylimer_tools::utils::parseNumericToken(cursor, vy) &&
-                    pylimer_tools::utils::parseNumericToken(cursor, vz);
-    RUNTIME_EXP_IFN(ok, "Invalid velocity line '" + line + "'.");
+  this->readSectionLines(
+    file, this->nAtoms, "velocities", [&](const std::string& line) {
+      long int atomId = 0;
+      double vx = 0.0, vy = 0.0, vz = 0.0;
+      parseVelocityLine(line, atomId, vx, vy, vz);
 
-    if (inOrder && atomId == this->atomIds[i]) {
-      orderedVx[i] = vx;
-      orderedVy[i] = vy;
-      orderedVz[i] = vz;
-    } else {
-      if (inOrder) {
-        inOrder = false;
-        atomIdToIdx.reserve(nAtomsSz);
-        for (size_t k = 0; k < nAtomsSz; ++k) {
-          atomIdToIdx.emplace(this->atomIds[k], k);
+      if (inOrder && atomId == this->atomIds[i]) {
+        orderedVx[i] = vx;
+        orderedVy[i] = vy;
+        orderedVz[i] = vz;
+      } else {
+        if (inOrder) {
+          inOrder = false;
+          atomIdToIdx.reserve(nAtomsSz);
+          for (size_t k = 0; k < nAtomsSz; ++k) {
+            atomIdToIdx.emplace(this->atomIds[k], k);
+          }
+          seen.assign(nAtomsSz, 0);
+          for (size_t k = 0; k < i; ++k) {
+            seen[k] = 1;
+          }
         }
-        seen.assign(nAtomsSz, 0);
-        for (size_t k = 0; k < i; ++k) {
-          seen[k] = 1;
-        }
+        const auto it = atomIdToIdx.find(atomId);
+        RUNTIME_EXP_IFN(it != atomIdToIdx.end(),
+                        "Velocity entry references unknown atom ID " +
+                          std::to_string(atomId) + ".");
+        const size_t targetIdx = it->second;
+        orderedVx[targetIdx] = vx;
+        orderedVy[targetIdx] = vy;
+        orderedVz[targetIdx] = vz;
+        seen[targetIdx] = 1;
       }
-      const auto it = atomIdToIdx.find(atomId);
-      RUNTIME_EXP_IFN(it != atomIdToIdx.end(),
-                      "Velocity entry references unknown atom ID " +
-                        std::to_string(atomId) + ".");
-      const size_t targetIdx = it->second;
-      orderedVx[targetIdx] = vx;
-      orderedVy[targetIdx] = vy;
-      orderedVz[targetIdx] = vz;
-      seen[targetIdx] = 1;
-    }
-  }
+      ++i;
+    });
 
   if (!inOrder) {
     for (size_t k = 0; k < nAtomsSz; ++k) {
