@@ -672,7 +672,7 @@ a-PS*      | 2.58(  5) | 1.67( 11) | 1.27( 22) | 1.02( 43) | 0.91( 86) | 0.84(17
 Measured on: Apple M3 Pro (12 cores), 36 GB RAM, Mac15,7, macOS 27.2.1 (arm64), Python 3.13.18 (cached 2026-11-26).
 ```
 
-**Total running time of the script:** (0 minutes 2.356 seconds)
+**Total running time of the script:** (0 minutes 1.687 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-multichemistry-and-coarse-graining-py"></a>
 

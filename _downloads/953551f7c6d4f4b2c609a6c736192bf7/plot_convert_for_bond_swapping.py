@@ -11,7 +11,7 @@ Here's how you could re-set the molecule indices for bond swapping with constant
 import os
 from pathlib import Path
 
-from pylimer_tools_cpp import DataFileWriter, UniverseSequence
+from pylimer_tools_cpp import AtomStyle, DataFileWriter, UniverseSequence
 
 if not os.path.exists("generated_structures"):
     os.makedirs("generated_structures")
@@ -32,6 +32,7 @@ def _find_fixtures_dir() -> Path:
 _fixtures_dir = _find_fixtures_dir()
 input_file = str(_fixtures_dir / "structure/melt_83_a_100.structure.out")
 sequence = UniverseSequence()
+sequence.set_data_file_atom_style([AtomStyle.HYBRID, AtomStyle.BOND, AtomStyle.EDPD])
 sequence.initialize_from_data_sequence([input_file])
 universe = sequence.at_index(0)
 

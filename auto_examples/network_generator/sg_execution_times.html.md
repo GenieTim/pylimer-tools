@@ -2,7 +2,7 @@
 
 # Computation times
 
-**00:57.600** total execution time for 10 files **from auto_examples/network_generator**:
+**00:41.521** total execution time for 10 files **from auto_examples/network_generator**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -19,13 +19,13 @@ $(document).ready( function () {
 
 | Example                                                                                                                                                                                                                                                 | Time      |   Mem (MB) |
 |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [Monte Carlo Configuration](plot_monte_carlo_configuration.html.md#sphx-glr-auto-examples-network-generator-plot-monte-carlo-configuration-py) (`plot_monte_carlo_configuration.py`)                                                               | 00:36.126 |          0 |
-| [Generate Vulcanized Networks](plot_vulcanized_network.html.md#sphx-glr-auto-examples-network-generator-plot-vulcanized-network-py) (`plot_vulcanized_network.py`)                                                                          | 00:18.914 |          0 |
-| [Algorithmic & PBC Failure Modes: MaxDistanceProvider Bias & assume_box_large_enough](plot_mc_cutoff_and_pbc_artifacts.html.md#sphx-glr-auto-examples-network-generator-plot-mc-cutoff-and-pbc-artifacts-py) (`plot_mc_cutoff_and_pbc_artifacts.py`) | 00:01.512 |          0 |
-| [Custom Crosslinking Callbacks](plot_custom_crosslinking_callback.html.md#sphx-glr-auto-examples-network-generator-plot-custom-crosslinking-callback-py) (`plot_custom_crosslinking_callback.py`)                                                     | 00:00.310 |          0 |
-| [Polydisperse Network](plot_polydisperse_system.html.md#sphx-glr-auto-examples-network-generator-plot-polydisperse-system-py) (`plot_polydisperse_system.py`)                                                                                | 00:00.269 |          0 |
-| [Tetra-PEG Network Generation](plot_tetra_peg_network.html.md#sphx-glr-auto-examples-network-generator-plot-tetra-peg-network-py) (`plot_tetra_peg_network.py`)                                                                            | 00:00.119 |          0 |
-| [Adding Topology Information](plot_add_angles.html.md#sphx-glr-auto-examples-network-generator-plot-add-angles-py) (`plot_add_angles.py`)                                                                                           | 00:00.100 |          0 |
-| [Multi-Component System](plot_multi_component_system.html.md#sphx-glr-auto-examples-network-generator-plot-multi-component-system-py) (`plot_multi_component_system.py`)                                                                        | 00:00.095 |          0 |
-| [Simple Crosslinked Network](plot_simple_crosslinked_network.html.md#sphx-glr-auto-examples-network-generator-plot-simple-crosslinked-network-py) (`plot_simple_crosslinked_network.py`)                                                            | 00:00.089 |          0 |
-| [Save Generated Network](plot_save_network.html.md#sphx-glr-auto-examples-network-generator-plot-save-network-py) (`plot_save_network.py`)                                                                                            | 00:00.066 |          0 |
+| [Monte Carlo Configuration](plot_monte_carlo_configuration.html.md#sphx-glr-auto-examples-network-generator-plot-monte-carlo-configuration-py) (`plot_monte_carlo_configuration.py`)                                                               | 00:27.250 |          0 |
+| [Generate Vulcanized Networks](plot_vulcanized_network.html.md#sphx-glr-auto-examples-network-generator-plot-vulcanized-network-py) (`plot_vulcanized_network.py`)                                                                          | 00:12.531 |          0 |
+| [Algorithmic & PBC Failure Modes: MaxDistanceProvider Bias & assume_box_large_enough](plot_mc_cutoff_and_pbc_artifacts.html.md#sphx-glr-auto-examples-network-generator-plot-mc-cutoff-and-pbc-artifacts-py) (`plot_mc_cutoff_and_pbc_artifacts.py`) | 00:01.009 |          0 |
+| [Custom Crosslinking Callbacks](plot_custom_crosslinking_callback.html.md#sphx-glr-auto-examples-network-generator-plot-custom-crosslinking-callback-py) (`plot_custom_crosslinking_callback.py`)                                                     | 00:00.218 |          0 |
+| [Polydisperse Network](plot_polydisperse_system.html.md#sphx-glr-auto-examples-network-generator-plot-polydisperse-system-py) (`plot_polydisperse_system.py`)                                                                                | 00:00.184 |          0 |
+| [Tetra-PEG Network Generation](plot_tetra_peg_network.html.md#sphx-glr-auto-examples-network-generator-plot-tetra-peg-network-py) (`plot_tetra_peg_network.py`)                                                                            | 00:00.084 |          0 |
+| [Adding Topology Information](plot_add_angles.html.md#sphx-glr-auto-examples-network-generator-plot-add-angles-py) (`plot_add_angles.py`)                                                                                           | 00:00.068 |          0 |
+| [Multi-Component System](plot_multi_component_system.html.md#sphx-glr-auto-examples-network-generator-plot-multi-component-system-py) (`plot_multi_component_system.py`)                                                                        | 00:00.066 |          0 |
+| [Simple Crosslinked Network](plot_simple_crosslinked_network.html.md#sphx-glr-auto-examples-network-generator-plot-simple-crosslinked-network-py) (`plot_simple_crosslinked_network.py`)                                                            | 00:00.066 |          0 |
+| [Save Generated Network](plot_save_network.html.md#sphx-glr-auto-examples-network-generator-plot-save-network-py) (`plot_save_network.py`)                                                                                            | 00:00.045 |          0 |

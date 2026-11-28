@@ -25,7 +25,7 @@ LAMMPS bond swapping can significantly speed up equilibration for polymer networ
 However, to preserve the strand lengths, you need to ensure that the molecule indices are set correctly.
 Here's how you could re-set the molecule indices for bond swapping with constant chain lengths.
 
-.. GENERATED FROM PYTHON SOURCE LINES 10-51
+.. GENERATED FROM PYTHON SOURCE LINES 10-52
 
 .. code-block:: Python
 
@@ -33,7 +33,7 @@ Here's how you could re-set the molecule indices for bond swapping with constant
     import os
     from pathlib import Path
 
-    from pylimer_tools_cpp import DataFileWriter, UniverseSequence
+    from pylimer_tools_cpp import AtomStyle, DataFileWriter, UniverseSequence
 
     if not os.path.exists("generated_structures"):
         os.makedirs("generated_structures")
@@ -54,6 +54,7 @@ Here's how you could re-set the molecule indices for bond swapping with constant
     _fixtures_dir = _find_fixtures_dir()
     input_file = str(_fixtures_dir / "structure/melt_83_a_100.structure.out")
     sequence = UniverseSequence()
+    sequence.set_data_file_atom_style([AtomStyle.HYBRID, AtomStyle.BOND, AtomStyle.EDPD])
     sequence.initialize_from_data_sequence([input_file])
     universe = sequence.at_index(0)
 
@@ -83,13 +84,13 @@ Here's how you could re-set the molecule indices for bond swapping with constant
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 52-55
+.. GENERATED FROM PYTHON SOURCE LINES 53-56
 
 Chain Length Distribution Verification
 --------------------------------------
 We verify the molecule size distribution across the prepared melt system:
 
-.. GENERATED FROM PYTHON SOURCE LINES 55-72
+.. GENERATED FROM PYTHON SOURCE LINES 56-73
 
 .. code-block:: Python
 
@@ -114,7 +115,7 @@ We verify the molecule size distribution across the prepared melt system:
 
 
 .. image-sg:: /auto_examples/readers_writers/images/sphx_glr_plot_convert_for_bond_swapping_001.png
-   :alt: Chain Length Distribution (Total: 429 chains)
+   :alt: Chain Length Distribution (Total: 83 chains)
    :srcset: /auto_examples/readers_writers/images/sphx_glr_plot_convert_for_bond_swapping_001.png
    :class: sphx-glr-single-img
 
@@ -122,7 +123,7 @@ We verify the molecule size distribution across the prepared melt system:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-75
+.. GENERATED FROM PYTHON SOURCE LINES 74-76
 
 To convert it back to the molecule index relating to their current connectivity,
 simply repeat the process with ``config_molecule_idx_for_swap(False)``
@@ -130,7 +131,7 @@ simply repeat the process with ``config_molecule_idx_for_swap(False)``
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.106 seconds)
+   **Total running time of the script:** (0 minutes 0.080 seconds)
 
 
 .. _sphx_glr_download_auto_examples_readers_writers_plot_convert_for_bond_swapping.py:

@@ -11,7 +11,7 @@ into the :class:`~pylimer_tools_cpp.Universe` objects.
 import os
 from pathlib import Path
 
-from pylimer_tools_cpp import UniverseSequence
+from pylimer_tools_cpp import AtomStyle, UniverseSequence
 
 
 def _find_fixtures_dir() -> Path:
@@ -34,6 +34,9 @@ data_file = os.path.join(
     "melt_83_a_100.structure.out",
 )
 one_universe_seq = UniverseSequence()
+one_universe_seq.set_data_file_atom_style(
+    [AtomStyle.HYBRID, AtomStyle.BOND, AtomStyle.EDPD]
+)
 one_universe_seq.initialize_from_data_sequence([data_file])
 universe = one_universe_seq.at_index(0)
 

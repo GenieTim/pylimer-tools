@@ -16,12 +16,12 @@ The `DataFileParser` handles LAMMPS data files containing complete system defini
 The [`UniverseSequence`](../../api/pylimer_tools_cpp.UniverseSequence.html.md#pylimer_tools_cpp.UniverseSequence) provides a convenient way to have these data files read
 into the [`Universe`](../../api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe) objects.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 10-57 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 10-60 -->
 ```Python
 import os
 from pathlib import Path
 
-from pylimer_tools_cpp import UniverseSequence
+from pylimer_tools_cpp import AtomStyle, UniverseSequence
 
 
 def _find_fixtures_dir() -> Path:
@@ -44,6 +44,9 @@ data_file = os.path.join(
     "melt_83_a_100.structure.out",
 )
 one_universe_seq = UniverseSequence()
+one_universe_seq.set_data_file_atom_style(
+    [AtomStyle.HYBRID, AtomStyle.BOND, AtomStyle.EDPD]
+)
 one_universe_seq.initialize_from_data_sequence([data_file])
 universe = one_universe_seq.at_index(0)
 
@@ -70,11 +73,11 @@ Loaded universe with 56000 atoms
 Loaded universe with 56000 atoms
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 58-60 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 61-63 -->
 
 ## Visualizing Loaded Network Statistics
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 60-87 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 63-90 -->
 ```Python
 import matplotlib.pyplot as plt
 import numpy as np
@@ -104,7 +107,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 88-93 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 91-96 -->
 
 Please note that the `hybrid` and `tdpd` atom styles are not fully supported.
 
@@ -112,7 +115,7 @@ If your data files don’t hint the atom style in the line that starts with “A
 you should specify it manually, see [`read()`](../../api/pylimer_tools_cpp.DataFileReader.html.md#pylimer_tools_cpp.DataFileReader.read)
 and [`set_data_file_atom_style()`](../../api/pylimer_tools_cpp.UniverseSequence.html.md#pylimer_tools_cpp.UniverseSequence.set_data_file_atom_style).
 
-**Total running time of the script:** (0 minutes 0.279 seconds)
+**Total running time of the script:** (0 minutes 0.162 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-data-file-reader-py"></a>
 

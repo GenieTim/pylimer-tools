@@ -16,12 +16,12 @@ LAMMPS bond swapping can significantly speed up equilibration for polymer networ
 However, to preserve the strand lengths, you need to ensure that the molecule indices are set correctly.
 Here’s how you could re-set the molecule indices for bond swapping with constant chain lengths.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 10-51 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 10-52 -->
 ```Python
 import os
 from pathlib import Path
 
-from pylimer_tools_cpp import DataFileWriter, UniverseSequence
+from pylimer_tools_cpp import AtomStyle, DataFileWriter, UniverseSequence
 
 if not os.path.exists("generated_structures"):
     os.makedirs("generated_structures")
@@ -42,6 +42,7 @@ def _find_fixtures_dir() -> Path:
 _fixtures_dir = _find_fixtures_dir()
 input_file = str(_fixtures_dir / "structure/melt_83_a_100.structure.out")
 sequence = UniverseSequence()
+sequence.set_data_file_atom_style([AtomStyle.HYBRID, AtomStyle.BOND, AtomStyle.EDPD])
 sequence.initialize_from_data_sequence([input_file])
 universe = sequence.at_index(0)
 
@@ -63,13 +64,13 @@ print(f"Optimized system capable of bond swapping written to: {output_file}")
 Optimized system capable of bond swapping written to: /home/runner/work/pylimer-tools/pylimer-tools/examples/readers_writers/generated_structures/for_swap_melt_83_a_100.structure.out
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 52-55 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 53-56 -->
 
 ## Chain Length Distribution Verification
 
 We verify the molecule size distribution across the prepared melt system:
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 55-72 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 56-73 -->
 ```Python
 import matplotlib.pyplot as plt
 
@@ -88,12 +89,12 @@ plt.tight_layout()
 plt.show()
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 73-75 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 74-76 -->
 
 To convert it back to the molecule index relating to their current connectivity,
 simply repeat the process with `config_molecule_idx_for_swap(False)`
 
-**Total running time of the script:** (0 minutes 0.106 seconds)
+**Total running time of the script:** (0 minutes 0.080 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-convert-for-bond-swapping-py"></a>
 

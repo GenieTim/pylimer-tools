@@ -186,7 +186,7 @@ via :class:`~pylimer_tools_cpp.Correlator`.
 
  .. code-block:: none
 
-    Demo melt (N_atoms=1125, SS=225): G_GK(0)=16.197, NMA modes=1125, static MEHP plateau=0.6280
+    Demo melt (N_atoms=1125, SS=225): G_GK(0)=16.863, NMA modes=1125, static MEHP plateau=0.5216
 
 
 
@@ -709,7 +709,7 @@ modulus :math:`G_{\text{MEHP}}` across all conditions.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.448 seconds)
+   **Total running time of the script:** (0 minutes 1.021 seconds)
 
 
 .. _sphx_glr_download_auto_examples_dpd_simulations_plot_dpd_slipspring_rheology.py:
