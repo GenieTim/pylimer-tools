@@ -1,6 +1,7 @@
 #ifndef AVE_FILE_READER
 #define AVE_FILE_READER
 
+#include <fstream>
 #include <string>
 #include <vector>
 
@@ -9,13 +10,13 @@ namespace pylimer_tools::utils {
 class AveFileReader
 {
 public:
-  AveFileReader(const std::string& file)
+  explicit AveFileReader(const std::string& file)
     : filePath(file) {};
 
-  std::vector<std::string> getColumnNames();
+  const std::vector<std::string>& getColumnNames();
   int getNrOfRows();
   int getNrOfColumns();
-  std::vector<std::vector<double>> getData();
+  const std::vector<std::vector<double>>& getData();
 
   std::vector<double> autocorrelateColumn(int column,
                                           const std::vector<size_t>& dts);
@@ -24,7 +25,7 @@ public:
     int column2,
     const std::vector<size_t>& dts);
 
-  std::string getFilePath() const { return this->filePath; }
+  const std::string& getFilePath() const { return this->filePath; }
 
 private:
   std::string filePath;
@@ -35,6 +36,10 @@ private:
   std::vector<std::vector<double>> data;
   bool dataIsRead = false;
 
+  std::ifstream openFile() const;
+  void readHeaderFromStream(std::ifstream& file,
+                            std::string& firstDataLine,
+                            bool& hasFirstDataLine);
   int getNrOfHeaderRows();
   void readData();
 };

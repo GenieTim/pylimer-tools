@@ -41,6 +41,43 @@ TEST_CASE("CsvTokenizer works", "[utils][StringUtil]")
   CHECK(split[1] == "test2");
   nSplit = pu::split(split, "test\ttest2", "\t");
   REQUIRE(nSplit == 2);
+
+  // Empty and whitespace-only strings do not throw on construction
+  const pu::CsvTokenizer emptyTk("");
+  CHECK(emptyTk.getLength() == 0);
+  CHECK_THROWS_AS(emptyTk.get<std::string>(0), std::runtime_error);
+  const pu::CsvTokenizer wsTk("   \t\r\n  ");
+  CHECK(wsTk.getLength() == 0);
+
+  // parseNumericToken boundary, sign, and range validation
+  {
+    const char* p = " 42 -3.5e1 # comment";
+    int iVal = 0;
+    double dVal = 0.0;
+    REQUIRE(pu::parseNumericToken(p, iVal));
+    CHECK(iVal == 42);
+    REQUIRE(pu::parseNumericToken(p, dVal));
+    CHECK(dVal == Catch::Approx(-35.0));
+
+    const char* floatForInt = "1.5 2";
+    CHECK_FALSE(pu::parseNumericToken(floatForInt, iVal));
+    const char* trailingChars = "12abc";
+    CHECK_FALSE(pu::parseNumericToken(trailingChars, iVal));
+    const char* negUnsigned = "-5";
+    unsigned int uVal = 0;
+    CHECK_FALSE(pu::parseNumericToken(negUnsigned, uVal));
+    const char* hugeInt = "999999999999999";
+    CHECK_FALSE(pu::parseNumericToken(hugeInt, iVal));
+  }
+
+  CHECK(pu::trimWhitespaceView(" \t hello \r\n ") == "hello");
+  CHECK(pu::trimWhitespaceView(" \t\r\n ").empty());
+  const std::vector<std::string_view> wsParts =
+    pu::splitWhitespaceView("  a\tb   c\r\n");
+  REQUIRE(wsParts.size() == 3);
+  CHECK(wsParts[0] == "a");
+  CHECK(wsParts[1] == "b");
+  CHECK(wsParts[2] == "c");
 }
 
 TEST_CASE("String utility functions work", "[utils][StringUtil]")

@@ -1010,6 +1010,8 @@ TEST_CASE("MEHP Force Balance2 correctly collapses melts even with random "
     suspectedPath + "/structure/melt_83_a_100.structure.out";
   REQUIRE(std::filesystem::exists(inputFile));
   std::cout << "Reading file " << inputFile << std::endl;
+  universeSeq.setDataFileAtomStyle(
+    { pu::AtomStyle::HYBRID, pu::AtomStyle::BOND, pu::AtomStyle::EDPD });
   universeSeq.initializeFromDataSequence({ { inputFile } });
   pe::Universe universe = universeSeq.atIndex(0);
   std::cout << "Read file " << inputFile << std::endl;
@@ -2467,6 +2469,10 @@ TEST_CASE("All MEHP Force Balance2 vs. Force Relaxation Phantom Comparisons",
     nFilesFound += 1;
     std::cout << "Processing file: " << file << std::endl;
 
+    if (file == "melt_83_a_100.structure.out") {
+      universeSeq.setDataFileAtomStyle(
+        { pu::AtomStyle::HYBRID, pu::AtomStyle::BOND, pu::AtomStyle::EDPD });
+    }
     universeSeq.initializeFromDataSequence({ { inputFile } });
     pe::Universe universe = universeSeq.atIndex(0);
 
@@ -2576,6 +2582,10 @@ TEST_CASE("All MEHP Force Balance 1 vs. 2 Comparisons with Entanglements and "
     nFilesFound += 1;
     std::cout << "Processing file: " << inputFile << std::endl;
 
+    if (file == "melt_83_a_100.structure.out") {
+      universeSeq.setDataFileAtomStyle(
+        { pu::AtomStyle::HYBRID, pu::AtomStyle::BOND, pu::AtomStyle::EDPD });
+    }
     universeSeq.initializeFromDataSequence({ { inputFile } });
     pe::Universe universe = universeSeq.atIndex(0);
 

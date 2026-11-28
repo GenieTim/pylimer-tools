@@ -4,6 +4,7 @@
 #include "../utils/LammpsAtomStyle.h"
 #include "../utils/StringUtils.h"
 #include <filesystem>
+#include <fstream>
 #include <map>
 #include <string>
 #include <unordered_map>
@@ -23,50 +24,63 @@ public:
   // access atom data
   int getNrOfAtoms() const { return this->nAtoms; }
   int getNrOfAtomTypes() const { return this->nAtomTypes; }
-  std::vector<long int> getAtomIds() { return this->atomIds; }
-  std::vector<int> getMoleculeIds() { return this->moleculeIds; }
-  std::vector<int> getAtomTypes() { return this->atomTypes; }
-  std::vector<double> getAtomX() { return this->atomX; }
-  std::vector<double> getAtomY() { return this->atomY; }
-  std::vector<double> getAtomZ() { return this->atomZ; }
-  std::vector<int> getAtomNx() { return this->atomNx; }
-  std::vector<int> getAtomNy() { return this->atomNy; }
-  std::vector<int> getAtomNz() { return this->atomNz; }
-  std::map<int, double> getMasses() { return this->masses; }
+  const std::vector<long int>& getAtomIds() const { return this->atomIds; }
+  const std::vector<int>& getMoleculeIds() const { return this->moleculeIds; }
+  const std::vector<int>& getAtomTypes() const { return this->atomTypes; }
+  const std::vector<double>& getAtomX() const { return this->atomX; }
+  const std::vector<double>& getAtomY() const { return this->atomY; }
+  const std::vector<double>& getAtomZ() const { return this->atomZ; }
+  const std::vector<int>& getAtomNx() const { return this->atomNx; }
+  const std::vector<int>& getAtomNy() const { return this->atomNy; }
+  const std::vector<int>& getAtomNz() const { return this->atomNz; }
+  const std::map<int, double>& getMasses() const { return this->masses; }
 
   // access bond data
   int getNrOfBonds() const { return this->nBonds; }
   int getNrOfBondTypes() const { return this->nBondTypes; }
-  std::vector<int> getBondTypes() { return this->bondTypes; }
-  std::vector<long int> getBondFrom() { return this->bondFrom; }
-  std::vector<long int> getBondTo() { return this->bondTo; }
+  const std::vector<long int>& getBondIds() const { return this->bondIds; }
+  const std::vector<int>& getBondTypes() const { return this->bondTypes; }
+  const std::vector<long int>& getBondFrom() const { return this->bondFrom; }
+  const std::vector<long int>& getBondTo() const { return this->bondTo; }
 
   // access angle data
   int getNrOfAngles() const { return this->nAngles; }
   int getNrOfAngleTypes() const { return this->nAngleTypes; }
-  std::vector<int> getAngleTypes() { return this->angleTypes; }
-  std::vector<long int> getAngleFrom() { return this->angleFrom; }
-  std::vector<long int> getAngleVia() { return this->angleVia; }
-  std::vector<long int> getAngleTo() { return this->angleTo; }
+  const std::vector<long int>& getAngleIds() const { return this->angleIds; }
+  const std::vector<int>& getAngleTypes() const { return this->angleTypes; }
+  const std::vector<long int>& getAngleFrom() const { return this->angleFrom; }
+  const std::vector<long int>& getAngleVia() const { return this->angleVia; }
+  const std::vector<long int>& getAngleTo() const { return this->angleTo; }
 
   // access dihedral angle data
   int getNrOfDihedralAngles() const { return this->nDihedralAngles; }
   int getNrOfDihedralAngleTypes() const { return this->nDihedralAngleTypes; }
-  std::vector<int> getDihedralAngleTypes() { return this->dihedralAngleTypes; }
-  std::vector<long int> getDihedralAngleFrom()
+  const std::vector<long int>& getDihedralAngleIds() const
+  {
+    return this->dihedralAngleIds;
+  }
+  const std::vector<int>& getDihedralAngleTypes() const
+  {
+    return this->dihedralAngleTypes;
+  }
+  const std::vector<long int>& getDihedralAngleFrom() const
   {
     return this->dihedralAngleFrom;
   }
-  std::vector<long int> getDihedralAngleVia1()
+  const std::vector<long int>& getDihedralAngleVia1() const
   {
     return this->dihedralAngleVia1;
   }
-  std::vector<long int> getDihedralAngleVia2()
+  const std::vector<long int>& getDihedralAngleVia2() const
   {
     return this->dihedralAngleVia2;
   }
-  std::vector<long int> getDihedralAngleTo() { return this->dihedralAngleTo; }
-  std::unordered_map<std::string, std::vector<double>> getAdditionalAtomData()
+  const std::vector<long int>& getDihedralAngleTo() const
+  {
+    return this->dihedralAngleTo;
+  }
+  const std::unordered_map<std::string, std::vector<double>>&
+  getAdditionalAtomData() const
   {
     return this->additionalAtomData;
   }
@@ -181,76 +195,43 @@ private:
     }
   };
 
-  void readNs(const std::string& line);
-  void readMass(const std::string& line);
-  // different atom styles
-  void readAtom(const std::string& line);
-  void readAtomFull(const std::string& line);
-  void readAtomCharge(const std::string& line);
-  void readAtomDipole(const std::string& line);
-  void readAtomDpd(const std::string& line);
-  void readAtomMdpd(const std::string& line);
-  void readAtomSphere(const std::string& line);
-  void readAtomHybrid(const std::string& line,
+  void reset();
+  void readNs(std::string_view line);
+  void readMass(std::string_view line);
+  // atom styles
+  void readAtomsSection(std::ifstream& file,
+                        AtomStyle atomStyle,
+                        AtomStyle atomStyle2,
+                        AtomStyle atomStyle3);
+  void readAtomHybrid(std::string_view line,
                       AtomStyle style1,
                       AtomStyle style2);
-  void readAtomAtomic(const std::string& line);
-  void readAtomBody(const std::string& line);
-  void readAtomBpmSphere(const std::string& line);
-  void readAtomDielectric(const std::string& line);
-  void readAtomEdpd(const std::string& line);
-  void readAtomElectron(const std::string& line);
-  void readAtomEllipsoid(const std::string& line);
-  void readAtomLine(const std::string& line);
-  void readAtomPeri(const std::string& line);
-  void readAtomRheo(const std::string& line);
-  void readAtomRheoThermal(const std::string& line);
-  void readAtomSmd(const std::string& line);
-  void readAtomSph(const std::string& line);
-  void readAtomSpin(const std::string& line);
-  void readAtomTemplate(const std::string& line);
-  void readAtomTri(const std::string& line);
-  void readAtomWavepacket(const std::string& line);
-
-  template<typename... Args>
-  void readAtomGeneric(const std::string& line,
-                       const AtomFieldDescriptor& descriptor,
-                       Args&... args);
 
   static const AtomFieldDescriptor& getAtomStyleDescriptor(AtomStyle style);
 
   // bonds, angles, etc.
-  void readBonds(std::ifstream& file, std::string& line);
-  void readBond(const std::string& line);
-  void readAngles(std::ifstream& file, std::string& line);
-  void readAngle(const std::string& line);
-  void readDihedralAngles(std::ifstream& file, std::string& line);
-  void readDihedralAngle(const std::string& line);
+  template<typename ParseFn>
+  void readSectionLines(std::ifstream& file,
+                        int count,
+                        const char* sectionName,
+                        ParseFn&& parseLine);
+  void readBonds(std::ifstream& file);
+  void readBond(std::string_view line);
+  void readAngles(std::ifstream& file);
+  void readAngle(std::string_view line);
+  void readDihedralAngles(std::ifstream& file);
+  void readDihedralAngle(std::string_view line);
   // additional atom data
-  void readVelocities(std::ifstream& file, std::string& line);
-
-  // utilities
-  static void skipEmptyLines(std::string& line, std::ifstream& file);
-  static void skipLinesToContains(std::string& line,
-                                  std::ifstream& file,
-                                  const std::string& upTo);
-  static void skipLinesToContains(std::string& line,
-                                  std::ifstream& file,
-                                  const std::vector<std::string>& upToEitherOr);
-
-  template<typename OUT>
-  inline std::vector<OUT> parseTypesInLine(const std::string& line,
-                                           const int nToRead)
-  {
-    std::vector<OUT> resultnumbers;
-    pylimer_tools::utils::CsvTokenizer tokenizer(line,
-                                                 static_cast<size_t>(nToRead));
-    resultnumbers.reserve(tokenizer.getLength());
-    for (size_t i = 0; i < tokenizer.getLength(); ++i) {
-      resultnumbers.push_back(tokenizer.get<OUT>(i));
-    }
-    return resultnumbers;
-  }
+  void readVelocities(std::ifstream& file,
+                      std::vector<long int>& pendingVelAtomIds,
+                      std::vector<double>& pendingVx,
+                      std::vector<double>& pendingVy,
+                      std::vector<double>& pendingVz);
+  void finalizePendingVelocities(const std::vector<long int>& pendingVelAtomIds,
+                                 const std::vector<double>& pendingVx,
+                                 const std::vector<double>& pendingVy,
+                                 const std::vector<double>& pendingVz);
+  static bool nextNonEmptyDataLine(std::ifstream& file, std::string& lineOut);
 
   //// data
   // nr of data points to read

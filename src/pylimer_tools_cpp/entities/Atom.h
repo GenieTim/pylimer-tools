@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../io/DataFileParser.h"
 #include "../utils/VectorUtils.h"
+#include "../utils/utilityMacros.h"
 #include "Box.h"
 
 #include <Eigen/Dense>

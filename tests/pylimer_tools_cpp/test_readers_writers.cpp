@@ -273,7 +273,7 @@ TEST_CASE("Writers can be used", "[utils][DataFileWriter][DataFileParser]")
       CHECK(newAngles["angle_to"][i] == oldAngles["angle_to"][i]);
     }
 
-    // std::filesystem::remove(fileToWrite);
+    std::filesystem::remove(fileToWrite);
   }
 }
 
@@ -366,7 +366,7 @@ TEST_CASE("All atom types are supported",
                        Catch::Matchers::WithinAbs(intVal, 1e-9));
           } else {
             // Double properties
-            int doubleVal = realDist(gen);
+            const double doubleVal = realDist(gen);
             universe.setPropertyValue(atomId - 1, property.c_str(), doubleVal);
             CHECK_THAT(universe.getAtom(atomId).getExtraData().at(property),
                        Catch::Matchers::WithinRel(doubleVal, 1e-9));
@@ -592,6 +592,51 @@ TEST_CASE("AveFileReader works", "[AveFileReader][io][utils]")
     pu::AveFileReader missingReader("/nonexistent/path/to/avg_file.txt");
     CHECK_THROWS(missingReader.getData());
   }
+
+  SECTION("AveFileReader handles CRLF, blank lines, multi-space/tab headers, "
+          "and zero-row files")
+  {
+    const std::filesystem::path crlfAvePath =
+      std::filesystem::temp_directory_path() / "pylimer_test_ave_crlf.txt";
+    {
+      std::ofstream out(crlfAvePath, std::ios::binary | std::ios::trunc);
+      out << "\r\n"
+          << "# Time-averaged data\r\n"
+          << "#   TimeStep\t  c_temp    v_press  \r\n"
+          << "\r\n"
+          << "100   1.5   2.5 # inline comment\r\n"
+          << "\r\n"
+          << "200\t2.0\t3.5\r\n"
+          << "   \r\n";
+    }
+    {
+      pu::AveFileReader crlfReader(crlfAvePath.string());
+      CHECK(crlfReader.getColumnNames() ==
+            std::vector<std::string>{ "TimeStep", "c_temp", "v_press" });
+      CHECK(crlfReader.getNrOfColumns() == 3);
+      CHECK(crlfReader.getNrOfRows() == 2);
+      const std::vector<std::vector<double>>& d = crlfReader.getData();
+      REQUIRE(d.size() == 3);
+      CHECK(d[0] == std::vector<double>{ 100.0, 200.0 });
+      CHECK(d[1] == std::vector<double>{ 1.5, 2.0 });
+      CHECK(d[2] == std::vector<double>{ 2.5, 3.5 });
+    }
+    std::filesystem::remove(crlfAvePath);
+
+    const std::filesystem::path zeroRowAvePath =
+      std::filesystem::temp_directory_path() /
+      "pylimer_test_ave_empty_rows.txt";
+    {
+      std::ofstream out(zeroRowAvePath, std::ios::binary | std::ios::trunc);
+      out << "# Header\r\n# Step Val\r\n\r\n";
+    }
+    {
+      pu::AveFileReader zeroReader(zeroRowAvePath.string());
+      CHECK(zeroReader.getNrOfRows() == 0);
+      CHECK(zeroReader.getData()[0].empty());
+    }
+    std::filesystem::remove(zeroRowAvePath);
+  }
 }
 
 TEST_CASE("CSVSplitter splits without leaking temp files",
@@ -644,4 +689,587 @@ TEST_CASE("CSVSplitter splits without leaking temp files",
     std::filesystem::remove(tmpPath);
   }
   std::filesystem::remove(multiInput);
+}
+
+namespace {
+struct TempFileGuard
+{
+  std::filesystem::path path;
+  explicit TempFileGuard(const std::string& filename)
+    : path(std::filesystem::temp_directory_path() / filename)
+  {
+  }
+  ~TempFileGuard()
+  {
+    std::error_code ec;
+    std::filesystem::remove(path, ec);
+  }
+  void writeBinary(const std::string& content) const
+  {
+    std::ofstream out(path, std::ios::binary | std::ios::trunc);
+    REQUIRE(out.is_open());
+    out.write(content.data(), static_cast<std::streamsize>(content.size()));
+    REQUIRE(out.good());
+  }
+};
+} // namespace
+
+TEST_CASE("DumpFileParser handles boundary cases",
+          "[utils][DumpFileParser][io]")
+{
+  SECTION("No trailing newline at EOF and zero-atom timestep")
+  {
+    TempFileGuard tmp("pylimer_test_dump_no_eof_nl.lammpstrj");
+    tmp.writeBinary("ITEM: TIMESTEP\r\n"
+                    "0\r\n"
+                    "ITEM: NUMBER OF ATOMS\r\n"
+                    "0\r\n"
+                    "ITEM: BOX BOUNDS pp pp pp\r\n"
+                    "-1.5 2.5\r\n"
+                    "0.0 4.0\r\n"
+                    "1.0e-1 3.1e+0\r\n"
+                    "ITEM: ATOMS id type x y z\r\n"
+                    "ITEM: TIMESTEP\r\n"
+                    "5\r\n"
+                    "ITEM: NUMBER OF ATOMS\r\n"
+                    "1\r\n"
+                    "ITEM: BOX BOUNDS pp pp pp\r\n"
+                    "0.0 10.0\r\n"
+                    "0.0 10.0\r\n"
+                    "0.0 10.0\r\n"
+                    "ITEM: ATOMS id type x y z\r\n"
+                    "7 3 1.25 2.5 3.75");
+
+    pu::DumpFileParser parser(tmp.path.string());
+    REQUIRE(parser.getLength() == 2);
+    CHECK(parser.readTimeSteps() == std::vector<long int>{ 0, 5 });
+
+    const std::vector<pe::Box> boxes = parser.readBoxes();
+    REQUIRE(boxes.size() == 2);
+    CHECK(boxes[0].getLx() == Catch::Approx(4.0));
+    CHECK(boxes[0].getLy() == Catch::Approx(4.0));
+    CHECK(boxes[0].getLz() == Catch::Approx(3.0));
+
+    const std::vector<std::vector<pe::Atom>> atoms = parser.readAtoms();
+    REQUIRE(atoms.size() == 2);
+    CHECK(atoms[0].empty());
+    REQUIRE(atoms[1].size() == 1);
+    CHECK(atoms[1][0].getId() == 7);
+    CHECK(atoms[1][0].getType() == 3);
+    CHECK(atoms[1][0].getX() == Catch::Approx(1.25));
+    CHECK(atoms[1][0].getY() == Catch::Approx(2.5));
+    CHECK(atoms[1][0].getZ() == Catch::Approx(3.75));
+  }
+
+  SECTION("CRLF and LF produce identical results across coordinate formats")
+  {
+    const std::string lfContent = "ITEM: TIMESTEP\n"
+                                  "100\n"
+                                  "ITEM: NUMBER OF ATOMS\n"
+                                  "2\n"
+                                  "ITEM: BOX BOUNDS pp pp pp\n"
+                                  "0.0 10.0\n"
+                                  "0.0 20.0\n"
+                                  "0.0 30.0\n"
+                                  "ITEM: ATOMS type z y x id\n"
+                                  "2 3.0 2.0 1.0 10\n"
+                                  "1 6.0 4.0 2.0 20\n"
+                                  "ITEM: TIMESTEP\n"
+                                  "200\n"
+                                  "ITEM: NUMBER OF ATOMS\n"
+                                  "1\n"
+                                  "ITEM: BOX BOUNDS pp pp pp\n"
+                                  "0.0 10.0\n"
+                                  "0.0 20.0\n"
+                                  "0.0 30.0\n"
+                                  "ITEM: ATOMS id type xsu ysu zsu vx\n"
+                                  "10 2 0.5 0.25 0.1 1.5\n";
+
+    std::string crlfContent;
+    crlfContent.reserve(lfContent.size() + 32);
+    for (const char c : lfContent) {
+      if (c == '\n') {
+        crlfContent.push_back('\r');
+      }
+      crlfContent.push_back(c);
+    }
+
+    TempFileGuard lfTmp("pylimer_test_dump_lf.lammpstrj");
+    TempFileGuard crlfTmp("pylimer_test_dump_crlf.lammpstrj");
+    lfTmp.writeBinary(lfContent);
+    crlfTmp.writeBinary(crlfContent);
+
+    pu::DumpFileParser lfParser(lfTmp.path.string());
+    pu::DumpFileParser crlfParser(crlfTmp.path.string());
+
+    REQUIRE(lfParser.getLength() == 2);
+    REQUIRE(crlfParser.getLength() == 2);
+
+    const pu::ReadDumpFileSections lfSections = lfParser.readDumpFileSections(
+      pu::ReadableDumpFileSections::TIMESTEP |
+      pu::ReadableDumpFileSections::BOX | pu::ReadableDumpFileSections::ATOM |
+      pu::ReadableDumpFileSections::EXTRA_ATOM);
+    const pu::ReadDumpFileSections crlfSections =
+      crlfParser.readDumpFileSections(pu::ReadableDumpFileSections::TIMESTEP |
+                                      pu::ReadableDumpFileSections::BOX |
+                                      pu::ReadableDumpFileSections::ATOM |
+                                      pu::ReadableDumpFileSections::EXTRA_ATOM);
+
+    CHECK(lfSections.timesteps == crlfSections.timesteps);
+    REQUIRE(lfSections.atoms.size() == 2);
+    REQUIRE(crlfSections.atoms.size() == 2);
+    CHECK(lfSections.atoms[0][0] == crlfSections.atoms[0][0]);
+    CHECK(lfSections.atoms[0][1] == crlfSections.atoms[0][1]);
+    CHECK(lfSections.atoms[1][0] == crlfSections.atoms[1][0]);
+    CHECK(crlfSections.atoms[1][0].getX() == Catch::Approx(5.0));
+    CHECK(crlfSections.atoms[1][0].getY() == Catch::Approx(5.0));
+    CHECK(crlfSections.atoms[1][0].getZ() == Catch::Approx(3.0));
+    CHECK(lfSections.extraAtomsData[1].at("vx") ==
+          crlfSections.extraAtomsData[1].at("vx"));
+    CHECK(crlfSections.extraAtomsData[1].at("vx") ==
+          std::vector<double>{ 1.5 });
+  }
+
+  SECTION("Chunk boundary (>256 KiB) with CRLF and random group access")
+  {
+    TempFileGuard tmp("pylimer_test_dump_large_crlf.lammpstrj");
+    std::string content;
+    content.reserve(300 * 1024);
+    // Step 0: enough atoms to exceed 256 KiB scan buffer
+    const int nAtoms = 12000;
+    content += "ITEM: TIMESTEP\r\n0\r\n";
+    content += "ITEM: NUMBER OF ATOMS\r\n" + std::to_string(nAtoms) + "\r\n";
+    content +=
+      "ITEM: BOX BOUNDS pp pp pp\r\n0.0 10.0\r\n0.0 10.0\r\n0.0 10.0\r\n";
+    content += "ITEM: ATOMS id type x y z ix iy iz\r\n";
+    for (int i = 1; i <= nAtoms; ++i) {
+      content += std::to_string(i) + " 1 1.0 2.0 3.0 0 0 0\r\n";
+    }
+    // Step 1 after 256 KiB boundary
+    content += "ITEM: TIMESTEP\r\n42\r\n";
+    content += "ITEM: NUMBER OF ATOMS\r\n1\r\n";
+    content +=
+      "ITEM: BOX BOUNDS pp pp pp\r\n0.0 10.0\r\n0.0 10.0\r\n0.0 10.0\r\n";
+    content += "ITEM: ATOMS id type x y z ix iy iz\r\n";
+    content += "9999 2 4.0 5.0 6.0 1 -1 2\r\n";
+    REQUIRE(content.size() > 260 * 1024);
+    tmp.writeBinary(content);
+
+    pu::DumpFileParser parser(tmp.path.string());
+    REQUIRE(parser.getLength() == 2);
+    CHECK(parser.readTimeSteps() == std::vector<long int>{ 0, 42 });
+
+    // Random access in reverse order + forgetAt
+    parser.readGroupByIdx(1);
+    CHECK(parser.getValuesForAt<long int>(1, "ATOMS", "id") ==
+          std::vector<long int>{ 9999 });
+    CHECK(parser.getValuesForAt<int>(1, "ATOMS", "ix") ==
+          std::vector<int>{ 1 });
+    parser.forgetAt(1);
+    CHECK(parser.getValuesForAt<long int>(0, "TIMESTEP", 0) ==
+          std::vector<long int>{ 0 });
+    CHECK(parser.getValuesForAt<long int>(1, "TIMESTEP", 0) ==
+          std::vector<long int>{ 42 });
+  }
+
+  SECTION("Truncated and closed-file error handling")
+  {
+    TempFileGuard truncatedTimestep("pylimer_test_dump_trunc_ts.lammpstrj");
+    truncatedTimestep.writeBinary("ITEM: TIMESTEP\r\n");
+    pu::DumpFileParser p1(truncatedTimestep.path.string());
+    CHECK_THROWS_AS(p1.readTimeSteps(), std::runtime_error);
+
+    TempFileGuard truncatedBox("pylimer_test_dump_trunc_box.lammpstrj");
+    truncatedBox.writeBinary(
+      "ITEM: TIMESTEP\n0\nITEM: BOX BOUNDS pp pp pp\n0 1\n");
+    pu::DumpFileParser p2(truncatedBox.path.string());
+    CHECK_THROWS_AS(p2.readBoxes(), std::runtime_error);
+
+    TempFileGuard truncatedAtoms("pylimer_test_dump_trunc_atoms.lammpstrj");
+    truncatedAtoms.writeBinary("ITEM: TIMESTEP\n0\nITEM: NUMBER OF ATOMS\n2\n"
+                               "ITEM: BOX BOUNDS pp pp pp\n0 1\n0 1\n0 1\n"
+                               "ITEM: ATOMS id type x y z\n1 1 0.1 0.2 0.3\n");
+    pu::DumpFileParser p3(truncatedAtoms.path.string());
+    CHECK_THROWS_AS(p3.readAtoms(), std::runtime_error);
+
+    p3.finish();
+    CHECK_THROWS_AS(p3.readGroupByIdx(0), std::runtime_error);
+
+    TempFileGuard emptyDump("pylimer_test_dump_empty.lammpstrj");
+    emptyDump.writeBinary("   # comment only\r\n\r\n");
+    pu::DumpFileParser pEmpty(emptyDump.path.string());
+    CHECK(pEmpty.getLength() == 0);
+    CHECK(pEmpty.readTimeSteps().empty());
+    CHECK_NOTHROW(pEmpty.read());
+
+    TempFileGuard malformedAtom("pylimer_test_dump_bad_atom.lammpstrj");
+    malformedAtom.writeBinary("ITEM: TIMESTEP\n0\nITEM: NUMBER OF ATOMS\n1\n"
+                              "ITEM: BOX BOUNDS pp pp pp\n0 10\n0 10\n0 10\n"
+                              "ITEM: ATOMS id type x y z ix iy iz\n"
+                              "1 1 0.5 0.5\n");
+    pu::DumpFileParser pBadAtom(malformedAtom.path.string());
+    CHECK_THROWS_AS(pBadAtom.readAtoms(), std::runtime_error);
+  }
+
+  SECTION("Scaled coordinates respect non-zero lower box bounds and 64-bit IDs")
+  {
+    TempFileGuard tmp("pylimer_test_dump_shifted_box.lammpstrj");
+    tmp.writeBinary("ITEM: TIMESTEP\n10\n"
+                    "ITEM: NUMBER OF ATOMS\n1\n"
+                    "ITEM: BOX BOUNDS pp pp pp\n"
+                    "-5.0 5.0\n"
+                    "2.0 12.0\n"
+                    "-10.0 0.0\n"
+                    "ITEM: ATOMS id type xs ys zs\n"
+                    "5000000000 2 0.5 0.25 0.8\n");
+
+    pu::DumpFileParser parser(tmp.path.string());
+    const std::vector<std::vector<pe::Atom>> atoms = parser.readAtoms();
+    REQUIRE(atoms.size() == 1);
+    REQUIRE(atoms[0].size() == 1);
+    CHECK(atoms[0][0].getId() == 5000000000L);
+    CHECK(atoms[0][0].getType() == 2);
+    CHECK(atoms[0][0].getX() == Catch::Approx(0.0));
+    CHECK(atoms[0][0].getY() == Catch::Approx(4.5));
+    CHECK(atoms[0][0].getZ() == Catch::Approx(-2.0));
+  }
+}
+
+TEST_CASE("DataFileParser handles boundary cases",
+          "[utils][DataFileParser][io]")
+{
+  SECTION("CRLF vs LF equivalence with comments, tabs, and all sections")
+  {
+    const std::string lfContent = "LAMMPS data file comment\n"
+                                  "\n"
+                                  "3 atoms # total atoms\n"
+                                  "2 bonds\n"
+                                  "1 angles\n"
+                                  "0 dihedrals\n"
+                                  "2 atom types\n"
+                                  "1 bond types\n"
+                                  "1 angle types\n"
+                                  "\n"
+                                  "-5.0 5.0 xlo xhi # x bounds\n"
+                                  "0.0 1.0e1 ylo yhi\n"
+                                  "-2.5 7.5 zlo zhi\n"
+                                  "\n"
+                                  "Masses # bead masses\n"
+                                  "\n"
+                                  "1 1.0 # type 1\n"
+                                  "2\t2.5 # type 2\n"
+                                  "\n"
+                                  "Atoms # bond\n"
+                                  "\n"
+                                  "1 1 1 0.5 1.5 2.5 0 1 -1\n"
+                                  "2\t1\t2\t1.5\t2.5\t3.5\t1\t0\t0\n"
+                                  "3 2 1 -1.0 0.0 4.0 0 0 1\n"
+                                  "\n"
+                                  "Velocities # out of atom-id order\n"
+                                  "\n"
+                                  "3 0.3 0.6 0.9\n"
+                                  "1 0.1 0.2 0.3\n"
+                                  "2 0.2 0.4 0.6\n"
+                                  "\n"
+                                  "Bonds\n"
+                                  "\n"
+                                  "1 1 1 2\n"
+                                  "2 1 2 3\n"
+                                  "\n"
+                                  "Angles\n"
+                                  "\n"
+                                  "1 1 1 2 3\n";
+
+    std::string crlfContent;
+    crlfContent.reserve(lfContent.size() + 64);
+    for (const char c : lfContent) {
+      if (c == '\n') {
+        crlfContent.push_back('\r');
+      }
+      crlfContent.push_back(c);
+    }
+
+    TempFileGuard lfTmp("pylimer_test_data_lf.out");
+    TempFileGuard crlfTmp("pylimer_test_data_crlf.out");
+    lfTmp.writeBinary(lfContent);
+    crlfTmp.writeBinary(crlfContent);
+
+    pu::DataFileParser lfParser;
+    pu::DataFileParser crlfParser;
+    lfParser.read(lfTmp.path.string());
+    crlfParser.read(crlfTmp.path.string());
+
+    CHECK(crlfParser.getNrOfAtoms() == 3);
+    CHECK(crlfParser.getNrOfBonds() == 2);
+    CHECK(crlfParser.getNrOfAngles() == 1);
+    CHECK(crlfParser.getNrOfDihedralAngles() == 0);
+    CHECK(crlfParser.getLowX() == Catch::Approx(-5.0));
+    CHECK(crlfParser.getHighX() == Catch::Approx(5.0));
+    CHECK(crlfParser.getLx() == Catch::Approx(10.0));
+    CHECK(crlfParser.getLy() == Catch::Approx(10.0));
+    CHECK(crlfParser.getLz() == Catch::Approx(10.0));
+
+    CHECK(crlfParser.getAtomIds() == lfParser.getAtomIds());
+    CHECK(crlfParser.getMoleculeIds() == lfParser.getMoleculeIds());
+    CHECK(crlfParser.getAtomTypes() == lfParser.getAtomTypes());
+    CHECK(crlfParser.getAtomX() == lfParser.getAtomX());
+    CHECK(crlfParser.getAtomY() == lfParser.getAtomY());
+    CHECK(crlfParser.getAtomZ() == lfParser.getAtomZ());
+    CHECK(crlfParser.getAtomNx() == lfParser.getAtomNx());
+    CHECK(crlfParser.getAtomNy() == lfParser.getAtomNy());
+    CHECK(crlfParser.getAtomNz() == lfParser.getAtomNz());
+    CHECK(crlfParser.getMasses() == lfParser.getMasses());
+    CHECK(crlfParser.getBondFrom() == lfParser.getBondFrom());
+    CHECK(crlfParser.getBondTo() == lfParser.getBondTo());
+    CHECK(crlfParser.getAngleFrom() == lfParser.getAngleFrom());
+    CHECK(crlfParser.getAngleVia() == lfParser.getAngleVia());
+    CHECK(crlfParser.getAngleTo() == lfParser.getAngleTo());
+    // Velocities must be reordered to match atomIds [1, 2, 3]
+    CHECK(crlfParser.getAdditionalAtomData().at("vx") ==
+          std::vector<double>{ 0.1, 0.2, 0.3 });
+    CHECK(crlfParser.getAdditionalAtomData().at("vy") ==
+          std::vector<double>{ 0.2, 0.4, 0.6 });
+    CHECK(crlfParser.getAdditionalAtomData().at("vz") ==
+          std::vector<double>{ 0.3, 0.6, 0.9 });
+  }
+
+  SECTION("No trailing newline at EOF, zero bonds, and explicit atom style")
+  {
+    TempFileGuard tmp("pylimer_test_data_no_eof_nl.out");
+    tmp.writeBinary("Header\r\n"
+                    "2 atoms\r\n"
+                    "1 atom types\r\n"
+                    "0.0 5.0 xlo xhi\r\n"
+                    "0.0 5.0 ylo yhi\r\n"
+                    "0.0 5.0 zlo zhi\r\n"
+                    "\r\n"
+                    "Masses\r\n"
+                    "\r\n"
+                    "1 1.0\r\n"
+                    "\r\n"
+                    "Atoms\r\n"
+                    "\r\n"
+                    "1 1 0.1 0.2 0.3 0 0 0\r\n"
+                    "2 1 1.1 1.2 1.3 0 0 0");
+
+    pu::DataFileParser parser;
+    parser.read(tmp.path.string(), pu::AtomStyle::ATOMIC);
+    CHECK(parser.getNrOfAtoms() == 2);
+    CHECK(parser.getNrOfBonds() == 0);
+    CHECK(parser.getAtomIds() == std::vector<long int>{ 1, 2 });
+    CHECK(parser.getAtomX() == std::vector<double>{ 0.1, 1.1 });
+  }
+
+  SECTION("Malformed and truncated data files throw descriptive errors")
+  {
+    TempFileGuard badMass("pylimer_test_data_bad_mass.out");
+    badMass.writeBinary("Header\n1 atoms\n1 atom types\n"
+                        "0 1 xlo xhi\n0 1 ylo yhi\n0 1 zlo zhi\n\n"
+                        "Masses\n\n1 1.0 2.0\n\nAtoms\n\n1 1 1 0 0 0 0 0 0\n");
+    pu::DataFileParser p1;
+    CHECK_THROWS_AS(p1.read(badMass.path.string()), std::runtime_error);
+
+    TempFileGuard truncAtoms("pylimer_test_data_trunc_atoms.out");
+    truncAtoms.writeBinary(
+      "Header\n2 atoms\n1 atom types\n"
+      "0 1 xlo xhi\n0 1 ylo yhi\n0 1 zlo zhi\n\n"
+      "Masses\n\n1 1.0\n\nAtoms # atomic\n\n1 1 0 0 0 0 0 0\n");
+    pu::DataFileParser p2;
+    CHECK_THROWS_AS(p2.read(truncAtoms.path.string()), std::runtime_error);
+
+    TempFileGuard truncBonds("pylimer_test_data_trunc_bonds.out");
+    truncBonds.writeBinary(
+      "Header\n2 atoms\n2 bonds\n1 atom types\n1 bond types\n"
+      "0 1 xlo xhi\n0 1 ylo yhi\n0 1 zlo zhi\n\n"
+      "Masses\n\n1 1.0\n\nAtoms # atomic\n\n"
+      "1 1 0 0 0 0 0 0\n2 1 0 0 0 0 0 0\n\nBonds\n\n1 1 1 2\n");
+    pu::DataFileParser p3;
+    CHECK_THROWS_AS(p3.read(truncBonds.path.string()), std::runtime_error);
+  }
+
+  SECTION("Auto-detected Atoms # style, optional Masses, section order, and "
+          "parser reuse")
+  {
+    TempFileGuard autoFullTmp("pylimer_test_data_autofull.out");
+    autoFullTmp.writeBinary(
+      "Title mentioning 999 atoms and Masses keyword\n"
+      "2 atoms\n"
+      "0 bonds\n"
+      "1 angles\n"
+      "1 atom types\n"
+      "1 angle types\n"
+      "-5.0 5.0 xlo xhi\n"
+      "-5.0 5.0 ylo yhi\n"
+      "-5.0 5.0 zlo zhi\n\n"
+      "Pair Coeffs # lj/cut\n\n"
+      "1 1.0 1.0\n\n"
+      "Velocities\n\n"
+      "2 0.4 0.5 0.6\n"
+      "1 0.1 0.2 0.3\n\n"
+      "# Bonds in a comment must not trigger bond parsing\n"
+      "Bonds\n\n"
+      "Atoms # full\n\n"
+      "1 10 1 -0.5 1.0 2.0 3.0\n"
+      "2 10 1 +0.5 -1.0 -2.0 -3.0\n\n"
+      "Angles\n\n"
+      "7 1 1 2 1\n");
+
+    pu::DataFileParser parser;
+    // Default atomStyle is ANGLE, so # full auto-detection must kick in
+    parser.read(autoFullTmp.path.string());
+    REQUIRE(parser.getNrOfAtoms() == 2);
+    CHECK(parser.getNrOfBonds() == 0);
+    CHECK(parser.getBondIds().empty());
+    REQUIRE(parser.getNrOfAngles() == 1);
+    CHECK(parser.getAngleIds() == std::vector<long int>{ 7 });
+    CHECK(parser.getMoleculeIds() == std::vector<int>{ 10, 10 });
+    CHECK(parser.getAdditionalAtomData().at("charge") ==
+          std::vector<double>{ -0.5, 0.5 });
+    CHECK(parser.getAtomNx() == std::vector<int>{ 0, 0 });
+    CHECK(parser.getAdditionalAtomData().at("vx") ==
+          std::vector<double>{ 0.1, 0.4 });
+
+    // Reusing the same parser instance must reset all previous state
+    TempFileGuard hybridTmp("pylimer_test_data_hybrid.out");
+    hybridTmp.writeBinary("Hybrid data file\n"
+                          "1 atoms\n"
+                          "1 atom types\n"
+                          "0 10 xlo xhi\n0 10 ylo yhi\n0 10 zlo zhi\n\n"
+                          "Masses\n\n1 1.0\n\n"
+                          "Atoms # hybrid bond edpd\n\n"
+                          "5 1 1.0 2.0 3.0 7 300.0 1.25\n");
+
+    parser.read(hybridTmp.path.string());
+    REQUIRE(parser.getNrOfAtoms() == 1);
+    CHECK(parser.getNrOfAngles() == 0);
+    CHECK(parser.getAngleIds().empty());
+    CHECK(parser.getAtomIds() == std::vector<long int>{ 5 });
+    CHECK(parser.getMoleculeIds() == std::vector<int>{ 7 });
+    CHECK(parser.getAtomNx() == std::vector<int>{ 0 });
+    CHECK(parser.getAdditionalAtomData().find("charge") ==
+          parser.getAdditionalAtomData().end());
+    CHECK(parser.getAdditionalAtomData().at("edpd_temp") ==
+          std::vector<double>{ 300.0 });
+    CHECK(parser.getAdditionalAtomData().at("edpd") ==
+          std::vector<double>{ 1.25 });
+  }
+}
+
+TEST_CASE("IO readers benchmark", "[benchmark][io_benchmark][.benchmark]")
+{
+  const size_t nDataAtoms = 50000;
+  TempFileGuard dataTmp("pylimer_bench_data.out");
+  {
+    std::string buf;
+    buf.reserve(nDataAtoms * 120);
+    buf += "LAMMPS data file\n\n";
+    buf += std::to_string(nDataAtoms) + " atoms\n";
+    buf += std::to_string(nDataAtoms - 1) + " bonds\n";
+    buf += "1 atom types\n1 bond types\n";
+    buf += "0.0 100.0 xlo xhi\n0.0 100.0 ylo yhi\n0.0 100.0 zlo zhi\n\n";
+    buf += "Masses\n\n1 1.0\n\nAtoms # full\n\n";
+    for (size_t i = 1; i <= nDataAtoms; ++i) {
+      buf += std::to_string(i) + " 1 1 0.1 1.25 2.5 3.75 0 0 0\n";
+    }
+    buf += "\nBonds\n\n";
+    for (size_t i = 1; i < nDataAtoms; ++i) {
+      buf += std::to_string(i) + " 1 " + std::to_string(i) + " " +
+             std::to_string(i + 1) + "\n";
+    }
+    buf += "\nVelocities\n\n";
+    for (size_t i = 1; i <= nDataAtoms; ++i) {
+      buf += std::to_string(i) + " 0.01 -0.02 0.03\n";
+    }
+    dataTmp.writeBinary(buf);
+  }
+
+  const size_t nFrames = 5;
+  const size_t nDumpAtoms = 20000;
+  TempFileGuard dumpStdTmp("pylimer_bench_dump_std.lammpstrj");
+  TempFileGuard dumpExtraTmp("pylimer_bench_dump_extra.lammpstrj");
+  {
+    std::string bufStd;
+    std::string bufExtra;
+    bufStd.reserve(nFrames * nDumpAtoms * 45);
+    bufExtra.reserve(nFrames * nDumpAtoms * 50);
+    for (size_t f = 0; f < nFrames; ++f) {
+      const std::string hdr = "ITEM: TIMESTEP\n" + std::to_string(f * 1000) +
+                              "\nITEM: NUMBER OF ATOMS\n" +
+                              std::to_string(nDumpAtoms) +
+                              "\nITEM: BOX BOUNDS pp pp pp\n"
+                              "0.0 100.0\n0.0 100.0\n0.0 100.0\n";
+      bufStd += hdr + "ITEM: ATOMS id type x y z ix iy iz\n";
+      bufExtra += hdr + "ITEM: ATOMS id type xu yu zu vx vy vz\n";
+      for (size_t i = 1; i <= nDumpAtoms; ++i) {
+        bufStd += std::to_string(i) + " 1 1.25 2.5 3.75 0 1 -1\n";
+        bufExtra += std::to_string(i) + " 1 1.25 2.5 3.75 0.1 -0.2 0.3\n";
+      }
+    }
+    dumpStdTmp.writeBinary(bufStd);
+    dumpExtraTmp.writeBinary(bufExtra);
+  }
+
+  TempFileGuard dumpSingleTmp("pylimer_bench_dump_single.lammpstrj");
+  {
+    std::string bufSingle;
+    bufSingle.reserve(nDumpAtoms * 45);
+    bufSingle += "ITEM: TIMESTEP\n0\nITEM: NUMBER OF ATOMS\n" +
+                 std::to_string(nDumpAtoms) +
+                 "\nITEM: BOX BOUNDS pp pp pp\n"
+                 "0.0 100.0\n0.0 100.0\n0.0 100.0\n"
+                 "ITEM: ATOMS id type x y z ix iy iz\n";
+    for (size_t i = 1; i <= nDumpAtoms; ++i) {
+      bufSingle += std::to_string(i) + " 1 1.25 2.5 3.75 0 1 -1\n";
+    }
+    dumpSingleTmp.writeBinary(bufSingle);
+  }
+
+  const size_t nAveRows = 20000;
+  TempFileGuard aveTmp("pylimer_bench_ave.txt");
+  {
+    std::string bufAve;
+    bufAve.reserve(nAveRows * 45);
+    bufAve += "# Time-averaged data\n# TimeStep c1 c2 c3 c4 c5\n";
+    for (size_t i = 0; i < nAveRows; ++i) {
+      bufAve += std::to_string(i * 10) + " 1.1 2.2 3.3 4.4 5.5\n";
+    }
+    aveTmp.writeBinary(bufAve);
+  }
+
+  BENCHMARK("DataFileParser::read (50k atoms full + bonds + velocities)")
+  {
+    pu::DataFileParser p;
+    p.read(dataTmp.path.string(), pu::AtomStyle::FULL);
+    return p.getNrOfAtoms();
+  };
+
+  BENCHMARK("DumpFileParser::readAtoms (5x20k standard format)")
+  {
+    pu::DumpFileParser p(dumpStdTmp.path.string());
+    return p.readAtoms().size();
+  };
+
+  BENCHMARK("DumpFileParser::readDumpFileSections (5x20k extra cols)")
+  {
+    pu::DumpFileParser p(dumpExtraTmp.path.string());
+    return p
+      .readDumpFileSections(pu::ReadableDumpFileSections::TIMESTEP |
+                            pu::ReadableDumpFileSections::BOX |
+                            pu::ReadableDumpFileSections::ATOM |
+                            pu::ReadableDumpFileSections::EXTRA_ATOM)
+      .atoms.size();
+  };
+
+  BENCHMARK("DumpFileParser::read + getValuesForAt (20k atoms)")
+  {
+    pu::DumpFileParser p(dumpSingleTmp.path.string());
+    p.read();
+    return p.getValuesForAt<double>(0, "ATOMS", "x").size();
+  };
+
+  BENCHMARK("AveFileReader::getData (20k rows x 6 cols)")
+  {
+    pu::AveFileReader r(aveTmp.path.string());
+    return r.getData()[0].size();
+  };
 }

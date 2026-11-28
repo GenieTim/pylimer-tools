@@ -2449,6 +2449,8 @@ TEST_CASE(
   std::string inputFile = suspectedPath + "melt_83_a_100.structure.out";
   if (std::filesystem::exists(inputFile)) {
     std::cout << "Reading file " << inputFile << std::endl;
+    universeSeq.setDataFileAtomStyle(
+      { pu::AtomStyle::HYBRID, pu::AtomStyle::BOND, pu::AtomStyle::EDPD });
     universeSeq.initializeFromDataSequence({ { inputFile } });
     pe::Universe universe = universeSeq.atIndex(0);
     std::cout << "Read file " << inputFile << std::endl;

@@ -2,6 +2,28 @@
 
 ## main
 
+### C++ I/O Parser Unification, Const-Correctness & Robustness Improvements (`DataFileParser`, `DumpFileParser`, `AveFileReader`, `StringUtils`)
+- **Breaking Changes**:
+  - **`DataFileParser` (`DataFileReader`)**:
+    - All vector and map getters (`getAtomIds`, `getMoleculeIds`, `getAtomTypes`, `getAtomX`, `getAtomY`, `getAtomZ`, `getAtomNx`, `getAtomNy`, `getAtomNz`, `getMasses`, `getBondTypes`, `getBondFrom`, `getBondTo`, `getAngleTypes`, `getAngleFrom`, `getAngleVia`, `getAngleTo`, `getDihedralAngleTypes`, `getDihedralAngleFrom`, `getDihedralAngleVia1`, `getDihedralAngleVia2`, `getDihedralAngleTo`, `getAdditionalAtomData`, plus new `getBondIds`, `getAngleIds`, `getDihedralAngleIds`) are now `const`-qualified and return `const &` references instead of copies.
+    - Calling `DataFileParser::read` on an already-used instance now resets previously parsed state instead of appending to prior data.
+    - `DataFileParser` and `parseNumericToken` now strictly validate token boundaries, integer bounds, and exact field counts (with or without all 3 trailing image flags), raising `std::runtime_error` on mismatched `AtomStyle` formats (e.g., floating-point coordinates in integer type/molecule-ID columns) instead of partially consuming tokens and silently corrupting subsequent columns.
+    - Removed private per-style `readAtom*` methods and `DataFileParser::parseTypesInLine` in favor of descriptor-driven `readAtomsSection` and shared `pylimer_tools::utils::parseTypesInLine` / `parseNumericToken`.
+    - Removed the unused transitive `#include "../io/DataFileParser.h"` from `Atom.h`; translation units using `DataFileParser` must include `DataFileParser.h` directly.
+  - **`AveFileReader`**:
+    - `AveFileReader::getColumnNames()`, `getData()`, and `getFilePath()` now return `const &` references instead of by-value copies, and the `AveFileReader(const std::string&)` constructor is now `explicit`.
+    - Header column names are now split on arbitrary whitespace rather than single `' '` characters (no longer producing empty `""` column names when headers contain multiple spaces or tabs).
+  - **`DumpFileParser` (`DumpFileReader`) & `UniverseSequence`**:
+    - `DumpFileParser::getLength()` now returns `0` (instead of `1`) for empty or comment-only dump files, and `DumpFileParser(const std::string&)` is now `explicit`.
+    - Scaled dump coordinates (`xs`, `ys`, `zs`, `xsu`, `ysu`, `zsu`) in `DumpFileParser::readDumpFileSections` and `UniverseSequence` now include the lower box bound offset ($x = x_{\text{lo}} + x_s L_x$) per the LAMMPS specification instead of $x_s L_x$, and `UniverseSequence` preserves `low..high` box bounds from the data file when `BOX BOUNDS` is omitted from the dump file.
+    - `DumpFileParser::hasKey`, `keyHasColumn`, `keyHasDirectionalColumn`, `getValuesForAt`, `getStringValuesForAt`, `getNumericValuesForAt`, and `getFilePath` now use `const std::string&`, and `keyHasColumn` / `keyHasDirectionalColumn` are now `const`-qualified.
+    - Removed private `DumpFileParser::parseTypesInLine` in favor of `pylimer_tools::utils::parseTypesInLine`.
+- **Correctness, Performance & Unification Improvements**:
+  - Fix `DataFileParser` `Atoms # <style>` comment auto-detection (including `Atoms # hybrid <style1> <style2>`), which was previously stripped when `Atoms` followed `Masses`, and support optional `Masses` sections, arbitrary section ordering (including `Velocities` before `Atoms` and skipping `Coeffs`/`Impropers`/`Labels`), LAMMPS title-line skipping, and comment-safe section matching.
+  - Replace `sscanf` and `std::stringstream` parsing across `DataFileParser`, `DumpFileParser`, and `AveFileReader` with validated `parseNumericToken` (checking token boundaries, integer bounds, and unsigned sign rejection), and optimize `DataFileParser::readVelocities` to a single-pass $O(1)$ fast path when velocity entries match `Atoms` order.
+  - Eliminate redundant full-result copies in `DumpFileParser::readDumpFileSections` and `UniverseSequence`, preserve 64-bit `long int` atom IDs in `DumpFileParser::readDumpFileSections`, and handle CRLF line endings, missing trailing newlines, blank lines, and single-pass fresh autocorrelation in `AveFileReader`, `DataFileParser`, and `DumpFileParser`.
+  - Unify `CsvTokenizer` constructors in `StringUtils.h` and fix `std::out_of_range` on empty or whitespace-only inputs.
+
 ### Unified MEHP Architecture (`MEHPSimulator`, `MEHPNetwork`, `MEHPSolver`, `MEHPForceEvaluator`)
 - **Breaking Changes**:
   - **Unified Simulator (`MEHPSimulator`)**: Removed `MEHPForceRelaxation`, `MEHPForceBalance`, and `MEHPForceBalance2` (`MEHPForceRelaxation.h/.cpp`, `MEHPForceBalance.h/.cpp`, `MEHPForceBalance2.h/.cpp`). All phantom force relaxation, fixed-entanglement linear/nonlinear force balance, and sliding slip-link relaxation workflows are now unified in `MEHPSimulator` (`pylimer_tools_cpp.MEHPSimulator`).

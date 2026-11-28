@@ -11,6 +11,57 @@
 
 namespace pylimer_tools::utils {
 
+std::ifstream
+AveFileReader::openFile() const
+{
+  std::ifstream file(this->filePath);
+  if (!file) {
+    throw std::runtime_error("Failed open file " + this->filePath);
+  }
+  return file;
+}
+
+void
+AveFileReader::readHeaderFromStream(std::ifstream& file,
+                                    std::string& firstDataLine,
+                                    bool& hasFirstDataLine)
+{
+  std::string line;
+  std::string lastHeaderLine;
+  int headerRowCount = 0;
+  hasFirstDataLine = false;
+  firstDataLine.clear();
+
+  while (std::getline(file, line)) {
+    const std::string_view trimmed =
+      pylimer_tools::utils::trimWhitespaceView(line);
+    if (trimmed.empty()) {
+      continue;
+    }
+    if (trimmed.front() == '#') {
+      headerRowCount += 1;
+      lastHeaderLine.assign(trimmed.data(), trimmed.size());
+    } else {
+      firstDataLine = std::move(line);
+      hasFirstDataLine = true;
+      break;
+    }
+  }
+
+  if (this->numHeaderRows < 0) {
+    this->numHeaderRows = headerRowCount;
+  }
+  if (this->columnNames.empty() && !lastHeaderLine.empty()) {
+    const std::vector<std::string_view> nameViews =
+      pylimer_tools::utils::splitWhitespaceView(
+        std::string_view(lastHeaderLine).substr(1));
+    this->columnNames.reserve(nameViews.size());
+    for (const std::string_view nameView : nameViews) {
+      this->columnNames.emplace_back(nameView);
+    }
+  }
+}
+
 /**
  * @brief Count the number of lines with data
  *
@@ -19,26 +70,17 @@ namespace pylimer_tools::utils {
 int
 AveFileReader::getNrOfRows()
 {
-  if (this->numRows > 0) {
+  if (this->numRows >= 0) {
     return this->numRows;
   }
-  std::ifstream in_stream(this->filePath);
-  if (!in_stream) {
-    throw std::runtime_error("Failed open file " + this->filePath);
-  }
-
-  int count = 0;
+  std::ifstream inStream = this->openFile();
   std::string line;
+  bool hasFirstDataLine = false;
+  this->readHeaderFromStream(inStream, line, hasFirstDataLine);
 
-  // skip all header lines
-  while (getline(in_stream, line)) {
-    if (line.at(0) != '#') {
-      count += line.size() > 0;
-      break;
-    }
-  }
-  while (getline(in_stream, line)) {
-    if (line.size() > 0) {
+  int count = hasFirstDataLine ? 1 : 0;
+  while (std::getline(inStream, line)) {
+    if (!pylimer_tools::utils::trimLineOmitCommentView(line).empty()) {
       count += 1;
     }
   }
@@ -55,64 +97,34 @@ AveFileReader::getNrOfRows()
 int
 AveFileReader::getNrOfHeaderRows()
 {
-  if (this->numHeaderRows > 0) {
+  if (this->numHeaderRows >= 0) {
     return this->numHeaderRows;
   }
 
-  std::ifstream file(this->filePath);
-  if (!file) {
-    throw std::runtime_error("Failed open file " + this->filePath);
-  }
-
-  std::string line;
-  int count = 0;
-  while (getline(file, line)) {
-    if (line.at(0) == '#') {
-      count += 1;
-    } else {
-      break;
-    }
-  }
-
-  this->numHeaderRows = count;
-  return count;
+  std::ifstream file = this->openFile();
+  std::string firstDataLine;
+  bool hasFirstDataLine = false;
+  this->readHeaderFromStream(file, firstDataLine, hasFirstDataLine);
+  return this->numHeaderRows;
 }
 
 /**
  * @brief Find the columns from the header
  *
- * @return std::vector<std::string>
+ * @return const std::vector<std::string>&
  */
-std::vector<std::string>
+const std::vector<std::string>&
 AveFileReader::getColumnNames()
 {
-  if (this->columnNames.size() > 0) {
+  if (!this->columnNames.empty()) {
     return this->columnNames;
   }
 
-  std::ifstream file(this->filePath);
-  if (!file) {
-    throw std::runtime_error("Failed open file " + this->filePath);
-  }
-
-  std::string line;
-  std::string lastLine;
-  while (getline(file, line)) {
-    if (line.size() == 0) {
-      break;
-    }
-    if (line.at(0) == '#') {
-      lastLine = line;
-    } else {
-      break;
-    }
-  }
-
-  RUNTIME_EXP_IFN(lastLine.size() > 0, "Detected header line is empty.");
-
-  std::string headerLine =
-    pylimer_tools::utils::trim(lastLine.substr(1, lastLine.size() - 1));
-  this->columnNames = pylimer_tools::utils::split(headerLine, ' ');
+  std::ifstream file = this->openFile();
+  std::string firstDataLine;
+  bool hasFirstDataLine = false;
+  this->readHeaderFromStream(file, firstDataLine, hasFirstDataLine);
+  RUNTIME_EXP_IFN(!this->columnNames.empty(), "Detected header line is empty.");
   return this->columnNames;
 }
 
@@ -137,49 +149,52 @@ AveFileReader::readData()
     return;
   }
 
-  const size_t nRows = static_cast<size_t>(std::max(0, this->getNrOfRows()));
-  const size_t nCols = static_cast<size_t>(std::max(0, this->getNrOfColumns()));
+  std::ifstream file = this->openFile();
+  std::string line;
+  bool hasFirstDataLine = false;
+  this->readHeaderFromStream(file, line, hasFirstDataLine);
+  RUNTIME_EXP_IFN(!this->columnNames.empty(), "Detected header line is empty.");
+
+  const size_t nCols = this->columnNames.size();
   std::vector<std::vector<double>> results =
     pylimer_tools::utils::initializeWithValue(nCols, std::vector<double>());
-  for (size_t i = 0; i < nCols; ++i) {
-    results[i].reserve(nCols);
-  }
-
-  std::ifstream file(this->filePath);
-  if (!file) {
-    throw std::runtime_error("Failed open file " + this->filePath);
-  }
-
-  std::string line;
-  const size_t nHeaderRows =
-    static_cast<size_t>(std::max(0, this->getNrOfHeaderRows()));
-  for (size_t i = 0; i < nHeaderRows; ++i) {
-    RUNTIME_EXP_IFN(std::getline(file, line),
-                    "File ended before data was even reached");
-  }
-
-  for (size_t i = 0; i < nRows; ++i) {
-    if (!std::getline(file, line)) {
-      if (i + 1 < nRows) {
-        throw std::runtime_error(
-          "File ended before all rows could be read (reached row " +
-          std::to_string(i) + " of " + std::to_string(nRows) + ")");
-      } else {
-        break;
-      }
+  if (this->numRows > 0) {
+    const size_t nRows = static_cast<size_t>(this->numRows);
+    for (size_t i = 0; i < nCols; ++i) {
+      results[i].reserve(nRows);
     }
-    std::stringstream ss(line);
+  }
+
+  size_t rowIdx = 0;
+  const auto parseRow = [&](const std::string& rowLine) {
+    const std::string_view cleaned =
+      pylimer_tools::utils::trimLineOmitCommentView(rowLine);
+    if (cleaned.empty()) {
+      return;
+    }
+    const char* cursor = cleaned.data();
     for (size_t col = 0; col < nCols; ++col) {
-      double val;
-      if (ss >> val) {
+      double val = 0.0;
+      if (pylimer_tools::utils::parseNumericToken(cursor, val)) {
         results[col].push_back(val);
       } else {
         throw std::runtime_error("Failed to read col " + std::to_string(col) +
-                                 " on row " + std::to_string(i) + ".");
+                                 " on row " + std::to_string(rowIdx) + ".");
       }
     }
+    rowIdx += 1;
+  };
+
+  if (hasFirstDataLine) {
+    parseRow(line);
+  }
+  while (std::getline(file, line)) {
+    parseRow(line);
   }
 
+  if (this->numRows < 0) {
+    this->numRows = static_cast<int>(rowIdx);
+  }
   this->data = std::move(results);
   this->dataIsRead = true;
 }
@@ -187,9 +202,9 @@ AveFileReader::readData()
 /**
  * @brief Actually read the file's data
  *
- * @return std::vector<std::vector<double>>
+ * @return const std::vector<std::vector<double>>&
  */
-std::vector<std::vector<double>>
+const std::vector<std::vector<double>>&
 AveFileReader::getData()
 {
   if (!this->dataIsRead) {
@@ -239,13 +254,13 @@ std::vector<double>
 AveFileReader::autocorrelateColumn(const int column,
                                    const std::vector<size_t>& dts)
 {
-  INVALIDINDEX_EXP_IFN(column >= 0 && column < this->getNrOfColumns(),
-                       "Invalid column");
-
-  const Eigen::Index nRows = static_cast<Eigen::Index>(this->getNrOfRows());
+  INVALIDINDEX_EXP_IFN(column >= 0, "Invalid column");
   if (!this->dataIsRead) {
     this->readData();
   }
+  INVALIDINDEX_EXP_IFN(column < this->getNrOfColumns(), "Invalid column");
+
+  const Eigen::Index nRows = static_cast<Eigen::Index>(this->getNrOfRows());
   const size_t colIdx = static_cast<size_t>(column);
   const Eigen::Map<const Eigen::ArrayXd, Eigen::Unaligned> colData(
     this->data[colIdx].data(),
@@ -268,15 +283,15 @@ AveFileReader::autocorrelateColumnDifference(const int column1,
                                              const int column2,
                                              const std::vector<size_t>& dts)
 {
-  INVALIDINDEX_EXP_IFN(column1 >= 0 && column1 < this->getNrOfColumns(),
-                       "Invalid column");
-  INVALIDINDEX_EXP_IFN(column2 >= 0 && column2 < this->getNrOfColumns(),
-                       "Invalid column");
-
-  const Eigen::Index nRows = static_cast<Eigen::Index>(this->getNrOfRows());
+  INVALIDINDEX_EXP_IFN(column1 >= 0 && column2 >= 0, "Invalid column");
   if (!this->dataIsRead) {
     this->readData();
   }
+  INVALIDINDEX_EXP_IFN(column1 < this->getNrOfColumns() &&
+                         column2 < this->getNrOfColumns(),
+                       "Invalid column");
+
+  const Eigen::Index nRows = static_cast<Eigen::Index>(this->getNrOfRows());
   const size_t col1Idx = static_cast<size_t>(column1);
   const size_t col2Idx = static_cast<size_t>(column2);
   const Eigen::ArrayXd colData =

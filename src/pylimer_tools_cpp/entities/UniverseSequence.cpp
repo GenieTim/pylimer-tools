@@ -200,9 +200,12 @@ UniverseSequence::readDumpFileAtIndex(size_t universeIndex)
       Box(lo[0], hi[0], lo[1], hi[1], lo[2], hi[2]);
     newUniverse.setBox(box);
   } else {
-    newUniverse.setBoxLengths(this->dataFileParser.getLx(),
-                              this->dataFileParser.getLy(),
-                              this->dataFileParser.getLz());
+    newUniverse.setBox(Box(this->dataFileParser.getLowX(),
+                           this->dataFileParser.getHighX(),
+                           this->dataFileParser.getLowY(),
+                           this->dataFileParser.getHighY(),
+                           this->dataFileParser.getLowZ(),
+                           this->dataFileParser.getHighZ()));
   }
 
   std::string positionSuffix = "";
@@ -246,13 +249,17 @@ UniverseSequence::readDumpFileAtIndex(size_t universeIndex)
       std::to_string(positionsZ.size()) + "). Is the file defect?");
   };
   if (isScaled) {
-    const double lx = newUniverse.getBox().getLx();
-    const double ly = newUniverse.getBox().getLy();
-    const double lz = newUniverse.getBox().getLz();
+    const Box& box = newUniverse.getBox();
+    const double lowX = box.getLowX();
+    const double lowY = box.getLowY();
+    const double lowZ = box.getLowZ();
+    const double lx = box.getLx();
+    const double ly = box.getLy();
+    const double lz = box.getLz();
     for (size_t i = 0; i < positionsZ.size(); ++i) {
-      positionsX[i] *= lx;
-      positionsY[i] *= ly;
-      positionsZ[i] *= lz;
+      positionsX[i] = lowX + positionsX[i] * lx;
+      positionsY[i] = lowY + positionsY[i] * ly;
+      positionsZ[i] = lowZ + positionsZ[i] * lz;
     }
   }
 
@@ -444,14 +451,14 @@ UniverseSequence::computeDistanceFromToAtoms(
   INVALIDARG_EXP_IFN(atomIdsFrom.size() == atomIdsTo.size(),
                      "Same size from and to is required.");
 
-  pylimer_tools::utils::ReadDumpFileSections sections =
+  const pylimer_tools::utils::ReadDumpFileSections sections =
     this->dumpFileParser.readDumpFileSections(
       pylimer_tools::utils::ReadableDumpFileSections::TIMESTEP |
       pylimer_tools::utils::ReadableDumpFileSections::ATOM |
       pylimer_tools::utils::ReadableDumpFileSections::BOX);
-  std::vector<long int> timeSteps = sections.timesteps;
-  std::vector<Box> boxes = sections.boxes;
-  std::vector<std::vector<Atom>> atoms = sections.atoms;
+  const std::vector<long int>& timeSteps = sections.timesteps;
+  const std::vector<Box>& boxes = sections.boxes;
+  const std::vector<std::vector<Atom>>& atoms = sections.atoms;
 
   RUNTIME_EXP_IFN(timeSteps.size() == boxes.size(),
                   "Dump file seems inconsistent: read " +
@@ -524,14 +531,14 @@ UniverseSequence::computeVectorFromToAtoms(
   INVALIDARG_EXP_IFN(atomIdsFrom.size() == atomIdsTo.size(),
                      "Same size from and to is required.");
 
-  pylimer_tools::utils::ReadDumpFileSections sections =
+  const pylimer_tools::utils::ReadDumpFileSections sections =
     this->dumpFileParser.readDumpFileSections(
       pylimer_tools::utils::ReadableDumpFileSections::TIMESTEP |
       pylimer_tools::utils::ReadableDumpFileSections::ATOM |
       pylimer_tools::utils::ReadableDumpFileSections::BOX);
-  std::vector<long int> timeSteps = sections.timesteps;
-  std::vector<Box> boxes = sections.boxes;
-  std::vector<std::vector<Atom>> atoms = sections.atoms;
+  const std::vector<long int>& timeSteps = sections.timesteps;
+  const std::vector<Box>& boxes = sections.boxes;
+  const std::vector<std::vector<Atom>>& atoms = sections.atoms;
 
   RUNTIME_EXP_IFN(timeSteps.size() == boxes.size(),
                   "Dump file seems inconsistent: read " +
@@ -604,14 +611,14 @@ UniverseSequence::computeDistanceAutocorrelationFromToAtoms(
   INVALIDARG_EXP_IFN(atomIdsFrom.size() == atomIdsTo.size(),
                      "Same size from and to is required.");
 
-  pylimer_tools::utils::ReadDumpFileSections sections =
+  const pylimer_tools::utils::ReadDumpFileSections sections =
     this->dumpFileParser.readDumpFileSections(
       pylimer_tools::utils::ReadableDumpFileSections::TIMESTEP |
       pylimer_tools::utils::ReadableDumpFileSections::ATOM |
       pylimer_tools::utils::ReadableDumpFileSections::BOX);
-  std::vector<long int> timeSteps = sections.timesteps;
-  std::vector<Box> boxes = sections.boxes;
-  std::vector<std::vector<Atom>> atoms = sections.atoms;
+  const std::vector<long int>& timeSteps = sections.timesteps;
+  const std::vector<Box>& boxes = sections.boxes;
+  const std::vector<std::vector<Atom>>& atoms = sections.atoms;
 
   RUNTIME_EXP_IFN(timeSteps.size() == boxes.size(),
                   "Dump file seems inconsistent: read " +

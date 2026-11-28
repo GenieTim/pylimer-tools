@@ -142,6 +142,96 @@ class TestFileReader(PandasComparingTestCase):
         universe = universe_sequence2.at_index(0)
         self.assertEqual(universe.get_nr_of_atoms(), 12)
 
+    def test_lammps_crlf_and_no_trailing_newline(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_path = pl.Path(tmp_dir)
+            data_path = tmp_path / "crlf_data.out"
+            dump_path = tmp_path / "crlf_dump.lammpstrj"
+
+            data_bytes = (
+                b"LAMMPS data file\r\n"
+                b"2 atoms\r\n"
+                b"1 bonds\r\n"
+                b"1 atom types\r\n"
+                b"1 bond types\r\n"
+                b"0.0 10.0 xlo xhi\r\n"
+                b"0.0 10.0 ylo yhi\r\n"
+                b"0.0 10.0 zlo zhi\r\n"
+                b"\r\n"
+                b"Masses\r\n"
+                b"\r\n"
+                b"1 1.0\r\n"
+                b"\r\n"
+                b"Atoms # bond\r\n"
+                b"\r\n"
+                b"1 1 1 1.0 2.0 3.0 0 0 0\r\n"
+                b"2 1 1 4.0 5.0 6.0 0 0 0\r\n"
+                b"\r\n"
+                b"Bonds\r\n"
+                b"\r\n"
+                b"1 1 1 2"
+            )
+            data_path.write_bytes(data_bytes)
+
+            dump_bytes = (
+                b"ITEM: TIMESTEP\r\n"
+                b"15\r\n"
+                b"ITEM: NUMBER OF ATOMS\r\n"
+                b"2\r\n"
+                b"ITEM: BOX BOUNDS pp pp pp\r\n"
+                b"0.0 10.0\r\n"
+                b"0.0 10.0\r\n"
+                b"0.0 10.0\r\n"
+                b"ITEM: ATOMS id type x y z\r\n"
+                b"1 1 2.0 3.0 4.0\r\n"
+                b"2 1 5.0 6.0 7.0"
+            )
+            dump_path.write_bytes(dump_bytes)
+
+            universe = read_data_file(data_path, [AtomStyle.BOND])
+            self.assertEqual(universe.get_nr_of_atoms(), 2)
+            self.assertEqual(universe.get_nr_of_bonds(), 1)
+
+            seq = read_dump_file(data_path, dump_path, [AtomStyle.BOND])
+            self.assertEqual(len(seq), 1)
+            step_universe = seq.at_index(0)
+            self.assertEqual(step_universe.get_nr_of_atoms(), 2)
+            self.assertEqual(step_universe.get_nr_of_bonds(), 1)
+            self.assertAlmostEqual(step_universe.get_atom(1).get_x(), 2.0)
+
+            # Auto-detected Atoms # full without Masses + shifted box xs/ys/zs dump
+            shifted_data = tmp_path / "shifted_full.out"
+            shifted_dump = tmp_path / "shifted_scaled.lammpstrj"
+            shifted_data.write_bytes(
+                b"LAMMPS shifted box data\r\n"
+                b"1 atoms\r\n"
+                b"1 atom types\r\n"
+                b"-5.0 5.0 xlo xhi\r\n"
+                b"2.0 12.0 ylo yhi\r\n"
+                b"-10.0 0.0 zlo zhi\r\n"
+                b"\r\n"
+                b"Atoms # full\r\n"
+                b"\r\n"
+                b"1 1 1 -0.25 0.0 7.0 -5.0\r\n"
+            )
+            shifted_dump.write_bytes(
+                b"ITEM: TIMESTEP\r\n"
+                b"1\r\n"
+                b"ITEM: NUMBER OF ATOMS\r\n"
+                b"1\r\n"
+                b"ITEM: ATOMS id type xs ys zs\r\n"
+                b"1 1 0.5 0.25 0.8\r\n"
+            )
+            u_full = read_data_file(shifted_data)
+            self.assertEqual(u_full.get_nr_of_atoms(), 1)
+            self.assertAlmostEqual(u_full.get_atom(1).get_property("charge"), -0.25)
+
+            shifted_seq = read_dump_file(shifted_data, shifted_dump)
+            shifted_step = shifted_seq.at_index(0)
+            self.assertAlmostEqual(shifted_step.get_atom(1).get_x(), 0.0)
+            self.assertAlmostEqual(shifted_step.get_atom(1).get_y(), 4.5)
+            self.assertAlmostEqual(shifted_step.get_atom(1).get_z(), -2.0)
+
     def test_averages_reader(self):
         data_file = os.path.join(
             os.path.dirname(__file__), "../fixtures/example_avg_file.out.avg.txt"

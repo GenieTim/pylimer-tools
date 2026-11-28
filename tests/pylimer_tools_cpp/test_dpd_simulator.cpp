@@ -469,6 +469,8 @@ TEST_CASE("DPD Simulator Converts Correctly", "[analysis][DPDSimulator]")
   REQUIRE(std::filesystem::exists(inputFile));
   pe::UniverseSequence universeSequence = pe::UniverseSequence();
   REQUIRE(universeSequence.getLength() == 0);
+  universeSequence.setDataFileAtomStyle(
+    { pu::AtomStyle::HYBRID, pu::AtomStyle::BOND, pu::AtomStyle::EDPD });
   universeSequence.initializeFromDataSequence({ { inputFile } });
   REQUIRE(universeSequence.getLength() == 1);
   pe::Universe universe = universeSequence.atIndex(0);
@@ -745,6 +747,8 @@ TEST_CASE("DPD Simulator's restart files are accurate",
   if (std::filesystem::exists(inputFile)) {
     pe::UniverseSequence universeSequence = pe::UniverseSequence();
     REQUIRE(universeSequence.getLength() == 0);
+    universeSequence.setDataFileAtomStyle(
+      { pu::AtomStyle::HYBRID, pu::AtomStyle::BOND, pu::AtomStyle::EDPD });
     universeSequence.initializeFromDataSequence({ { inputFile } });
     REQUIRE(universeSequence.getLength() == 1);
     pe::Universe universe = universeSequence.atIndex(0);

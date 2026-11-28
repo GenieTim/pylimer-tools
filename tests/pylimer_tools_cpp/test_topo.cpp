@@ -613,6 +613,8 @@ TEST_CASE("randomlyFindEntanglementsV2 works in fast test",
                                 "/structure/melt_83_a_100.structure.out";
   REQUIRE(std::filesystem::exists(inputFile));
   pe::UniverseSequence universeSequence;
+  universeSequence.setDataFileAtomStyle(
+    { pu::AtomStyle::HYBRID, pu::AtomStyle::BOND, pu::AtomStyle::EDPD });
   universeSequence.initializeFromDataSequence({ { inputFile } });
   const pe::Universe universe = universeSequence.atIndex(0);
 
